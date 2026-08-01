@@ -15,6 +15,13 @@
       "url": "../localFirstTools/rappvision/channel.json",
       "repo": "https://github.com/kody-w/localFirstTools",
       "_why": "Origin-relative on purpose: kody-w.github.io serves every repo from one origin, so this resolves in production AND in local testing. It also keeps the player same-origin with the apps, which is what makes live replay possible."
+    },
+    {
+      "id": "learnwithkody",
+      "name": "Learn with Kody",
+      "url": "../learnwithkody/rappvision/channel.json",
+      "repo": "https://github.com/kody-w/kody-w.github.io",
+      "_why": "Origin-relative, like the others: the channel lives in the site repo next to the examples it documents, and still plays here."
     }
   ]
 }
