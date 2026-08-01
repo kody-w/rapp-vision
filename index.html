@@ -781,7 +781,7 @@ function viewChannel(id) {
       </div>
       <p style="margin-top:14px">${esc(c.tagline || "")}</p>
       <div class="toolbar" style="margin-top:14px">
-        ${(c.links || []).map(l => `<a class="tbtn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} \u2197</a>`).join("")}
+        ${(Array.isArray(c.links) ? c.links : []).map(l => `<a class="tbtn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} \u2197</a>`).join("")}
         <a class="tbtn" href="${esc(c._url)}" target="_blank" rel="noopener">channel.json \u2197</a>
       </div>
     </section>
@@ -918,6 +918,7 @@ $("#q").addEventListener("keydown", e => {
    resolve against its own URL, so a channel can live in any repo.    */
 
 function absolutise(url, base) {
+  if (!url) return "";                 // absolutise(undefined) used to yield ".../undefined" and a real 404
   try { return new URL(url, base).href; } catch { return url; }
 }
 
@@ -928,9 +929,16 @@ async function fetchChannel(entry) {
   const c = await r.json();
   c._url = url;
   c._repo = entry.repo || c.repo || "";
+  /* Be forgiving about shape. Anyone can publish a channel, so one typo in
+     someone else's JSON must not blank the network: `poster` is the obvious
+     name for a thumbnail and people reach for it, and `links` is just as
+     naturally written as an object as an array. Accept both, render one. */
+  if (c.links && !Array.isArray(c.links)) {
+    c.links = Object.keys(c.links).map(k => ({ label: k, url: c.links[k] }));
+  }
   (c.videos || []).forEach(v => {
     v._ch = c;
-    v.thumb = absolutise(v.thumb, url);
+    v.thumb = absolutise(v.thumb || v.poster, url);
     (v.sources || []).forEach(s => { s.src = absolutise(s.src, url); });
     if (v.live) (v.live.scenes || []).forEach(sc => {
       if (sc.app) sc.app = absolutise(sc.app, url);
