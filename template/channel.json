@@ -1,0 +1,81 @@
+{
+  "schema": "rapp-vision-channel/1.0",
+
+  "id": "my-channel",
+  "name": "My Channel",
+  "handle": "@your-github-handle",
+  "tagline": "One line about what this channel is.",
+  "avatar": "📺",
+
+  "links": [
+    { "label": "GitHub", "url": "https://github.com/your-github-handle" }
+  ],
+
+  "_howto": "Every src/thumb resolves RELATIVE TO THIS FILE'S URL. Put this file in any public repo, host media next to it, and RAPP Vision streams it straight off raw.githubusercontent / Pages. Absolute https:// URLs work too, so media may live in a different repo entirely.",
+
+  "videos": [
+    {
+      "id": "my-first-video",
+      "title": "My first video",
+      "description": "Line breaks are preserved, so write a real description.\n\nThis is what viewers read under the player.",
+      "published": "2026-01-01",
+      "duration": 123.4,
+      "width": 1920,
+      "height": 1080,
+      "orientation": "landscape",
+      "tags": ["demo", "howto"],
+      "thumb": "thumbs/my-first-video.jpg",
+      "sources": [
+        { "src": "media/my-first-video.mp4",  "type": "video/mp4; codecs=\"avc1.4D401F, mp4a.40.2\"" },
+        { "src": "media/my-first-video.webm", "type": "video/webm; codecs=\"vp9, opus\"" }
+      ],
+      "chapters": [
+        { "t": 0,    "label": "Intro" },
+        { "t": 42.5, "label": "The interesting part" }
+      ]
+    },
+
+    {
+      "id": "my-live-replay",
+      "_comment": "A video with no video file. The player drives a real web app in an iframe on a clock. Needs the app same-origin with the player (all your GitHub Pages repos share kody-w.github.io, so they are). Publish a static cut alongside as a fallback.",
+      "title": "A live replay, not a recording",
+      "description": "No sources. This is a script that replays interactions against the real app.",
+      "published": "2026-01-02",
+      "duration": 30,
+      "width": 1280,
+      "height": 800,
+      "orientation": "landscape",
+      "tags": ["live-replay"],
+      "thumb": "thumbs/my-live-replay.jpg",
+      "sources": [],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "t": 0, "dur": 6,
+            "card": { "title": "A title card", "sub": "Shown before the app loads", "note": "Optional small print." }
+          },
+          {
+            "t": 6, "dur": 24,
+            "app": "../my-app.html",
+            "lower": {
+              "title": "My App",
+              "bench": "vs Some Benchmark",
+              "bug": "What was wrong (shown in red)",
+              "fix": "The measurement that closed it (shown in green)"
+            },
+            "actions": [
+              { "at": 1,  "do": "click",   "text": "START" },
+              { "at": 2,  "do": "click",   "selector": "#some-button" },
+              { "at": 4,  "do": "keydown", "code": "KeyW" },
+              { "at": 9,  "do": "keyup",   "code": "KeyW" },
+              { "at": 10, "do": "key",     "code": "Enter" },
+              { "at": 12, "do": "type",    "text": "hello\n" },
+              { "at": 15, "do": "drag",    "from": [400, 300], "to": [700, 420] }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

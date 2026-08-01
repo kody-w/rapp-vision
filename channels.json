@@ -1,0 +1,20 @@
+{
+  "schema": "rapp-vision-network/1.0",
+  "name": "RAPP Vision Network",
+  "_note": "The network is just a list of channel.json URLs. Anyone can run their own registry, or add a channel locally in the UI without asking permission. Open a PR to be listed here.",
+  "channels": [
+    {
+      "id": "rock-tumbler",
+      "name": "Rock Tumbler",
+      "url": "channel.json",
+      "repo": "https://github.com/kody-w/rapp-vision"
+    },
+    {
+      "id": "localfirsttools",
+      "name": "Local First Tools",
+      "url": "../localFirstTools/rappvision/channel.json",
+      "repo": "https://github.com/kody-w/localFirstTools",
+      "_why": "Origin-relative on purpose: kody-w.github.io serves every repo from one origin, so this resolves in production AND in local testing. It also keeps the player same-origin with the apps, which is what makes live replay possible."
+    }
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "schema": "rapp-vision-channel/1.0",
+  "id": "rock-tumbler",
+  "name": "Rock Tumbler",
+  "handle": "@kody-w",
+  "tagline": "An agent's report of success is not evidence of success.",
+  "avatar": "🪨",
+  "links": [
+    {
+      "label": "GitHub",
+      "url": "https://github.com/kody-w"
+    },
+    {
+      "label": "Source repo",
+      "url": "https://github.com/kody-w/rapp-rock-tumbler"
+    }
+  ],
+  "_note": "Sources and thumbs resolve RELATIVE TO THIS FILE'S URL, so a channel works from any repo, any host.",
+  "videos": [
+    {
+      "id": "rock-tumbler-showcase",
+      "title": "I built 10 apps with AI sub-agents. All 10 said they worked. Nine were broken.",
+      "description": "Ten ambitious single-file browser applications, each benchmarked against a named commercial product — Gran Turismo, Ableton Live, macOS, Blender Cycles, Mesen, Breath of the Wild, Excel, Figma, Teardown. Every sub-agent ran its own checks. Every sub-agent reported success. Nine of the ten were still broken, and not one of those defects was reachable by node --check, a linter, or jsdom.\n\nThis is what an adversarial verification loop finds when it refuses to accept prose and demands a number instead.\n\nThe finding worth keeping: exactly one app shipped correct on the first attempt with zero correction loops — and it was the only one whose prompt carried an objective fail condition. If you can name the measurement, put it in the prompt, not in the review.\n\nThe one that worked was told: run the white furnace test — put the camera inside a uniformly emitting sphere with albedo 1.0, and if energy error exceeds 1%, your integrator is wrong. It came back at 0.49%.",
+      "published": "2026-08-01",
+      "duration": 219.5,
+      "width": 1920,
+      "height": 1080,
+      "orientation": "landscape",
+      "tags": [
+        "ai-agents",
+        "verification",
+        "testing",
+        "webdev",
+        "playwright",
+        "furnace-test"
+      ],
+      "thumb": "thumbs/rock-tumbler-showcase.jpg",
+      "sources": [
+        {
+          "src": "media/rock-tumbler-showcase.mp4",
+          "type": "video/mp4; codecs=\"avc1.4D401F, mp4a.40.2\""
+        },
+        {
+          "src": "media/rock-tumbler-showcase.webm",
+          "type": "video/webm; codecs=\"vp9, opus\""
+        }
+      ],
+      "chapters": [
+        {
+          "t": 0,
+          "label": "Nine of ten reported success while broken"
+        },
+        {
+          "t": 18.0,
+          "label": "Apex Driving Simulator — a 7.28° kink in the track"
+        },
+        {
+          "t": 45.5,
+          "label": "WebGPU Path Tracer — furnace test, 0.49% error"
+        },
+        {
+          "t": 67.8,
+          "label": "Fluid & Destruction Sandbox — dead on arrival"
+        },
+        {
+          "t": 84.0,
+          "label": "Open World Explorer — grass taller than the player"
+        },
+        {
+          "t": 97.6,
+          "label": "webOS Desktop — the whole UI at x = −1138"
+        },
+        {
+          "t": 119.9,
+          "label": "NES Emulator Studio — 2× speed on 120Hz"
+        },
+        {
+          "t": 138.6,
+          "label": "Browser DAW Studio — it exported silence"
+        },
+        {
+          "t": 155.0,
+          "label": "HyperSheet — text that would not spill"
+        },
+        {
+          "t": 168.9,
+          "label": "Vector Design Studio — twelve layers named “r”"
+        },
+        {
+          "t": 180.2,
+          "label": "Self-Writing Game Engine — it rejects its own bad output"
+        },
+        {
+          "t": 198.0,
+          "label": "Name the measurement"
+        }
+      ]
+    },
+    {
+      "id": "rock-tumbler-short",
+      "title": "10 apps. 10 said they worked. 9 were broken.",
+      "description": "The 32-second cut. Six defects an AI agent swore did not exist, and the one app that shipped perfect — because it was the only one I gave a number to hit.",
+      "published": "2026-08-01",
+      "duration": 32.1,
+      "width": 1080,
+      "height": 1920,
+      "orientation": "portrait",
+      "tags": [
+        "shorts",
+        "ai-agents",
+        "verification"
+      ],
+      "thumb": "thumbs/rock-tumbler-short.jpg",
+      "sources": [
+        {
+          "src": "media/rock-tumbler-short.mp4",
+          "type": "video/mp4; codecs=\"avc1.4D401F, mp4a.40.2\""
+        },
+        {
+          "src": "media/rock-tumbler-short.webm",
+          "type": "video/webm; codecs=\"vp9, opus\""
+        }
+      ],
+      "chapters": []
+    },
+    {
+      "id": "rock-tumbler-reel",
+      "title": "Ten browser apps, after tumbling — silent reel",
+      "description": "The original silent cut. Each clip is a real driven session captured in headless Chromium: the car is steered through a corner, the path tracer converges on camera, the fluid sim is stirred, the desktop's terminal is typed into.\n\nNo narration — just the artifacts running.",
+      "published": "2026-08-01",
+      "duration": 110.0,
+      "width": 1280,
+      "height": 720,
+      "orientation": "landscape",
+      "tags": [
+        "reel",
+        "webgl",
+        "demo"
+      ],
+      "thumb": "thumbs/rock-tumbler-reel.jpg",
+      "sources": [
+        {
+          "src": "media/rock-tumbler-reel.mp4",
+          "type": "video/mp4; codecs=\"avc1.4D401F\""
+        },
+        {
+          "src": "media/rock-tumbler-reel.webm",
+          "type": "video/webm; codecs=\"vp9\""
+        }
+      ],
+      "chapters": [
+        {
+          "t": 0,
+          "label": "Apex Driving Simulator"
+        },
+        {
+          "t": 11,
+          "label": "WebGPU Path Tracer"
+        },
+        {
+          "t": 22,
+          "label": "Fluid Destruction Sandbox"
+        },
+        {
+          "t": 33,
+          "label": "Open World Explorer"
+        },
+        {
+          "t": 44,
+          "label": "webOS Desktop"
+        },
+        {
+          "t": 55,
+          "label": "NES Emulator Studio"
+        },
+        {
+          "t": 66,
+          "label": "Browser DAW Studio"
+        },
+        {
+          "t": 77,
+          "label": "HyperSheet"
+        },
+        {
+          "t": 88,
+          "label": "Vector Design Studio"
+        },
+        {
+          "t": 99,
+          "label": "Self-Writing Game Engine"
+        }
+      ]
+    }
+  ]
+}
