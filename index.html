@@ -625,7 +625,7 @@ function viewWatch(id) {
         </div>
       </div>
       <div class="desc">
-        <div class="stat">${esc(ago(v.published))} · ${fmt(v.duration)} · ${v.width}×${v.height} · ${(v.tags || []).map(t => "#" + t).join(" ")}</div>
+        <div class="stat">${[esc(ago(v.published)), fmt(v.duration), (v.width && v.height ? v.width + "×" + v.height : ""), (v.tags || []).map(t => "#" + t).join(" ")].filter(Boolean).join(" · ")}</div>
         ${esc(v.description)}
       </div>
       ${(v.chapters || []).length ? `<div class="chapters">
