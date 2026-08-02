@@ -36,6 +36,27 @@
       "url": "../rappvision-field-notes/rappvision/channel.json",
       "repo": "https://github.com/kody-w/rappvision-field-notes",
       "_why": "Origin-relative, like the others: kody-w.github.io serves every repo from one origin, so this resolves in production and in local testing, and keeps the player same-origin with the media."
+    },
+    {
+      "id": "rooms",
+      "name": "Rooms",
+      "url": "../localFirstTools/rappvision/rooms/channel.json",
+      "repo": "https://github.com/kody-w/localFirstTools",
+      "_why": "Ships no video at all — every entry is a live script over a real WebGL room in the same repo. The proof that live replay is a medium and not just a demo."
+    },
+    {
+      "id": "arcade",
+      "name": "Arcade",
+      "url": "../localFirstTools/rappvision/arcade/channel.json",
+      "repo": "https://github.com/kody-w/localFirstTools",
+      "_why": "Games and emulators, booted and played live. Pause any entry and you are holding the controller."
+    },
+    {
+      "id": "workbench",
+      "name": "The Workbench",
+      "url": "../localFirstTools/rappvision/workbench/channel.json",
+      "repo": "https://github.com/kody-w/localFirstTools",
+      "_why": "Production tools — a DAW, a vector editor, a spreadsheet — driven live. A tool demo you can seize control of is a different thing from a tool demo you watch."
     }
   ]
 }

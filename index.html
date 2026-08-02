@@ -393,7 +393,13 @@ function mountLive(v, host) {
       frame = document.createElement("iframe");
       frame.src = s.app;
       frame.setAttribute("title", (s.lower && s.lower.title) || "application");
-      frame.setAttribute("sandbox", "allow-scripts allow-same-origin");
+      /* allow-pointer-lock is not decoration. Without it a first-person app in
+         the frame can never capture the mouse, so "pause and take the wheel"
+         is a promise the player cannot keep: the viewer takes over and finds
+         the camera welded in place. Chromium says so out loud —
+         "Blocked pointer lock ... the 'allow-pointer-lock' permission is not
+         set" — which is how this was found. */
+      frame.setAttribute("sandbox", "allow-scripts allow-same-origin allow-pointer-lock");
       stage.appendChild(frame);
       if (s.lower) {
         const l = document.createElement("div");
@@ -485,9 +491,43 @@ function mountLive(v, host) {
 
       return null;
     };
-    const mouse = (type, x, y) => {
+    /* A drag has to speak Pointer Events, not just Mouse Events. Modern
+       canvases bind pointerdown/pointermove and never see a MouseEvent, so the
+       old mouse-only drag was a silent no-op in every one of them — the vector
+       editor's tools and the snow globe both looked driven and were not.
+       Clicks already dispatch both; drags now do too. */
+    const PID = 1;
+    /* Pointer capture is the other half of that trap: an app's very first line
+       is often overlay.setPointerCapture(e.pointerId), and a synthetic pointer
+       id belongs to no active pointer, so it throws NotFoundError and aborts
+       the whole handler before it reads a single coordinate. Swallow only that
+       failure — a real pointer still captures exactly as before. */
+    const shimCapture = () => {
+      const P = win.Element && win.Element.prototype;
+      if (!P || P.__rvCaptureShim) return;
+      ["setPointerCapture", "releasePointerCapture", "hasPointerCapture"].forEach(m => {
+        const orig = P[m];
+        if (typeof orig !== "function") return;
+        P[m] = function (id) { try { return orig.call(this, id); } catch (e) { return undefined; } };
+      });
+      P.__rvCaptureShim = true;
+    };
+    const pointer = (kind, x, y) => {
       const el = doc.elementFromPoint(x, y);
-      el && el.dispatchEvent(new win.MouseEvent(type, { bubbles: true, clientX: x, clientY: y, buttons: type === "mouseup" ? 0 : 1 }));
+      if (!el) return;
+      const down = kind !== "up";
+      const base = { bubbles: true, cancelable: true, composed: true, view: win,
+                     clientX: x, clientY: y, screenX: x, screenY: y,
+                     button: 0, buttons: down ? 1 : 0 };
+      if (win.PointerEvent) {
+        try {
+          el.dispatchEvent(new win.PointerEvent("pointer" + kind, {
+            ...base, pointerId: PID, pointerType: "mouse", isPrimary: true,
+            width: 1, height: 1, pressure: down ? 0.5 : 0
+          }));
+        } catch (e) {}
+      }
+      try { el.dispatchEvent(new win.MouseEvent("mouse" + kind, base)); } catch (e) {}
     };
     /* A KeyboardEvent carries both `code` (the physical key) and `key` (the
        character it produces). Apps disagree about which one they read - Apex
@@ -528,10 +568,23 @@ function mountLive(v, host) {
                           const el = doc.activeElement || doc.body;
                           ["keydown", "keypress", "keyup"].forEach(tt => el.dispatchEvent(kev(tt, "Key", ch)));
                         }); break;
-        case "drag":    { const f = a.from || [0, 0], to = a.to || [0, 0];
-                          mouse("mousedown", f[0], f[1]);
-                          for (let i = 1; i <= 8; i++) mouse("mousemove", f[0] + (to[0] - f[0]) * i / 8, f[1] + (to[1] - f[1]) * i / 8);
-                          mouse("mouseup", to[0], to[1]); break; }
+        case "drag":    { const f = a.from || [0, 0], to = a.to || [0, 0], N = 12;
+                          shimCapture();
+                          pointer("down", f[0], f[1]);
+                          /* A gesture with no intermediate motion is not a
+                             drag — apps latch a `moved` flag on the first
+                             pointermove and treat anything else as a click. */
+                          for (let i = 1; i <= N; i++)
+                            pointer("move", f[0] + (to[0] - f[0]) * i / N, f[1] + (to[1] - f[1]) * i / N);
+                          pointer("up", to[0], to[1]); break; }
+        /* Real tools are taller than a 16:10 stage. Without this, the most
+           interesting half of an app — the 808's step sequencer, a long
+           settings page — is simply below the fold for the whole scene, and
+           the only fix available to a scene author was to not use the app. */
+        case "scroll":  { const el = (a.selector || a.text) ? hit() : null;
+                          if (el && el.scrollIntoView) el.scrollIntoView({ block: a.block || "center", inline: "nearest", behavior: a.behavior || "smooth" });
+                          else if (a.to) win.scrollTo({ left: a.to[0] || 0, top: a.to[1] || 0, behavior: a.behavior || "smooth" });
+                          break; }
       }
     } catch (e) { /* app not ready or blocked — never break playback */ }
   }

@@ -29,16 +29,43 @@ That's the entire pitch: **a video that is also a program.**
 
 ---
 
+## What's on it
+
+Seven channels, twenty entries. Three of them publish **no video files at all** —
+every entry is a script over a real application in a neighbouring repo:
+
+| Channel | | What it is |
+|---|---|---|
+| **Rooms** | 🕯️ | Nine ambient places that do not exist — a canoe at dawn, a cabin under the aurora, a cave lit by larvae. Slow TV where the rain is simulated, so it never falls the same way twice. |
+| **Arcade** | 🕹️ | Games and emulators, booted cold and played live. Including one entry that stops scripting halfway through and hands you the keyboard. |
+| **The Workbench** | 🛠️ | A DAW, a vector editor, a spreadsheet, an 808 — driven live. A product demo you can interrupt is a different object from one you watch. |
+| **Rock Tumbler** | 🪨 | Ten apps built by AI sub-agents; nine reported success while broken. Static video. |
+| **Local First Tools** · **Learn with Kody** · **Catch-up** | | The rest of the network. |
+
+The three live-only channels come to 57 KB of JSON, and drive 31 scenes across 26
+of the apps in the neighbouring repo. (Plus 0.9 MB of poster images — which any
+format needs, and which are themselves screenshots of the scenes running.) The
+equivalent as rendered video would be north of a gigabyte, and would not let you
+take the wheel.
+
+---
+
 ## Run it
 
 ```bash
+# clone next to each other: live channels reference apps in sibling repos
 git clone https://github.com/kody-w/rapp-vision
-cd rapp-vision
-python3 -m http.server 8000
-open http://localhost:8000
+git clone https://github.com/kody-w/localFirstTools
+python3 -m http.server 8000          # from the PARENT directory
+open http://localhost:8000/rapp-vision/
 ```
 
-Or just open `index.html` — though live replay needs an HTTP origin.
+Serving the parent directory reproduces GitHub Pages exactly: `kody-w.github.io`
+puts every repo on one origin, which is what keeps the player same-origin with
+the apps — and same-origin is what makes live replay possible at all.
+
+Opening `index.html` from disk works for static entries; live replay needs an
+HTTP origin.
 
 ---
 
@@ -83,13 +110,24 @@ to rot.
     {
       "id": "my-live-video",
       "title": "A live, remixable video",
+      "duration": 90,
+      "thumb": "thumbs/live.jpg",
+      "sources": [],
       "live": {
-        "app": "../localFirstTools/apex-driving-simulator.html",
-        "duration": 90,
         "scenes": [
-          { "t": 0,  "caption": "Boot the sim" },
-          { "t": 8,  "caption": "Start a chase", "act": { "click": "Chase" } },
-          { "t": 30, "caption": "Photo mode",    "act": { "click": "Photo" } }
+          { "t": 0, "dur": 6, "card": { "title": "No video file", "sub": "This is a script." } },
+          {
+            "t": 6, "dur": 84,
+            "app": "../localFirstTools/apex-driving-simulator.html",
+            "ready":  { "selector": "#startBtn" },
+            "lower":  { "title": "Apex", "bench": "vs Gran Turismo 7", "fix": "W is throttle — take the wheel" },
+            "actions": [
+              { "at": 0.4, "do": "click",   "selector": "#startBtn" },
+              { "at": 2.0, "do": "keydown", "code": "KeyW" },
+              { "at": 4.2, "do": "keyup",   "code": "KeyW" },
+              { "at": 9.0, "do": "drag",    "from": [420, 330], "to": [640, 300] }
+            ]
+          }
         ]
       }
     }
@@ -97,8 +135,41 @@ to rot.
 }
 ```
 
-**Always ship WebM alongside MP4.** Not just for coverage — headless Chromium has no H.264
-decoder, so a WebM is what makes your channel *verifiable in CI*.
+An entry is treated as **live** when it has a `live` block and no `sources`.
+
+### Scenes
+
+A scene is either a **card** (`card: {title, sub, note}`) or an **app**
+(`app`, plus optional `lower: {title, bench, bug, fix}` for the lower third).
+
+`ready: { selector }` or `ready: { text }` declares what "this app is usable"
+means. Every `at` is measured from the moment that becomes true, not from scene
+start — so a slow machine drifts without desyncing. Without it, times run from
+scene start.
+
+### Actions
+
+| `do` | fields | notes |
+|---|---|---|
+| `click` | `selector` or `text` | retries for up to 20 s until the control is visible **and enabled**, then dispatches the full pointer/mouse sequence. A cue aimed at a control that appears later fires exactly when it appears. |
+| `key` / `keydown` / `keyup` | `code`, optional `key` | `key` is derived from `code` when omitted, because apps disagree about which one they read |
+| `type` | `text` | for terminals and anything that builds its own buffer from key events; it does **not** set `input.value` |
+| `drag` | `from: [x,y]`, `to: [x,y]` | dispatches Pointer **and** Mouse events, with intermediate moves. Coordinates are inside the app's own viewport |
+| `scroll` | `selector`/`text`, or `to: [x,y]` | brings a control into view — real tools are taller than a 16:10 stage |
+
+Two things that will silently cost you a scene:
+
+- **Pointer-lock apps cannot be scripted.** A synthetic click carries no user
+  activation, so `requestPointerLock()` always fails and the app's *Click to
+  play* overlay never closes. The iframe grants `allow-pointer-lock` so a
+  *human* who pauses can take the mouse — but a script cannot.
+- **Address controls by id or by label, never by position.** A ROM shelf or a
+  tab strip is a grid whose order is not guaranteed, and `nth-child` will
+  quietly pick the wrong one.
+
+**Always ship WebM alongside MP4** for static entries. Not just for coverage —
+headless Chromium has no H.264 decoder, so a WebM is what makes your channel
+*verifiable in CI*. Live entries dodge this entirely: there is nothing to encode.
 
 ---
 
@@ -115,17 +186,37 @@ decoder, so a WebM is what makes your channel *verifiable in CI*.
 
 ## Verified, not asserted
 
-Every claim above was measured from *outside* the page, in real headless Chromium:
+Every claim above was measured from *outside* the page, in real headless Chromium,
+against the actual player — not a mock:
 
 ```
-HOME cards=6 (both channels aggregated)
-CHANNELS listed=2
-CHANNEL page cards=3  sub-btn=Subscribed
-LIVE stage=true tag=true video=false openingCard=true
-LIVE @0:11 iframe=true src=apex-driving-simulator.html
-LIVE @0:20 HUD-present=true   => the sim is RUNNING and being driven
-LIVE scrub -> 0:55        404s: none        errors: 0
+FOOT    Source · 7 channels, 20 videos.
+HOME    cards=20   thumbs-loaded=20/20
+TAGS    50 filter chips
+CHANS   Rock Tumbler, Local First Tools, Learn with Kody, Catch-up, Rooms, Arcade, The Workbench
+  /rooms      cards=3  sub=✓ Subscribed
+  /arcade     cards=3  sub=✓ Subscribed
+  /workbench  cards=3  sub=✓ Subscribed
+404s:   none
+errors: none
+
+47 live scenes across 9 entries — ALL SCENES PASS
+  rooms-tour   @0:07  misty-canoe.html        ✓ RUNNING  nStrokes=1 nDrift=4.0
+  rooms-tour   @2:39  glass-elevator.html     ✓ RUNNING  floor-num=58
+  arcade       @0:08  skybreak-dogfight.html  ✓ RUNNING  gate cleared, HUD live
+  workbench    @1:18  vector-design-studio    ✓ RUNNING  LAYERS 66 → 69 after 3 drags
 ```
+
+A scene that fails to drive its app does not look broken — it looks like a video
+of an app sitting still. So the harness hit-tests the centre of the frame to
+prove the entry gate actually closed, and samples the DOM as well as the pixels,
+because a spreadsheet that is working perfectly does not animate.
+
+It rejected four of the nine entries on the first pass. The failures, and the two
+player bugs they exposed — `drag` was Mouse-only and silently did nothing in any
+Pointer Events app, and pointer capture threw on the handler's first line — are
+written up in
+[localFirstTools/rappvision/VERIFY.md](https://github.com/kody-w/localFirstTools/blob/main/rappvision/VERIFY.md).
 
 The method is documented at [rapp-rock-tumbler](https://github.com/kody-w/rapp-rock-tumbler).
 
