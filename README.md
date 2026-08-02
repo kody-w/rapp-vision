@@ -31,7 +31,7 @@ That's the entire pitch: **a video that is also a program.**
 
 ## What's on it
 
-Seven channels, twenty entries. Three of them publish **no video files at all** —
+Eight channels, twenty-one entries. Three of them publish **no video files at all** —
 every entry is a script over a real application in a neighbouring repo:
 
 | Channel | | What it is |
@@ -40,7 +40,7 @@ every entry is a script over a real application in a neighbouring repo:
 | **Arcade** | 🕹️ | Games and emulators, booted cold and played live. Including one entry that stops scripting halfway through and hands you the keyboard. |
 | **The Workbench** | 🛠️ | A DAW, a vector editor, a spreadsheet, an 808 — driven live. A product demo you can interrupt is a different object from one you watch. |
 | **Rock Tumbler** | 🪨 | Ten apps built by AI sub-agents; nine reported success while broken. Static video. |
-| **Local First Tools** · **Learn with Kody** · **Catch-up** | | The rest of the network. |
+| **Local First Tools** · **Learn with Kody** · **Catch-up** · **Field Notes** | | The rest of the network. |
 
 The three live-only channels come to 57 KB of JSON, and drive 31 scenes across 26
 of the apps in the neighbouring repo. (Plus 0.9 MB of poster images — which any
@@ -190,10 +190,11 @@ Every claim above was measured from *outside* the page, in real headless Chromiu
 against the actual player — not a mock:
 
 ```
-FOOT    Source · 7 channels, 20 videos.
-HOME    cards=20   thumbs-loaded=20/20
-TAGS    50 filter chips
-CHANS   Rock Tumbler, Local First Tools, Learn with Kody, Catch-up, Rooms, Arcade, The Workbench
+FOOT    Source · 8 channels, 21 videos.
+HOME    cards=21   thumbs-loaded=21/21
+TAGS    56 filter chips
+CHANS   Rock Tumbler, Local First Tools, Learn with Kody, Catch-up,
+        Field Notes, Rooms, Arcade, The Workbench
   /rooms      cards=3  sub=✓ Subscribed
   /arcade     cards=3  sub=✓ Subscribed
   /workbench  cards=3  sub=✓ Subscribed
