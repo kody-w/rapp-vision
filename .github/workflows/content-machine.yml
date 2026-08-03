@@ -40,6 +40,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Same mirror step as metrics.yml, for the same reason: channel
+      # enumeration is filesystem-only by design, and the cross-repo channels
+      # live at ../<repo>/... relative to this checkout.
+      - name: Mirror sibling channel files
+        run: |
+          for p in localFirstTools/rappvision localFirstTools/rappvision/rooms \
+                   localFirstTools/rappvision/arcade localFirstTools/rappvision/workbench \
+                   learnwithkody/rappvision catchup/rappvision \
+                   rappvision-field-notes/rappvision; do
+            mkdir -p "../$p"
+            curl -sf --max-time 20 "https://kody-w.github.io/$p/channel.json" \
+              -o "../$p/channel.json" || echo "skip $p (unreachable today)"
+          done
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:

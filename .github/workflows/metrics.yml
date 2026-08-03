@@ -190,6 +190,23 @@ jobs:
           # moved. The repo is nine commits deep; there is nothing to save here.
           fetch-depth: 0
 
+      # Enumeration is filesystem-only ON PURPOSE (resolve_channel_ref refuses
+      # http(s) URLs), so the cross-repo channels' channel.json files must
+      # exist on disk at the same relative positions the player resolves them
+      # to (../<repo>/...). Mirror just those files — a few KB, no media.
+      # `curl -f` + `|| true` per file: an unreachable sibling skips that
+      # channel for a day (the collector already warns), it never fails the run.
+      - name: Mirror sibling channel files
+        run: |
+          for p in localFirstTools/rappvision localFirstTools/rappvision/rooms \
+                   localFirstTools/rappvision/arcade localFirstTools/rappvision/workbench \
+                   learnwithkody/rappvision catchup/rappvision \
+                   rappvision-field-notes/rappvision; do
+            mkdir -p "../$p"
+            curl -sf --max-time 20 "https://kody-w.github.io/$p/channel.json" \
+              -o "../$p/channel.json" || echo "skip $p (unreachable today)"
+          done
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
