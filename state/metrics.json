@@ -507,6 +507,101 @@
       },
       "url": "https://github.com/kody-w/rapp-vision/discussions/26",
       "number": 26
+    },
+    "rooms/rooms-slow": {
+      "channel": "rooms",
+      "video": "rooms-slow",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/27",
+      "number": 27
+    },
+    "rooms/rooms-tour": {
+      "channel": "rooms",
+      "video": "rooms-tour",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/28",
+      "number": 28
+    },
+    "workbench/workbench-808": {
+      "channel": "workbench",
+      "video": "workbench-808",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/29",
+      "number": 29
+    },
+    "workbench/workbench-generative": {
+      "channel": "workbench",
+      "video": "workbench-generative",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/30",
+      "number": 30
+    },
+    "workbench/workbench-three-tools": {
+      "channel": "workbench",
+      "video": "workbench-three-tools",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/31",
+      "number": 31
     }
   },
   "editorial": {
