@@ -175,6 +175,18 @@
   .stage .l3{position:absolute;left:0;right:0;bottom:0;padding:16px 20px;
     background:linear-gradient(transparent,rgba(4,7,12,.93) 32%);pointer-events:none}
   .stage .l3 b{display:block;font-size:clamp(15px,2vw,23px)}
+  /* ---- shred: record your own run of a live scene ---- */
+  .stage .shred-pip{position:absolute;right:12px;bottom:12px;width:22%;max-width:220px;aspect-ratio:4/3;
+    object-fit:cover;border-radius:calc(var(--radius) - 4px);border:2px solid var(--accent);z-index:5;
+    background:#000;transform:scaleX(-1)}
+  .shredp{margin-top:10px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--panel);font-size:14px;line-height:1.55}
+  .shredp h3{margin:0 0 6px;font-size:15px}
+  .shredp label{display:flex;gap:8px;align-items:center;margin:4px 0;cursor:pointer;color:var(--fg)}
+  .shredp .fine{color:var(--dim);font-size:12.5px;margin:8px 0 10px}
+  .shredp .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .shredp .rec{color:var(--bad);font-weight:600}
+  .shredp time{font-variant-numeric:tabular-nums;color:var(--accent)}
   .stage .l3 .bn{color:var(--accent);font-size:12.5px}
   .stage .l3 .bg{color:var(--bad);font-size:13.5px;margin-top:5px}
   .stage .l3 .fx{color:var(--good);font-size:12.5px;font-family:var(--mono);margin-top:2px}
@@ -610,6 +622,156 @@ function viewHome(q = "", tag = "") {
  * Cross-origin (or a browser that blocks it) degrades to captions;
  * channels publish a static cut alongside anyway.
  * ---------------------------------------------------------------- */
+/* ---------- shred: capture your own run of a live scene ----------
+
+   A shred is a performance, not a copy: the viewer runs the scene (and can
+   seize the controls), and what happened on THEIR screen becomes THEIR video.
+   Everything below is deliberate policy, not convenience:
+
+   - Camera and mic are OFF unless switched on for this one recording. The
+     network is mirrored and content-addressed; a face published to it is
+     effectively permanent, so nothing defaults toward the camera.
+   - Export is the default; publishing is a separate, deliberate act. The
+     Share button hands the file to the device's own share sheet (iMessage,
+     AirDrop, …) — nothing is uploaded anywhere by this page, ever.
+   - Capture is the TAB, via getDisplayMedia. The camera preview is an
+     on-page overlay, so the browser composites it into the recording for
+     free — no canvas pipeline, and what you see is exactly what you get.  */
+const Shred = (() => {
+  let rec = null, chunks = [], streams = [], ctx = null, timerId = 0, capId = 0;
+  const CAP_MS = 10 * 60 * 1000;                 // hard stop; a shred is a run, not a broadcast
+
+  const mime = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"]
+    .find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || "";
+
+  function panel(v) {
+    let el = $("#shredp");
+    if (!el) {
+      el = document.createElement("div");
+      el.className = "shredp"; el.id = "shredp";
+      $("#host").after(el);
+    }
+    return el;
+  }
+
+  function cleanup() {
+    clearInterval(timerId); clearTimeout(capId); timerId = capId = 0;
+    streams.forEach(s => s.getTracks().forEach(t => t.stop())); streams = [];
+    if (ctx) { ctx.close().catch(() => {}); ctx = null; }
+    document.querySelector(".shred-pip")?.remove();
+    rec = null;
+  }
+
+  function open(v) {
+    if (rec) return;                              // already recording
+    if (!mime || !navigator.mediaDevices?.getDisplayMedia) {
+      toast("This browser can’t record the tab"); return;
+    }
+    panel(v).innerHTML = `
+      <h3>⏺ Shred this scene</h3>
+      <div class="fine">Recording happens on this device and stays on it. When you stop,
+        you get the file — share it or keep it. Nothing is uploaded by this page.
+        Publishing to a channel is a separate, deliberate step, and published videos are
+        mirrored in ways that are effectively permanent — so the camera stays off unless
+        you turn it on, each time.</div>
+      <label><input type="checkbox" id="sh-mic"> My microphone (narrate over it)</label>
+      <label><input type="checkbox" id="sh-cam"> My camera, as a small overlay (off by default on purpose)</label>
+      <div class="fine">The browser will ask which surface to record — pick <b>this tab</b>.
+        Playback starts when recording does.</div>
+      <div class="row">
+        <button class="tbtn" id="sh-go">Start recording</button>
+        <button class="tbtn" id="sh-no">Cancel</button>
+      </div>`;
+    $("#sh-no").onclick = () => { panel(v).remove(); };
+    $("#sh-go").onclick = () => start(v).catch(e => {
+      cleanup(); panel(v).remove();
+      toast(String(e && e.name === "NotAllowedError" ? "Recording permission declined" : "Couldn’t start: " + (e.message || e)));
+    });
+  }
+
+  async function start(v) {
+    const wantMic = $("#sh-mic").checked, wantCam = $("#sh-cam").checked;
+    const disp = await navigator.mediaDevices.getDisplayMedia({
+      video: { preferCurrentTab: true }, audio: true, selfBrowserSurface: "include",
+    });
+    streams.push(disp);
+    let tracks = [...disp.getVideoTracks()];
+
+    if (wantMic) {
+      const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streams.push(mic);
+      if (disp.getAudioTracks().length) {        // mix tab audio + mic into one track
+        ctx = new AudioContext();
+        const out = ctx.createMediaStreamDestination();
+        ctx.createMediaStreamSource(disp).connect(out);
+        ctx.createMediaStreamSource(mic).connect(out);
+        tracks.push(...out.stream.getAudioTracks());
+      } else tracks.push(...mic.getAudioTracks());
+    } else tracks.push(...disp.getAudioTracks());
+
+    if (wantCam) {
+      const cam = await navigator.mediaDevices.getUserMedia({ video: { width: 640 } });
+      streams.push(cam);
+      const pip = document.createElement("video");
+      pip.className = "shred-pip"; pip.muted = true; pip.autoplay = true; pip.playsInline = true;
+      pip.srcObject = cam;
+      ($("#stage") || $("#host")).appendChild(pip); // in-tab overlay -> composited into the capture
+    }
+
+    chunks = [];
+    rec = new MediaRecorder(new MediaStream(tracks), { mimeType: mime });
+    rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+    rec.onstop = () => finish(v);
+    disp.getVideoTracks()[0].addEventListener("ended", () => stop()); // browser's own Stop-sharing UI
+    rec.start(1000);
+    capId = setTimeout(stop, CAP_MS);
+
+    $("#lp") && !document.querySelector("#lp.on") && $("#lp").click?.(); // roll the scene if paused
+    const t0 = Date.now();
+    panel(v).innerHTML = `
+      <h3><span class="rec">● REC</span> — shredding <time id="sh-t">0:00</time></h3>
+      <div class="fine">Stop with the button here or the browser’s own “Stop sharing”.
+        Hard stop at 10:00.</div>
+      <div class="row"><button class="tbtn" id="sh-stop">■ Stop &amp; get the file</button></div>`;
+    timerId = setInterval(() => {
+      const el = $("#sh-t"); if (el) el.textContent = fmt((Date.now() - t0) / 1000);
+    }, 500);
+    $("#sh-stop").onclick = () => stop();
+  }
+
+  function stop() { if (rec && rec.state !== "inactive") rec.stop(); }
+
+  function finish(v) {
+    const blob = new Blob(chunks, { type: "video/webm" });
+    cleanup();
+    if (!blob.size) { panel(v).remove(); toast("Nothing was recorded"); return; }
+    const name = `shred-${v.id}-${new Date().toISOString().slice(0, 10)}.webm`;
+    const file = new File([blob], name, { type: "video/webm" });
+    const url = URL.createObjectURL(blob);
+    const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
+    panel(v).innerHTML = `
+      <h3>Your shred — ${esc(fmtBytes(blob.size))}</h3>
+      <div class="fine">It exists only on this device until you send it somewhere.
+        Sharing goes through your own share sheet — person to person, no platform in
+        the middle. If you’d rather put it on the network, publish it to a channel
+        with <code>remix_of: "${esc(vkey(v))}"</code> and it joins this post’s remix tree.</div>
+      <div class="row">
+        ${canShare ? `<button class="tbtn" id="sh-share">Share…</button>` : ""}
+        <a class="tbtn" id="sh-dl" href="${url}" download="${esc(name)}">↓ Save the file</a>
+        <button class="tbtn" id="sh-bin">Discard</button>
+      </div>`;
+    if (canShare) $("#sh-share").onclick = () =>
+      navigator.share({ files: [file], title: v.title }).catch(() => {});
+    $("#sh-bin").onclick = () => { URL.revokeObjectURL(url); panel(v).remove(); toast("Discarded"); };
+  }
+
+  return { open };
+})();
+
+function fmtBytes(n) {
+  return n > 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.round(n / 1024) + " KB";
+}
+
 function mountLive(v, host) {
   const scenes = (v.live.scenes || []).slice().sort((a, b) => a.t - b.t);
   const total = v.duration || scenes.reduce((m, s) => Math.max(m, s.t + (s.dur || 0)), 0);
@@ -1006,7 +1168,8 @@ function viewWatch(id) {
           <button class="tbtn${later ? " on" : ""}" id="b-later">${later ? "✓ Saved" : "+ Watch later"}</button>
           ${isLive ? "" : `<button class="tbtn" id="b-speed">Speed ${state.rate}×</button>`}
           ${isLive
-            ? `<a class="tbtn" href="${esc((v.live.scenes || []).map(s => s.app).filter(Boolean)[0] || "#")}" target="_blank" rel="noopener">Open the app ↗</a>`
+            ? `<button class="tbtn" id="b-shred" title="Record your own run of this scene — camera off by default, file stays on your device">⏺ Shred</button>
+               <a class="tbtn" href="${esc((v.live.scenes || []).map(s => s.app).filter(Boolean)[0] || "#")}" target="_blank" rel="noopener">Open the app ↗</a>`
             : `<a class="tbtn" href="${esc(v.sources[0].src)}" download>↓ Download</a>`}
           <button class="tbtn" id="b-link">Copy link</button>
         </div>
@@ -1039,6 +1202,7 @@ function viewWatch(id) {
 
   if (isLive) {                       // a script, not a file
     const live = mountLive(v, $("#host"));
+    $("#b-shred") && ($("#b-shred").onclick = () => Shred.open(v));
     app._keys = live.keys;
     document.addEventListener("keydown", app._keys);
     return;
