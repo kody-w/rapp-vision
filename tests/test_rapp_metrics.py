@@ -637,25 +637,38 @@ class PersistTests(SilentWarnings):
 
 
 class SeedSnapshotFileTests(unittest.TestCase):
-    """The committed state/metrics.json must be exactly what the code
-    writes for an empty network — otherwise the first real run produces a
-    diff full of noise nobody can read."""
+    """The committed state/metrics.json must be shaped exactly as the code
+    writes it. It started life as the empty seed, but the daily cron now
+    commits real counts into it — the git history of this one file is the
+    network's time series — so these tests pin the SHAPE the player parses
+    and never the emptiness of a file whose whole job is to fill up."""
 
-    def test_shipped_seed_snapshot_matches_the_code(self):
+    def test_shipped_snapshot_matches_the_code_shape(self):
+        """Byte-compare the committed file against snapshot_body() re-run on
+        its own contents. Round-tripping proves the file was written by this
+        code (key order, indent, escaping, trailing newline) without ever
+        asserting what the counts are."""
         path = REPO_ROOT / "state" / "metrics.json"
         self.assertTrue(path.exists(), f"{path} is missing")
+        text = path.read_text(encoding="utf-8")
+        body = json.loads(text)
         expected = json.dumps(
-            rm.snapshot_body({}, {}), indent=2, ensure_ascii=False
+            rm.snapshot_body(body.get("videos", {}), body.get("editorial", {})),
+            indent=2, ensure_ascii=False,
         ) + "\n"
-        self.assertEqual(path.read_text(encoding="utf-8"), expected)
+        self.assertEqual(text, expected)
 
-    def test_shipped_seed_snapshot_is_well_formed_and_empty(self):
+    def test_shipped_snapshot_is_well_formed(self):
         body = json.loads(
             (REPO_ROOT / "state" / "metrics.json").read_text(encoding="utf-8")
         )
         self.assertEqual(body["schema"], rm.SNAPSHOT_SCHEMA)
-        self.assertEqual(body["videos"], {})
-        self.assertEqual(body["editorial"], {})
+        self.assertIsInstance(body["videos"], dict)
+        self.assertIsInstance(body["editorial"], dict)
+        # Every subject key must be channel-qualified — the invariant the
+        # player's collision handling depends on.
+        for key in body["videos"]:
+            self.assertIn("/", key, f"unscoped subject id in snapshot: {key!r}")
 
 
 # ── the editorial lane ──────────────────────────────────────────────────
