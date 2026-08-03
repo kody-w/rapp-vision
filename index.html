@@ -573,10 +573,38 @@ function mountLive(v, host) {
         case "keyup":   doc.dispatchEvent(kev("keyup", a.code, a.key)); break;
         case "key":     doc.dispatchEvent(kev("keydown", a.code, a.key));
                         doc.dispatchEvent(kev("keyup", a.code, a.key)); break;
-        case "type":    [...(a.text || "")].forEach(ch => {
-                          const el = doc.activeElement || doc.body;
-                          ["keydown", "keypress", "keyup"].forEach(tt => el.dispatchEvent(kev(tt, "Key", ch)));
-                        }); break;
+        /* Typing has to change the value, not just announce itself. Synthetic
+           key events never mutate an <input>, by design, so the old version
+           dispatched a tidy keydown/keypress/keyup per character into a field
+           that stayed empty - the webOS terminal sat at a bare prompt while the
+           caption described the command it was supposedly running. Set the
+           value as we go and fire `input`, the way a real keystroke does, then
+           let Enter through so the app's own handler reads what is there. */
+        case "type": {
+          const txt = String(a.text || "");
+          let el = null;
+          try { el = a.selector ? doc.querySelector(a.selector) : null; } catch (e) {}
+          if (!el) el = doc.activeElement;
+          if (!el || el === doc.body) el = doc.querySelector("input:not([type=hidden]),textarea,[contenteditable=true]") || doc.body;
+          try { el.focus && el.focus(); } catch (e) {}
+          const editable = !!el && (/^(INPUT|TEXTAREA)$/.test(el.tagName) || el.isContentEditable);
+          for (const ch of txt) {
+            if (ch === "\n" || ch === "\r") {
+              el.dispatchEvent(kev("keydown", "Enter", "Enter"));
+              el.dispatchEvent(kev("keyup", "Enter", "Enter"));
+              continue;
+            }
+            const code = /[a-z]/i.test(ch) ? "Key" + ch.toUpperCase() : /\d/.test(ch) ? "Digit" + ch : ch === " " ? "Space" : "";
+            el.dispatchEvent(kev("keydown", code, ch));
+            if (editable) {
+              if (el.isContentEditable) el.textContent += ch; else el.value += ch;
+              try { el.dispatchEvent(new win.InputEvent("input", { bubbles: true, data: ch, inputType: "insertText" })); }
+              catch (e) { el.dispatchEvent(new win.Event("input", { bubbles: true })); }
+            }
+            el.dispatchEvent(kev("keyup", code, ch));
+          }
+          break;
+        }
         case "drag":    { const f = a.from || [0, 0], to = a.to || [0, 0], N = 12;
                           shimCapture();
                           pointer("down", f[0], f[1]);
