@@ -1,0 +1,82 @@
+# The content machine's clock. Two jobs a day, both non-fatal, both dry-run:
+#
+#   propose — walk the network for gaps (stale channels, thin coverage, viewer
+#             signals saying "confused" or "want more") and refresh the proposal
+#             queue in state/proposals.json. It NEVER publishes into a channel:
+#             a proposal is promoted by a person, or not at all. The queue is
+#             the steering wheel, not an autopilot.
+#   review  — score published videos against the versioned rubric and write the
+#             verdicts through the EDITORIAL lane only. Machine judgment never
+#             touches a human counter (the founding tenet of rapp-metrics/1.0:
+#             the actor determines the lane, never the subject).
+#
+# The default adapter is 'dryrun' and --allow-model is deliberately absent:
+# this workflow can propose and score from local evidence, but it cannot spend
+# model credits or generate prose unattended. Wiring a real adapter is a
+# human edit to this file, on purpose.
+#
+# Cron sits at 09:40 UTC: after RAR's 05:20 metrics and 07:00 ratings crons and
+# after this repo's own 08:10 metrics refresh, so the machine reads today's
+# numbers, not yesterday's.
+name: Content Machine
+
+on:
+  schedule:
+    - cron: "40 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: content-machine-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  propose-and-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Self-test first: a machine that cannot pass its own offline suite has
+      # no business writing proposals. Cheap (no network), and a red here
+      # stops the run before any state file is touched.
+      - name: Self-test
+        run: python3 scripts/content_machine.py selftest
+
+      # Non-fatal by design (no --strict): a bad network day leaves the
+      # proposal queue exactly as it was rather than emptying it. The queue is
+      # durable state a human may have triaged; silence must never erase it.
+      - name: Refresh proposal queue
+        run: python3 scripts/content_machine.py propose
+
+      # Editorial lane only. --review-limit caps the day's writes so a big
+      # catalog drains over successive runs instead of hammering the API.
+      - name: Review published videos (editorial lane)
+        run: python3 scripts/content_machine.py review --review-limit 20
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit state if changed
+        run: |
+          FILES=""
+          for f in state/proposals.json state/metrics.json state/editorial.json; do
+            [ -f "$f" ] && FILES="$FILES $f"
+          done
+          if [ -z "$FILES" ] || [ -z "$(git status --porcelain $FILES)" ]; then
+            echo "No changes; nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add $FILES
+          git commit -m "chore(machine): refresh proposals + editorial reviews [skip ci]"
+          git pull --rebase origin main
+          git push origin main

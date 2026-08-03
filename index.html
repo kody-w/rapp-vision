@@ -66,6 +66,11 @@
     padding:2px 7px;border-radius:5px;font:600 12px/1.5 var(--mono)}
   .badge{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.8);color:var(--good);
     padding:2px 8px;border-radius:5px;font:600 11px/1.6 var(--mono)}
+  /* Top-right so it never collides with .badge (SHORT), .dur or .resume, and
+     absolutely positioned so a snapshot that arrives after first paint can be
+     patched in without moving anything already on screen. */
+  .score{position:absolute;right:8px;top:8px;background:rgba(0,0,0,.8);color:var(--accent);
+    padding:2px 8px;border-radius:5px;font:600 11px/1.6 var(--mono)}
   .resume{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.25)}
   .resume i{display:block;height:100%;background:var(--bad)}
   .meta{padding:11px 3px 0}
@@ -102,6 +107,34 @@
   .chapters li button:hover{background:var(--surface)}
   .chapters li button.on{background:var(--surface2);color:var(--ink)}
   .chapters time{font:600 12.5px/1.5 var(--mono);color:var(--accent);flex-shrink:0}
+
+  /* ---------- community (optional metrics snapshot) ---------- */
+  .comm{margin-top:18px;background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--radius);padding:15px 17px}
+  .comm h2{font-size:14px;margin:0 0 13px;color:var(--dim);
+    text-transform:uppercase;letter-spacing:.08em}
+  .comm .nums{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:11px}
+  .comm .nums span{background:var(--surface2);border:1px solid var(--line);
+    border-radius:999px;padding:5px 13px;font-size:13px;color:var(--dim)}
+  .comm .sig{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px}
+  .comm .sig span{background:var(--surface2);border:1px solid var(--line);
+    border-radius:6px;padding:3px 9px;font-size:12.5px;color:var(--dim)}
+  /* Published, not hidden — just not dressed as an endorsement. */
+  .comm .sig span.neg b{color:var(--bad)}
+  .comm b{font-family:var(--mono);color:var(--ink)}
+  .comm .src{color:var(--dim);font-size:12px;margin-top:11px}
+  /* A machine review must not read as a human one. Dashed rather than solid,
+     no surface fill, a mono tag chip and its reviewer id on the same line —
+     different at a glance from every other card in the file. */
+  .mrev{margin-top:15px;border:1px dashed var(--line);border-left:3px dashed var(--dim);
+    border-radius:0 var(--radius) var(--radius) 0;padding:13px 16px}
+  .mrev .tag{font:700 10.5px/1.6 var(--mono);letter-spacing:.08em;
+    background:var(--dim);color:var(--bg);padding:2px 8px;border-radius:4px}
+  .mrev .who{font:600 12px/1.6 var(--mono);color:var(--dim);margin-left:9px}
+  .mrev h4{margin:11px 0 6px;font-size:14px;font-weight:600}
+  .mrev p{margin:0;font-size:13.5px;color:#cfd9e8;white-space:pre-wrap}
+  .mrev .disc{color:var(--dim);font-size:12px;margin-top:9px}
+
   aside h3{font-size:14px;margin:0 0 12px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
   .up{display:flex;gap:11px;margin-bottom:13px;text-align:left;width:100%;border-radius:9px}
   .up:hover{background:var(--surface)}
@@ -266,15 +299,263 @@ function ago(d) {
 const byId = id => VIDEOS.find(v => v.id === id);
 const prog = id => { const h = state.history[id]; return h && h.d ? Math.min(1, h.t / h.d) : 0; };
 
+/* ---------------- community snapshot (optional) ----------------
+ *
+ * state/metrics.json is a read-only aggregate committed to THIS repo:
+ * endorsements, signal channels, conversation counts, thread URLs and any
+ * editorial review, keyed per video. It is entirely optional. Missing,
+ * 404, malformed JSON or a shape nobody recognises all land in the same
+ * place — METRICS stays null and every render site below returns "", so
+ * the player is byte-for-byte the player it was before the file existed.
+ *
+ * It is deliberately NOT part of state: save() re-serialises the whole of
+ * `state` on every timeupdate tick and Export spreads it into the user's
+ * library file, so a snapshot parked there would be both constant write
+ * traffic and fake "personal data" in an export.
+ *
+ * It also never gates first paint — see loadMetrics().
+ */
+let METRICS = null;                 // Map(normalised key -> parsed record)
+
+/* votes.json-style key skew is a solved problem upstream: one normaliser,
+   called by the shipped code, never re-derived at the call site. */
+const normKey = s => String(s ?? "").trim().toLowerCase().replace(/[-\s]+/g, "_");
+
+/* A video id is only unique inside its own channel.json — template/channel.json
+   ships "my-first-video" and every new publisher copies it — so the subject id
+   is scoped by the channel id declared INSIDE that file. */
+const vkey = v => (v && v._ch ? v._ch.id : "") + "/" + (v ? v.id : "");
+
+const numOr = x => (typeof x === "number" && isFinite(x) && x >= 0) ? x : null;
+const strOr = x => (typeof x === "string" ? x.trim() : "");
+
+/* The snapshot is untrusted input — anyone can open a PR against it. esc()
+   keeps a value inside its attribute; this keeps `javascript:` out of an href. */
+function httpUrl(u) {
+  if (!u) return "";
+  try { const p = new URL(String(u), location.href); return /^https?:$/.test(p.protocol) ? p.href : ""; }
+  catch { return ""; }
+}
+
+/* The experience channels this network actually publishes — `SIGNAL_MAP` in
+   scripts/rapp_metrics.py, mirrored into the snapshot's own `signal_channels`
+   block. The collector is the authority for that vocabulary; anything else a
+   snapshot carries is labelled from its own key rather than dropped, so a
+   publisher can add a channel without shipping a new player. */
+const SIGNAL_LABELS = {
+  watched_it_all: "watched it all", learned_something: "learned something",
+  want_more_like_this: "want more like this", tried_it_myself: "tried it myself",
+  saved_for_later: "saved for later", too_long: "too long",
+  confusing: "found it confusing"
+};
+
+/* Named negatives, read from the snapshot's own `counting.negative_signals`
+   rather than hardcoded here — a second list of what counts as negative is a
+   second source of truth, and the two would drift. They are published under
+   their own names and subtract from nothing, so they are shown, not hidden;
+   they are just not shown as though they were endorsements. */
+let NEG_SIGNALS = new Set();
+
+/* An agent review is editorial: engine-written, printed beside the human
+   numbers and never folded into them. It is only worth rendering if it says
+   something and can be attributed to the thing that wrote it.
+ *
+ * Two shapes are accepted. The rubric record this repo's collector writes
+ * (`editorial_review()` in scripts/rapp_metrics.py) is a verdict plus a
+ * checks tally plus a `notes` array of what a reader would trip over; a
+ * different reviewer may instead publish a freeform headline and body. */
+function parseReview(r) {
+  if (!r || typeof r !== "object" || Array.isArray(r)) return null;
+  const verdict = strOr(r.verdict);
+  const passed = numOr(r.checks_passed), total = numOr(r.checks_total), na = numOr(r.not_applicable);
+  const notes = Array.isArray(r.notes) ? r.notes.map(strOr).filter(Boolean) : [];
+  /* A one-word verdict ("ready" / "rough") is a headline, not prose. Printed as
+     a body it says nothing; the checks it was computed from are the content. */
+  const rubric = !!verdict && total !== null;
+  const headline = strOr(r.headline ?? r.title) ||
+    (rubric ? `${verdict} — ${passed === null ? "?" : passed} of ${total} checks pass` +
+              (na ? `, ${na} not applicable` : "")
+            : verdict);
+  const body = strOr(r.review ?? r.body ?? r.text) ||
+    (notes.length ? notes.map(n => "• " + n).join("\n")
+                  : (rubric ? "Nothing in the record to flag." : ""));
+  if (!body && !headline) return null;
+  return {
+    who: strOr(r.model ?? r.reviewer_id ?? r.reviewer ?? r.critic_id ?? r.critic ?? r.by) || "unattributed",
+    score: numOr(r.score), url: httpUrl(r.url),
+    /* The fingerprint of the record the verdict was computed from. Without it a
+       stale review is indistinguishable from a current one. */
+    on: strOr(r.record_sha8 ?? r.sha8), headline, body
+  };
+}
+
+function parseRecord(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const sigs = raw.signals && typeof raw.signals === "object" ? raw.signals : {};
+  return {
+    /* null, not 0, when the snapshot does not carry the field — see figure(). */
+    up: numOr(raw.up ?? raw.upvotes ?? raw.endorsements),
+    watched: numOr(raw.watched),
+    comments: numOr(raw.comments ?? raw.conversation),
+    /* `score` is whatever ranking the writer chose to publish — this network's
+       collector publishes `2 * upvotes + watched` — so it is taken as given and
+       never recomputed here. When the snapshot omits it the endorsement count
+       stands in rather than a number being invented; when it carries neither,
+       there is no figure and no pill. */
+    score: numOr(raw.score) ?? numOr(raw.up ?? raw.upvotes ?? raw.endorsements),
+    /* Only channels that actually registered are rendered. A row of zeros is
+       noise, and a zero is indistinguishable from a channel nobody wired up. */
+    signals: Object.keys(sigs).map(k => [k, numOr(sigs[k])])
+      .filter(([, n]) => n !== null && n > 0)
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])),
+    url: httpUrl(raw.url ?? raw.thread ?? raw.discussion),
+    review: parseReview(raw.review ?? raw.editorial ?? raw.machine_review)
+  };
+}
+
+const EMPTY_RECORD = () =>
+  ({ up: null, watched: null, comments: null, score: null, signals: [], url: "", review: null });
+
+function indexMetrics(doc) {
+  if (!doc || typeof doc !== "object") return null;
+  const map = doc.videos || doc.agents || doc.entries || doc.items ||
+              (doc.schema ? null : doc);          // a bare map is accepted too
+  if (!map || typeof map !== "object") return null;
+
+  /* The snapshot names its own negatives; the player does not get a vote. */
+  const neg = (doc.counting || {}).negative_signals;
+  NEG_SIGNALS = new Set(Array.isArray(neg)
+    ? neg.filter(x => typeof x === "string").map(normKey) : []);
+
+  /* A key is stored exactly as the snapshot published it (normalised, nothing
+     more). A scoped key never also registers its bare tail: `<channel>/<video>`
+     answers for that channel's video and for nothing else. Deriving a bare alias
+     from a scoped key would let one channel's record answer for a different
+     channel's identically-named video — and bare ids collide by construction,
+     since `template/channel.json` ships "my-first-video" and the README tells
+     every new publisher to copy it. That is why the subject id is scoped in the
+     first place; the lookup must not undo it. */
+  const out = new Map();
+
+  Object.keys(map).forEach(k => {
+    const rec = parseRecord(map[k]);
+    if (!rec) return;                              // one bad record, not one bad file
+    out.set(normKey(k), rec);
+  });
+
+  /* Agent reviews live in their own top-level block precisely so they are never
+     summed into a human count. An entry may have a review and no reactions at
+     all, so a review can bring a record into being — with every human figure
+     still unknown rather than zero.
+     `editorial` is checked first because that is the key this repo's collector
+     actually writes (`snapshot_body()` in scripts/rapp_metrics.py). Reading only
+     the other two spellings was a silent join failure of the worst kind: every
+     review would have been invisible, and "the rubric wrote nothing yet" and
+     "the player cannot see what the rubric wrote" render identically. */
+  const revs = doc.editorial || doc.agent_reviews || doc.reviews;
+  if (revs && typeof revs === "object") Object.keys(revs).forEach(k => {
+    const review = parseReview(revs[k]);          // skips the block's own `note`
+    if (!review) return;
+    let rec = out.get(normKey(k));
+    if (!rec) { rec = EMPTY_RECORD(); out.set(normKey(k), rec); }
+    if (!rec.review) rec.review = review;
+  });
+
+  return out.size ? out : null;
+}
+
+/* The scoped key first, then the bare video id — which can only match a key the
+   snapshot itself published unscoped, since nothing registers a bare alias on a
+   scoped key's behalf. So a publisher who writes plain "my-video" is still read,
+   and a record filed under another channel can never answer here. */
+function mfind(key) {
+  if (!METRICS) return null;
+  const k = String(key || "");
+  return METRICS.get(normKey(k)) || METRICS.get(normKey(k.slice(k.lastIndexOf("/") + 1))) || null;
+}
+const mget = v => mfind(vkey(v));
+
+/* The compact figure on a card is the snapshot's published `score` — a ranking
+   convention, not a measurement, and not the endorsement count: calling it
+   "endorsements" in the tooltip would assert that N people endorsed this when
+   the figure this network publishes also folds in the watch tally. So the
+   components go in the tooltip and the number is named for what it is.
+   It appears only when there is one to show: a video with no record, or a
+   record with no figure, or a figure of 0, gets no badge at all rather than a
+   "—" on every tile — "never counted" and "counted, and it is zero" are
+   different claims. */
+function scorePillHTML(m) {
+  if (!m || m.score === null || m.score <= 0) return "";
+  const parts = [];
+  if (m.up !== null) parts.push(`${m.up} ${plural(m.up, "endorsement", "endorsements")}`);
+  if (m.watched !== null) parts.push(`${m.watched} marked watched`);
+  const title = `Community score ${m.score}` + (parts.length ? ` · ${parts.join(", ")}` : "");
+  return `<span class="score" title="${esc(title)}">★ ${esc(m.score)}</span>`;
+}
+
+function reviewHTML(r) {
+  if (!r) return "";
+  return `<div class="mrev">
+    <span class="tag">MACHINE REVIEW</span><span class="who">reviewer: ${esc(r.who)}${r.score === null ? "" : ` · score ${esc(r.score)}`}</span>
+    ${r.headline ? `<h4>${esc(r.headline)}</h4>` : ""}
+    ${r.body ? `<p>${esc(r.body)}</p>` : ""}
+    <div class="disc">Written by an engine, not by a person. It is a second opinion printed
+      beside the human numbers and is counted in none of them.${r.on
+        ? ` Computed from record <code>${esc(r.on)}</code>.` : ""}${r.url
+        ? ` <a href="${esc(r.url)}" target="_blank" rel="noopener">Transcript ↗</a>` : ""}</div>
+  </div>`;
+}
+
+/* A number the snapshot does not carry is unknown, and unknown renders as an
+   em-dash. "No thread seeded yet" and "nobody reacted" are different claims,
+   and printing 0 for the first asserts the second. A measured zero still
+   prints as 0. */
+const figure = n => (n === null ? "—" : esc(n));
+const plural = (n, one, many) => (n === 1 ? one : many);
+
+/* No thread and no signal renders nothing at all — not a heading, not a row of
+   zeros. A thread that exists but has not been reacted to yet renders as the
+   link alone, which is the one thing about it that is true. */
+function communityHTML(m) {
+  if (!m) return "";
+  const known = [m.up, m.watched, m.comments].some(n => n !== null);
+  if (!(m.url || known || m.signals.length || m.review)) return "";
+
+  const nums = [];
+  if (m.up !== null) nums.push(`<span><b>${figure(m.up)}</b> ${plural(m.up, "endorsement", "endorsements")}</span>`);
+  /* "watched" is people who signed in and tapped a reaction. It is a floor and
+     a fraction, so it is labelled as what it is and never as "views". */
+  if (m.watched !== null) nums.push(`<span><b>${figure(m.watched)}</b> marked watched</span>`);
+  if (m.comments !== null) nums.push(`<span><b>${figure(m.comments)}</b> in the conversation</span>`);
+
+  return `<section class="comm">
+    <h2>Community</h2>
+    ${nums.length ? `<div class="nums">${nums.join("")}</div>` : ""}
+    ${m.signals.length ? `<div class="sig">${m.signals.map(([k, n]) => {
+      /* A named negative is published, never hidden and never netted off a
+         positive — but it must not read as one either, sitting in an identical
+         chip in a list sorted by count. */
+      const bad = NEG_SIGNALS.has(normKey(k));
+      return `<span${bad ? ` class="neg" title="A named negative. It is published under its own name, subtracts from nothing and is in no score."` : ""}><b>${esc(n)}</b> ${esc(SIGNAL_LABELS[k] || k.replace(/_/g, " "))}</span>`;
+    }).join("")}</div>` : ""}
+    ${m.url ? `<div class="toolbar"><a class="tbtn" href="${esc(m.url)}" target="_blank" rel="noopener">Discuss on GitHub →</a></div>` : ""}
+    <div class="src">Counts are read from a static snapshot committed next to this player, and
+      they count people signed in to GitHub — a minority of any audience. Reading the file
+      sends nothing about you, and nothing you do here is written back.</div>
+    ${reviewHTML(m.review)}
+  </section>`;
+}
+
 /* ---------------------------- views ---------------------------- */
 
 function cardHTML(v) {
   const p = prog(v.id), portrait = v.orientation === "portrait";
-  return `<a class="card" href="#/watch/${encodeURIComponent(v.id)}">
+  return `<a class="card" href="#/watch/${encodeURIComponent(v.id)}" data-vk="${esc(vkey(v))}">
     <div class="thumbwrap${portrait ? " portrait" : ""}">
       <img src="${esc(v.thumb)}" alt="" loading="lazy" decoding="async">
       ${portrait ? '<span class="badge">SHORT</span>' : ""}
       <span class="dur">${fmt(v.duration)}</span>
+      ${scorePillHTML(mget(v))}
       ${p > 0.02 && p < 0.97 ? `<span class="resume"><i style="width:${(p * 100).toFixed(1)}%"></i></span>` : ""}
     </div>
     <div class="meta">
@@ -739,6 +1020,7 @@ function viewWatch(id) {
         <ol>${v.chapters.map((c, i) => `<li><button data-t="${c.t}" data-i="${i}">
           <time>${fmt(c.t)}</time><span>${esc(c.label)}</span></button></li>`).join("")}</ol>
       </div>` : ""}
+      <div id="community" data-vk="${esc(vkey(v))}">${communityHTML(mget(v))}</div>
     </div>
     <aside>
       <h3>Up next</h3>
@@ -1053,6 +1335,36 @@ async function fetchChannel(entry) {
   return c;
 }
 
+/* The snapshot belongs to the PLAYER, not to a channel: it is resolved against
+   this page the way channels.json is, never against a channel.json's own URL.
+   It is fetched without being awaited anywhere, because route() already sits
+   behind the channel loads — putting a second host in front of first paint
+   would mean a slow metrics server is a blank player. */
+async function loadMetrics() {
+  try {
+    const r = await fetch(absolutise("state/metrics.json", location.href), { cache: "no-cache" });
+    if (!r.ok) return;                 // no snapshot published yet — that is a valid state
+    METRICS = indexMetrics(await r.json());
+  } catch { return; }                  // offline, or somebody's JSON has a comma in it
+  if (METRICS) applyMetrics();
+}
+
+/* Patch what is already on screen rather than re-running route(): a re-render
+   would tear down a playing <video> and start it over. Both surfaces are
+   additive — the pill is absolutely positioned inside the thumbnail and the
+   community block is the last element in the watch column — so nothing that is
+   already laid out moves when a late snapshot lands. */
+function applyMetrics() {
+  const slot = $("#community");
+  if (slot && !slot.innerHTML) slot.innerHTML = communityHTML(mfind(slot.dataset.vk));
+  document.querySelectorAll(".card[data-vk]").forEach(a => {
+    const wrap = $(".thumbwrap", a);
+    if (!wrap || $(".score", wrap)) return;
+    const pill = scorePillHTML(mfind(a.dataset.vk));
+    if (pill) wrap.insertAdjacentHTML("beforeend", pill);
+  });
+}
+
 async function boot() {
   let registry = { channels: [] };
   try {
@@ -1087,6 +1399,7 @@ function rebuild() {
 }
 
 boot();
+loadMetrics();          // deliberately not awaited — it must never gate first paint
 </script>
 </body>
 </html>

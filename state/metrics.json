@@ -1,0 +1,45 @@
+{
+  "schema": "rapp-vision-metrics/1.0",
+  "repo": "kody-w/rapp-vision",
+  "category": "Announcements",
+  "counting": {
+    "subject_id": "<channel id>/<video id>. A video id is unique only inside its own channel.json, so every counter is keyed on the channel-qualified id.",
+    "upvotes": "Positive reactions on the thread's top post (HEART, HOORAY, LAUGH, ROCKET, THUMBS_UP). One reaction per GitHub account, so this is a count of people.",
+    "watched": "Distinct accounts that reacted 👍 on the watch-tally comment. A deliberate click by a signed-in viewer — not a play count, not telemetry. Report it as 'viewers who said they watched', never as 'views'.",
+    "comments": "Replies on the thread, minus the bot-written machinery comments actually present on it. null with 'comments_truncated': true means the thread is longer than the one page of comments the collector reads, so the subtraction could leave a machine's own comment inside a human count — unknown is published as null, never as a number that might be wrong.",
+    "signals": "Independent per-user reaction counters on the signal comment. Never summed with each other.",
+    "negative_signals": [
+      "confusing",
+      "too_long"
+    ],
+    "negative_signals_note": "Collected, named and published. They subtract from nothing and appear in no score.",
+    "score": "2 * upvotes + watched. A ranking convention, not a measurement; both components are published so it can be recomputed with other weights.",
+    "editorial": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+    "reviewer_feedback": "Human reactions on the machine review. The ACTOR decides the lane, never the subject: a person reacting at the bot layer is real human engagement and is counted as such. It rates the REVIEWER, not the video, so it is summed into no video counter, no score and no ranking.",
+    "unwired": "Nothing in the player writes to these surfaces yet. A subject with no thread has no entry here at all — absent is not zero."
+  },
+  "signal_channels": {
+    "THUMBS_UP": "watched_it_all",
+    "HOORAY": "learned_something",
+    "HEART": "want_more_like_this",
+    "ROCKET": "tried_it_myself",
+    "EYES": "saved_for_later",
+    "THUMBS_DOWN": "too_long",
+    "CONFUSED": "confusing"
+  },
+  "reviewer_feedback_channels": {
+    "THUMBS_UP": "agreed",
+    "THUMBS_DOWN": "disputed",
+    "CONFUSED": "unclear"
+  },
+  "videos": {},
+  "editorial": {},
+  "rubric_health": {
+    "actor": "human",
+    "agreed": 0,
+    "disputed": 0,
+    "unclear": 0,
+    "subjects_where_dispute_leads": [],
+    "note": "Human reactions on the machine review — people rating the REVIEWER, not the video. Real human engagement, counted as such, and summed into no video counter or ranking. Sustained dispute means the rubric is wrong."
+  }
+}

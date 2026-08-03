@@ -31,18 +31,20 @@ That's the entire pitch: **a video that is also a program.**
 
 ## What's on it
 
-Eight channels, twenty-one entries. Three of them publish **no video files at all** —
-every entry is a script over a real application in a neighbouring repo:
+Nine channels, twenty-nine entries. Four of them publish **no video files at all** —
+in three, every entry is a script over a real application in a neighbouring repo; in the
+fourth, every entry is a title-card lesson:
 
 | Channel | | What it is |
 |---|---|---|
 | **Rooms** | 🕯️ | Nine ambient places that do not exist — a canoe at dawn, a cabin under the aurora, a cave lit by larvae. Slow TV where the rain is simulated, so it never falls the same way twice. |
 | **Arcade** | 🕹️ | Games and emulators, booted cold and played live. Including one entry that stops scripting halfway through and hands you the keyboard. |
 | **The Workbench** | 🛠️ | A DAW, a vector editor, a spreadsheet, an 808 — driven live. A product demo you can interrupt is a different object from one you watch. |
+| **OpenRappter Training** | 🦖 | Eight modules on a sibling project, built only from commands that were actually run. No video, no app scenes, no binary assets — posters are inline SVG. It says out loud which of its own claims are unverified. |
 | **Rock Tumbler** | 🪨 | Ten apps built by AI sub-agents; nine reported success while broken. Static video. |
 | **Local First Tools** · **Learn with Kody** · **Catch-up** · **Field Notes** | | The rest of the network. |
 
-The three live-only channels come to 57 KB of JSON, and drive 31 scenes across 26
+The three app-driving channels come to 57 KB of JSON, and drive 31 scenes across 26
 of the apps in the neighbouring repo. (Plus 0.9 MB of poster images — which any
 format needs, and which are themselves screenshots of the scenes running.) The
 equivalent as rendered video would be north of a gigabyte, and would not let you
@@ -187,7 +189,9 @@ headless Chromium has no H.264 decoder, so a WebM is what makes your channel
 ## Verified, not asserted
 
 Every claim above was measured from *outside* the page, in real headless Chromium,
-against the actual player — not a mock:
+against the actual player — not a mock.
+
+**The network run**, at the eight channels that existed when it was taken:
 
 ```
 FOOT    Source · 8 channels, 21 videos.
@@ -207,6 +211,29 @@ errors: none
   arcade       @0:08  skybreak-dogfight.html  ✓ RUNNING  gate cleared, HUD live
   workbench    @1:18  vector-design-studio    ✓ RUNNING  LAYERS 66 → 69 after 3 drags
 ```
+
+**OpenRappter Training** was registered afterwards and measured the same way. That takes
+the registry to nine channels and twenty-nine entries — twenty-one above, plus these eight:
+
+```
+FOOT    Source · 9 channels.
+CHANS   …, OpenRappter Training                     ← from channels.json alone:
+  /channel/openrappter-training  cards=8  thumbs-loaded=8/8    no localStorage,
+                                                              no "Add channel"
+WATCH   openrappter-m8-know-what-is-real
+  chapter 0:08  "900 passed cold — and the flag you need"
+  stage   0:10  pytest tests -q --continue-on-collection-errors
+                9 failed, 900 passed, 1 skipped, 7 errors — on a clone with
+                nothing installed
+  stage   0:58  --status · conformance.py · pytest -q --continue-on-collection-errors
+  card fits the stage: 642px in a 644px stage, not clipped
+404s:   none from this channel — it ships no media and its posters are data URIs
+errors: none
+```
+
+That run was taken against this repo plus stand-in sibling repos, so its own footer read a
+lower video total; the twenty-nine above is the network run's twenty-one plus the eight
+entries measured here, not a single end-to-end re-count.
 
 A scene that fails to drive its app does not look broken — it looks like a video
 of an app sitting still. So the harness hit-tests the centre of the frame to

@@ -57,6 +57,13 @@
       "url": "../localFirstTools/rappvision/workbench/channel.json",
       "repo": "https://github.com/kody-w/localFirstTools",
       "_why": "Production tools — a DAW, a vector editor, a spreadsheet — driven live. A tool demo you can seize control of is a different thing from a tool demo you watch."
+    },
+    {
+      "id": "openrappter-training",
+      "name": "OpenRappter Training",
+      "url": "openrappter-training/channel.json",
+      "repo": "https://github.com/kody-w/openrappter",
+      "_why": "Relative like rock-tumbler, because the channel lives in THIS repo — it documents a sibling project but ships from here. Eight card-only modules with no media file of any kind: the lesson is the description, and every command in it was run before it was written."
     }
   ]
 }

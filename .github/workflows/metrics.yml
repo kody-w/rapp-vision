@@ -1,0 +1,569 @@
+name: Channel Metrics
+
+# Once a day: seed a Discussion thread for every entry in the network, make sure
+# every thread carries its signal surfaces, re-count the reactions into
+# state/metrics.json, refresh the editorial lane, and commit the snapshot ONLY
+# when a number actually moved.
+#
+# Ported from RAR's .github/workflows/refresh-ratings.yml, which has been running
+# this shape in production. Every comment below that says "why" is carried over
+# from a failure that already happened somewhere, or from a property of this repo
+# that was measured rather than assumed.
+#
+# THE SNAPSHOT CARRIES NO TIMESTAMP, and that is load-bearing rather than
+# stylistic. scripts/rapp_metrics.py:snapshot_body() writes schema/repo/category/
+# counting/signal_channels/videos/editorial and nothing else — no generated_at,
+# no history array — with sorted keys and stable serialisation. Identical counts
+# therefore produce identical bytes, `git status --porcelain` finds nothing, and a
+# quiet day produces NO COMMIT AT ALL. The git history of state/metrics.json is
+# the time series; every commit in it marks a day a number really changed.
+# The counter-example lives in the repo this was ported from: RAR's own
+# state/metrics.json stamps generated_at on every build, so its identical
+# "commit only if changed" guard can never fire and it commits daily whether or
+# not anything moved. Its history tells you nothing.
+on:
+  schedule:
+    # 08:10 UTC. Deliberately off the hour and away from the rest of the estate's
+    # crons — RAR runs refresh-ratings at 07:00 and its metrics snapshot at 05:20.
+    # Nothing here shares a rate-limit budget with those (each repo gets its own
+    # installation token), but stacking cron minutes on the same runner pool buys
+    # nothing and staggering costs nothing. GitHub's scheduler is best-effort and
+    # drifts under load; nothing in this workflow depends on the exact minute.
+    - cron: "10 8 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write # commit the refreshed metrics snapshot
+  discussions: write # seed threads and provision signal surfaces
+
+concurrency:
+  group: rapp-vision-metrics
+  # NEVER cancel in progress. Seeding and surfacing are cheap to repeat, but a
+  # run killed between "created the thread" and "created its signal comment"
+  # leaves a thread nobody can answer on until the next run. Queueing is the
+  # correct behaviour here; cancelling is not.
+  cancel-in-progress: false
+
+env:
+  # The collector CLI, in one place, so renaming it is one edit rather than six.
+  #
+  # THE CONTRACT (scripts/rapp_metrics.py module docstring; docs/METRICS.md):
+  #   <CLI> seed      --limit N   create missing per-subject Discussions
+  #   <CLI> surfaces  --limit N   provision the watch/signal marker comments
+  #   <CLI> fetch                 re-count -> state/metrics.json
+  #   <CLI> editorial --limit N   write/refresh the machine-review lane
+  #   <CLI> subjects              list enumerated subjects (no token, no network)
+  # Every subcommand returns 0 on a missing token, a network error, an unreadable
+  # channels.json or a missing Discussion category, leaving any existing snapshot
+  # byte-for-byte untouched (cmd_fetch/cmd_seed/cmd_surfaces/cmd_editorial each
+  # catch OSError/RuntimeError/URLError and return 0).
+  METRICS_CLI: scripts/rapp_metrics.py
+
+  # Where the sibling channels are published. channels.json lists seven entries
+  # as origin-relative paths (../localFirstTools/rappvision/channel.json and
+  # friends) with the reason written into each `_why`: "kody-w.github.io serves
+  # every repo from one origin, so this resolves in production AND in local
+  # testing." A CI checkout has only this repo, so those paths resolve to
+  # nothing — see "Materialise the sibling channels" below.
+  RAPP_VISION_SITE_ORIGIN: https://kody-w.github.io
+
+jobs:
+  # ─── OFFLINE UNIT TESTS (every push and PR) ─────────────────────────────────
+  # Hermetic by construction: no GITHUB_TOKEN is exposed to this job, so nothing
+  # in it can reach the GitHub API even by accident. That is the point. RAR's
+  # docs/REPORTING-TESTS.md puts it plainly — "faking an API mostly tests the
+  # fake: it passes while the real call 404s, and the first you hear of it is a
+  # report card full of zeroes." So the suite drives the pure transforms
+  # (subject-id construction, the reaction -> channel map, the refuse-to-clobber
+  # guard, the isolation of the editorial lane) with hand-built payloads, and the
+  # live half is driven by hand — docs/METRICS.md, "Verifying it before you trust
+  # it".
+  #
+  # A red run here always means the code broke, never that GitHub was having a
+  # bad day, which is exactly why it is allowed to gate a merge.
+  test:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # this job never writes; do not let it
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # stdlib unittest, not pytest, and no `pip install` step. tests/ is written
+      # against unittest (its own docstring says "python3 -m unittest discover -s
+      # tests -v") and it patches urllib.request.urlopen for the whole module so
+      # that any accidental network call is a red test rather than a slow one.
+      # Keeping the runner free of pip means this gate cannot be turned red by
+      # PyPI having a bad afternoon.
+      #
+      # An absent suite is a failure, not a pass: an empty tests/ directory is
+      # indistinguishable from a green run if you let "no tests collected" slide.
+      - name: Offline unit tests
+        run: |
+          if [ ! -d tests ] || [ -z "$(ls -A tests 2>/dev/null)" ]; then
+            echo "::error::tests/ is missing or empty - the metrics collector ships with an offline suite"
+            exit 1
+          fi
+          python -m unittest discover -s tests -v
+
+      # `subjects` walks channels.json -> each channel.json -> videos[] straight
+      # off the filesystem, with no token and no network, so it is a free
+      # integration check against the REAL registry instead of a fixture.
+      #
+      # The enumerator is deliberately forgiving: it warns on stderr and keeps
+      # walking, so one publisher's typo cannot blank the rest of the network.
+      # That is right at runtime and wrong at review time. A duplicate subject id
+      # in particular means two entries would share one counter — invisible
+      # afterwards, and once counts exist there is no way to split them apart
+      # again. stdout is unique by construction (it is a dict), so the WARNING is
+      # the only observable, and this step promotes it to a failure.
+      #
+      # The sibling channel repos are NOT checked out on a PR, so "could not
+      # read" for a path outside this workspace is expected here and is filtered
+      # out. Everything else on stderr is a problem with the registry in this
+      # pull request. (The daily job applies the strict version of this gate,
+      # after materialising those files — failure posture is the caller's
+      # choice, not the collector's.)
+      - name: Enumerate subjects (offline, real registry)
+        run: |
+          python "$METRICS_CLI" subjects >/tmp/subjects.out 2>/tmp/subjects.err || true
+          cat /tmp/subjects.err >&2
+          awk -v ws="$PWD/" '
+            /^\[rapp-metrics\] [0-9]+ subject\(s\)\.$/            { next }
+            /could not read / && index($0, ws) == 0               { next }
+            { print }
+          ' /tmp/subjects.err > /tmp/subjects.bad
+          if [ -s /tmp/subjects.bad ]; then
+            echo "::error::the registry in this PR does not enumerate cleanly - see the lines below"
+            cat /tmp/subjects.bad >&2
+            exit 1
+          fi
+          echo "Enumerated $(wc -l < /tmp/subjects.out) subject(s) from the checked-out channels."
+
+      # The player reads state/metrics.json directly (index.html loadMetrics()),
+      # and it fails soft: a malformed snapshot leaves METRICS null and every
+      # render site returns "". That is the correct runtime behaviour and the
+      # worst possible review-time behaviour — a broken snapshot looks exactly
+      # like an honest "nothing published yet". So parse it here, where a human
+      # is watching.
+      - name: Snapshot parses
+        run: |
+          if [ ! -f state/metrics.json ]; then
+            echo "No snapshot yet - nothing to check."
+            exit 0
+          fi
+          python - <<'PY'
+          import json, sys
+          from pathlib import Path
+          doc = json.loads(Path("state/metrics.json").read_text(encoding="utf-8"))
+          if not isinstance(doc, dict):
+              sys.exit("::error::state/metrics.json is not a JSON object")
+          if "generated_at" in doc or "updated_at" in doc or "history" in doc:
+              sys.exit("::error::the snapshot carries a timestamp - that makes every "
+                       "rebuild a diff and destroys the only time series there is")
+          videos = doc.get("videos") or {}
+          print(f"snapshot ok: schema={doc.get('schema')!r} videos={len(videos)} "
+                f"editorial={len(doc.get('editorial') or {})}")
+          PY
+
+  # ─── DAILY COLLECTION ───────────────────────────────────────────────────────
+  refresh:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Full history. This job's entire purpose is to land a commit on a
+          # branch another session also pushes to, and `git pull --rebase` on a
+          # shallow clone is the kind of thing that works until the day main has
+          # moved. The repo is nine commits deep; there is nothing to save here.
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # THE ONE STEP HERE THAT IS ALLOWED TO FAIL THE RUN, AND THE REASON IT
+      # EXISTS: `discussions: write` in the permissions block above authorises
+      # nothing if the FEATURE is switched off for the repository, and every
+      # collector below is continue-on-error and returns 0 on exactly that
+      # condition. Traced through the collector: with Discussions disabled,
+      # SEED_INFO_QUERY comes back with an empty discussionCategories list, so
+      # cmd_seed's category_id is None and it warns + returns 0
+      # (scripts/rapp_metrics.py:1193-1194); fetch_all_discussions returns [],
+      # so cmd_surfaces and cmd_editorial find no targets and return 0; and
+      # cmd_fetch builds videos={}, which persist() will happily write over a
+      # snapshot whose own `videos` is already empty (its refuse-to-clobber
+      # guard keys on _prior_has_counts(), line 982 — an empty prior is falsy
+      # and does not protect anything). The gates below are filesystem-only and
+      # pass. Net result without this step: a green badge every morning, a
+      # commit of machine-written editorial notes, and ZERO human metrics
+      # forever. Nothing anywhere in the pipeline notices.
+      #
+      # So it is checked once, up front, loudly, before anything spends an API
+      # call. A definitive "the feature is off" or "the category is missing" is
+      # a configuration error and stops the run. A transport failure is NOT: if
+      # the API cannot be reached at all, the collectors below cannot reach it
+      # either, they will each no-op by design, and the publication gates
+      # protect the snapshot — that is a bad API day, not a misconfigured repo,
+      # and it must not be reported as one.
+      - name: Discussions preflight
+        run: |
+          python - <<'PY'
+          import json, os, sys, urllib.error, urllib.request
+
+          # The collector talks to RAPP_VISION_METRICS_REPO (default
+          # kody-w/rapp-vision); check the repo it will actually use, not
+          # whichever fork this happens to be running in.
+          repo = os.environ.get("RAPP_VISION_METRICS_REPO") or os.environ["GITHUB_REPOSITORY"]
+          owner, _, name = repo.partition("/")
+          category = os.environ.get("RAPP_VISION_METRICS_CATEGORY", "Announcements")
+          query = (
+              '{repository(owner:"%s",name:"%s"){hasDiscussionsEnabled '
+              "discussionCategories(first:25){nodes{name}}}}" % (owner, name)
+          )
+          req = urllib.request.Request(
+              "https://api.github.com/graphql",
+              data=json.dumps({"query": query}).encode(),
+              headers={
+                  "Authorization": "Bearer " + os.environ["GITHUB_TOKEN"],
+                  "Content-Type": "application/json",
+                  "User-Agent": "rapp-vision-metrics",
+              },
+          )
+          try:
+              payload = json.load(urllib.request.urlopen(req, timeout=30))
+          except (OSError, ValueError, urllib.error.URLError) as exc:
+              print(f"::warning::could not reach the GitHub API to preflight "
+                    f"Discussions ({exc}); the collectors below will no-op and "
+                    f"the publication gates will keep the snapshot as it is")
+              raise SystemExit(0)
+          if payload.get("errors"):
+              print("::warning::preflight query returned errors "
+                    f"({payload['errors']}); not treating that as a "
+                    "misconfigured repo")
+              raise SystemExit(0)
+          repository = (payload.get("data") or {}).get("repository") or {}
+          categories = [
+              c.get("name")
+              for c in (repository.get("discussionCategories") or {}).get("nodes") or []
+          ]
+          if not repository.get("hasDiscussionsEnabled"):
+              sys.exit(
+                  f"::error::Discussions is disabled on {repo} - every collector "
+                  "below would no-op and this run would go green with no data. "
+                  "Enable it in Settings -> Features -> Discussions."
+              )
+          if category not in categories:
+              sys.exit(
+                  f"::error::Discussions category '{category}' does not exist on "
+                  f"{repo}; the seeder cannot create a thread without it. "
+                  f"Categories present: {categories}"
+              )
+          print(f"Discussions enabled on {repo}; category '{category}' present.")
+          PY
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # WITHOUT THIS STEP THIS WORKFLOW MEASURES ONE CHANNEL OUT OF EIGHT.
+      #
+      # The collector enumerates subjects off the FILESYSTEM (so it can run
+      # offline, with no token), resolving each channels.json entry against the
+      # network file exactly as the player's absolutise(entry.url, location.href)
+      # does. Seven of the eight entries are origin-relative paths into sibling
+      # repos — ../localFirstTools/rappvision/channel.json, ../catchup/…, and so
+      # on — which exist on kody-w.github.io and do not exist in a CI checkout of
+      # this repo alone. Measured locally: without this step `subjects` finds 3
+      # subjects and warns seven times; with it, 22 subjects and a clean stderr.
+      #
+      # This fetches the PUBLISHED channel file for each one — the same bytes the
+      # player itself loads — and writes it to the path the resolver expects, one
+      # level above the workspace. That mirrors README.md's own local layout
+      # ("clone the repos side by side and run python3 -m http.server 8000 from
+      # the PARENT directory", which reproduces the single kody-w.github.io
+      # origin). No token, no clone, no media: only the channel.json is read.
+      #
+      # Non-fatal per source, like every other collector here: a channel that
+      # does not answer is a ::warning:: and the walk continues. What it must NOT
+      # do is quietly publish the result — see the completeness gate below.
+      - name: Materialise the sibling channels
+        run: |
+          python - <<'PY'
+          import json, os, urllib.error, urllib.request
+          from pathlib import Path
+          from urllib.parse import urlsplit
+
+          origin = os.environ.get("RAPP_VISION_SITE_ORIGIN", "").rstrip("/")
+          net = Path("channels.json").resolve()
+          try:
+              doc = json.loads(net.read_text(encoding="utf-8"))
+          except (OSError, ValueError) as exc:
+              print(f"::warning::cannot read channels.json ({exc}); nothing materialised")
+              raise SystemExit(0)
+
+          root = net.parent
+          here = fetched = unavailable = 0
+          for entry in doc.get("channels") or []:
+              url = str(entry.get("url") or "").strip()
+              # Absolute and root-relative URLs are skipped by the enumerator
+              # itself (there is no origin on a filesystem), so there is nothing
+              # to place on disk for them.
+              if not url or urlsplit(url).scheme or url.startswith("/"):
+                  continue
+              dest = (root / url).resolve()
+              if dest.exists():
+                  here += 1
+                  continue
+              rel = os.path.relpath(dest, root.parent).replace(os.sep, "/")
+              if rel.startswith(".."):
+                  print(f"::warning::{url} resolves above the work tree; skipped")
+                  unavailable += 1
+                  continue
+              src = f"{origin}/{rel}"
+              # Ask the CDN in front of Pages for the current bytes rather than
+              # whatever it is still holding. A stale copy here does not fail —
+              # it succeeds with the WRONG videos[], which is the input the
+              # deletion gate below exists to catch. Cheaper to not produce it.
+              req = urllib.request.Request(
+                  src,
+                  headers={
+                      "Cache-Control": "no-cache",
+                      "Pragma": "no-cache",
+                      "User-Agent": "rapp-vision-metrics",
+                  },
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as resp:
+                      body = resp.read()
+                  json.loads(body.decode("utf-8"))   # never write a 404 page to disk
+              except (OSError, ValueError, urllib.error.URLError) as exc:
+                  print(f"::warning::{src}: {exc}")
+                  unavailable += 1
+                  continue
+              dest.parent.mkdir(parents=True, exist_ok=True)
+              dest.write_bytes(body)
+              fetched += 1
+              print(f"materialised {entry.get('id')}  {src}")
+          print(f"channels: {here} in-repo, {fetched} fetched, {unavailable} unavailable")
+          PY
+
+      # Idempotent: creates a thread only for entries that don't have one yet.
+      # Capped per run to stay under GitHub's content-creation rate limits; the
+      # collector stops on the first error rather than failing, so the next run
+      # resumes exactly where this one left off and the daily cron drains any
+      # backlog. A newly created thread gets its FULL signal surface in the same
+      # pass, so nothing about a new entry needs back-filling.
+      #
+      # Collection only runs on a schedule or a manual run, so a brand-new entry
+      # waits up to 24h for its thread. If that matters for a launch, run this by
+      # hand: Actions -> Channel Metrics -> Run workflow.
+      #
+      # continue-on-error is belt over the collector's own suspenders. The CLI is
+      # specified to exit 0 on any API problem, but if that guard ever regresses a
+      # red step here would skip every step below it and throw away the whole
+      # day's counts. Losing a day of reactions is the expensive failure; a thread
+      # seeded a day late is not.
+      - name: Seed missing entry threads
+        continue-on-error: true
+        run: python "$METRICS_CLI" seed --limit 60
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Every thread needs its marker comments — the watch tally and the signal
+      # poll. They are comments rather than a real Discussion poll because
+      # createDiscussion accepts only repositoryId/title/body/categoryId, so a
+      # poll can ONLY be created by hand in the web UI. A signal surface that
+      # needs a human to click through the web UI once per video is not a
+      # pattern, it is a chore that will not survive the network growing. A
+      # comment is API-creatable and carries all eight reaction contents as
+      # independent per-user counters, so one comment behaves as an eight-option
+      # poll.
+      #
+      # Back-fill is per-marker and idempotent: a thread missing only the newer
+      # marker gets only that one. That is what makes adding a signal surface a
+      # one-entry change in MARKERS rather than a migration script.
+      - name: Ensure signal surfaces on every thread
+        continue-on-error: true
+        run: python "$METRICS_CLI" surfaces --limit 60
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Non-fatal by design: any API problem leaves the snapshot unchanged rather
+      # than failing the run or erasing real counts. The counts live on GitHub and
+      # are not recomputable from here, so an empty result must never overwrite a
+      # non-empty file — that guard lives in the collector's persist(), not here,
+      # and is pinned by the offline suite. continue-on-error without it would
+      # happily commit whatever was left on disk.
+      - name: Fetch metrics snapshot
+        continue-on-error: true
+        run: python "$METRICS_CLI" fetch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # The editorial lane: a machine-written note per entry, in its own comment,
+      # attributed, and structurally unable to move a human counter (it is one
+      # comment carrying its own marker, that marker is subtracted from the human
+      # comment count, and this command adds no reaction anywhere).
+      #
+      # It runs LAST of the collectors and separately continue-on-error for the
+      # reason RAR wrote into the same slot after being bitten by it: this step
+      # sits between the collectors and the commit, so an unhandled error here
+      # threw away the entire day's collected signal. Writing a review is the
+      # least important thing this workflow does; losing a day of reactions is the
+      # most expensive.
+      - name: Refresh the editorial lane
+        continue-on-error: true
+        run: python "$METRICS_CLI" editorial --limit 40
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # THE PUBLICATION GATE. Everything above collects; this decides whether
+      # what was collected is fit to publish.
+      #
+      # build_snapshot() keeps only threads whose title is in the ENUMERATED
+      # subject set (belt and suspenders: shape check plus registry membership).
+      # So a channel that failed to materialise does not merely go uncounted — its
+      # entries are dropped from the snapshot entirely, and committing that would
+      # delete real counts from the file the player reads. "A snapshot rebuilt
+      # from the sources that happened to answer is a deletion of the ones that
+      # did not."
+      #
+      # Nothing is lost by stopping here: the counts live in GitHub Discussions
+      # and the snapshot is rebuilt from scratch on every run, so the next run (or
+      # a manual dispatch) publishes the correct file. The seeding and surfacing
+      # above already happened and were pure additions.
+      #
+      # If a channel is genuinely gone, remove its entry from channels.json — the
+      # run goes green again, and the removal is a reviewable commit rather than a
+      # silent shrinkage of the network.
+      - name: Refuse to publish a partial network
+        run: |
+          python "$METRICS_CLI" subjects >/tmp/subjects.out 2>/tmp/subjects.err || true
+          cat /tmp/subjects.err >&2
+          grep -v -E '^\[rapp-metrics\] [0-9]+ subject\(s\)\.$' /tmp/subjects.err > /tmp/subjects.bad || true
+          if [ -s /tmp/subjects.bad ]; then
+            echo "::error::the network did not enumerate cleanly - refusing to commit a snapshot that would drop the missing entries"
+            cat /tmp/subjects.bad >&2
+            exit 1
+          fi
+          echo "Enumerated $(wc -l < /tmp/subjects.out) subject(s) across the whole network."
+
+      # THE OTHER HALF OF THE PUBLICATION GATE — and the half that catches the
+      # failure the step above cannot see.
+      #
+      # That step only reads the enumerator's stderr, so it fires when a channel
+      # fails to PARSE. It is blind to a channel that parses perfectly and has
+      # SHRUNK: a stale CDN copy, a half-finished deploy or a publisher who
+      # emptied videos[] by accident all produce valid JSON with fewer entries.
+      # Reproduced with the real code: with one sibling channel rewritten to
+      # `"videos": []`, `subjects` printed its normal one-line summary and
+      # nothing else, so the grep above found nothing and the step passed —
+      # while persist() went from 22 counted subjects to 19 and dropped 123
+      # upvotes. persist()'s own guard cannot help either; it only refuses a
+      # TOTALLY empty result (scripts/rapp_metrics.py:1071), and a smaller
+      # snapshot is not empty.
+      #
+      # So this gate ignores stderr entirely and diffs the file that is about to
+      # be committed against the one already committed. A subject that currently
+      # holds counts and is not in the new snapshot is a deletion, and a
+      # deletion is never something a collection run gets to do silently: the
+      # counts live in GitHub Discussions, the snapshot is rebuilt from scratch
+      # every run, so stopping here costs nothing and the next run publishes the
+      # correct file. If an entry is genuinely retired, take it out of
+      # channels.json — a reviewable commit, not a silent shrinkage.
+      - name: Refuse to publish a deletion
+        run: |
+          git show HEAD:state/metrics.json > /tmp/prior.json 2>/dev/null || echo '{}' > /tmp/prior.json
+          python - <<'PY'
+          import json, sys
+          from pathlib import Path
+
+          def videos_of(text):
+              try:
+                  doc = json.loads(text or "{}")
+              except ValueError:
+                  # Deliberately fails OPEN, unlike persist()'s guard, and only
+                  # here: an unparseable side holds no readable counts, so there
+                  # is nothing this gate can prove would be deleted. If it is
+                  # the COMMITTED snapshot that will not parse, the file the
+                  # player reads is already broken and blocking a good rebuild
+                  # would wedge the pipeline until a human hand-fixed it.
+                  return {}
+              return (doc or {}).get("videos") or {} if isinstance(doc, dict) else {}
+
+          prior = videos_of(Path("/tmp/prior.json").read_text(encoding="utf-8"))
+          snapshot = Path("state/metrics.json")
+          new = videos_of(snapshot.read_text(encoding="utf-8")) if snapshot.exists() else {}
+
+          def has_counts(record):
+              if not isinstance(record, dict):
+                  return False
+              return any(
+                  int(record.get(key, 0) or 0) for key in ("upvotes", "watched", "comments")
+              )
+
+          gone = sorted(s for s in prior if s not in new and has_counts(prior[s]))
+          if gone:
+              sys.exit(
+                  "::error::this snapshot would DELETE subjects that currently "
+                  "hold counts: " + ", ".join(gone) + " - a source shrank rather "
+                  "than failed. Refusing to publish. If the entries are genuinely "
+                  "retired, remove them from channels.json in a reviewable commit."
+              )
+          print(f"no deletions: {len(prior)} subject(s) committed, {len(new)} in the new snapshot.")
+          PY
+
+      - name: Commit snapshot if changed
+        run: |
+          # Only stage files that exist. An unmatched pathspec fails `git add`
+          # for every other file listed alongside it, so a snapshot that has not
+          # been produced yet must not take the others down with it.
+          FILES=""
+          for f in state/metrics.json; do
+            if [ -f "$f" ]; then FILES="$FILES $f"; fi
+          done
+          if [ -z "$FILES" ] || [ -z "$(git status --porcelain $FILES)" ]; then
+            echo "No changes; nothing to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add $FILES
+          # [skip ci] so the snapshot commit does not retrigger this workflow's
+          # own push-triggered test job every time a number moves.
+          git commit -m "chore(metrics): refresh channel metrics snapshot [skip ci]"
+
+          # Another session pushes to this repo, so main can move under us between
+          # checkout and push. Rebase rather than merge keeps the history a
+          # straight line; the retry covers the narrow race where somebody lands a
+          # commit between our pull and our push.
+          for attempt in 1 2 3; do
+            if ! git pull --rebase origin main; then
+              git rebase --abort 2>/dev/null || true
+              echo "::error::rebase conflict on the snapshot - refusing to guess which counts are real"
+              echo "Nothing is lost: the snapshot is rebuilt from the live API on every run,"
+              echo "so the next run (or a manual dispatch) produces the correct file."
+              exit 1
+            fi
+            if git push origin main; then
+              echo "Pushed on attempt $attempt."
+              exit 0
+            fi
+            echo "Push rejected - main moved. Retrying."
+            sleep 5
+          done
+          echo "::error::could not push the snapshot after 3 attempts"
+          exit 1
