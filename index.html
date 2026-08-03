@@ -399,7 +399,16 @@ function mountLive(v, host) {
          the camera welded in place. Chromium says so out loud —
          "Blocked pointer lock ... the 'allow-pointer-lock' permission is not
          set" — which is how this was found. */
-      frame.setAttribute("sandbox", "allow-scripts allow-same-origin allow-pointer-lock");
+      /* allow-forms for the same reason. The webOS scene sat on its lock
+         screen for all 18 seconds because that app unlocks on a form submit,
+         and Chromium refuses that too - "Blocked form submission ... because
+         the form's frame is sandboxed and the 'allow-forms' permission is not
+         set." Measured both ways against production: without allow-forms the
+         click reaches the button and the submit event never fires; with it,
+         the desktop appears. This is not a loosening - allow-scripts plus
+         allow-same-origin already lets a same-origin frame escape the sandbox,
+         and the browser warns as much. */
+      frame.setAttribute("sandbox", "allow-scripts allow-same-origin allow-pointer-lock allow-forms");
       stage.appendChild(frame);
       if (s.lower) {
         const l = document.createElement("div");
