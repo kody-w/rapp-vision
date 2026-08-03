@@ -1,0 +1,60 @@
+{
+  "advisories": [],
+  "coverage": {
+    "channels_in_registry": 9,
+    "channels_loaded": 9,
+    "channels_unreachable": [],
+    "queue_channels_not_loaded": [],
+    "signals_available": true
+  },
+  "generated_by": {
+    "adapter": "dryrun-structural/1.0.0",
+    "judgment": false,
+    "kind": "structural"
+  },
+  "note": "A QUEUE, NOT A PUBLICATION. Nothing here is on the network. A human — or an explicit promotion step — turns a proposal into an episode by editing a channel.json. The content machine cannot write a channel.json: its only write path refuses any destination outside state/.",
+  "proposals": [
+    {
+      "channel": "field-notes",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "Two platforms were silently deadlocked for 19 days. Both looked perfectly healthy."
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "98308ad783bd",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Post-mortems from autonomous systems that looked perfectly healthy while being completely frozen.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: Two platforms were silently deadlocked for 19 days. Both looked perfectly healthy..",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Field Notes has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "field-notes"
+    }
+  ],
+  "schema": "rapp-vision-proposals/1.0",
+  "thresholds": {
+    "long_video_seconds": 180,
+    "min_signal": 2,
+    "stale_days": 45,
+    "thin_min": 3
+  },
+  "totals": {
+    "advisories": 0,
+    "open": 1,
+    "proposals": 1
+  }
+}
