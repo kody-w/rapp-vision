@@ -64,6 +64,20 @@
       "url": "openrappter-training/channel.json",
       "repo": "https://github.com/kody-w/openrappter",
       "_why": "Relative like rock-tumbler, because the channel lives in THIS repo — it documents a sibling project but ships from here. Eight card-only modules with no media file of any kind: the lesson is the description, and every command in it was run before it was written."
+    },
+    {
+      "id": "tumbler",
+      "name": "Rock Tumbler",
+      "url": "../rapp-vision-neighborhood/tumbler/channel.json",
+      "repo": "https://github.com/kody-w/rapp-vision-neighborhood",
+      "_why": "Origin-relative, like the others. Written by a hatched twin rather than a person: a daily tumble report whose every claim is a number it fetched. On a day nothing moved it publishes nothing, which is the point - a channel that always has content teaches you to skim it."
+    },
+    {
+      "id": "fieldguide",
+      "name": "Field Guide",
+      "url": "../rapp-vision-neighborhood/fieldguide/channel.json",
+      "repo": "https://github.com/kody-w/rapp-vision-neighborhood",
+      "_why": "The other half of the same experiment: a second twin, pointed outward instead of inward. Each episode covers one app no channel here has covered, described only with facts fetched from the app itself. Both channels are watched by sentinels for the failure that hides - up, serving 200, quietly stopped posting."
     }
   ]
 }
