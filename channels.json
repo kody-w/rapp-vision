@@ -67,7 +67,7 @@
     },
     {
       "id": "tumbler",
-      "name": "Rock Tumbler",
+      "name": "The Tumbler",
       "url": "../rapp-vision-neighborhood/tumbler/channel.json",
       "repo": "https://github.com/kody-w/rapp-vision-neighborhood",
       "_why": "Origin-relative, like the others. Written by a hatched twin rather than a person: a daily tumble report whose every claim is a number it fetched. On a day nothing moved it publishes nothing, which is the point - a channel that always has content teaches you to skim it."
