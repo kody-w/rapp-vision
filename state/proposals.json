@@ -1,8 +1,8 @@
 {
   "advisories": [],
   "coverage": {
-    "channels_in_registry": 9,
-    "channels_loaded": 9,
+    "channels_in_registry": 11,
+    "channels_loaded": 11,
     "channels_unreachable": [],
     "queue_channels_not_loaded": [],
     "signals_available": true
@@ -23,7 +23,7 @@
           "Two platforms were silently deadlocked for 19 days. Both looked perfectly healthy."
         ]
       },
-      "gap_closed": false,
+      "gap_closed": true,
       "generated_by": {
         "adapter": "dryrun-structural/1.0.0",
         "judgment": false,
@@ -43,6 +43,97 @@
       },
       "status": "proposed",
       "subject": "field-notes"
+    },
+    {
+      "channel": "field-notes",
+      "evidence": {
+        "entries": 2,
+        "thin_below": 3,
+        "titles": [
+          "I gave three agents the night's record and asked them nothing. All three proved my dashboard was lying.",
+          "Two platforms were silently deadlocked for 19 days. Both looked perfectly healthy."
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "e313f5faf4ac",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Post-mortems from autonomous systems that looked perfectly healthy while being completely frozen.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: I gave three agents the night's record and asked them nothing. All three proved my dashboard was lying., Two platforms were silently deadlocked for 19 days. Both looked perfectly healthy..",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Field Notes has only 2 entries",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "field-notes"
+    },
+    {
+      "channel": "fieldguide",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "Field Guide 2026-08-04 - The Alpine Summit · Above The Clouds"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "b960427764d4",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "One app nobody has covered yet, walked through for someone who arrived five minutes ago.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: Field Guide 2026-08-04 - The Alpine Summit · Above The Clouds.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Field Guide has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "fieldguide"
+    },
+    {
+      "channel": "tumbler",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "Tumble 2026-08-04 - Baseline: 30 apps hashed, 24 media files probed"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "f1dda9c765f5",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "A daily tumble report on the RAPP Vision network. Every claim is a number, or it is not published.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: Tumble 2026-08-04 - Baseline: 30 apps hashed, 24 media files probed.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] The Tumbler has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "tumbler"
     }
   ],
   "schema": "rapp-vision-proposals/1.0",
@@ -54,7 +145,7 @@
   },
   "totals": {
     "advisories": 0,
-    "open": 1,
-    "proposals": 1
+    "open": 3,
+    "proposals": 4
   }
 }
