@@ -147,6 +147,25 @@
       "url": "https://github.com/kody-w/rapp-vision/discussions/18",
       "number": 18
     },
+    "field-notes/above-not-beside": {
+      "channel": "field-notes",
+      "video": "above-not-beside",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/33",
+      "number": 33
+    },
     "field-notes/platform-relaunch-recap": {
       "channel": "field-notes",
       "video": "platform-relaunch-recap",
@@ -165,6 +184,25 @@
       },
       "url": "https://github.com/kody-w/rapp-vision/discussions/19",
       "number": 19
+    },
+    "fieldguide/guide-2026-08-04": {
+      "channel": "fieldguide",
+      "video": "guide-2026-08-04",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/34",
+      "number": 34
     },
     "learnwithkody/lwk-apex-live": {
       "channel": "learnwithkody",
@@ -565,6 +603,25 @@
       "url": "https://github.com/kody-w/rapp-vision/discussions/28",
       "number": 28
     },
+    "tumbler/tumble-2026-08-04": {
+      "channel": "tumbler",
+      "video": "tumble-2026-08-04",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/35",
+      "number": 35
+    },
     "workbench/workbench-808": {
       "channel": "workbench",
       "video": "workbench-808",
@@ -726,6 +783,22 @@
         "actor": "human"
       }
     },
+    "field-notes/above-not-beside": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 6,
+      "checks_total": 6,
+      "not_applicable": 2,
+      "notes": [],
+      "record_sha8": "f8b0dd6d",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
     "field-notes/platform-relaunch-recap": {
       "by": "rapp-vision-rubric/1.0",
       "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
@@ -734,7 +807,23 @@
       "checks_total": 6,
       "not_applicable": 2,
       "notes": [],
-      "record_sha8": "d29add76",
+      "record_sha8": "961bdf89",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "fieldguide/guide-2026-08-04": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 5,
+      "checks_total": 5,
+      "not_applicable": 3,
+      "notes": [],
+      "record_sha8": "af72f500",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1079,6 +1168,22 @@
       "not_applicable": 1,
       "notes": [],
       "record_sha8": "0263ebc4",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "tumbler/tumble-2026-08-04": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 5,
+      "checks_total": 5,
+      "not_applicable": 3,
+      "notes": [],
+      "record_sha8": "ffcf3f03",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
