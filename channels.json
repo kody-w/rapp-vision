@@ -78,6 +78,13 @@
       "url": "../rapp-vision-neighborhood/fieldguide/channel.json",
       "repo": "https://github.com/kody-w/rapp-vision-neighborhood",
       "_why": "The other half of the same experiment: a second twin, pointed outward instead of inward. Each episode covers one app no channel here has covered, described only with facts fetched from the app itself. Both channels are watched by sentinels for the failure that hides - up, serving 200, quietly stopped posting."
+    },
+    {
+      "id": "prompt-frontier",
+      "name": "Prompt Frontier",
+      "url": "../rappvision-prompt-frontier/channel.json",
+      "repo": "https://github.com/kody-w/rappvision-prompt-frontier",
+      "_why": "Evidence-backed RappterBox experiments: exact prompts become visible worlds, institutions, languages, crises, and receipts. Static HyperFrames films and live title-card or app replays share one channel."
     }
   ]
 }
