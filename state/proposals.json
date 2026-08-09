@@ -1,8 +1,8 @@
 {
   "advisories": [],
   "coverage": {
-    "channels_in_registry": 11,
-    "channels_loaded": 11,
+    "channels_in_registry": 12,
+    "channels_loaded": 12,
     "channels_unreachable": [],
     "queue_channels_not_loaded": [],
     "signals_available": true
@@ -106,6 +106,36 @@
       "subject": "fieldguide"
     },
     {
+      "channel": "prompt-frontier",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "Prompt Frontier begins"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "6a776e9021bf",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Give machine minds a world, a constitution, and a receipt.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: Prompt Frontier begins.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Prompt Frontier has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "prompt-frontier"
+    },
+    {
       "channel": "tumbler",
       "evidence": {
         "entries": 1,
@@ -145,7 +175,7 @@
   },
   "totals": {
     "advisories": 0,
-    "open": 3,
-    "proposals": 4
+    "open": 4,
+    "proposals": 5
   }
 }
