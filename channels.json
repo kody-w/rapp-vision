@@ -85,6 +85,13 @@
       "url": "../rappvision-prompt-frontier/channel.json",
       "repo": "https://github.com/kody-w/rappvision-prompt-frontier",
       "_why": "Evidence-backed RappterBox experiments: exact prompts become visible worlds, institutions, languages, crises, and receipts. Static HyperFrames films and live title-card or app replays share one channel."
+    },
+    {
+      "id": "rappterbox",
+      "name": "RappterBox Experiments",
+      "url": "../rappvision-rappterbox/channel.json",
+      "repo": "https://github.com/kody-w/rappvision-rappterbox",
+      "_why": "QC-approved films from bounded RappterBox experiments. Every static entry ships both MP4 and WebM sources, labels synthetic constructs, and preserves an evidence-first production trail."
     }
   ]
 }
