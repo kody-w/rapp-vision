@@ -489,6 +489,25 @@
       "url": "https://github.com/kody-w/rapp-vision/discussions/9",
       "number": 9
     },
+    "prompt-frontier/prompt-frontier-founding": {
+      "channel": "prompt-frontier",
+      "video": "prompt-frontier-founding",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/37",
+      "number": 37
+    },
     "rock-tumbler/rock-tumbler-reel": {
       "channel": "rock-tumbler",
       "video": "rock-tumbler-reel",
@@ -1070,6 +1089,22 @@
       "not_applicable": 3,
       "notes": [],
       "record_sha8": "a982fec0",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "prompt-frontier/prompt-frontier-founding": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 5,
+      "checks_total": 5,
+      "not_applicable": 3,
+      "notes": [],
+      "record_sha8": "efe53b4f",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
