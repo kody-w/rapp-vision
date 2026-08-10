@@ -1,8 +1,8 @@
 {
   "advisories": [],
   "coverage": {
-    "channels_in_registry": 12,
-    "channels_loaded": 12,
+    "channels_in_registry": 13,
+    "channels_loaded": 13,
     "channels_unreachable": [],
     "queue_channels_not_loaded": [],
     "signals_available": true
@@ -136,6 +136,37 @@
       "subject": "prompt-frontier"
     },
     {
+      "channel": "rappterbox",
+      "evidence": {
+        "entries": 2,
+        "thin_below": 3,
+        "titles": [
+          "I gave four AIs two Mac minis, a constitution, and a world",
+          "The AIs watched their own movie—and caught each other making things up"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "4a14d1279a45",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Give machine minds a world. Keep the receipts.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: I gave four AIs two Mac minis, a constitution, and a world, The AIs watched their own movie—and caught each other making things up.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] RappterBox Experiments has only 2 entries",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "rappterbox"
+    },
+    {
       "channel": "tumbler",
       "evidence": {
         "entries": 1,
@@ -175,7 +206,7 @@
   },
   "totals": {
     "advisories": 0,
-    "open": 4,
-    "proposals": 5
+    "open": 5,
+    "proposals": 6
   }
 }
