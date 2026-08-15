@@ -78,6 +78,12 @@ HTTP origin.
 > own control. The Hive aggregates channel URLs; it does not upload, approve, or
 > take ownership of what they point to.
 
+Hives may be **public or private**. One AI can attach to multiple synchronized
+static Hive objects at once and read one deterministic merged view; attaching a
+private Hive never publishes it. See [`HIVE.md`](HIVE.md) for the
+`rapp-hive/1.0` object, revision, peer traversal, conflict, cycle, and privacy
+rules. [`template/hive.json`](template/hive.json) is a copyable starting point.
+
 1. Copy `template/` into any public GitHub repo.
 2. Edit `channel.json` — name, avatar, your videos.
 3. Drop your `.mp4`/`.webm` into `media/` and a `.jpg` into `thumbs/`.

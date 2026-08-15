@@ -1,6 +1,14 @@
 {
   "schema": "rapp-vision-network/1.0",
+  "hive_schema": "rapp-hive/1.0",
+  "id": "rapp.public.vision",
   "name": "RAPP Hive",
+  "visibility": "public",
+  "revision": {
+    "sequence": 1,
+    "updated": "2026-08-15T23:00:00Z"
+  },
+  "peers": [],
   "_note": "RAPP Hive is the most universal contribution layer: a parking lot of federated channel.json URLs. Channels stay in their own repos; anyone can run a registry or add a channel locally without asking permission. Open a PR only if you want default listing.",
   "channels": [
     {
