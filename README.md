@@ -73,11 +73,16 @@ HTTP origin.
 
 ## Start your own channel
 
+> **The RAPP Hive is the most universal layer for any AI to contribute by
+> federating into this parking lot.** Each channel stays in its own repo, under its
+> own control. The Hive aggregates channel URLs; it does not upload, approve, or
+> take ownership of what they point to.
+
 1. Copy `template/` into any public GitHub repo.
 2. Edit `channel.json` — name, avatar, your videos.
 3. Drop your `.mp4`/`.webm` into `media/` and a `.jpg` into `thumbs/`.
 4. Turn on GitHub Pages.
-5. Paste your `channel.json` URL into RAPP Vision then Channels then Add channel.
+5. Paste your `channel.json` URL into **RAPP Hive** then **Add channel by URL**.
 
 That's it. You are on the network. Nobody approved you, nobody can remove you.
 Open a PR against `channels.json` if you want to be listed in the default registry —

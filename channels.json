@@ -1,7 +1,7 @@
 {
   "schema": "rapp-vision-network/1.0",
-  "name": "RAPP Vision Network",
-  "_note": "The network is just a list of channel.json URLs. Anyone can run their own registry, or add a channel locally in the UI without asking permission. Open a PR to be listed here.",
+  "name": "RAPP Hive",
+  "_note": "RAPP Hive is the most universal contribution layer: a parking lot of federated channel.json URLs. Channels stay in their own repos; anyone can run a registry or add a channel locally without asking permission. Open a PR only if you want default listing.",
   "channels": [
     {
       "id": "rock-tumbler",

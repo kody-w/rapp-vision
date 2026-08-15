@@ -223,7 +223,7 @@
       <span aria-hidden="true">🔍</span>
       <input id="q" type="search" placeholder="Search videos, tags, chapters…" aria-label="Search">
     </div>
-    <button class="navbtn" id="nav-ch">Channels</button>
+    <button class="navbtn" id="nav-ch">RAPP Hive</button>
     <button class="navbtn" id="nav-lib">Library</button>
     <button class="navbtn" id="nav-about">About</button>
   </div>
@@ -1350,13 +1350,16 @@ function viewChannel(id) {
 
 function viewChannels() {
   app.innerHTML = `
-    <section class="hero"><h1>Channels</h1>
-      <p>A channel is a <code>channel.json</code> in any public repo, with the media sitting next to it.
-         Subscribe to what you want \u2014 that choice lives in this browser, not on a server. You can add
-         any channel by URL without asking anyone's permission.</p>
+    <section class="hero"><h1>RAPP Hive</h1>
+      <p><b>The RAPP Hive is the most universal layer for any AI to contribute by federating into
+         this parking lot.</b> A contribution is just a <code>channel.json</code> in a public repo,
+         with its media or live replays sitting next to it. Add any channel by URL without asking
+         permission, moving the source, or surrendering ownership.</p>
+      <p style="margin-top:10px">Subscribe to what you want \u2014 that choice lives in this browser,
+         not on a central server. The Hive aggregates independent channels; it does not absorb them.</p>
       <div class="toolbar" style="margin-top:16px">
         <button class="tbtn" id="add">+ Add channel by URL</button>
-        <a class="tbtn" href="https://github.com/kody-w/rapp-vision/tree/main/template" target="_blank" rel="noopener">Start your own \u2197</a>
+        <a class="tbtn" href="https://github.com/kody-w/rapp-vision/tree/main/template" target="_blank" rel="noopener">Federate your channel \u2197</a>
       </div>
     </section>
     <div class="grid">
@@ -1400,17 +1403,22 @@ function viewAbout() {
        the recommendations and the audience. This is the other option: the video is a file in a
        repo you control, and the player is one HTML file sitting next to it.</p></section>
 
+  <div class="note"><b>RAPP Hive is the federation layer.</b> Any person or AI can park a
+    <code>channel.json</code> in its own public repo and contribute it by URL. The Hive makes
+    independent channels discoverable together without becoming their host, owner, or approval gate.</div>
+
   <div class="note"><b>There is no server.</b> This page is static. The catalog is
-    <code>videos.json</code>; the media are ordinary files served over GitHub Pages with byte-range
-    support, which is all a <code>&lt;video&gt;</code> element needs in order to stream and seek.</div>
+    a federated list of <code>channel.json</code> URLs; media remain ordinary files in their own
+    repositories, served with byte-range support, which is all a <code>&lt;video&gt;</code> element
+    needs in order to stream and seek.</div>
 
   <h2 class="sec">Publishing a video</h2>
   <div class="desc">1. Commit the file to a public repo.
-2. Add an entry to <code>videos.json</code> — title, thumbnail, duration, sources, chapters.
-3. Push.
+2. Add it to that repo's <code>channel.json</code> — title, thumbnail, duration, sources, chapters.
+3. Paste the channel URL into RAPP Hive, or open a PR to the default registry.
 
 That's it. Sources may be relative paths or absolute <code>raw.githubusercontent.com</code> URLs, so a
-catalog can point at media living in a completely different repo.</div>
+channel can point at media living in a completely different repo.</div>
 
   <h2 class="sec">What it does</h2>
   <div class="desc">• Home grid, search across titles, descriptions, tags and chapter labels
