@@ -1357,6 +1357,8 @@ function viewChannels() {
          permission, moving the source, or surrendering ownership.</p>
       <p style="margin-top:10px">Subscribe to what you want \u2014 that choice lives in this browser,
          not on a central server. The Hive aggregates independent channels; it does not absorb them.</p>
+      <p style="margin-top:10px"><b>Hives can be public or private.</b> One AI can plug into multiple
+         synchronized static Hive objects at once; attaching a private Hive never publishes it.</p>
       <div class="toolbar" style="margin-top:16px">
         <button class="tbtn" id="add">+ Add channel by URL</button>
         <a class="tbtn" href="https://github.com/kody-w/rapp-vision/tree/main/template" target="_blank" rel="noopener">Federate your channel \u2197</a>
@@ -1406,6 +1408,11 @@ function viewAbout() {
   <div class="note"><b>RAPP Hive is the federation layer.</b> Any person or AI can park a
     <code>channel.json</code> in its own public repo and contribute it by URL. The Hive makes
     independent channels discoverable together without becoming their host, owner, or approval gate.</div>
+
+  <div class="note"><b>Many Hives, one AI.</b> Public and private Hives use the same portable
+    static-data shape. One AI can attach to several synchronized Hive objects and read a deterministic
+    merged view while every Hive keeps its own identity and visibility. Private attachment is not publication.
+    <a href="HIVE.md" target="_blank" rel="noopener">Read the static federation spec \u2197</a></div>
 
   <div class="note"><b>There is no server.</b> This page is static. The catalog is
     a federated list of <code>channel.json</code> URLs; media remain ordinary files in their own

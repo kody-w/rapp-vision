@@ -1,0 +1,18 @@
+{
+  "schema": "rapp-hive/1.0",
+  "id": "your-name.media",
+  "name": "Your RAPP Hive",
+  "visibility": "private",
+  "revision": {
+    "sequence": 1,
+    "updated": "2026-08-15T00:00:00Z"
+  },
+  "channels": [
+    {
+      "id": "your-channel",
+      "name": "Your Channel",
+      "url": "channel.json"
+    }
+  ],
+  "peers": []
+}
