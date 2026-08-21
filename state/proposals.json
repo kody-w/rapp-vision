@@ -1,8 +1,8 @@
 {
   "advisories": [],
   "coverage": {
-    "channels_in_registry": 13,
-    "channels_loaded": 13,
+    "channels_in_registry": 14,
+    "channels_loaded": 14,
     "channels_unreachable": [],
     "queue_channels_not_loaded": [],
     "signals_available": true
