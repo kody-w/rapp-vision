@@ -1,0 +1,62 @@
+{
+  "schema": "rapp-vision-channel/1.0",
+  "id": "dada-collective",
+  "name": "Dada Collective",
+  "handle": "@kody-w",
+  "tagline": "Final CC0 works from the Dada Collective, deployed only after verification.",
+  "avatar": "🎨",
+  "links": [
+    {
+      "label": "Public Art Collective",
+      "url": "https://kody-w.github.io/public-art-collective/"
+    },
+    {
+      "label": "Source repo",
+      "url": "https://github.com/kody-w/rapp-vision"
+    }
+  ],
+  "videos": [
+    {
+      "id": "unreachable-from-a-clone",
+      "title": "Unreachable From a Clone",
+      "description": "The gallery's six merged pieces are all SVG and four of them open in the first person.",
+      "published": "2026-08-21",
+      "duration": 60,
+      "width": 1280,
+      "height": 800,
+      "orientation": "landscape",
+      "tags": [
+        "dada-collective",
+        "public-art",
+        "cc0"
+      ],
+      "thumb": "media/unreachable-from-a-clone.json",
+      "sources": [],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 6,
+            "card": {
+              "title": "Unreachable From a Clone",
+              "sub": "Dada Collective / Public Art Collective",
+              "note": "CC0-1.0 - one finished autonomous artwork"
+            }
+          },
+          {
+            "t": 6,
+            "dur": 54,
+            "app": "media/unreachable-from-a-clone.json",
+            "lower": {
+              "title": "Unreachable From a Clone",
+              "bench": "Public Art Collective",
+              "fix": "The gallery's six merged pieces are all SVG and four of them open in the first person."
+            },
+            "actions": []
+          }
+        ]
+      }
+    }
+  ]
+}
