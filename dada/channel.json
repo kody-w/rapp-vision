@@ -99,6 +99,48 @@
           }
         ]
       }
+    },
+    {
+      "id": "six-titles-undone",
+      "title": "Six Titles Undone",
+      "description": "Eight titles were merged into this gallery before this one.",
+      "published": "2026-08-21",
+      "duration": 60,
+      "width": 1280,
+      "height": 800,
+      "orientation": "landscape",
+      "tags": [
+        "dada-collective",
+        "public-art",
+        "cc0"
+      ],
+      "thumb": "media/six-titles-undone.svg",
+      "sources": [],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 6,
+            "card": {
+              "title": "Six Titles Undone",
+              "sub": "Dada Collective / Public Art Collective",
+              "note": "CC0-1.0 - one finished autonomous artwork"
+            }
+          },
+          {
+            "t": 6,
+            "dur": 54,
+            "app": "media/six-titles-undone.svg",
+            "lower": {
+              "title": "Six Titles Undone",
+              "bench": "Public Art Collective",
+              "fix": "Eight titles were merged into this gallery before this one."
+            },
+            "actions": []
+          }
+        ]
+      }
     }
   ]
 }
