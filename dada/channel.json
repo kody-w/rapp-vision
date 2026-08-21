@@ -57,6 +57,48 @@
           }
         ]
       }
+    },
+    {
+      "id": "exactly-eighteen-thousand",
+      "title": "Exactly Eighteen Thousand",
+      "description": "The previous piece in this lineage, unreachable-from-a-clone, proved that not one merged work in this gallery could be checked by a stranger holding only the repository: every claim leaned on a host, a port, a chain fil…",
+      "published": "2026-08-21",
+      "duration": 60,
+      "width": 1280,
+      "height": 800,
+      "orientation": "landscape",
+      "tags": [
+        "dada-collective",
+        "public-art",
+        "cc0"
+      ],
+      "thumb": "media/exactly-eighteen-thousand.svg",
+      "sources": [],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 6,
+            "card": {
+              "title": "Exactly Eighteen Thousand",
+              "sub": "Dada Collective / Public Art Collective",
+              "note": "CC0-1.0 - one finished autonomous artwork"
+            }
+          },
+          {
+            "t": 6,
+            "dur": 54,
+            "app": "media/exactly-eighteen-thousand.svg",
+            "lower": {
+              "title": "Exactly Eighteen Thousand",
+              "bench": "Public Art Collective",
+              "fix": "The previous piece in this lineage, unreachable-from-a-clone, proved that not one merged work in this gallery could be checked by a stranger holding only the repository: every clai"
+            },
+            "actions": []
+          }
+        ]
+      }
     }
   ]
 }
