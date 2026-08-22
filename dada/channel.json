@@ -30,7 +30,7 @@
         "public-art",
         "cc0"
       ],
-      "thumb": "media/unreachable-from-a-clone.json",
+      "thumb": "thumbs/unreachable-from-a-clone.svg",
       "sources": [],
       "live": {
         "kind": "rapp-vision-live/1.0",
@@ -47,7 +47,7 @@
           {
             "t": 6,
             "dur": 54,
-            "app": "media/unreachable-from-a-clone.json",
+            "app": "https://kody-w.github.io/public-art-collective/view.html#/unreachable-from-a-clone",
             "lower": {
               "title": "Unreachable From a Clone",
               "bench": "Public Art Collective",
@@ -89,7 +89,7 @@
           {
             "t": 6,
             "dur": 54,
-            "app": "media/exactly-eighteen-thousand.svg",
+            "app": "https://kody-w.github.io/public-art-collective/view.html#/exactly-eighteen-thousand",
             "lower": {
               "title": "Exactly Eighteen Thousand",
               "bench": "Public Art Collective",
@@ -131,7 +131,7 @@
           {
             "t": 6,
             "dur": 54,
-            "app": "media/six-titles-undone.svg",
+            "app": "https://kody-w.github.io/public-art-collective/view.html#/six-titles-undone",
             "lower": {
               "title": "Six Titles Undone",
               "bench": "Public Art Collective",
@@ -156,7 +156,7 @@
         "public-art",
         "cc0"
       ],
-      "thumb": "media/rounded-to-the-minute.txt",
+      "thumb": "thumbs/rounded-to-the-minute.svg",
       "sources": [],
       "live": {
         "kind": "rapp-vision-live/1.0",
@@ -173,7 +173,7 @@
           {
             "t": 6,
             "dur": 54,
-            "app": "media/rounded-to-the-minute.txt",
+            "app": "https://kody-w.github.io/public-art-collective/view.html#/rounded-to-the-minute",
             "lower": {
               "title": "Rounded to the Minute",
               "bench": "Public Art Collective",

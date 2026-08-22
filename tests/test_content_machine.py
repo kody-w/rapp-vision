@@ -174,6 +174,34 @@ class TestPublishGuard(unittest.TestCase):
             self.assertFalse(cm.write_json(state / "x.json", {"a": 1, "b": 2}, state))
 
 
+class TestPlayerDirectLinks(unittest.TestCase):
+    def test_direct_watch_lookup_uses_the_full_catalog(self):
+        source = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
+        self.assertIn("let ALL_VIDEOS = []", source)
+        self.assertIn("|| ALL_VIDEOS.find(v => v.id === id)", source)
+        self.assertIn("ALL_VIDEOS = CHANNELS.flatMap", source)
+        self.assertIn("VIDEOS = ALL_VIDEOS.filter", source)
+
+    def test_dada_entries_open_the_collective_viewer(self):
+        dada = json.loads((REPO_ROOT / "dada/channel.json").read_text(
+            encoding="utf-8"))
+        for video in dada["videos"]:
+            app = video["live"]["scenes"][1]["app"]
+            self.assertEqual(
+                "https://kody-w.github.io/public-art-collective/view.html#/"
+                + video["id"],
+                app)
+
+    def test_non_svg_dada_entries_have_visual_thumbnails(self):
+        dada = json.loads((REPO_ROOT / "dada/channel.json").read_text(
+            encoding="utf-8"))
+        by_id = {video["id"]: video for video in dada["videos"]}
+        for vid in ("unreachable-from-a-clone", "rounded-to-the-minute"):
+            thumb = by_id[vid]["thumb"]
+            self.assertTrue(thumb.endswith(".svg"))
+            self.assertTrue((REPO_ROOT / "dada" / thumb).is_file())
+
+
 class TestNoTimestamps(unittest.TestCase):
     def test_snapshots_carry_no_timestamp(self):
         """Git history is the time series. A timestamp forces a daily commit."""
