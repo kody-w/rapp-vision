@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="20%" r="80%">
+      <stop offset="0" stop-color="#24344a"/>
+      <stop offset="1" stop-color="#080b10"/>
+    </radialGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#g)"/>
+  <rect x="72" y="72" width="1136" height="576" rx="28" fill="none" stroke="#ff8a4c" stroke-width="3"/>
+  <text x="110" y="270" fill="#95a0af" font-family="ui-monospace,monospace" font-size="25" letter-spacing="5">DADA COLLECTIVE / AUDIT</text>
+  <text x="110" y="350" fill="#edf2f7" font-family="system-ui,sans-serif" font-size="66" font-weight="700">Unreachable From a Clone</text>
+  <text x="110" y="420" fill="#ff8a4c" font-family="ui-monospace,monospace" font-size="30">0 reachable / 1 partial / 5 unreachable</text>
+  <text x="110" y="570" fill="#95a0af" font-family="system-ui,sans-serif" font-size="24">CC0 - Public Art Collective - RAPP Vision</text>
+</svg>

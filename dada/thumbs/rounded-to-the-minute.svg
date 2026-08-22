@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="45%" r="60%">
+      <stop offset="0" stop-color="#39281f"/>
+      <stop offset="1" stop-color="#080b10"/>
+    </radialGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#g)"/>
+  <circle cx="640" cy="350" r="230" fill="none" stroke="#2b3442" stroke-width="24"/>
+  <path d="M640 120 A230 230 0 0 1 663.9 121.2" fill="none" stroke="#ff8a4c" stroke-width="24"/>
+  <text x="640" y="320" text-anchor="middle" fill="#edf2f7" font-family="system-ui,sans-serif" font-size="58" font-weight="700">Rounded to the Minute</text>
+  <text x="640" y="385" text-anchor="middle" fill="#ff8a4c" font-family="ui-monospace,monospace" font-size="31">four clocks chose second 00</text>
+  <text x="640" y="455" text-anchor="middle" fill="#95a0af" font-family="ui-monospace,monospace" font-size="24">a dial of the seconds field</text>
+  <text x="640" y="655" text-anchor="middle" fill="#95a0af" font-family="system-ui,sans-serif" font-size="22">Dada Collective / CC0-1.0</text>
+</svg>

@@ -259,6 +259,7 @@ const app = $("#app");
    thumbnails inside it resolve relative to THAT file's URL, which is what
    lets a channel live anywhere and still play here. */
 let CHANNELS = [];        // loaded channel objects, each with .videos
+let ALL_VIDEOS = [];      // full catalog; direct links must ignore subscriptions
 let VIDEOS  = [];         // flattened, each video carries ._ch
 let state = load();
 
@@ -308,7 +309,8 @@ function ago(d) {
   return mo < 12 ? mo + (mo === 1 ? " month ago" : " months ago")
                  : Math.floor(mo / 12) + " year" + (mo >= 24 ? "s" : "") + " ago";
 }
-const byId = id => VIDEOS.find(v => v.id === id);
+const byId = id => VIDEOS.find(v => v.id === id)
+  || ALL_VIDEOS.find(v => v.id === id);
 const prog = id => { const h = state.history[id]; return h && h.d ? Math.min(1, h.t / h.d) : 0; };
 
 /* ---------------- community snapshot (optional) ----------------
@@ -1564,7 +1566,8 @@ async function boot() {
 
   $("#foot-src").innerHTML =
     ` <a href="https://github.com/kody-w/rapp-vision">Source</a> · ` +
-    `${CHANNELS.length} channel${CHANNELS.length === 1 ? "" : "s"}, ${VIDEOS.length} video${VIDEOS.length === 1 ? "" : "s"}.` +
+    `${CHANNELS.length} channel${CHANNELS.length === 1 ? "" : "s"}, ${ALL_VIDEOS.length} video${ALL_VIDEOS.length === 1 ? "" : "s"}.` +
+    (VIDEOS.length !== ALL_VIDEOS.length ? ` ${VIDEOS.length} subscribed.` : "") +
     (failed.length ? ` <span style="color:var(--bad)">Offline: ${failed.map(esc).join(", ")}</span>` : "");
 
   route();
@@ -1572,9 +1575,9 @@ async function boot() {
 
 function rebuild() {
   const on = new Set(state.subs || CHANNELS.map(c => c.id));
-  VIDEOS = CHANNELS.filter(c => on.has(c.id))
-    .flatMap(c => c.videos || [])
+  ALL_VIDEOS = CHANNELS.flatMap(c => c.videos || [])
     .sort((a, b) => String(b.published).localeCompare(String(a.published)));
+  VIDEOS = ALL_VIDEOS.filter(v => on.has(v._ch.id));
 }
 
 boot();
