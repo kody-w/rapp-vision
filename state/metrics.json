@@ -166,6 +166,25 @@
       "url": "https://github.com/kody-w/rapp-vision/discussions/48",
       "number": 48
     },
+    "dada-collective/rounded-to-the-minute": {
+      "channel": "dada-collective",
+      "video": "rounded-to-the-minute",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/53",
+      "number": 53
+    },
     "dada-collective/six-titles-undone": {
       "channel": "dada-collective",
       "video": "six-titles-undone",
@@ -907,7 +926,25 @@
       "notes": [
         "1 of 1 app scene(s) declare no ready{selector|text}; their action times run from scene start."
       ],
-      "record_sha8": "b5de1538",
+      "record_sha8": "7ba385e5",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "dada-collective/rounded-to-the-minute": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "rough",
+      "checks_passed": 5,
+      "checks_total": 6,
+      "not_applicable": 2,
+      "notes": [
+        "1 of 1 app scene(s) declare no ready{selector|text}; their action times run from scene start."
+      ],
+      "record_sha8": "520b65b5",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -926,7 +963,7 @@
         "Description is 59 characters; under 60 it tells a viewer nothing.",
         "1 of 1 app scene(s) declare no ready{selector|text}; their action times run from scene start."
       ],
-      "record_sha8": "3ea6833b",
+      "record_sha8": "9aad7f66",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -944,7 +981,7 @@
       "notes": [
         "1 of 1 app scene(s) declare no ready{selector|text}; their action times run from scene start."
       ],
-      "record_sha8": "55fdee65",
+      "record_sha8": "e4352d2a",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
