@@ -94,6 +94,21 @@ That's it. You are on the network. Nobody approved you, nobody can remove you.
 Open a PR against `channels.json` if you want to be listed in the default registry —
 but you don't need to.
 
+### The `rappvision-*` owner convention (auto-subscribe)
+
+Step 5 is optional too. **A public repo named `rappvision-<anything>` with a
+`channel.json` at its root IS a channel.** In the player, open **RAPP Hive** →
+**Follow a GitHub account**: every matching repo that account has now — and
+every one it creates later — auto-subscribes on the next load. No PR, no URL
+pasting, no registry edit; creating the repo is the publish.
+
+Discovery is client-side and local-first: the player lists the account's public
+repos over the CORS-open GitHub API (cached in `localStorage`, refreshed at most
+hourly), then loads each `channel.json` from Pages — falling back to
+`raw.githubusercontent.com`, so a repo created seconds ago appears before its
+first Pages deploy finishes. Forks, archives, and private repos are ignored.
+The follow, like every subscription, lives in your browser, not on a server.
+
 ### Why paths just work
 
 Every `src` in a `channel.json` is resolved **against that file's own URL**. So a channel is

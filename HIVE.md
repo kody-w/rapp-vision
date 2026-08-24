@@ -106,3 +106,26 @@ mutation, consensus, or automatic write-back.
 `visibility`, `revision`, and `peers` fields are additive metadata.
 
 Copy [`template/hive.json`](template/hive.json) to start another static Hive.
+
+## The owner convention: an account as an implicit Hive
+
+A GitHub account that publishes public repos named `rappvision-*`, each with a
+`channel.json` at its root, forms an **implicit Hive** — no `hive.json` object
+is authored; the channel list is derived deterministically from the account's
+public repo listing at read time.
+
+- Derived channel entry id: `gh:<owner>/<repo>` (lowercased).
+- Channel URL: `https://<owner>.github.io/<repo>/channel.json`, with
+  `https://raw.githubusercontent.com/<owner>/<repo>/<default_branch>/channel.json`
+  as an equivalent-bytes fallback before the first Pages deploy.
+- Forks, archived repos, and private repos are excluded. Excluding private
+  repos is the same boundary as everywhere in this spec: attachment is not
+  publication, and a private repo never enters a public view merely because a
+  reader could see it.
+- A reader that follows an account merges the implicit Hive exactly as it
+  merges a static one: channel identity comes from each `channel.json`, and a
+  channel already present from another Hive is not duplicated.
+
+The implicit Hive is a *reader-side* convenience. It grants the account no
+authority over any registry, and unfollowing removes the derived entries the
+same way detaching a static Hive does.

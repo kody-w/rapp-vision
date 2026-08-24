@@ -267,8 +267,10 @@ function load() {
   try {
     const s = JSON.parse(localStorage.getItem(LS) || "{}");
     return { history: s.history || {}, later: s.later || [], liked: s.liked || [],
-             rate: s.rate || 1, subs: s.subs || null, custom: s.custom || [] };
-  } catch { return { history: {}, later: [], liked: [], rate: 1, subs: null, custom: [] }; }
+             rate: s.rate || 1, subs: s.subs || null, custom: s.custom || [],
+             follows: s.follows || [], followSeen: s.followSeen || [], followCache: s.followCache || {} };
+  } catch { return { history: {}, later: [], liked: [], rate: 1, subs: null, custom: [],
+                     follows: [], followSeen: [], followCache: {} }; }
 }
 function save() { try { localStorage.setItem(LS, JSON.stringify(state)); } catch {} }
 
@@ -1303,7 +1305,9 @@ function viewLibrary() {
         try {
           const d = JSON.parse(r.result);
           state = { history: d.history || {}, later: d.later || [], liked: d.liked || [],
-                    rate: d.rate || 1, catalogs: d.catalogs || [] };
+                    rate: d.rate || 1, catalogs: d.catalogs || [],
+                    follows: d.follows || state.follows || [], followSeen: d.followSeen || state.followSeen || [],
+                    followCache: d.followCache || state.followCache || {} };
           save(); toast("Library imported"); viewLibrary();
         } catch { toast("That file isn’t a valid library export"); }
       };
@@ -1313,7 +1317,8 @@ function viewLibrary() {
   };
   $("#cl").onclick = () => {
     if (!confirm("Clear watch history, resume points, likes and watch-later?")) return;
-    state = { history: {}, later: [], liked: [], rate: 1, catalogs: [] };
+    state = { history: {}, later: [], liked: [], rate: 1, catalogs: [],
+              follows: state.follows || [], followSeen: [], followCache: state.followCache || {} };
     save(); toast("Cleared"); viewLibrary();
   };
 }
@@ -1361,9 +1366,16 @@ function viewChannels() {
          not on a central server. The Hive aggregates independent channels; it does not absorb them.</p>
       <p style="margin-top:10px"><b>Hives can be public or private.</b> One AI can plug into multiple
          synchronized static Hive objects at once; attaching a private Hive never publishes it.</p>
+      <p style="margin-top:10px"><b>Or skip the URL entirely.</b> A public repo named
+         <code>rappvision-*</code> with a <code>channel.json</code> at its root <i>is</i> a channel.
+         Follow a GitHub account and every matching repo it has \u2014 and every one it creates
+         later \u2014 subscribes here automatically. No PR, no registry, no approval.</p>
       <div class="toolbar" style="margin-top:16px">
+        <button class="tbtn" id="follow">+ Follow a GitHub account</button>
         <button class="tbtn" id="add">+ Add channel by URL</button>
         <a class="tbtn" href="https://github.com/kody-w/rapp-vision/tree/main/template" target="_blank" rel="noopener">Federate your channel \u2197</a>
+        ${(state.follows || []).map(o =>
+          `<button class="tbtn on" data-unfollow="${esc(o)}" title="Unfollow">@${esc(o)} \u00d7</button>`).join("")}
       </div>
     </section>
     <div class="grid">
@@ -1385,6 +1397,28 @@ function viewChannels() {
     const id = b.dataset.sub, i = (state.subs || []).indexOf(id);
     if (i < 0) state.subs.push(id); else state.subs.splice(i, 1);
     save(); rebuild(); viewChannels();
+  });
+  $("#follow").onclick = async () => {
+    const raw = prompt('GitHub account to follow\n\nEvery public repo named "rappvision-*" with a channel.json at its root — the ones it has now and the ones it creates later — auto-subscribes here.\n\ne.g. kody-w');
+    if (!raw) return;
+    const owner = raw.trim().replace(/^@/, "").replace(/^https?:\/\/github\.com\//i, "").split("/")[0].toLowerCase();
+    if (!/^[a-z0-9](?:[a-z0-9-]{0,38})$/.test(owner)) { toast("That doesn't look like a GitHub account"); return; }
+    if (state.follows.includes(owner)) { toast("Already following @" + owner); return; }
+    state.follows.push(owner);
+    delete state.followCache[owner];       // force a fresh listing for the first look
+    save();
+    toast("Looking for rappvision-* repos…");
+    const n = await loadFollows();
+    rebuild(); viewChannels();
+    toast(n ? `Following @${owner} — ${n} channel${n === 1 ? "" : "s"} joined`
+            : `Following @${owner} — no rappvision-* channels yet (they'll appear when created)`);
+  };
+  app.querySelectorAll("[data-unfollow]").forEach(b => b.onclick = () => {
+    const o = b.dataset.unfollow;
+    state.follows = (state.follows || []).filter(x => x !== o);
+    delete state.followCache[o]; save();
+    toast(`Unfollowed @${o} — their channels leave on next load`);
+    viewChannels();
   });
   $("#add").onclick = async () => {
     const url = prompt("URL of a channel.json\n\ne.g. https://kody-w.github.io/my-channel/channel.json");
@@ -1516,6 +1550,74 @@ async function fetchChannel(entry) {
   return c;
 }
 
+/* ---- Follow a GitHub account (the rappvision-* owner convention) ---------
+   The convention: a public repo named rappvision-* with a channel.json at its
+   root IS a channel. Following an owner turns the convention into a standing
+   subscription — every matching repo they have now, and every one they create
+   later, joins this player on the next load. No PR, no URL pasting, no
+   registry edit. The GitHub listing API is CORS-open to a static page but
+   rate-limited per IP when unauthenticated, so each owner's listing is cached
+   and refreshed at most hourly; a failed refresh serves the cached listing
+   rather than dropping their channels. */
+const FOLLOW_TTL_MS = 60 * 60 * 1000;
+
+function conventionEntries(owner, repos) {
+  return (repos || [])
+    .filter(r => r && /^rappvision-/i.test(r.name || "") && !r.fork && !r.archived && !r.private)
+    .map(r => ({
+      id: ("gh:" + owner + "/" + r.name).toLowerCase(),
+      url: `https://${owner}.github.io/${r.name}/channel.json`,
+      alt: `https://raw.githubusercontent.com/${owner}/${r.name}/${r.default_branch || "main"}/channel.json`,
+      repo: `https://github.com/${owner}/${r.name}`
+    }));
+}
+
+async function ownerEntries(owner) {
+  const cached = state.followCache[owner];
+  if (cached && Date.now() - cached.at < FOLLOW_TTL_MS) return cached.entries;
+  try {
+    const r = await fetch(`https://api.github.com/users/${encodeURIComponent(owner)}/repos?per_page=100&sort=updated`);
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const entries = conventionEntries(owner, await r.json());
+    state.followCache[owner] = { at: Date.now(), entries }; save();
+    return entries;
+  } catch {
+    return cached ? cached.entries : [];   // rate-limited or offline: stale beats gone
+  }
+}
+
+/* Pages first — but a repo created seconds ago has no Pages deployment yet,
+   and raw.githubusercontent serves the same bytes (CORS included) instantly.
+   The fallback is what makes "create the repo, reload the player, the channel
+   is there" true with zero wait. */
+async function fetchFollowChannel(entry) {
+  try { return await fetchChannel(entry); }
+  catch (e) {
+    if (!entry.alt) throw e;
+    return await fetchChannel({ id: entry.id, url: entry.alt, repo: entry.repo });
+  }
+}
+
+async function loadFollows() {
+  const perOwner = await Promise.all((state.follows || []).map(ownerEntries));
+  const settled = await Promise.allSettled(perOwner.flat().map(fetchFollowChannel));
+  let joined = 0;
+  for (const s of settled) {
+    if (s.status !== "fulfilled") continue;
+    const c = s.value;
+    if (CHANNELS.some(x => x.id === c.id)) continue;   // already in the registry or added by URL
+    CHANNELS.push(c); joined++;
+    /* Auto-subscribe only the FIRST time a channel is seen, so unsubscribing
+       one of a followed owner's channels sticks across reloads. */
+    if (!state.followSeen.includes(c.id)) {
+      state.followSeen.push(c.id);
+      if (state.subs && !state.subs.includes(c.id)) state.subs.push(c.id);
+    }
+  }
+  if (joined) save();
+  return joined;
+}
+
 /* The snapshot belongs to the PLAYER, not to a channel: it is resolved against
    this page the way channels.json is, never against a channel.json's own URL.
    It is fetched without being awaited anywhere, because route() already sits
@@ -1560,6 +1662,8 @@ async function boot() {
   const settled = await Promise.allSettled(wanted.map(fetchChannel));
   CHANNELS = settled.filter(s => s.status === "fulfilled").map(s => s.value);
   const failed = settled.map((s, i) => s.status === "rejected" ? wanted[i].id : null).filter(Boolean);
+
+  await loadFollows();   // followed owners' rappvision-* fleets; never throws, cached hourly
 
   if (state.subs === null) state.subs = CHANNELS.map(c => c.id);   // subscribe to all on first run
   rebuild();
