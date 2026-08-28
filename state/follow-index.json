@@ -1,0 +1,40 @@
+{
+  "generated_at": "2026-08-28T02:34:02Z",
+  "owners": {
+    "kody-w": {
+      "at": "2026-08-28T02:34:02Z",
+      "entries": [
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-rappid-zoo/main/channel.json",
+          "id": "gh:kody-w/rappvision-rappid-zoo",
+          "repo": "https://github.com/kody-w/rappvision-rappid-zoo",
+          "url": "https://kody-w.github.io/rappvision-rappid-zoo/channel.json"
+        },
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-pokemon/main/channel.json",
+          "id": "gh:kody-w/rappvision-pokemon",
+          "repo": "https://github.com/kody-w/rappvision-pokemon",
+          "url": "https://kody-w.github.io/rappvision-pokemon/channel.json"
+        },
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-rappterbox/main/channel.json",
+          "id": "gh:kody-w/rappvision-rappterbox",
+          "repo": "https://github.com/kody-w/rappvision-rappterbox",
+          "url": "https://kody-w.github.io/rappvision-rappterbox/channel.json"
+        },
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-prompt-frontier/main/channel.json",
+          "id": "gh:kody-w/rappvision-prompt-frontier",
+          "repo": "https://github.com/kody-w/rappvision-prompt-frontier",
+          "url": "https://kody-w.github.io/rappvision-prompt-frontier/channel.json"
+        },
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-field-notes/main/channel.json",
+          "id": "gh:kody-w/rappvision-field-notes",
+          "repo": "https://github.com/kody-w/rappvision-field-notes",
+          "url": "https://kody-w.github.io/rappvision-field-notes/channel.json"
+        }
+      ]
+    }
+  }
+}

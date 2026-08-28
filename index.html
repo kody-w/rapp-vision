@@ -1555,10 +1555,20 @@ async function fetchChannel(entry) {
    root IS a channel. Following an owner turns the convention into a standing
    subscription — every matching repo they have now, and every one they create
    later, joins this player on the next load. No PR, no URL pasting, no
-   registry edit. The GitHub listing API is CORS-open to a static page but
-   rate-limited per IP when unauthenticated, so each owner's listing is cached
-   and refreshed at most hourly; a failed refresh serves the cached listing
-   rather than dropping their channels. */
+   registry edit.
+
+   Static Data Covenant (RAR CONSTITUTION.md Article XXIV): the browser never
+   calls api.github.com — this used to fetch the owner's repo listing live;
+   now scripts/harvest_follows.py (CI, on a schedule) does that and commits
+   the matching entries to state/follow-index.json in the exact
+   {owner: {at, entries}} shape state.followCache already uses locally, so
+   only the *source* of a first lookup changed, not the shape or the TTL
+   logic below it.
+
+   LIMITATION this trades in: an owner not yet in state/follow-seed.json
+   won't resolve until they're added there and the harvester runs again —
+   see that file's note. Before this migration, any typed-in owner resolved
+   on the next reload via a live anonymous call. */
 const FOLLOW_TTL_MS = 60 * 60 * 1000;
 
 function conventionEntries(owner, repos) {
@@ -1576,13 +1586,15 @@ async function ownerEntries(owner) {
   const cached = state.followCache[owner];
   if (cached && Date.now() - cached.at < FOLLOW_TTL_MS) return cached.entries;
   try {
-    const r = await fetch(`https://api.github.com/users/${encodeURIComponent(owner)}/repos?per_page=100&sort=updated`);
+    const r = await fetch(absolutise("state/follow-index.json", location.href), { cache: "no-cache" });
     if (!r.ok) throw new Error("HTTP " + r.status);
-    const entries = conventionEntries(owner, await r.json());
-    state.followCache[owner] = { at: Date.now(), entries }; save();
-    return entries;
+    const snapshot = await r.json();
+    const harvested = (snapshot.owners || {})[owner];
+    if (!harvested) throw new Error("owner not yet harvested");
+    state.followCache[owner] = { at: Date.now(), entries: harvested.entries }; save();
+    return harvested.entries;
   } catch {
-    return cached ? cached.entries : [];   // rate-limited or offline: stale beats gone
+    return cached ? cached.entries : [];   // not harvested yet, or offline: stale beats gone
   }
 }
 

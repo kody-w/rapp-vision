@@ -1,0 +1,6 @@
+{
+  "_note": "Static Data Covenant (RAR CONSTITUTION.md Article XXIV) seed list for scripts/harvest_follows.py. Owners listed here get their rappvision-* repos harvested into state/follow-index.json on schedule, so the player can offer them as follows without the browser ever calling api.github.com. Add an owner here (and open a PR) to get them harvested — seeded for now from every distinct repo owner already in channels.json.",
+  "owners": [
+    "kody-w"
+  ]
+}

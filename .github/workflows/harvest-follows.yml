@@ -1,0 +1,69 @@
+name: Harvest follow index
+
+# Static Data Covenant (kody-w/RAR CONSTITUTION.md Article XXIV): the
+# player's visitor browser must never call api.github.com. This workflow is
+# the CI harvester for the "follow a GitHub owner" convention — it reads
+# state/follow-seed.json, calls the repos-listing endpoint for each seeded
+# owner, and commits the matching rappvision-* entries to
+# state/follow-index.json. index.html's ownerEntries() only ever reads that
+# committed file (see scripts/harvest_follows.py for the full contract and
+# its documented limitation).
+
+on:
+  schedule:
+    - cron: "40 8 * * *"  # daily, staggered from this repo's other crons
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "state/follow-seed.json"
+      - "scripts/harvest_follows.py"
+
+permissions:
+  contents: write
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Harvest follow index
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/harvest_follows.py
+
+      - name: Commit snapshot if changed
+        run: |
+          if [ -z "$(git status --porcelain state/follow-index.json)" ]; then
+            echo "No changes; nothing to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/follow-index.json
+          git commit -m "chore(follows): refresh follow index snapshot [skip ci]"
+
+          for attempt in 1 2 3; do
+            if ! git pull --rebase origin main; then
+              git rebase --abort 2>/dev/null || true
+              echo "::error::rebase conflict on the follow index - refusing to guess"
+              exit 1
+            fi
+            if git push origin main; then
+              echo "Pushed on attempt $attempt."
+              exit 0
+            fi
+            echo "Push rejected - main moved. Retrying."
+            sleep 5
+          done
+          echo "::error::could not push the snapshot after 3 attempts"
+          exit 1
