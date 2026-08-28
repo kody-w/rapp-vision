@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-08-28T02:34:02Z",
+  "generated_at": "2026-08-28T03:03:14Z",
   "owners": {
     "kody-w": {
-      "at": "2026-08-28T02:34:02Z",
+      "at": "2026-08-28T03:03:14Z",
       "entries": [
         {
           "alt": "https://raw.githubusercontent.com/kody-w/rappvision-rappid-zoo/main/channel.json",
@@ -27,12 +27,6 @@
           "id": "gh:kody-w/rappvision-prompt-frontier",
           "repo": "https://github.com/kody-w/rappvision-prompt-frontier",
           "url": "https://kody-w.github.io/rappvision-prompt-frontier/channel.json"
-        },
-        {
-          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-field-notes/main/channel.json",
-          "id": "gh:kody-w/rappvision-field-notes",
-          "repo": "https://github.com/kody-w/rappvision-field-notes",
-          "url": "https://kody-w.github.io/rappvision-field-notes/channel.json"
         }
       ]
     }
