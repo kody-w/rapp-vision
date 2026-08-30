@@ -90,6 +90,11 @@
                 "at": 32,
                 "do": "click",
                 "selector": "#forge-button"
+              },
+              {
+                "at": 38,
+                "do": "click",
+                "selector": "#verify-button"
               }
             ]
           },
@@ -499,7 +504,7 @@
     {
       "id": "ai-soul-passport",
       "title": "AI Soul Passport — Identity Migration and Counterfeit Rejection",
-      "description": "A public synthetic identity crosses a boundary while retaining its verifiable history. After the guided migration settles, RAPP Vision clicks the counterfeit control and leaves the live app to show why the forged passport fails. The entry is a programmatic replay with no captured footage or private identity data.",
+      "description": "A public synthetic identity crosses a boundary while retaining its verifiable history. After the guided migration settles, RAPP Vision creates a counterfeit and invokes the independent clone verifier so the live app shows why the forged passport fails. The entry is a programmatic replay with no captured footage or private identity data.",
       "published": "2026-08-30",
       "duration": 88,
       "width": 1280,
@@ -534,7 +539,7 @@
             },
             "lower": {
               "title": "AI Soul Passport",
-              "bench": "Guided migration · counterfeit attempt",
+              "bench": "Guided migration · counterfeit · independent verification",
               "fix": "Continuity is accepted; the synthetic counterfeit is rejected."
             },
             "actions": [
@@ -547,6 +552,11 @@
                 "at": 44,
                 "do": "click",
                 "selector": "#forge-button"
+              },
+              {
+                "at": 52,
+                "do": "click",
+                "selector": "#verify-button"
               }
             ]
           },

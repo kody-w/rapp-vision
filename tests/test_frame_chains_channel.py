@@ -25,7 +25,11 @@ VIDEO_IDS = [
 
 APP_SELECTORS = {
     "01-many-worlds": {"#guided-btn", "#mutate-btn"},
-    "02-soul-passport": {"#guided-button", "#forge-button"},
+    "02-soul-passport": {
+        "#guided-button",
+        "#forge-button",
+        "#verify-button",
+    },
     "03-mars-colony": {"#nextButton"},
     "04-five-realities": {"#guideBtn", "#mutationBtn"},
     "05-causal-detective": {
@@ -209,6 +213,16 @@ class TestFrameChainsChannel(unittest.TestCase):
             [action["at"] for action in mars_actions],
             [0.5, 6.5, 12.5, 18.5, 24.5, 30.5, 36.5, 42.5],
         )
+        soul_actions = app_scenes(loop)[1]["actions"]
+        self.assertEqual(
+            [action["selector"] for action in soul_actions],
+            ["#guided-button", "#forge-button", "#verify-button"],
+        )
+        self.assertGreaterEqual(
+            soul_actions[2]["at"] - soul_actions[1]["at"],
+            4,
+            "Frame 02 needs settling time before independent verification",
+        )
         causal_actions = app_scenes(loop)[4]["actions"]
         self.assertEqual(
             [action["selector"] for action in causal_actions],
@@ -241,7 +255,7 @@ class TestFrameChainsChannel(unittest.TestCase):
                 "#guided-btn", "#mutate-btn",
             ],
             "ai-soul-passport": [
-                "#guided-button", "#forge-button",
+                "#guided-button", "#forge-button", "#verify-button",
             ],
             "teleporting-roguelike": [
                 "#runDemo", "#forgeItem", "#forgeParent",
