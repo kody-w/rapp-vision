@@ -201,9 +201,13 @@ class TestFrameChainsChannel(unittest.TestCase):
         self.assertIn("card", loop["live"]["scenes"][0])
         self.assertIn("card", loop["live"]["scenes"][-1])
         mars_actions = app_scenes(loop)[2]["actions"]
-        self.assertGreaterEqual(
-            sum(action["selector"] == "#nextButton" for action in mars_actions),
-            5,
+        self.assertEqual(
+            [action["selector"] for action in mars_actions],
+            ["#nextButton"] * 8,
+        )
+        self.assertEqual(
+            [action["at"] for action in mars_actions],
+            [0.5, 6.5, 12.5, 18.5, 24.5, 30.5, 36.5, 42.5],
         )
         causal_actions = app_scenes(loop)[4]["actions"]
         self.assertEqual(

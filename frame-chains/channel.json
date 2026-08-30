@@ -111,32 +111,37 @@
                 "selector": "#nextButton"
               },
               {
-                "at": 7,
+                "at": 6.5,
                 "do": "click",
                 "selector": "#nextButton"
               },
               {
-                "at": 14,
+                "at": 12.5,
                 "do": "click",
                 "selector": "#nextButton"
               },
               {
-                "at": 21,
+                "at": 18.5,
                 "do": "click",
                 "selector": "#nextButton"
               },
               {
-                "at": 28,
+                "at": 24.5,
                 "do": "click",
                 "selector": "#nextButton"
               },
               {
-                "at": 35,
+                "at": 30.5,
                 "do": "click",
                 "selector": "#nextButton"
               },
               {
-                "at": 42,
+                "at": 36.5,
+                "do": "click",
+                "selector": "#nextButton"
+              },
+              {
+                "at": 42.5,
                 "do": "click",
                 "selector": "#nextButton"
               }
