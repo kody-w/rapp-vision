@@ -184,7 +184,37 @@
                 "selector": "#guidedBtn"
               },
               {
+                "at": 5,
+                "do": "click",
+                "selector": ".cite-btn[data-id=\"E02\"]"
+              },
+              {
+                "at": 10,
+                "do": "click",
+                "selector": ".cite-btn[data-id=\"E03\"]"
+              },
+              {
+                "at": 15,
+                "do": "click",
+                "selector": ".cite-btn[data-id=\"E04\"]"
+              },
+              {
+                "at": 20,
+                "do": "click",
+                "selector": ".cite-btn[data-id=\"E06\"]"
+              },
+              {
+                "at": 25,
+                "do": "click",
+                "selector": ".cite-btn[data-id=\"E07\"]"
+              },
+              {
                 "at": 32,
+                "do": "click",
+                "selector": "#accuseBtn"
+              },
+              {
+                "at": 44,
                 "do": "click",
                 "selector": "#mutateBtn"
               }
@@ -199,18 +229,13 @@
             },
             "lower": {
               "title": "06 · Space Station",
-              "fix": "Run the station proof, then attempt an overwrite."
+              "fix": "Run the visible guided station proof; no hidden controls are scripted."
             },
             "actions": [
               {
                 "at": 0.5,
                 "do": "click",
                 "selector": "#guided"
-              },
-              {
-                "at": 32,
-                "do": "click",
-                "selector": "#mutate-overwrite"
               }
             ]
           },

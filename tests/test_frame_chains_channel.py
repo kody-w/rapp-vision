@@ -1,9 +1,11 @@
 """Focused offline contract and privacy tests for the Frame Chains channel."""
 
 import json
+import os
 import re
 import unittest
 import xml.etree.ElementTree as ET
+from html.parser import HTMLParser
 from pathlib import Path, PurePosixPath
 from urllib.parse import urljoin, urlparse
 
@@ -26,8 +28,17 @@ APP_SELECTORS = {
     "02-soul-passport": {"#guided-button", "#forge-button"},
     "03-mars-colony": {"#nextButton"},
     "04-five-realities": {"#guideBtn", "#mutationBtn"},
-    "05-causal-detective": {"#guidedBtn", "#mutateBtn"},
-    "06-space-station": {"#guided", "#mutate-overwrite"},
+    "05-causal-detective": {
+        "#guidedBtn",
+        '.cite-btn[data-id="E02"]',
+        '.cite-btn[data-id="E03"]',
+        '.cite-btn[data-id="E04"]',
+        '.cite-btn[data-id="E06"]',
+        '.cite-btn[data-id="E07"]',
+        "#accuseBtn",
+        "#mutateBtn",
+    },
+    "06-space-station": {"#guided"},
     "07-constitution": {"#guidedBtn", "#tyrantBtn"},
     "08-teleporting-roguelike": {"#runDemo", "#forgeItem", "#forgeParent"},
     "09-attack-timeline": {"#controlBtn", "#attackAllBtn", "#replayBtn"},
@@ -51,6 +62,34 @@ def load_json(path):
 
 def app_scenes(video):
     return [scene for scene in video["live"]["scenes"] if "app" in scene]
+
+
+class ElementIndex(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.elements = []
+
+    def handle_starttag(self, _tag, attrs):
+        self.elements.append(dict(attrs))
+
+
+def selector_exists(selector, elements):
+    if selector.startswith("#"):
+        target_id = selector[1:]
+        return any(attrs.get("id") == target_id for attrs in elements)
+
+    match = re.fullmatch(
+        r'\.([A-Za-z0-9_-]+)\[([A-Za-z0-9_-]+)="([^"]+)"\]',
+        selector,
+    )
+    if not match:
+        raise AssertionError(f"unsupported action selector in local HTML test: {selector}")
+    class_name, attribute, value = match.groups()
+    return any(
+        class_name in attrs.get("class", "").split()
+        and attrs.get(attribute) == value
+        for attrs in elements
+    )
 
 
 class TestFrameChainsChannel(unittest.TestCase):
@@ -140,6 +179,31 @@ class TestFrameChainsChannel(unittest.TestCase):
             sum(action["selector"] == "#nextButton" for action in mars_actions),
             5,
         )
+        causal_actions = app_scenes(loop)[4]["actions"]
+        self.assertEqual(
+            [action["selector"] for action in causal_actions],
+            [
+                "#guidedBtn",
+                '.cite-btn[data-id="E02"]',
+                '.cite-btn[data-id="E03"]',
+                '.cite-btn[data-id="E04"]',
+                '.cite-btn[data-id="E06"]',
+                '.cite-btn[data-id="E07"]',
+                "#accuseBtn",
+                "#mutateBtn",
+            ],
+        )
+        causal_times = [action["at"] for action in causal_actions]
+        self.assertTrue(
+            all(later - earlier >= 4
+                for earlier, later in zip(causal_times, causal_times[1:])),
+            "Frame 05 actions need settling time between selector clicks",
+        )
+        station_actions = app_scenes(loop)[5]["actions"]
+        self.assertEqual(
+            [action["selector"] for action in station_actions],
+            ["#guided"],
+        )
 
     def test_focused_entries_use_the_required_sequences(self):
         expected = {
@@ -176,6 +240,38 @@ class TestFrameChainsChannel(unittest.TestCase):
                         self.assertIn(action["selector"], APP_SELECTORS[slug])
                         self.assertGreaterEqual(action["at"], 0)
                         self.assertLess(action["at"], scene["dur"])
+
+    def test_action_selectors_exist_in_supplied_local_app_html(self):
+        configured_root = os.environ.get("FRAME_CHAINS_ROOT")
+        if not configured_root:
+            self.skipTest("FRAME_CHAINS_ROOT not supplied")
+
+        frame_chains_root = Path(configured_root).expanduser()
+        self.assertTrue(
+            frame_chains_root.is_dir(),
+            f"FRAME_CHAINS_ROOT is not a directory: {frame_chains_root}",
+        )
+        indexes = {}
+        for video in self.videos.values():
+            for scene in app_scenes(video):
+                slug = PurePosixPath(scene["app"]).parts[-2]
+                html_path = frame_chains_root / "showcase" / slug / "index.html"
+                with self.subTest(video=video["id"], app=slug):
+                    self.assertTrue(html_path.is_file(), f"missing local app: {html_path}")
+                if slug not in indexes and html_path.is_file():
+                    parser = ElementIndex()
+                    parser.feed(html_path.read_text(encoding="utf-8"))
+                    indexes[slug] = parser.elements
+                for action in scene["actions"]:
+                    with self.subTest(
+                        video=video["id"],
+                        app=slug,
+                        selector=action["selector"],
+                    ):
+                        self.assertTrue(
+                            selector_exists(action["selector"], indexes.get(slug, [])),
+                            f"{action['selector']} not found in {html_path}",
+                        )
 
     def test_thumbnails_exist_and_are_safe_authored_svg(self):
         for video in self.videos.values():
