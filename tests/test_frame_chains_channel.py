@@ -73,7 +73,7 @@ class ElementIndex(HTMLParser):
         self.elements.append(dict(attrs))
 
 
-def selector_exists(selector, elements):
+def static_selector_exists(selector, elements):
     if selector.startswith("#"):
         target_id = selector[1:]
         return any(attrs.get("id") == target_id for attrs in elements)
@@ -90,6 +90,32 @@ def selector_exists(selector, elements):
         and attrs.get(attribute) == value
         for attrs in elements
     )
+
+
+def generated_selector_contract_exists(selector, source):
+    match = re.fullmatch(
+        r'\.([A-Za-z0-9_-]+)\[([A-Za-z0-9_-]+)="([^"]+)"\]',
+        selector,
+    )
+    if not match:
+        return False
+
+    class_name, attribute, value = match.groups()
+    class_template = re.search(
+        rf'(?:class\s*=\s*"[^"]*(?<![\w-]){re.escape(class_name)}(?![\w-])'
+        rf"|class\s*=\s*'[^']*(?<![\w-]){re.escape(class_name)}(?![\w-]))",
+        source,
+    )
+    dynamic_attribute = re.search(
+        rf'{re.escape(attribute)}\s*=\s*["\']\s*\$\{{\s*'
+        r'[A-Za-z_$][\w$]*\.id\s*\}\s*["\']',
+        source,
+    )
+    evidence_ids = set(re.findall(
+        r'\bid\s*:\s*["\']([A-Za-z0-9_-]+)["\']',
+        source,
+    ))
+    return bool(class_template and dynamic_attribute and value in evidence_ids)
 
 
 class TestFrameChainsChannel(unittest.TestCase):
@@ -241,7 +267,28 @@ class TestFrameChainsChannel(unittest.TestCase):
                         self.assertGreaterEqual(action["at"], 0)
                         self.assertLess(action["at"], scene["dur"])
 
-    def test_action_selectors_exist_in_supplied_local_app_html(self):
+    def test_dynamic_selector_contract_checks_template_and_evidence(self):
+        source = """
+        const evidence = [{ id: "E02" }, { id: "E03" }];
+        panel.innerHTML = evidence.map(e =>
+          `<button class="cite-btn ${selected ? 'active' : ''}"
+                   data-id="${e.id}">cite</button>`
+        ).join("");
+        """
+        self.assertTrue(generated_selector_contract_exists(
+            '.cite-btn[data-id="E02"]',
+            source,
+        ))
+        self.assertFalse(generated_selector_contract_exists(
+            '.cite-btn[data-id="E04"]',
+            source,
+        ))
+        self.assertFalse(generated_selector_contract_exists(
+            '.other-btn[data-id="E02"]',
+            source,
+        ))
+
+    def test_action_selector_contracts_in_supplied_local_app_html(self):
         configured_root = os.environ.get("FRAME_CHAINS_ROOT")
         if not configured_root:
             self.skipTest("FRAME_CHAINS_ROOT not supplied")
@@ -252,6 +299,7 @@ class TestFrameChainsChannel(unittest.TestCase):
             f"FRAME_CHAINS_ROOT is not a directory: {frame_chains_root}",
         )
         indexes = {}
+        sources = {}
         for video in self.videos.values():
             for scene in app_scenes(video):
                 slug = PurePosixPath(scene["app"]).parts[-2]
@@ -259,8 +307,9 @@ class TestFrameChainsChannel(unittest.TestCase):
                 with self.subTest(video=video["id"], app=slug):
                     self.assertTrue(html_path.is_file(), f"missing local app: {html_path}")
                 if slug not in indexes and html_path.is_file():
+                    sources[slug] = html_path.read_text(encoding="utf-8")
                     parser = ElementIndex()
-                    parser.feed(html_path.read_text(encoding="utf-8"))
+                    parser.feed(sources[slug])
                     indexes[slug] = parser.elements
                 for action in scene["actions"]:
                     with self.subTest(
@@ -268,9 +317,20 @@ class TestFrameChainsChannel(unittest.TestCase):
                         app=slug,
                         selector=action["selector"],
                     ):
+                        selector = action["selector"]
                         self.assertTrue(
-                            selector_exists(action["selector"], indexes.get(slug, [])),
-                            f"{action['selector']} not found in {html_path}",
+                            static_selector_exists(
+                                selector,
+                                indexes.get(slug, []),
+                            )
+                            or generated_selector_contract_exists(
+                                selector,
+                                sources.get(slug, ""),
+                            ),
+                            (
+                                f"{selector} has neither a static element nor a "
+                                f"generating template/evidence contract in {html_path}"
+                            ),
                         )
 
     def test_thumbnails_exist_and_are_safe_authored_svg(self):
