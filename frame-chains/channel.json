@@ -1,0 +1,740 @@
+{
+  "schema": "rapp-vision-channel/1.0",
+  "id": "frame-chains",
+  "name": "Frame Chains",
+  "handle": "@kody-w",
+  "tagline": "Ten public synthetic worlds prove that history can be replayed, branched, and challenged.",
+  "avatar": "⛓️",
+  "links": [
+    {
+      "label": "Frame Chains",
+      "url": "https://github.com/kody-w/frame-chains"
+    },
+    {
+      "label": "Live showcase",
+      "url": "https://kody-w.github.io/frame-chains/showcase/"
+    }
+  ],
+  "videos": [
+    {
+      "id": "frame-chains-ten-frame-loop",
+      "title": "Frame Chains — The Ten-Frame Live Loop",
+      "description": "A public synthetic tour of all ten Frame Chains showcase apps. This entry contains no captured footage: RAPP Vision loads each live program from GitHub Pages and clicks its visible controls at replay time. The sequence moves from branching worlds and portable identity through colonies, constitutions, provenance, timeline attacks, and a futures museum.",
+      "published": "2026-08-30",
+      "duration": 576,
+      "width": 1280,
+      "height": 800,
+      "orientation": "landscape",
+      "tags": [
+        "frame-chains",
+        "live-replay",
+        "public-showcase",
+        "synthetic"
+      ],
+      "thumb": "thumbs/frame-chains-ten-frame-loop.svg",
+      "sources": [],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 8,
+            "card": {
+              "title": "Ten frames. Ten live programs.",
+              "sub": "A replay script, not captured footage",
+              "note": "Each scene opens a public GitHub Pages app and addresses controls by selector."
+            }
+          },
+          {
+            "t": 8,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/01-many-worlds/index.html",
+            "ready": {
+              "selector": "#guided-btn"
+            },
+            "lower": {
+              "title": "01 · Many Worlds Mission Control",
+              "fix": "Run the guided branch, then challenge its parent hash."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#guided-btn"
+              },
+              {
+                "at": 32,
+                "do": "click",
+                "selector": "#mutate-btn"
+              }
+            ]
+          },
+          {
+            "t": 64,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/02-soul-passport/index.html",
+            "ready": {
+              "selector": "#guided-button"
+            },
+            "lower": {
+              "title": "02 · AI Soul Passport",
+              "fix": "Migrate a synthetic identity, then reject a counterfeit."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#guided-button"
+              },
+              {
+                "at": 32,
+                "do": "click",
+                "selector": "#forge-button"
+              }
+            ]
+          },
+          {
+            "t": 120,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/03-mars-colony/index.html",
+            "ready": {
+              "selector": "#nextButton"
+            },
+            "lower": {
+              "title": "03 · Mars Colony",
+              "fix": "Advance the public synthetic colony tour one verified step at a time."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#nextButton"
+              },
+              {
+                "at": 7,
+                "do": "click",
+                "selector": "#nextButton"
+              },
+              {
+                "at": 14,
+                "do": "click",
+                "selector": "#nextButton"
+              },
+              {
+                "at": 21,
+                "do": "click",
+                "selector": "#nextButton"
+              },
+              {
+                "at": 28,
+                "do": "click",
+                "selector": "#nextButton"
+              },
+              {
+                "at": 35,
+                "do": "click",
+                "selector": "#nextButton"
+              },
+              {
+                "at": 42,
+                "do": "click",
+                "selector": "#nextButton"
+              }
+            ]
+          },
+          {
+            "t": 176,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/04-five-realities/index.html",
+            "ready": {
+              "selector": "#guideBtn"
+            },
+            "lower": {
+              "title": "04 · Five Realities",
+              "fix": "Follow the guide, then expose a conflicting mutation."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#guideBtn"
+              },
+              {
+                "at": 32,
+                "do": "click",
+                "selector": "#mutationBtn"
+              }
+            ]
+          },
+          {
+            "t": 232,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/05-causal-detective/index.html",
+            "ready": {
+              "selector": "#guidedBtn"
+            },
+            "lower": {
+              "title": "05 · Causal Detective",
+              "fix": "Trace the chain, then test whether altered evidence survives."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#guidedBtn"
+              },
+              {
+                "at": 32,
+                "do": "click",
+                "selector": "#mutateBtn"
+              }
+            ]
+          },
+          {
+            "t": 288,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/06-space-station/index.html",
+            "ready": {
+              "selector": "#guided"
+            },
+            "lower": {
+              "title": "06 · Space Station",
+              "fix": "Run the station proof, then attempt an overwrite."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#guided"
+              },
+              {
+                "at": 32,
+                "do": "click",
+                "selector": "#mutate-overwrite"
+              }
+            ]
+          },
+          {
+            "t": 344,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/07-constitution/index.html",
+            "ready": {
+              "selector": "#guidedBtn"
+            },
+            "lower": {
+              "title": "07 · Constitution",
+              "fix": "Replay the rules, then show the tyrant branch being challenged."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#guidedBtn"
+              },
+              {
+                "at": 32,
+                "do": "click",
+                "selector": "#tyrantBtn"
+              }
+            ]
+          },
+          {
+            "t": 400,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/08-teleporting-roguelike/index.html",
+            "ready": {
+              "selector": "#runDemo"
+            },
+            "lower": {
+              "title": "08 · Teleporting Roguelike",
+              "fix": "Complete the proof, then reject forged inventory and provenance."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#runDemo"
+              },
+              {
+                "at": 30,
+                "do": "click",
+                "selector": "#forgeItem"
+              },
+              {
+                "at": 40,
+                "do": "click",
+                "selector": "#forgeParent"
+              }
+            ]
+          },
+          {
+            "t": 456,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/09-attack-timeline/index.html",
+            "ready": {
+              "selector": "#controlBtn"
+            },
+            "lower": {
+              "title": "09 · Attack the Timeline",
+              "fix": "Establish control, attack every branch, then replay the evidence."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#controlBtn"
+              },
+              {
+                "at": 20,
+                "do": "click",
+                "selector": "#attackAllBtn"
+              },
+              {
+                "at": 40,
+                "do": "click",
+                "selector": "#replayBtn"
+              }
+            ]
+          },
+          {
+            "t": 512,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/10-futures-museum/index.html",
+            "ready": {
+              "selector": "#playBtn"
+            },
+            "lower": {
+              "title": "10 · Futures Museum",
+              "fix": "Play the exhibit, then compare its mutated future."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#playBtn"
+              },
+              {
+                "at": 32,
+                "do": "click",
+                "selector": "#mutateBtn"
+              }
+            ]
+          },
+          {
+            "t": 568,
+            "dur": 8,
+            "card": {
+              "title": "The pixels were never recorded.",
+              "sub": "The public programs just ran",
+              "note": "Pause any app scene to inspect the live synthetic state yourself."
+            }
+          }
+        ]
+      },
+      "chapters": [
+        {
+          "t": 0,
+          "label": "Live replay, not captured footage"
+        },
+        {
+          "t": 8,
+          "label": "01 · Many Worlds Mission Control"
+        },
+        {
+          "t": 64,
+          "label": "02 · AI Soul Passport"
+        },
+        {
+          "t": 120,
+          "label": "03 · Mars Colony"
+        },
+        {
+          "t": 176,
+          "label": "04 · Five Realities"
+        },
+        {
+          "t": 232,
+          "label": "05 · Causal Detective"
+        },
+        {
+          "t": 288,
+          "label": "06 · Space Station"
+        },
+        {
+          "t": 344,
+          "label": "07 · Constitution"
+        },
+        {
+          "t": 400,
+          "label": "08 · Teleporting Roguelike"
+        },
+        {
+          "t": 456,
+          "label": "09 · Attack the Timeline"
+        },
+        {
+          "t": 512,
+          "label": "10 · Futures Museum"
+        },
+        {
+          "t": 568,
+          "label": "Take the wheel"
+        }
+      ]
+    },
+    {
+      "id": "many-worlds-mission-control",
+      "title": "Many Worlds Mission Control — Parent-Hash Challenge",
+      "description": "A focused live run of the public synthetic Many Worlds app. The guided sequence builds and verifies a branch; the second selector-based action mutates its parent hash so the app can demonstrate rejection. This is an executable replay over the current GitHub Pages program, not captured desktop footage.",
+      "published": "2026-08-30",
+      "duration": 88,
+      "width": 1280,
+      "height": 800,
+      "orientation": "landscape",
+      "tags": [
+        "frame-chains",
+        "live-replay",
+        "many-worlds",
+        "integrity"
+      ],
+      "thumb": "thumbs/many-worlds-mission-control.svg",
+      "sources": [],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 8,
+            "card": {
+              "title": "Mission control is a live program.",
+              "sub": "First the proof, then the parent-hash challenge",
+              "note": "This is live public program state, not captured footage."
+            }
+          },
+          {
+            "t": 8,
+            "dur": 72,
+            "app": "../../frame-chains/showcase/01-many-worlds/index.html",
+            "ready": {
+              "selector": "#guided-btn"
+            },
+            "lower": {
+              "title": "Many Worlds Mission Control",
+              "bench": "Guided branch · parent-hash mutation",
+              "fix": "The chain explains why the altered parent cannot inherit trust."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#guided-btn"
+              },
+              {
+                "at": 44,
+                "do": "click",
+                "selector": "#mutate-btn"
+              }
+            ]
+          },
+          {
+            "t": 80,
+            "dur": 8,
+            "card": {
+              "title": "The branch remains inspectable.",
+              "sub": "Live state, public code, replayable selectors",
+              "note": "The mutation is evidence inside the synthetic app, not an edited frame."
+            }
+          }
+        ]
+      },
+      "chapters": [
+        {
+          "t": 0,
+          "label": "What a live proof replay is"
+        },
+        {
+          "t": 8,
+          "label": "Guided branch construction"
+        },
+        {
+          "t": 52,
+          "label": "Parent-hash mutation"
+        },
+        {
+          "t": 80,
+          "label": "Inspect the result"
+        }
+      ]
+    },
+    {
+      "id": "ai-soul-passport",
+      "title": "AI Soul Passport — Identity Migration and Counterfeit Rejection",
+      "description": "A public synthetic identity crosses a boundary while retaining its verifiable history. After the guided migration settles, RAPP Vision clicks the counterfeit control and leaves the live app to show why the forged passport fails. The entry is a programmatic replay with no captured footage or private identity data.",
+      "published": "2026-08-30",
+      "duration": 88,
+      "width": 1280,
+      "height": 800,
+      "orientation": "landscape",
+      "tags": [
+        "frame-chains",
+        "live-replay",
+        "identity",
+        "counterfeit-rejection"
+      ],
+      "thumb": "thumbs/ai-soul-passport.svg",
+      "sources": [],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 8,
+            "card": {
+              "title": "A synthetic passport migrates live.",
+              "sub": "Portable identity without private identity data",
+              "note": "The public app generates this state; it is not captured footage."
+            }
+          },
+          {
+            "t": 8,
+            "dur": 72,
+            "app": "../../frame-chains/showcase/02-soul-passport/index.html",
+            "ready": {
+              "selector": "#guided-button"
+            },
+            "lower": {
+              "title": "AI Soul Passport",
+              "bench": "Guided migration · counterfeit attempt",
+              "fix": "Continuity is accepted; the synthetic counterfeit is rejected."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#guided-button"
+              },
+              {
+                "at": 44,
+                "do": "click",
+                "selector": "#forge-button"
+              }
+            ]
+          },
+          {
+            "t": 80,
+            "dur": 8,
+            "card": {
+              "title": "Identity is a chain, not a screenshot.",
+              "sub": "Migration passes; counterfeit history does not",
+              "note": "Pause during the app scene to examine the live public proof."
+            }
+          }
+        ]
+      },
+      "chapters": [
+        {
+          "t": 0,
+          "label": "A live synthetic identity"
+        },
+        {
+          "t": 8,
+          "label": "Guided identity migration"
+        },
+        {
+          "t": 52,
+          "label": "Counterfeit rejection"
+        },
+        {
+          "t": 80,
+          "label": "Continuity over appearance"
+        }
+      ]
+    },
+    {
+      "id": "teleporting-roguelike",
+      "title": "Teleporting Roguelike — Inventory and Provenance Proof",
+      "description": "The complete public synthetic roguelike proof runs in the live app before two adversarial checks. One action forges an inventory item; the next forges its parent provenance. Both use visible selector-addressed controls, giving the running program time to reject state that cannot prove where it came from. No gameplay footage is stored in this channel.",
+      "published": "2026-08-30",
+      "duration": 112,
+      "width": 1280,
+      "height": 800,
+      "orientation": "landscape",
+      "tags": [
+        "frame-chains",
+        "live-replay",
+        "roguelike",
+        "provenance"
+      ],
+      "thumb": "thumbs/teleporting-roguelike.svg",
+      "sources": [],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 8,
+            "card": {
+              "title": "The dungeon is running now.",
+              "sub": "A live proof, not captured gameplay footage",
+              "note": "First complete the guided transfer; then challenge inventory and provenance."
+            }
+          },
+          {
+            "t": 8,
+            "dur": 96,
+            "app": "../../frame-chains/showcase/08-teleporting-roguelike/index.html",
+            "ready": {
+              "selector": "#runDemo"
+            },
+            "lower": {
+              "title": "Teleporting Roguelike",
+              "bench": "Full proof · forged item · forged parent",
+              "fix": "Possession is not enough: inventory must carry valid provenance."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#runDemo"
+              },
+              {
+                "at": 56,
+                "do": "click",
+                "selector": "#forgeItem"
+              },
+              {
+                "at": 72,
+                "do": "click",
+                "selector": "#forgeParent"
+              }
+            ]
+          },
+          {
+            "t": 104,
+            "dur": 8,
+            "card": {
+              "title": "The item needs a history.",
+              "sub": "Inventory and parent provenance were both challenged",
+              "note": "The synthetic state remains available in the live program."
+            }
+          }
+        ]
+      },
+      "chapters": [
+        {
+          "t": 0,
+          "label": "Why this is a live program"
+        },
+        {
+          "t": 8,
+          "label": "Full guided teleport proof"
+        },
+        {
+          "t": 64,
+          "label": "Forged inventory rejection"
+        },
+        {
+          "t": 80,
+          "label": "Forged parent provenance rejection"
+        },
+        {
+          "t": 104,
+          "label": "The provenance result"
+        }
+      ]
+    },
+    {
+      "id": "attack-the-timeline",
+      "title": "Attack the Timeline — Control, Attack All, Replay",
+      "description": "A live adversarial sequence over the public synthetic timeline app. The control run establishes the baseline, Attack All challenges every branch, and Replay reconstructs the evidence. RAPP Vision performs only selector-based clicks against the current GitHub Pages program; this channel stores no desktop recording.",
+      "published": "2026-08-30",
+      "duration": 112,
+      "width": 1280,
+      "height": 800,
+      "orientation": "landscape",
+      "tags": [
+        "frame-chains",
+        "live-replay",
+        "timeline",
+        "adversarial-proof"
+      ],
+      "thumb": "thumbs/attack-the-timeline.svg",
+      "sources": [],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 8,
+            "card": {
+              "title": "Attack a live synthetic timeline.",
+              "sub": "Control first. Attack all. Replay the evidence.",
+              "note": "The state is produced by the public app, not by a captured desktop."
+            }
+          },
+          {
+            "t": 8,
+            "dur": 96,
+            "app": "../../frame-chains/showcase/09-attack-timeline/index.html",
+            "ready": {
+              "selector": "#controlBtn"
+            },
+            "lower": {
+              "title": "Attack the Timeline",
+              "bench": "Control · attack all · replay",
+              "fix": "Replay makes the synthetic attack sequence independently inspectable."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#controlBtn"
+              },
+              {
+                "at": 38,
+                "do": "click",
+                "selector": "#attackAllBtn"
+              },
+              {
+                "at": 70,
+                "do": "click",
+                "selector": "#replayBtn"
+              }
+            ]
+          },
+          {
+            "t": 104,
+            "dur": 8,
+            "card": {
+              "title": "The replay is the receipt.",
+              "sub": "Baseline, attack, and reconstruction remain visible",
+              "note": "Pause the app scene and inspect the current public program."
+            }
+          }
+        ]
+      },
+      "chapters": [
+        {
+          "t": 0,
+          "label": "The live adversarial plan"
+        },
+        {
+          "t": 8,
+          "label": "Control run"
+        },
+        {
+          "t": 46,
+          "label": "Attack every branch"
+        },
+        {
+          "t": 78,
+          "label": "Replay the evidence"
+        },
+        {
+          "t": 104,
+          "label": "The replay receipt"
+        }
+      ]
+    }
+  ]
+}

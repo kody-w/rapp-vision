@@ -107,6 +107,13 @@
       "url": "dada/channel.json",
       "repo": "https://github.com/kody-w/rapp-vision",
       "_why": "Verified Dada works mirrored from the Public Art Collective."
+    },
+    {
+      "id": "frame-chains",
+      "name": "Frame Chains",
+      "url": "frame-chains/channel.json",
+      "repo": "https://github.com/kody-w/frame-chains",
+      "_why": "Ten public synthetic showcase apps replayed live from GitHub Pages, including focused adversarial proofs for branching, identity, provenance, and timeline integrity."
     }
   ]
 }

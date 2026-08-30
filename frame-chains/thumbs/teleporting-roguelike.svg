@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800" role="img" aria-labelledby="title desc">
+  <title id="title">Teleporting Roguelike abstract thumbnail</title>
+  <desc id="desc">A geometric inventory artifact travels between two dungeon gates.</desc>
+  <rect width="1280" height="800" fill="#0a1218"/>
+  <g stroke="#244052" stroke-width="4">
+    <path d="M0 640H1280M0 560H1280M0 480H1280M0 400H1280M0 320H1280M0 240H1280"/>
+    <path d="M160 200V720M320 200V720M480 200V720M640 200V720M800 200V720M960 200V720M1120 200V720"/>
+  </g>
+  <path d="M230 590V300Q230 220 310 220H430Q510 220 510 300V590" fill="#102632" stroke="#22d3ee" stroke-width="10"/>
+  <path d="M770 590V300Q770 220 850 220H970Q1050 220 1050 300V590" fill="#18223a" stroke="#a78bfa" stroke-width="10"/>
+  <path d="M510 410C600 340 680 340 770 410" fill="none" stroke="#fbbf24" stroke-width="10" stroke-dasharray="20 16"/>
+  <path d="M730 374L770 410L726 438" fill="none" stroke="#fbbf24" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M640 300L706 364L682 468L640 520L598 468L574 364Z" fill="#fbbf24" stroke="#fef3c7" stroke-width="8"/>
+  <circle cx="640" cy="400" r="34" fill="#0a1218"/>
+  <text x="90" y="112" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="66" font-weight="800">TELEPORTING ROGUELIKE</text>
+  <text x="94" y="166" fill="#67e8f9" font-family="system-ui, sans-serif" font-size="30" font-weight="650" letter-spacing="4">INVENTORY NEEDS PROVENANCE</text>
+</svg>
