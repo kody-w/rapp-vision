@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kody-w.github.io/rapp-vision/channel.schema.json",
+  "title": "RAPP Vision paired publication channel",
+  "type": "object",
+  "required": ["schema", "id", "name", "videos"],
+  "properties": {
+    "schema": { "const": "rapp-vision-channel/2.0" },
+    "id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "videos": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/publication" }
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "required": ["src", "type"],
+      "properties": {
+        "src": { "type": "string", "minLength": 1 },
+        "type": {
+          "type": "string",
+          "pattern": "^video/(mp4|webm)(?:\\s*;.*)?$"
+        }
+      }
+    },
+    "publication": {
+      "type": "object",
+      "required": ["id", "title", "duration", "sources", "live"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "duration": { "type": "number", "exclusiveMinimum": 0, "maximum": 86400 },
+        "sources": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/source" },
+          "allOf": [
+            {
+              "contains": {
+                "properties": { "type": { "pattern": "^video/mp4(?:\\s*;.*)?$" } },
+                "required": ["type"]
+              }
+            },
+            {
+              "contains": {
+                "properties": { "type": { "pattern": "^video/webm(?:\\s*;.*)?$" } },
+                "required": ["type"]
+              }
+            }
+          ]
+        },
+        "live": {
+          "type": "object",
+          "required": ["kind", "scenes"],
+          "properties": {
+            "kind": { "const": "rapp-vision-live/1.0" },
+            "scenes": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["t", "dur"],
+                "properties": {
+                  "t": { "type": "number", "minimum": 0 },
+                  "dur": { "type": "number", "exclusiveMinimum": 0 },
+                  "card": { "type": "object" },
+                  "app": { "type": "string", "minLength": 1 },
+                  "ready": { "type": "object" },
+                  "actions": { "type": "array" }
+                },
+                "oneOf": [
+                  { "required": ["card"], "not": { "required": ["app"] } },
+                  { "required": ["app"], "not": { "required": ["card"] } }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

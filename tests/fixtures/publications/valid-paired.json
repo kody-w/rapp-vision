@@ -1,0 +1,67 @@
+{
+  "schema": "rapp-vision-channel/2.0",
+  "id": "fixture-channel",
+  "name": "Fixture Channel",
+  "videos": [
+    {
+      "id": "paired",
+      "title": "Paired",
+      "duration": 10,
+      "sources": [
+        {
+          "src": "paired.mp4",
+          "type": "video/mp4; codecs=\"avc1\""
+        },
+        {
+          "src": "paired.webm",
+          "type": "video/webm; codecs=\"vp9\""
+        }
+      ],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 2,
+            "card": {
+              "title": "Intro"
+            }
+          },
+          {
+            "t": 2,
+            "dur": 8,
+            "app": "app.html",
+            "ready": {
+              "selector": "#go"
+            },
+            "actions": [
+              {
+                "at": 1,
+                "do": "click",
+                "selector": "#go"
+              },
+              {
+                "at": 3,
+                "do": "keydown",
+                "code": "KeyW"
+              },
+              {
+                "at": 4,
+                "do": "keyup",
+                "code": "KeyW"
+              },
+              {
+                "at": 5,
+                "do": "scroll",
+                "to": [
+                  0,
+                  300
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

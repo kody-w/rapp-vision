@@ -1,0 +1,145 @@
+{
+  "schema": "rapp-vision-legacy-publications/1.0",
+  "id": "legacy-publications-2026-08-31",
+  "frozen_at": "2026-08-31T16:24:12Z",
+  "registry_base": "https://kody-w.github.io/rapp-vision/channels.json",
+  "channels": [
+    {
+      "id": "rock-tumbler",
+      "source": "https://kody-w.github.io/rapp-vision/channel.json",
+      "publications": [
+        "rock-tumbler-showcase",
+        "rock-tumbler-short",
+        "rock-tumbler-reel"
+      ]
+    },
+    {
+      "id": "localfirsttools",
+      "source": "https://kody-w.github.io/localFirstTools/rappvision/channel.json",
+      "publications": [
+        "lft-tumbler-live",
+        "lft-tumbler-short",
+        "lft-tumbler-reel"
+      ]
+    },
+    {
+      "id": "learnwithkody",
+      "source": "https://kody-w.github.io/learnwithkody/rappvision/channel.json",
+      "publications": [
+        "lwk-coastal-city",
+        "lwk-buzzsaw-voxel",
+        "lwk-walkthrough-apex",
+        "lwk-apex-live"
+      ]
+    },
+    {
+      "id": "catchup",
+      "source": "https://kody-w.github.io/catchup/rappvision/channel.json",
+      "publications": [
+        "catchup-2026-08-01-part-3",
+        "catchup-2026-08-01-part-2",
+        "catchup-2026-08-01"
+      ]
+    },
+    {
+      "id": "field-notes",
+      "source": "https://kody-w.github.io/rappvision-field-notes/rappvision/channel.json",
+      "publications": [
+        "above-not-beside",
+        "platform-relaunch-recap"
+      ]
+    },
+    {
+      "id": "rooms",
+      "source": "https://kody-w.github.io/localFirstTools/rappvision/rooms/channel.json",
+      "publications": [
+        "rooms-tour",
+        "rooms-rain",
+        "rooms-slow"
+      ]
+    },
+    {
+      "id": "arcade",
+      "source": "https://kody-w.github.io/localFirstTools/rappvision/arcade/channel.json",
+      "publications": [
+        "arcade-cold-boot",
+        "arcade-emulator-shelf",
+        "arcade-take-over"
+      ]
+    },
+    {
+      "id": "workbench",
+      "source": "https://kody-w.github.io/localFirstTools/rappvision/workbench/channel.json",
+      "publications": [
+        "workbench-three-tools",
+        "workbench-808",
+        "workbench-generative"
+      ]
+    },
+    {
+      "id": "openrappter-training",
+      "source": "https://kody-w.github.io/rapp-vision/openrappter-training/channel.json",
+      "publications": [
+        "openrappter-m1-install-first-run",
+        "openrappter-m2-local-memory",
+        "openrappter-m3-deterministic-agents",
+        "openrappter-m4-brainstem-local-endpoint",
+        "openrappter-m5-author-single-file-agent",
+        "openrappter-m6-conformance-gate",
+        "openrappter-m7-llm-free-chaining",
+        "openrappter-m8-know-what-is-real"
+      ]
+    },
+    {
+      "id": "tumbler",
+      "source": "https://kody-w.github.io/rapp-vision-neighborhood/tumbler/channel.json",
+      "publications": [
+        "tumble-2026-08-04"
+      ]
+    },
+    {
+      "id": "fieldguide",
+      "source": "https://kody-w.github.io/rapp-vision-neighborhood/fieldguide/channel.json",
+      "publications": [
+        "guide-2026-08-04"
+      ]
+    },
+    {
+      "id": "prompt-frontier",
+      "source": "https://kody-w.github.io/rappvision-prompt-frontier/channel.json",
+      "publications": [
+        "prompt-frontier-founding"
+      ]
+    },
+    {
+      "id": "rappterbox",
+      "source": "https://kody-w.github.io/rappvision-rappterbox/channel.json",
+      "publications": [
+        "genesis-251-founding-four-draft",
+        "veridion-proof-trailer",
+        "aivms-watch-their-own-film"
+      ]
+    },
+    {
+      "id": "dada-collective",
+      "source": "https://kody-w.github.io/rapp-vision/dada/channel.json",
+      "publications": [
+        "unreachable-from-a-clone",
+        "exactly-eighteen-thousand",
+        "six-titles-undone",
+        "rounded-to-the-minute"
+      ]
+    },
+    {
+      "id": "frame-chains",
+      "source": "https://kody-w.github.io/rapp-vision/frame-chains/channel.json",
+      "publications": [
+        "frame-chains-ten-frame-loop",
+        "many-worlds-mission-control",
+        "ai-soul-passport",
+        "teleporting-roguelike",
+        "attack-the-timeline"
+      ]
+    }
+  ]
+}

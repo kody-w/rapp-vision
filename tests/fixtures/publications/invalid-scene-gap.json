@@ -1,0 +1,41 @@
+{
+  "schema": "rapp-vision-channel/2.0",
+  "id": "scene-gap",
+  "name": "Scene Gap",
+  "videos": [
+    {
+      "id": "bad",
+      "title": "Bad",
+      "duration": 10,
+      "sources": [
+        {
+          "src": "bad.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "bad.webm",
+          "type": "video/webm"
+        }
+      ],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 4,
+            "card": {
+              "title": "First"
+            }
+          },
+          {
+            "t": 5,
+            "dur": 5,
+            "card": {
+              "title": "Second"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

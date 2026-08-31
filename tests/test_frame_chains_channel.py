@@ -142,6 +142,7 @@ class TestFrameChainsChannel(unittest.TestCase):
                 "name": "Frame Chains",
                 "url": "frame-chains/channel.json",
                 "repo": "https://github.com/kody-w/frame-chains",
+                "legacy": "legacy-publications-2026-08-31",
                 "_why": (
                     "Ten public synthetic showcase apps replayed live from GitHub Pages, "
                     "including focused adversarial proofs for branching, identity, "
