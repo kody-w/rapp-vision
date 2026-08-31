@@ -18,6 +18,12 @@ def contract_block():
     return INDEX[start:end]
 
 
+def identity_block():
+    start = INDEX.index("/* publication identity:start */")
+    end = INDEX.index("/* publication identity:end */") + len("/* publication identity:end */")
+    return INDEX[start:end]
+
+
 @unittest.skipUnless(NODE, "node not available; exact player validation test skipped")
 class TestPairedPlayer(unittest.TestCase):
     def run_node(self, body):
@@ -41,36 +47,93 @@ class TestPairedPlayer(unittest.TestCase):
         policy = json.dumps(json.loads(
             (ROOT / "policy/legacy-publications.json").read_text()
         ))
+        frame_chains = json.dumps(json.loads(
+            (ROOT / "frame-chains/channel.json").read_text()
+        ))
         script = f"""
+        if (!globalThis.crypto) globalThis.crypto = require("crypto").webcrypto;
         let LEGACY_POLICY = {policy};
         {contract_block()}
-        const valid = validateChannelContract({valid}, "https://example.test/channel.json");
-        const invalid = validateChannelContract({invalid}, "https://example.test/channel.json");
-        if (valid.length) throw new Error(valid.join("\\n"));
-        if (replayDuration({valid}.videos[0].live) !== 12)
-          throw new Error("browser validator reused the 10 second film duration");
-        const derivedReplay = JSON.parse(JSON.stringify({valid}.videos[0].live));
-        delete derivedReplay.duration;
-        if (replayDuration(derivedReplay) !== 12)
-          throw new Error("browser player did not derive replay duration from scenes");
-        if (!invalid.some(e => e.includes("missing required video/webm")))
-          throw new Error("browser validator accepted an MP4-only publication");
+        (async () => {{
+          const validErrors = await validateChannelContract({valid}, "https://example.test/channel.json");
+          const invalidErrors = await validateChannelContract({invalid}, "https://example.test/channel.json");
+          if (validErrors.length) throw new Error(validErrors.join("\\n"));
+          if (replayDuration({valid}.videos[0].live) !== 12)
+            throw new Error("browser validator reused the 10 second film duration");
+          const derivedReplay = JSON.parse(JSON.stringify({valid}.videos[0].live));
+          delete derivedReplay.duration;
+          if (replayDuration(derivedReplay) !== 12)
+            throw new Error("browser player did not derive replay duration from scenes");
+          if (!invalidErrors.some(e => e.includes("missing required video/webm")))
+            throw new Error("browser validator accepted an MP4-only publication");
+          const legacyErrors = await validateChannelContract(
+            {frame_chains},
+            "https://kody-w.github.io/rapp-vision/frame-chains/channel.json"
+          );
+          if (legacyErrors.length) throw new Error(legacyErrors.join("\\n"));
+        }})().catch(error => {{ console.error(error); process.exit(1); }});
         """
         self.run_node(script)
 
-    def test_modes_have_separate_progress_keys(self):
-        script = """
-        const isPaired = v => !!(v && v.live && Array.isArray(v.sources) && v.sources.length);
-        const historyKey = (v, mode) => isPaired(v) ? `${v.id}::${mode}` : v.id;
-        const paired = {id:"proof", sources:[{src:"proof.mp4"}], live:{scenes:[]}};
-        if (historyKey(paired, "video") !== "proof::video") throw new Error("video key");
-        if (historyKey(paired, "live") !== "proof::live") throw new Error("live key");
-        const history = {};
-        history[historyKey(paired, "video")] = {t:9,d:10};
-        history[historyKey(paired, "live")] = {t:11,d:12};
-        if (history["proof::video"].d === history["proof::live"].d) throw new Error("shared duration");
-        if (history["proof::video"].t !== 9 || history["proof::live"].t !== 11) throw new Error("shared progress");
-        if (historyKey({id:"legacy", sources:[]}, "live") !== "legacy") throw new Error("legacy key");
+    def test_channel_scoped_routes_state_and_collision_migration(self):
+        script = f"""
+        let VIDEOS = [], ALL_VIDEOS = [], state = {{history: {{}}, liked: [], later: []}};
+        {identity_block()}
+        const channelA = {{id:"alpha"}}, channelB = {{id:"beta"}};
+        const a = {{id:"shared", _ch:channelA, sources:[{{src:"a.mp4"}}], live:{{scenes:[]}}}};
+        const b = {{id:"shared", _ch:channelB, sources:[{{src:"b.mp4"}}], live:{{scenes:[]}}}};
+        VIDEOS = [a, b]; ALL_VIDEOS = [a, b];
+        if (byId("shared") !== a) throw new Error("old link did not retain first-match migration");
+        if (byId("beta/shared") !== b) throw new Error("scoped route collision");
+        if (historyKey(a, "video") !== "alpha/shared::video") throw new Error("alpha history key");
+        if (historyKey(b, "live") !== "beta/shared::live") throw new Error("beta history key");
+        state.history["shared::video"] = {{t:3,d:10}};
+        if (historyRecord(a, "video").t !== 3) throw new Error("old history did not migrate");
+        if (historyRecord(b, "video") !== null) throw new Error("old history leaked across collision");
+        state.history[historyKey(b, "video")] = {{t:8,d:20}};
+        if (historyRecord(b, "video").t !== 8) throw new Error("scoped history missing");
+        if (historyVideo("beta/shared::video") !== b) throw new Error("scoped recent history collision");
+        if (historyVideo("shared::video") !== a) throw new Error("old recent history migration");
+        state.liked = ["shared"];
+        if (!stateHasVideo(state.liked, a)) throw new Error("old like did not migrate");
+        if (stateHasVideo(state.liked, b)) throw new Error("old like leaked across collision");
+        state.later = ["beta/shared"];
+        if (stateVideos(state.later)[0] !== b) throw new Error("scoped watch-later collision");
+        """
+        self.run_node(script)
+
+    def test_browser_rejects_legacy_content_replacement_boundary_action_and_mime_case(self):
+        script = f"""
+        if (!globalThis.crypto) globalThis.crypto = require("crypto").webcrypto;
+        let LEGACY_POLICY = {{channels:[]}};
+        {contract_block()}
+        (async () => {{
+          const video = {{id:"legacy",title:"Original",duration:5,sources:[]}};
+          const source = "https://example.test/channel.json";
+          const policy = {{channels:[{{id:"old",source,publications:[
+            {{id:"legacy",sha256:await publicationSha256(video)}}
+          ]}}]}};
+          const channel = {{schema:LEGACY_CHANNEL_SCHEMA,id:"old",name:"Old",videos:[video]}};
+          if ((await validateChannelContract(channel, source, policy)).length)
+            throw new Error("exact legacy content rejected");
+          channel.videos[0].title = "Replacement";
+          const replaced = await validateChannelContract(channel, source, policy);
+          if (!replaced.some(e => e.includes("frozen legacy digest")))
+            throw new Error("legacy replacement accepted");
+
+          const paired = {json.dumps(json.loads(
+              (ROOT / "tests/fixtures/publications/valid-paired.json").read_text()
+          ))};
+          paired.videos[0].live.scenes[1].actions[0].at = paired.videos[0].live.scenes[1].dur;
+          const boundary = await validateChannelContract(paired, source, policy);
+          if (!boundary.some(e => e.includes("less than the scene duration")))
+            throw new Error("boundary action accepted");
+          paired.videos[0].live.scenes[1].actions[0].at = 1;
+          paired.videos[0].sources[0].type = "Video/MP4";
+          const mime = await validateChannelContract(paired, source, policy);
+          if (!mime.some(e => e.includes("only video/mp4 and video/webm")))
+            throw new Error("uppercase MIME accepted");
+        }})().catch(error => {{ console.error(error); process.exit(1); }});
         """
         self.run_node(script)
 
@@ -85,6 +148,8 @@ class TestPairedPlayer(unittest.TestCase):
         self.assertIn("const total = replayDuration(v.live);", INDEX)
         self.assertIn('next === "live" ? ((v.live && v.live.chapters) || [])', INDEX)
         self.assertIn('mode === "live" ? replayDuration(v.live) : v.duration', INDEX)
+        self.assertIn('href="#/watch/${encodeURIComponent(vkey(v))}"', INDEX)
+        self.assertIn('href="#/watch/${encodeURIComponent(vkey(x))}"', INDEX)
 
 
 if __name__ == "__main__":

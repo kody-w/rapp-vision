@@ -36,8 +36,10 @@ MP4-only, and WebM-only entries are rejected. See
 
 The default registry includes pre-constitution material in several formats.
 Those exact channel URL + publication id identities remain playable through a
-frozen legacy allowlist. They are examples of the network's history, not
-templates for new publication:
+frozen legacy allowlist whose normalized publication objects are SHA-256
+pinned. CI compares that policy to the trusted git base, so changing the
+allowlist in the same contribution cannot self-authorize v1 content. These are
+examples of the network's history, not templates for new publication:
 
 | Channel | | What it is |
 |---|---|---|
@@ -199,6 +201,9 @@ scene start.
 | `drag` | `from: [x,y]`, `to: [x,y]` | dispatches Pointer **and** Mouse events, with intermediate moves. Coordinates are inside the app's own viewport |
 | `scroll` | `selector`/`text`, or `to: [x,y]` | brings a control into view — real tools are taller than a 16:10 stage |
 
+Action times satisfy `0 <= at < scene.dur`; an action exactly on the scene end
+belongs to no executable instant and is rejected.
+
 Two things that will silently cost you a scene:
 
 - **Pointer-lock apps cannot be scripted.** A synthetic click carries no user
@@ -212,7 +217,8 @@ Two things that will silently cost you a scene:
 **MP4 and WebM are both required for every new entry.** This is not just codec
 coverage: headless Chromium commonly has no H.264 decoder, so WebM makes the
 guided layer verifiable in CI, while MP4 covers browsers and devices that do
-not ship WebM support.
+not ship WebM support. MIME bases are canonical lowercase (`video/mp4` and
+`video/webm`) in the schema and both validators.
 
 ---
 
@@ -220,6 +226,8 @@ not ship WebM support.
 
 - **Aggregated home feed** across every channel you've subscribed to
 - **Separate resume points**, per film and replay, in `localStorage`
+- **Channel-scoped identity** for routes, history, likes, and Watch later; old
+  unscoped links and state migrate to their original first match
 - **Mode-specific chapters**, keyboard shortcuts, PiP, playback rate
 - **Watch later / liked**, exportable and importable as JSON
 - **Live replay** with a real transport (play/pause/seek) over a running app

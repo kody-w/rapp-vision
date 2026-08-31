@@ -4,8 +4,12 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
+import posixpath
+import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -20,6 +24,9 @@ LIVE_KIND = "rapp-vision-live/1.0"
 MAX_DURATION = 86400
 EPSILON = 1e-6
 ACTION_KINDS = {"click", "key", "keydown", "keyup", "type", "drag", "scroll"}
+LEGACY_POLICY_ID = "legacy-publications-2026-08-31"
+LEGACY_FROZEN_AT = "2026-08-31T16:24:12Z"
+TRUSTED_REGISTRY_BASE = "https://kody-w.github.io/rapp-vision/channels.json"
 
 
 def is_object(value: Any) -> bool:
@@ -55,8 +62,8 @@ def validate_action(action: Any, duration: float, path: str) -> list[str]:
     if not is_object(action):
         return [f"{path}: must be an object"]
     at = action.get("at")
-    if not is_number(at) or at < 0 or at > duration:
-        errors.append(f"{path}.at: must be between 0 and the scene duration")
+    if not is_number(at) or at < 0 or at >= duration:
+        errors.append(f"{path}.at: must be at least 0 and less than the scene duration")
     kind = action.get("do")
     if kind not in ACTION_KINDS:
         errors.append(f"{path}.do: unsupported action {kind!r}")
@@ -215,11 +222,11 @@ def validate_publication(video: Any, path: str) -> list[str]:
             if not nonempty_string(source_type):
                 errors.append(f"{source_path}.type: must be a non-empty media type")
                 continue
-            base_type = source_type.split(";", 1)[0].strip().lower()
-            if base_type not in {"video/mp4", "video/webm"}:
+            match = re.fullmatch(r"video/(mp4|webm)(?:\s*;.*)?", source_type)
+            if not match:
                 errors.append(f"{source_path}.type: only video/mp4 and video/webm are allowed")
             else:
-                media_types.add(base_type)
+                media_types.add(f"video/{match.group(1)}")
     for required_type in ("video/mp4", "video/webm"):
         if required_type not in media_types:
             errors.append(f"{path}.sources: missing required {required_type} source")
@@ -238,6 +245,33 @@ def legacy_record(
             and record.get("source") == source_url
         ):
             return record
+    return None
+
+
+def normalize_json(value: Any) -> Any:
+    if is_object(value):
+        return {key: normalize_json(value[key]) for key in sorted(value)}
+    if isinstance(value, list):
+        return [normalize_json(item) for item in value]
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
+    return value
+
+
+def publication_digest(publication: Any) -> str:
+    canonical = json.dumps(
+        normalize_json(publication),
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
+
+
+def legacy_publication_record(record: dict[str, Any], publication_id: Any) -> dict[str, Any] | None:
+    for publication in record.get("publications", []):
+        if is_object(publication) and publication.get("id") == publication_id:
+            return publication
     return None
 
 
@@ -271,12 +305,16 @@ def validate_channel(
                 "channel.schema: v1 is frozen legacy only; channel id and canonical source are not allowlisted"
             )
         else:
-            allowed = set(record.get("publications", []))
             for index, video in enumerate(videos):
                 video_id = video.get("id") if is_object(video) else None
-                if video_id not in allowed:
+                publication = legacy_publication_record(record, video_id)
+                if not publication:
                     errors.append(
                         f"channel.videos[{index}].id: {video_id!r} is not a frozen legacy publication"
+                    )
+                elif publication_digest(video) != publication.get("sha256"):
+                    errors.append(
+                        f"channel.videos[{index}]: content does not match its frozen legacy digest"
                     )
     else:
         errors.append(f"channel.schema: must equal {CURRENT_SCHEMA!r}")
@@ -318,12 +356,195 @@ def validate_legacy_policy(policy: Any) -> list[str]:
         publications = record.get("publications")
         if not isinstance(publications, list) or not publications:
             errors.append(f"{path}.publications: must be a non-empty array")
-        elif (
-            not all(nonempty_string(item) for item in publications)
-            or len(publications) != len(set(publications))
-        ):
-            errors.append(f"{path}.publications: ids must be non-empty and unique")
+        else:
+            publication_ids = []
+            for publication_index, publication in enumerate(publications):
+                publication_path = f"{path}.publications[{publication_index}]"
+                if not is_object(publication):
+                    errors.append(f"{publication_path}: must be an object with id and sha256")
+                    continue
+                publication_id = publication.get("id")
+                digest = publication.get("sha256")
+                if not nonempty_string(publication_id):
+                    errors.append(f"{publication_path}.id: must be a non-empty string")
+                else:
+                    publication_ids.append(publication_id)
+                if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+                    errors.append(f"{publication_path}.sha256: must be a lowercase SHA-256 digest")
+            if len(publication_ids) != len(set(publication_ids)):
+                errors.append(f"{path}.publications: ids must be unique")
     return errors
+
+
+def git_json(ref: str, path: str) -> Any:
+    completed = subprocess.run(
+        ["git", "-C", str(ROOT), "show", f"{ref}:{path}"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode:
+        raise RuntimeError(completed.stderr.strip() or f"cannot read {path} from {ref}")
+    return json.loads(completed.stdout)
+
+
+def git_has_path(ref: str, path: str) -> bool:
+    return subprocess.run(
+        ["git", "-C", str(ROOT), "cat-file", "-e", f"{ref}:{path}"],
+        check=False,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    ).returncode == 0
+
+
+def policy_identity(policy: dict[str, Any]) -> list[tuple[Any, Any, tuple[Any, ...]]]:
+    identity = []
+    for record in policy.get("channels", []):
+        publications = []
+        for publication in record.get("publications", []):
+            publications.append(
+                publication.get("id") if is_object(publication) else publication
+            )
+        identity.append((record.get("id"), record.get("source"), tuple(publications)))
+    return identity
+
+
+def baseline_channel_documents(
+    ref: str, policy: dict[str, Any], registry: dict[str, Any]
+) -> tuple[dict[tuple[Any, Any], dict[str, Any]], list[str]]:
+    documents: dict[tuple[Any, Any], dict[str, Any]] = {}
+    errors: list[str] = []
+    base = policy.get("registry_base", "")
+    entries = registry.get("channels", []) if is_object(registry) else []
+    for record in policy.get("channels", []):
+        channel_id = record.get("id")
+        source = record.get("source")
+        entry = next(
+            (
+                item
+                for item in entries
+                if is_object(item)
+                and item.get("id") == channel_id
+                and urljoin(base, item.get("url", "")) == source
+            ),
+            None,
+        )
+        if not entry:
+            errors.append(
+                f"legacy baseline: {channel_id!r} at {source!r} is absent from baseline registry"
+            )
+            continue
+        raw_url = entry.get("url", "")
+        parsed = urlparse(raw_url)
+        repo_path = posixpath.normpath(parsed.path)
+        try:
+            if not parsed.scheme and not parsed.netloc and not repo_path.startswith("../"):
+                channel = git_json(ref, repo_path)
+            else:
+                channel = fetch_json(source)
+        except Exception as exc:
+            errors.append(f"legacy baseline: could not load {source}: {exc}")
+            continue
+        documents[(channel_id, source)] = channel
+    return documents, errors
+
+
+def validate_frozen_policy(
+    current: dict[str, Any],
+    baseline: dict[str, Any],
+    baseline_channels: dict[tuple[Any, Any], dict[str, Any]],
+) -> list[str]:
+    errors: list[str] = []
+    for field in ("schema", "id", "frozen_at", "registry_base"):
+        if current.get(field) != baseline.get(field):
+            errors.append(f"legacy policy.{field}: frozen value differs from git baseline")
+    if policy_identity(current) != policy_identity(baseline):
+        errors.append("legacy policy: channel/source/publication identities differ from git baseline")
+        return errors
+
+    baseline_publications = [
+        publication
+        for record in baseline.get("channels", [])
+        for publication in record.get("publications", [])
+    ]
+    if baseline_publications and all(is_object(item) for item in baseline_publications):
+        if normalize_json(current) != normalize_json(baseline):
+            errors.append("legacy policy: frozen digest baseline was modified")
+        return errors
+
+    # One-time transition from the original string allowlist to content digests.
+    # Identities still come from git, and every digest must describe the
+    # publication bytes reachable from that baseline registry.
+    for record in current.get("channels", []):
+        key = (record.get("id"), record.get("source"))
+        channel = baseline_channels.get(key)
+        if not channel:
+            errors.append(f"legacy policy: no trusted baseline channel for {key[0]!r}")
+            continue
+        videos = {
+            video.get("id"): video
+            for video in channel.get("videos", [])
+            if is_object(video) and nonempty_string(video.get("id"))
+        }
+        for publication in record.get("publications", []):
+            publication_id = publication.get("id") if is_object(publication) else None
+            video = videos.get(publication_id)
+            if not video:
+                errors.append(
+                    f"legacy policy: baseline publication {key[0]}/{publication_id} is unavailable"
+                )
+            elif publication.get("sha256") != publication_digest(video):
+                errors.append(
+                    f"legacy policy: digest for {key[0]}/{publication_id} does not match git baseline content"
+                )
+    return errors
+
+
+def validate_baseline_ref(current: dict[str, Any], ref: str) -> list[str]:
+    try:
+        registry = git_json(ref, "channels.json")
+    except Exception as exc:
+        return [f"legacy policy: could not read trusted git baseline {ref}: {exc}"]
+    if not git_has_path(ref, "policy/legacy-publications.json"):
+        # Bootstrap against the trusted pre-policy registry. The base commit,
+        # not the PR, decides which channels and publications may become legacy.
+        baseline = {
+            "schema": "rapp-vision-legacy-publications/1.0",
+            "id": LEGACY_POLICY_ID,
+            "frozen_at": LEGACY_FROZEN_AT,
+            "registry_base": TRUSTED_REGISTRY_BASE,
+            "channels": [
+                {
+                    "id": entry.get("id"),
+                    "source": urljoin(TRUSTED_REGISTRY_BASE, entry.get("url", "")),
+                    "publications": [],
+                }
+                for entry in registry.get("channels", [])
+                if is_object(entry)
+            ],
+        }
+        channels, errors = baseline_channel_documents(ref, baseline, registry)
+        for record in baseline["channels"]:
+            channel = channels.get((record["id"], record["source"]))
+            record["publications"] = [
+                video.get("id")
+                for video in (channel or {}).get("videos", [])
+                if is_object(video) and nonempty_string(video.get("id"))
+            ]
+        return errors + validate_frozen_policy(current, baseline, channels)
+    try:
+        baseline = git_json(ref, "policy/legacy-publications.json")
+    except Exception as exc:
+        return [f"legacy policy: trusted git baseline is unreadable: {exc}"]
+    baseline_publications = [
+        publication
+        for record in baseline.get("channels", [])
+        for publication in record.get("publications", [])
+    ]
+    if baseline_publications and all(is_object(item) for item in baseline_publications):
+        return validate_frozen_policy(current, baseline, {})
+    channels, errors = baseline_channel_documents(ref, baseline, registry)
+    return errors + validate_frozen_policy(current, baseline, channels)
 
 
 def registry_local_path(registry_path: Path, raw_url: str) -> Path | None:
@@ -417,10 +638,20 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="skip remote registry channels while still checking registry policy declarations",
     )
+    parser.add_argument(
+        "--check-legacy-baseline",
+        metavar="GIT_REF",
+        help="reject any legacy-policy change not authorized by the trusted git baseline",
+    )
     args = parser.parse_args(argv)
 
     policy = load_json(args.legacy_policy)
     ok = print_result(str(args.legacy_policy), validate_legacy_policy(policy))
+    if args.check_legacy_baseline:
+        ok = print_result(
+            f"{args.legacy_policy} vs {args.check_legacy_baseline}",
+            validate_baseline_ref(policy, args.check_legacy_baseline),
+        ) and ok
     if args.source_url and len(args.channels) != 1:
         parser.error("--source-url requires exactly one channel file")
     for channel_path in args.channels:

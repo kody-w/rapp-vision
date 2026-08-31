@@ -3,6 +3,7 @@
 import copy
 import importlib.util
 import json
+import re
 import unittest
 from pathlib import Path
 from urllib.parse import urljoin
@@ -79,18 +80,35 @@ class TestPublicationPolicy(unittest.TestCase):
 
     def test_duration_and_action_bounds_are_rejected(self):
         errors = self.validate(load(FIXTURES / "invalid-ready-action.json"))
-        self.assertTrue(any("between 0 and the scene duration" in error for error in errors))
+        self.assertTrue(any("less than the scene duration" in error for error in errors))
         self.assertTrue(any("click requires exactly one" in error for error in errors))
 
-    def test_frozen_legacy_identity_and_source_are_both_required(self):
-        legacy = {
-            "schema": "rapp-vision-channel/1.0",
-            "id": "frame-chains",
-            "name": "Frame Chains",
-            "videos": [{"id": "many-worlds-mission-control"}],
-        }
+    def test_action_at_exact_scene_boundary_is_rejected(self):
+        channel = copy.deepcopy(self.valid)
+        scene = channel["videos"][0]["live"]["scenes"][1]
+        scene["actions"][0]["at"] = scene["dur"]
+        errors = self.validate(channel)
+        self.assertTrue(any("less than the scene duration" in error for error in errors))
+
+    def test_mime_types_are_canonical_lowercase_in_schema_and_validators(self):
+        channel = copy.deepcopy(self.valid)
+        channel["videos"][0]["sources"][0]["type"] = "Video/MP4"
+        errors = self.validate(channel)
+        self.assertTrue(any("only video/mp4 and video/webm" in error for error in errors))
+        schema = load(ROOT / "channel.schema.json")
+        pattern = schema["$defs"]["source"]["properties"]["type"]["pattern"]
+        self.assertIsNone(re.fullmatch(pattern, "Video/MP4"))
+        self.assertIsNotNone(re.fullmatch(pattern, "video/mp4; codecs=\"avc1\""))
+
+    def test_frozen_legacy_identity_source_and_content_are_all_required(self):
+        legacy = load(ROOT / "frame-chains" / "channel.json")
         canonical = "https://kody-w.github.io/rapp-vision/frame-chains/channel.json"
         self.assertEqual(self.validate(legacy, canonical), [])
+        replaced = copy.deepcopy(legacy)
+        replaced["videos"][0]["title"] = "Arbitrary replacement"
+        self.assertTrue(any("frozen legacy digest" in error for error in self.validate(
+            replaced, canonical
+        )))
         self.assertTrue(any("canonical source" in error for error in self.validate(
             legacy, "https://example.test/frame-chains/channel.json"
         )))
@@ -109,7 +127,6 @@ class TestPublicationPolicy(unittest.TestCase):
         self.assertTrue(any("not a frozen legacy publication" in error for error in errors))
 
     def test_new_v1_registry_url_is_not_grandfathered_by_adding_it(self):
-        registry = load(ROOT / "channels.json")
         bypass = {
             "id": "new-v1",
             "name": "New v1",
@@ -142,6 +159,79 @@ class TestPublicationPolicy(unittest.TestCase):
                         urljoin(base, entry["url"]),
                     )
                 )
+                record = VALIDATOR.legacy_record(
+                    self.policy,
+                    entry["id"],
+                    urljoin(base, entry["url"]),
+                )
+                self.assertTrue(all(
+                    isinstance(publication, dict)
+                    and re.fullmatch(r"[0-9a-f]{64}", publication.get("sha256", ""))
+                    for publication in record["publications"]
+                ))
+
+    def test_git_baseline_rejects_legacy_expansion_and_digest_self_authorization(self):
+        video = {"id": "old-video", "title": "Original"}
+        digest = VALIDATOR.publication_digest(video)
+        baseline = {
+            "schema": "rapp-vision-legacy-publications/1.0",
+            "id": "legacy-publications-2026-08-31",
+            "frozen_at": "2026-08-31T16:24:12Z",
+            "registry_base": "https://example.test/channels.json",
+            "channels": [{
+                "id": "old",
+                "source": "https://example.test/old/channel.json",
+                "publications": ["old-video"],
+            }],
+        }
+        current = copy.deepcopy(baseline)
+        current["channels"][0]["publications"] = [{"id": "old-video", "sha256": digest}]
+        documents = {
+            ("old", "https://example.test/old/channel.json"): {
+                "videos": [video],
+            }
+        }
+        self.assertEqual(
+            VALIDATOR.validate_frozen_policy(current, baseline, documents),
+            [],
+        )
+
+        expanded = copy.deepcopy(current)
+        expanded["channels"].append({
+            "id": "new",
+            "source": "https://example.test/new/channel.json",
+            "publications": [{"id": "new-video", "sha256": "0" * 64}],
+        })
+        self.assertTrue(any(
+            "identities differ from git baseline" in error
+            for error in VALIDATOR.validate_frozen_policy(expanded, baseline, documents)
+        ))
+
+        self_authorized = copy.deepcopy(current)
+        self_authorized["channels"][0]["publications"][0]["sha256"] = "0" * 64
+        self.assertTrue(any(
+            "does not match git baseline content" in error
+            for error in VALIDATOR.validate_frozen_policy(
+                self_authorized, baseline, documents
+            )
+        ))
+
+    def test_ci_uses_full_git_history_and_checks_the_trusted_base(self):
+        workflow = (
+            ROOT / ".github" / "workflows" / "publication-policy.yml"
+        ).read_text(encoding="utf-8")
+        self.assertIn("fetch-depth: 0", workflow)
+        self.assertIn("--check-legacy-baseline", workflow)
+        self.assertIn('origin/${{ github.base_ref }}', workflow)
+
+    def test_digest_baseline_is_immutable_after_bootstrap(self):
+        baseline = copy.deepcopy(self.policy)
+        changed = copy.deepcopy(self.policy)
+        changed["channels"][0]["publications"][0]["sha256"] = "0" * 64
+        self.assertTrue(any(
+            "frozen digest baseline was modified" in error
+            for error in VALIDATOR.validate_frozen_policy(changed, baseline, {})
+        ))
 
 
 if __name__ == "__main__":

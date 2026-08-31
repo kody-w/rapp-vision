@@ -34,6 +34,16 @@
         "label": { "type": "string", "minLength": 1 }
       }
     },
+    "action": {
+      "type": "object",
+      "required": ["at", "do"],
+      "properties": {
+        "at": { "type": "number", "minimum": 0 },
+        "do": {
+          "enum": ["click", "key", "keydown", "keyup", "type", "drag", "scroll"]
+        }
+      }
+    },
     "publication": {
       "type": "object",
       "required": ["id", "title", "duration", "sources", "live"],
@@ -90,7 +100,10 @@
                   "card": { "type": "object" },
                   "app": { "type": "string", "minLength": 1 },
                   "ready": { "type": "object" },
-                  "actions": { "type": "array" }
+                  "actions": {
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/action" }
+                  }
                 },
                 "oneOf": [
                   { "required": ["card"], "not": { "required": ["app"] } },

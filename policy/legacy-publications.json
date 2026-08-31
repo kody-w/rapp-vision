@@ -8,137 +8,137 @@
       "id": "rock-tumbler",
       "source": "https://kody-w.github.io/rapp-vision/channel.json",
       "publications": [
-        "rock-tumbler-showcase",
-        "rock-tumbler-short",
-        "rock-tumbler-reel"
+        { "id": "rock-tumbler-showcase", "sha256": "a793a61b244b3e3509dda1c11dce97234c7b15c3723e183eb2828e8c66ca5f6d" },
+        { "id": "rock-tumbler-short", "sha256": "d4194601796d3020726a608f19e0070901947fc1c562555fa841c1fa777209d9" },
+        { "id": "rock-tumbler-reel", "sha256": "5ae8181e446620ac0f098fa8d0ae55744a122e00e5d40c80f787836b358f0618" }
       ]
     },
     {
       "id": "localfirsttools",
       "source": "https://kody-w.github.io/localFirstTools/rappvision/channel.json",
       "publications": [
-        "lft-tumbler-live",
-        "lft-tumbler-short",
-        "lft-tumbler-reel"
+        { "id": "lft-tumbler-live", "sha256": "7b2911ee008be8760f5446727d82a7a461f3d99cefd43b5a36527f401ba28d7a" },
+        { "id": "lft-tumbler-short", "sha256": "7a263a03811eba5bdad96f2882be8dc514c835f55c56360e367280afe36381af" },
+        { "id": "lft-tumbler-reel", "sha256": "3b426117d9c2b0d9045bca5e8060c91316233e1921f3c18293a49163a9e335d3" }
       ]
     },
     {
       "id": "learnwithkody",
       "source": "https://kody-w.github.io/learnwithkody/rappvision/channel.json",
       "publications": [
-        "lwk-coastal-city",
-        "lwk-buzzsaw-voxel",
-        "lwk-walkthrough-apex",
-        "lwk-apex-live"
+        { "id": "lwk-coastal-city", "sha256": "5910748faa4210338824196243c0fa2bfc971a7a2e9c141ddd3ab5efc65e4b9d" },
+        { "id": "lwk-buzzsaw-voxel", "sha256": "ba7eb2ab84e38ba8d004f47059b816a4f05854e211af212a1bec3cb78c8a9090" },
+        { "id": "lwk-walkthrough-apex", "sha256": "bd89a539a4dcd7c3ca99b2337a4b29e59e0bf1c612eaaeecd536da2a542bfd47" },
+        { "id": "lwk-apex-live", "sha256": "30cc1ec2273d32351ad15125edfdca58d51f90f422a7f287c39881bd20129796" }
       ]
     },
     {
       "id": "catchup",
       "source": "https://kody-w.github.io/catchup/rappvision/channel.json",
       "publications": [
-        "catchup-2026-08-01-part-3",
-        "catchup-2026-08-01-part-2",
-        "catchup-2026-08-01"
+        { "id": "catchup-2026-08-01-part-3", "sha256": "9c863b5b32073a0a1c1a1a4431d0e1c45e42a64dc77bc136d7bddf12395e7974" },
+        { "id": "catchup-2026-08-01-part-2", "sha256": "ef4e94393e11b47db80725c54e36339a44e760c2942d77405b1c938a7b2dd56e" },
+        { "id": "catchup-2026-08-01", "sha256": "28bee8140b4d80f5a3415012ee662fe4bd57ab4d539548c8b7085732b55001ed" }
       ]
     },
     {
       "id": "field-notes",
       "source": "https://kody-w.github.io/rappvision-field-notes/rappvision/channel.json",
       "publications": [
-        "above-not-beside",
-        "platform-relaunch-recap"
+        { "id": "above-not-beside", "sha256": "34afe2aae327d0554617da2ab8eef6e989028a0804c5c963a708dd2ca4fb656c" },
+        { "id": "platform-relaunch-recap", "sha256": "dcf2c260a463345d612f0c3bbc28d7aa31ee7d9768443d844ca033cb63cc8af3" }
       ]
     },
     {
       "id": "rooms",
       "source": "https://kody-w.github.io/localFirstTools/rappvision/rooms/channel.json",
       "publications": [
-        "rooms-tour",
-        "rooms-rain",
-        "rooms-slow"
+        { "id": "rooms-tour", "sha256": "8d4902d9b68bdce79d16e7ac59981fed9e80198c0cda0f174d0847431b033b4e" },
+        { "id": "rooms-rain", "sha256": "120e0c2768b3e3ee10ab87222425cea7d7361c330ef85316eec5990a6c374d87" },
+        { "id": "rooms-slow", "sha256": "fd1b901c63eba1c6bbaf15d38241efe43ae432642fd054e668fbe17427473e97" }
       ]
     },
     {
       "id": "arcade",
       "source": "https://kody-w.github.io/localFirstTools/rappvision/arcade/channel.json",
       "publications": [
-        "arcade-cold-boot",
-        "arcade-emulator-shelf",
-        "arcade-take-over"
+        { "id": "arcade-cold-boot", "sha256": "3b8610287290b7240071de79f5316bf32d45ec967701c08cf9ce3a957f3c3c34" },
+        { "id": "arcade-emulator-shelf", "sha256": "707369ff4ea8ddfb9614e9cd91a28bb49733941028fd3c26c342ffb5ffe311c5" },
+        { "id": "arcade-take-over", "sha256": "6ab03562109967259a8a0557c8c70a9c84b4833530f0c8dada17fe9c3758c48c" }
       ]
     },
     {
       "id": "workbench",
       "source": "https://kody-w.github.io/localFirstTools/rappvision/workbench/channel.json",
       "publications": [
-        "workbench-three-tools",
-        "workbench-808",
-        "workbench-generative"
+        { "id": "workbench-three-tools", "sha256": "0e3b2beceb7fd4023d13f77fd0a60ae068e5a80f340386d8de44379e7e091432" },
+        { "id": "workbench-808", "sha256": "1bd942e233827ffb7f5a7cb10c72bbd40d2ba61b1d357763a0bbe79f7d410820" },
+        { "id": "workbench-generative", "sha256": "bee38a7c782ebe7492a5bd3f1dae567c536b669096ed0c011b2c8a8e83f26250" }
       ]
     },
     {
       "id": "openrappter-training",
       "source": "https://kody-w.github.io/rapp-vision/openrappter-training/channel.json",
       "publications": [
-        "openrappter-m1-install-first-run",
-        "openrappter-m2-local-memory",
-        "openrappter-m3-deterministic-agents",
-        "openrappter-m4-brainstem-local-endpoint",
-        "openrappter-m5-author-single-file-agent",
-        "openrappter-m6-conformance-gate",
-        "openrappter-m7-llm-free-chaining",
-        "openrappter-m8-know-what-is-real"
+        { "id": "openrappter-m1-install-first-run", "sha256": "3ab4c226194b3be33ce4f7c42d58e0bcdc904f7d2b97ff8598e8c33f87a0753b" },
+        { "id": "openrappter-m2-local-memory", "sha256": "ec6d6a7e88342b9661fed5b81299beddb385a611629a5a8faa69c804051e0235" },
+        { "id": "openrappter-m3-deterministic-agents", "sha256": "b150ee766e423915a8950351bd977b601f7ac778f55f2ac53eca70dd84718626" },
+        { "id": "openrappter-m4-brainstem-local-endpoint", "sha256": "038b628707e4eaa5e3f5249b597f00f7bf50f168046dde3e6879442c60277548" },
+        { "id": "openrappter-m5-author-single-file-agent", "sha256": "12edced0aafe30c5f128f04cf36d80f9b337daec9c70bb3974db4da4b0de14db" },
+        { "id": "openrappter-m6-conformance-gate", "sha256": "61044f91a0f87ca8ee3d03cb5ec778f1c43f6ac9fe712e4240de476d661f9597" },
+        { "id": "openrappter-m7-llm-free-chaining", "sha256": "f182a30c658eefdb9d7e9cedaa082fd6ec661ec5f4ada7a5d37473c2ece3bba8" },
+        { "id": "openrappter-m8-know-what-is-real", "sha256": "a982fec07c43df7e7250056be7c0c02c177c7096dcd8b7d65c101be01ea9734e" }
       ]
     },
     {
       "id": "tumbler",
       "source": "https://kody-w.github.io/rapp-vision-neighborhood/tumbler/channel.json",
       "publications": [
-        "tumble-2026-08-04"
+        { "id": "tumble-2026-08-04", "sha256": "eda8daaa4643292feae48e059ca67c3412100aaefc48342195174ca0b440bb57" }
       ]
     },
     {
       "id": "fieldguide",
       "source": "https://kody-w.github.io/rapp-vision-neighborhood/fieldguide/channel.json",
       "publications": [
-        "guide-2026-08-04"
+        { "id": "guide-2026-08-04", "sha256": "70d40c7765c4d3d3160093daf6b5828a0ef779bf42b668e57e218b0aacd89e56" }
       ]
     },
     {
       "id": "prompt-frontier",
       "source": "https://kody-w.github.io/rappvision-prompt-frontier/channel.json",
       "publications": [
-        "prompt-frontier-founding"
+        { "id": "prompt-frontier-founding", "sha256": "efe53b4f64dc2dc3920f5b8d5969a37c8425f605c1562236c51c96b26715b84d" }
       ]
     },
     {
       "id": "rappterbox",
       "source": "https://kody-w.github.io/rappvision-rappterbox/channel.json",
       "publications": [
-        "genesis-251-founding-four-draft",
-        "veridion-proof-trailer",
-        "aivms-watch-their-own-film"
+        { "id": "genesis-251-founding-four-draft", "sha256": "c9f90708f8bc768ce33a882d2e3fc75596216fc197e1abcd53211f84a0eb9ac0" },
+        { "id": "veridion-proof-trailer", "sha256": "c1f8342f0be8a4c3d12dabc0bdc7adc3f704407adf9abaf5cc0d770c15f896fe" },
+        { "id": "aivms-watch-their-own-film", "sha256": "6e9fab838d07aac9741facc54a428691da0f62754bfb36261651665b68b65988" }
       ]
     },
     {
       "id": "dada-collective",
       "source": "https://kody-w.github.io/rapp-vision/dada/channel.json",
       "publications": [
-        "unreachable-from-a-clone",
-        "exactly-eighteen-thousand",
-        "six-titles-undone",
-        "rounded-to-the-minute"
+        { "id": "unreachable-from-a-clone", "sha256": "e4352d2a623397a6d040f2ec5a800d5f38ac44dfdbe23275b370e75d5c5f1ecc" },
+        { "id": "exactly-eighteen-thousand", "sha256": "7ba385e5df85b166772b36e18d1e0f1caaccf6b75e4d4604b728e7f30e996b9a" },
+        { "id": "six-titles-undone", "sha256": "9aad7f66fbf0d88f068ba379e18d15f753c6dc5e9a921cf7ec01fcb4d1cbcca4" },
+        { "id": "rounded-to-the-minute", "sha256": "520b65b59b0f3e46b44c616e560ca38777d9a227bf819a29117a073eba22694a" }
       ]
     },
     {
       "id": "frame-chains",
       "source": "https://kody-w.github.io/rapp-vision/frame-chains/channel.json",
       "publications": [
-        "frame-chains-ten-frame-loop",
-        "many-worlds-mission-control",
-        "ai-soul-passport",
-        "teleporting-roguelike",
-        "attack-the-timeline"
+        { "id": "frame-chains-ten-frame-loop", "sha256": "4b038a5383954a4264b830058b035b0685cdeeb854c19e32dca68c58d50a6be1" },
+        { "id": "many-worlds-mission-control", "sha256": "926b7ebf45285dc2e4489b58c6fd8d377ee48289d114631374e8d22a519c4f6f" },
+        { "id": "ai-soul-passport", "sha256": "9a432a8eb1fc30d1deb72168c63dc4914485ad7cefea9b152a6c4860e6f79e4d" },
+        { "id": "teleporting-roguelike", "sha256": "59cadeba9d4153a8cf2c98fca2444c8db59450e483da55993333359b1d7ce490" },
+        { "id": "attack-the-timeline", "sha256": "e5a993c83221e86893f22435b4cdc48d80b085e01da592caa6ae40611147e9fd" }
       ]
     }
   ]

@@ -306,8 +306,8 @@ function validateModeChapters(chapters, duration, path) {
 function validateReplayAction(a, dur, path) {
   const out = [];
   if (!rvObject(a)) return [`${path}: must be an object`];
-  if (!rvNumber(a.at) || a.at < 0 || a.at > dur)
-    out.push(`${path}.at: must be between 0 and the scene duration`);
+  if (!rvNumber(a.at) || a.at < 0 || a.at >= dur)
+    out.push(`${path}.at: must be at least 0 and less than the scene duration`);
   const kinds = new Set(["click", "key", "keydown", "keyup", "type", "drag", "scroll"]);
   if (!kinds.has(a.do)) return out.concat(`${path}.do: unsupported action ${JSON.stringify(a.do)}`);
   const selector = rvString(a.selector), text = rvString(a.text);
@@ -382,10 +382,10 @@ function validatePairedPublication(v, path) {
     if (!rvString(s.src)) out.push(`${sp}.src: must be a non-empty string`);
     if (!rvString(s.type)) out.push(`${sp}.type: must be a non-empty media type`);
     else {
-      const type = s.type.split(";", 1)[0].trim().toLowerCase();
-      if (!["video/mp4", "video/webm"].includes(type))
+      const match = /^video\/(mp4|webm)(?:\s*;.*)?$/.exec(s.type);
+      if (!match)
         out.push(`${sp}.type: only video/mp4 and video/webm are allowed`);
-      else types.add(type);
+      else types.add(`video/${match[1]}`);
     }
   });
   ["video/mp4", "video/webm"].forEach(type => {
@@ -399,7 +399,25 @@ function legacyPublicationRecord(policy, channelId, sourceUrl) {
   return (policy.channels || []).find(r => rvObject(r) && r.id === channelId && r.source === sourceUrl) || null;
 }
 
-function validateChannelContract(channel, sourceUrl, policy = LEGACY_POLICY) {
+function canonicalPublicationJson(value) {
+  if (Array.isArray(value)) return `[${value.map(canonicalPublicationJson).join(",")}]`;
+  if (rvObject(value)) return `{${Object.keys(value).sort().map(key =>
+    `${JSON.stringify(key)}:${canonicalPublicationJson(value[key])}`).join(",")}}`;
+  return JSON.stringify(value);
+}
+
+async function publicationSha256(publication) {
+  const bytes = new TextEncoder().encode(canonicalPublicationJson(publication));
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function legacyPublicationDigest(record, publicationId) {
+  return (record.publications || []).find(publication =>
+    rvObject(publication) && publication.id === publicationId) || null;
+}
+
+async function validateChannelContract(channel, sourceUrl, policy = LEGACY_POLICY) {
   const out = [];
   if (!rvObject(channel)) return ["channel: must be an object"];
   if (!rvString(channel.id)) out.push("channel.id: must be a non-empty string");
@@ -414,11 +432,14 @@ function validateChannelContract(channel, sourceUrl, policy = LEGACY_POLICY) {
     const legacy = legacyPublicationRecord(policy, channel.id, sourceUrl);
     if (!legacy) out.push("channel.schema: v1 is frozen legacy only; channel id and canonical source are not allowlisted");
     else {
-      const allowed = new Set(legacy.publications || []);
-      videos.forEach((v, i) => {
-        if (!rvObject(v) || !allowed.has(v.id))
+      for (let i = 0; i < videos.length; i++) {
+        const v = videos[i];
+        const frozen = rvObject(v) ? legacyPublicationDigest(legacy, v.id) : null;
+        if (!frozen)
           out.push(`channel.videos[${i}].id: ${JSON.stringify(v && v.id)} is not a frozen legacy publication`);
-      });
+        else if (await publicationSha256(v) !== frozen.sha256)
+          out.push(`channel.videos[${i}]: content does not match its frozen legacy digest`);
+      }
     }
   } else out.push(`channel.schema: must equal "${CURRENT_CHANNEL_SCHEMA}"`);
   return out;
@@ -473,13 +494,27 @@ function ago(d) {
   return mo < 12 ? mo + (mo === 1 ? " month ago" : " months ago")
                  : Math.floor(mo / 12) + " year" + (mo >= 24 ? "s" : "") + " ago";
 }
-const byId = id => VIDEOS.find(v => v.id === id)
-  || ALL_VIDEOS.find(v => v.id === id);
+/* publication identity:start */
+const vkey = v => (v && v._ch ? v._ch.id : "") + "/" + (v ? v.id : "");
+const byId = ref => {
+  const value = String(ref || "");
+  const catalog = [...VIDEOS, ...ALL_VIDEOS.filter(v => !VIDEOS.includes(v))];
+  if (value.includes("/")) return catalog.find(v => vkey(v) === value);
+  return catalog.find(v => v.id === value); // old unscoped links resolve exactly as before
+};
 const isPaired = v => !!(v && v.live && Array.isArray(v.sources) && v.sources.length);
-const historyKey = (v, mode) => isPaired(v) ? `${v.id}::${mode}` : v.id;
+const historyKey = (v, mode) => `${vkey(v)}${isPaired(v) ? `::${mode}` : ""}`;
+const historyRecord = (v, mode) => state.history[historyKey(v, mode)]
+  || (legacyStateOwner(v) && isPaired(v) ? state.history[`${v.id}::${mode}`] : null)
+  || (legacyStateOwner(v) && (mode === "video" || !isPaired(v)) ? state.history[v.id] : null);
 const historyVideo = key => byId(String(key).replace(/::(?:video|live)$/, ""));
+const legacyStateOwner = v => byId(v.id) === v;
+const stateHasVideo = (items, v) => items.includes(vkey(v))
+  || (items.includes(v.id) && legacyStateOwner(v));
+const stateVideos = items => items.map(byId).filter((v, i, all) => v && all.indexOf(v) === i);
+/* publication identity:end */
 const prog = v => {
-  const h = state.history[historyKey(v, "video")];
+  const h = historyRecord(v, "video");
   return h && h.d ? Math.min(1, h.t / h.d) : 0;
 };
 
@@ -508,8 +543,6 @@ const normKey = s => String(s ?? "").trim().toLowerCase().replace(/[-\s]+/g, "_"
 /* A video id is only unique inside its own channel.json — template/channel.json
    ships "my-first-video" and every new publisher copies it — so the subject id
    is scoped by the channel id declared INSIDE that file. */
-const vkey = v => (v && v._ch ? v._ch.id : "") + "/" + (v ? v.id : "");
-
 const numOr = x => (typeof x === "number" && isFinite(x) && x >= 0) ? x : null;
 const strOr = x => (typeof x === "string" ? x.trim() : "");
 
@@ -734,7 +767,7 @@ function communityHTML(m) {
 
 function cardHTML(v) {
   const p = prog(v), portrait = v.orientation === "portrait";
-  return `<a class="card" href="#/watch/${encodeURIComponent(v.id)}" data-vk="${esc(vkey(v))}">
+  return `<a class="card" href="#/watch/${encodeURIComponent(vkey(v))}" data-vk="${esc(vkey(v))}">
     <div class="thumbwrap${portrait ? " portrait" : ""}">
       <img src="${esc(v.thumb)}" alt="" loading="lazy" decoding="async">
       ${portrait ? '<span class="badge">SHORT</span>' : ""}
@@ -946,7 +979,7 @@ function fmtBytes(n) {
   return n > 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.round(n / 1024) + " KB";
 }
 
-function mountLive(v, host, progressKey = v.id) {
+function mountLive(v, host, progressKey) {
   const scenes = (v.live.scenes || []).slice().sort((a, b) => a.t - b.t);
   const total = replayDuration(v.live);
 
@@ -1296,7 +1329,7 @@ function mountLive(v, host, progressKey = v.id) {
     cur = -1; seek((e.clientX - r.left) / r.width * total);
   };
 
-  const h = state.history[progressKey];
+  const h = historyRecord(v, "live");
   seek(h && h.t > 2 && h.t < total - 4 ? h.t : 0);
 
   const keys = e => {
@@ -1325,18 +1358,27 @@ function mountLive(v, host, progressKey = v.id) {
   };
 }
 
-function bindCommon(id) {
+function bindCommon(v) {
+  const key = vkey(v);
+  const toggle = items => {
+    const active = stateHasVideo(items, v);
+    if (active) {
+      const oldId = legacyStateOwner(v) ? v.id : null;
+      items.splice(0, items.length, ...items.filter(item => item !== key && item !== oldId));
+    } else items.push(key);
+    return !active;
+  };
   $("#b-like").onclick = e => {
-    const i = state.liked.indexOf(id);
-    if (i < 0) { state.liked.push(id); e.target.classList.add("on"); e.target.textContent = "♥ Liked"; }
-    else { state.liked.splice(i, 1); e.target.classList.remove("on"); e.target.textContent = "♥ Like"; }
-    save(); toast(i < 0 ? "Liked" : "Removed like");
+    const on = toggle(state.liked);
+    e.target.classList.toggle("on", on);
+    e.target.textContent = on ? "♥ Liked" : "♥ Like";
+    save(); toast(on ? "Liked" : "Removed like");
   };
   $("#b-later").onclick = e => {
-    const i = state.later.indexOf(id);
-    if (i < 0) { state.later.push(id); e.target.classList.add("on"); e.target.textContent = "✓ Saved"; }
-    else { state.later.splice(i, 1); e.target.classList.remove("on"); e.target.textContent = "+ Watch later"; }
-    save(); toast(i < 0 ? "Saved to Watch later" : "Removed");
+    const on = toggle(state.later);
+    e.target.classList.toggle("on", on);
+    e.target.textContent = on ? "✓ Saved" : "+ Watch later";
+    save(); toast(on ? "Saved to Watch later" : "Removed");
   };
   $("#b-link").onclick = () => {
     const url = location.href;
@@ -1358,7 +1400,7 @@ function mountEncoded(v, host, progressKey) {
   const vid = $("#v", host);
   vid.playbackRate = state.rate;
 
-  const h = state.history[progressKey];
+  const h = historyRecord(v, "video");
   const resume = () => {
     if (h && h.t > 3 && h.d && h.t < h.d - 8) {
       vid.currentTime = h.t;
@@ -1428,8 +1470,8 @@ function viewWatch(id) {
   const hasVideo = !!(v.sources && v.sources.length);
   const hasLive = !!v.live;
   const paired = hasVideo && hasLive;
-  const up = VIDEOS.filter(x => x.id !== id);
-  const liked = state.liked.includes(id), later = state.later.includes(id);
+  const up = VIDEOS.filter(x => x !== v);
+  const liked = stateHasVideo(state.liked, v), later = stateHasVideo(state.later, v);
 
   app.innerHTML = `
   <div class="watch">
@@ -1458,7 +1500,7 @@ function viewWatch(id) {
     </div>
     <aside>
       <h3>Up next</h3>
-      ${up.map(x => `<a class="up" href="#/watch/${encodeURIComponent(x.id)}">
+      ${up.map(x => `<a class="up" href="#/watch/${encodeURIComponent(vkey(x))}">
         <span class="t"><img src="${esc(x.thumb)}" alt="" loading="lazy"></span>
         <span class="i"><h4>${esc(x.title)}</h4><span>${esc(x._ch.name)} · ${fmt(x.duration)}</span></span>
       </a>`).join("")}
@@ -1469,7 +1511,7 @@ function viewWatch(id) {
     </aside>
   </div>`;
 
-  bindCommon(id);
+  bindCommon(v);
   const host = $("#host"), tools = $("#mode-tools"), status = $("#mode-status");
   const chaptersSlot = $("#chapters-slot");
   const modeDuration = $("#mode-duration");
@@ -1551,8 +1593,8 @@ function viewLibrary() {
         <button class="tbtn" id="cl">Clear history</button>
       </div>
     </section>
-    ${sec("Watch later", state.later.map(byId).filter(Boolean), "Nothing saved yet.")}
-    ${sec("Liked", state.liked.map(byId).filter(Boolean), "Nothing liked yet.")}
+    ${sec("Watch later", stateVideos(state.later), "Nothing saved yet.")}
+    ${sec("Liked", stateVideos(state.liked), "Nothing liked yet.")}
     ${sec("Recently watched", watched, "You haven’t watched anything yet.")}`;
 
   $("#ex").onclick = () => {
@@ -1804,7 +1846,7 @@ async function fetchChannel(entry) {
   const sourceIdentity = entry.legacy === LEGACY_POLICY.id && LEGACY_POLICY.registry_base
     ? absolutise(entry.url, LEGACY_POLICY.registry_base)
     : url;
-  const contractErrors = validateChannelContract(c, sourceIdentity);
+  const contractErrors = await validateChannelContract(c, sourceIdentity);
   if (contractErrors.length)
     throw new Error(`${entry.id || c.id || "channel"} rejected: ${contractErrors[0]}`);
   c._url = url;

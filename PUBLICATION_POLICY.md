@@ -28,12 +28,16 @@ three values match the frozen
 
 - channel id;
 - canonical channel URL; and
-- publication id.
+- publication id; and
+- SHA-256 of the complete normalized publication object.
 
 The exception is an allowlist of existing identities, not permission to publish
 new v1 material. Adding a URL to `channels.json`, copying the legacy marker, or
 adding a new publication to an allowlisted channel does not confer legacy
-status. Once migrated to v2, a publication follows the paired contract.
+status. CI reconstructs the legacy set from the trusted git base and rejects
+policy additions or digest changes authored by the proposed commit. The browser
+and CLI reject an allowlisted id whose content no longer matches its digest.
+Once migrated to v2, a publication follows the paired contract.
 
 ## Rationale
 
