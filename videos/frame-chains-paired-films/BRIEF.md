@@ -57,3 +57,4 @@ same RAPP Vision publication; neither format is complete by itself.
 - The most typical direction deliberately rejected is a silent product tour that assumes the viewer already understands Frame Chains.
 - Remembered user defaults applied: 1920x1080, English, automation, and no storyboard checkpoint.
 - The local narrator's measured ten-line delivery is 105.344 seconds, so the flagship target was expanded from 90 seconds rather than unnaturally accelerating the voice.
+- The public page's Segoe UI and Consolas system-font declarations are represented with bundled open equivalents, Inter and JetBrains Mono, so every render is reproducible and redistributable.
