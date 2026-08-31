@@ -1,0 +1,190 @@
+{
+  "schema": "rapp-vision.capture-loop-ledger/1",
+  "loop": 1,
+  "base_commit": "0ed78fd1549c02c047aa7357ebdc0dbc73c8856c",
+  "integration_head_before_ledger": "e80fb1a4f90f56be081aed0a7bf7e841e8848707",
+  "merge_strategy": "git merge --no-ff",
+  "squash": false,
+  "frame_count": 10,
+  "frames": [
+    {
+      "frame": 1,
+      "slug": "01-many-worlds",
+      "branch": "frame-film/01-many-worlds-capture",
+      "path": "assets/proof-clips/01-many-worlds",
+      "commit": "08558baf7d55f73fa68b9a1b861aea0abe9d1fe5",
+      "commits": [
+        "08558baf7d55f73fa68b9a1b861aea0abe9d1fe5"
+      ],
+      "media": {
+        "duration": 28.866,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sha256": "c081e0fcf6f16de5eee2cd37413385d95827b431b9ce91de4b0073b9e59e0d62"
+      }
+    },
+    {
+      "frame": 2,
+      "slug": "02-soul-passport",
+      "branch": "frame-film/02-soul-passport-capture",
+      "path": "assets/proof-clips/02-soul-passport",
+      "commit": "25d740a92ed40f0aed80aa20f7c02d6ccb366cbe",
+      "commits": [
+        "a5f408288189f2a6dee626cefa5ac05213edb17d",
+        "25d740a92ed40f0aed80aa20f7c02d6ccb366cbe"
+      ],
+      "media": {
+        "duration": 26.2,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sha256": "b4e372b05923436b179d9884780d045bb3a2c4778f55061e50b58caa135d72c8"
+      }
+    },
+    {
+      "frame": 3,
+      "slug": "03-mars-colony",
+      "branch": "frame-film/03-mars-colony-capture",
+      "path": "assets/proof-clips/03-mars-colony",
+      "commit": "e15e51565349990af64825d73d2dc11020b95d39",
+      "commits": [
+        "433a2e6ef414859df130c0de4290615f545f26cc",
+        "e15e51565349990af64825d73d2dc11020b95d39"
+      ],
+      "media": {
+        "duration": 33.166,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sha256": "ffb1624c2f4d28c61030e3400333f6f9473c91f3f423816cd71c8c0a371be760"
+      }
+    },
+    {
+      "frame": 4,
+      "slug": "04-five-realities",
+      "branch": "frame-film/04-five-realities-capture",
+      "path": "assets/proof-clips/04-five-realities",
+      "commit": "a9383b1f52fef03ff34720e5139190624fa4432f",
+      "commits": [
+        "d6ddb447528bd1d9f9b5cbe0e300516c69e3e61a",
+        "a9383b1f52fef03ff34720e5139190624fa4432f"
+      ],
+      "media": {
+        "duration": 27.933,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sha256": "e9127a60365442a7e7cbfb20f0e97a1c169c5d870833bb0be48b717440eab0e2"
+      }
+    },
+    {
+      "frame": 5,
+      "slug": "05-causal-detective",
+      "branch": "frame-film/05-causal-detective-capture",
+      "path": "assets/proof-clips/05-causal-detective",
+      "commit": "58177f1b4a4707a5040ab0ecb66ed12d673e7a19",
+      "commits": [
+        "5af36bc2cb452b075d3ff492e85f93fd0fa53455",
+        "58177f1b4a4707a5040ab0ecb66ed12d673e7a19"
+      ],
+      "media": {
+        "duration": 20.633,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sha256": "a56d893a855b333add63a7f1226ad5bf6ea4ab8a40337f2fbf3ac0650ebc77a7"
+      }
+    },
+    {
+      "frame": 6,
+      "slug": "06-space-station",
+      "branch": "frame-film/06-space-station-capture",
+      "path": "assets/proof-clips/06-space-station",
+      "commit": "49025722d865f7b60803328f0d1c82a0d2a9198b",
+      "commits": [
+        "5efe4fd117d1e0587933eec45e5855cbf4053b8b",
+        "49025722d865f7b60803328f0d1c82a0d2a9198b"
+      ],
+      "media": {
+        "duration": 22.066,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sha256": "bd5b7047a45d9f18fedb55053c623e556b6d5e1d506fb3b49fe527384735cf9b"
+      }
+    },
+    {
+      "frame": 7,
+      "slug": "07-constitution",
+      "branch": "frame-film/07-constitution-capture",
+      "path": "assets/proof-clips/07-constitution",
+      "commit": "78ed3c4f7b707f59bc06fcdc4861318c994d3be7",
+      "commits": [
+        "0b88221e75b5c49c1a307208095447e8e758860f",
+        "78ed3c4f7b707f59bc06fcdc4861318c994d3be7"
+      ],
+      "media": {
+        "duration": 24.533,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sha256": "db0e1f7bbdbb823b7dc1c610dfce417fd21bbf4953a6ea52f12550123453b3d6"
+      }
+    },
+    {
+      "frame": 8,
+      "slug": "08-teleporting-roguelike",
+      "branch": "frame-film/08-teleporting-roguelike-capture",
+      "path": "assets/proof-clips/08-teleporting-roguelike",
+      "commit": "6923f39abc82922d2b217bdb433169d6e0019555",
+      "commits": [
+        "35b53efc4cc2fa238e86c91703b24f39f2f362c6",
+        "6923f39abc82922d2b217bdb433169d6e0019555"
+      ],
+      "media": {
+        "duration": 23.433,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sha256": "1af26be6e46be30819b9285e22c797945d944299b86980a1c26b3920032ceb7e"
+      }
+    },
+    {
+      "frame": 9,
+      "slug": "09-attack-timeline",
+      "branch": "frame-film/09-attack-timeline-capture",
+      "path": "assets/proof-clips/09-attack-timeline",
+      "commit": "3d45c7e25e969f111c2b72153b62802a6fa0d6e9",
+      "commits": [
+        "f01ecea8e81ec153dadfd048e452bbdcf9dd4893",
+        "3d45c7e25e969f111c2b72153b62802a6fa0d6e9"
+      ],
+      "media": {
+        "duration": 29.333,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sha256": "f9a75c4a595e8fde6b9c274245b3f91251bec918dcc6b9b00df2a7822035c386"
+      }
+    },
+    {
+      "frame": 10,
+      "slug": "10-futures-museum",
+      "branch": "frame-film/10-futures-museum-capture",
+      "path": "assets/proof-clips/10-futures-museum",
+      "commit": "63c6eb7f8ff4b880b3d5556d25de74bf0e995bc9",
+      "commits": [
+        "06b2999113d8d4ca259b854ea098e748da6bd9bf",
+        "63c6eb7f8ff4b880b3d5556d25de74bf0e995bc9"
+      ],
+      "media": {
+        "duration": 34.8,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sha256": "ede83f71c59b322ba20c1f3fc7ed85afe9170f535bb247fe54d7785d14942153"
+      }
+    }
+  ]
+}
