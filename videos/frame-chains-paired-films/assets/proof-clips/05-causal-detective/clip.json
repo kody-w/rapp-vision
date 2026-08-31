@@ -1,6 +1,28 @@
 {
   "schema": "rapp-vision.proof-clip/1",
+  "frame": 5,
   "slug": "05-causal-detective",
+  "title": "The Causal Detective",
+  "source_url": "https://kody-w.github.io/frame-chains/showcase/05-causal-detective/",
+  "duration": 20.633,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "selectors": [
+    "#guidedBtn",
+    ".cite-btn[data-id=\"E02\"]",
+    ".cite-btn[data-id=\"E03\"]",
+    ".cite-btn[data-id=\"E04\"]",
+    ".cite-btn[data-id=\"E06\"]",
+    ".cite-btn[data-id=\"E07\"]",
+    "#accuseBtn",
+    "#mutateBtn"
+  ],
+  "positive_outcome": "The exact E02, E03, E04, E06, and E07 evidence chain supports and accepts the accusation against Mara Voss.",
+  "failure_outcome": "Forged frame F01 remains cryptographically valid but is isolated when the causal-transition oracle turns red.",
+  "sha256": "a56d893a855b333add63a7f1226ad5bf6ea4ab8a40337f2fbf3ac0650ebc77a7",
+  "synthetic_only": true,
+  "audio": false,
   "provenance": {
     "sourceUrl": "https://kody-w.github.io/frame-chains/showcase/05-causal-detective/",
     "sourceType": "public-web-page",
@@ -44,7 +66,7 @@
     "isolatedFailureFrame": "F01",
     "finalOracle": "Causal transition oracle: red"
   },
-  "sha256": {
+  "checksums": {
     "source.webm": "a56d893a855b333add63a7f1226ad5bf6ea4ab8a40337f2fbf3ac0650ebc77a7",
     "poster.jpg": "33ccdb9cd5ae143996c0ca28a2243d5cafe1d0de919da57541bef5cdf86a6139"
   }
