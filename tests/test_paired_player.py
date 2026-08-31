@@ -190,7 +190,8 @@ class TestPairedPlayer(unittest.TestCase):
           for (const app of [
             "javascript:alert(1)", "data:text/html,bad", "blob:https://example.test/id",
             "file:///tmp/app.html", "http://example.test/app.html",
-            "//example.test/app.html", "\\\\\\\\example.test\\\\app.html"
+            "//example.test/app.html", "\\\\\\\\example.test\\\\app.html",
+            "https://[", "../app.html;execute"
           ]) {{
             const channel = {valid};
             channel.videos[0].live.scenes[1].app = app;
@@ -218,6 +219,14 @@ class TestPairedPlayer(unittest.TestCase):
           );
           if (!errors.some(error => error.includes("video/mp4 requires a .mp4 pathname")))
             throw new Error("mismatched extension accepted");
+
+          const parameterized = {valid};
+          parameterized.videos[0].sources[0].src = "paired.mp4;served-as-html";
+          errors = await validateChannelContract(
+            parameterized, "https://example.test/channel.json"
+          );
+          if (!errors.some(error => error.includes("pathname parameters are not allowed")))
+            throw new Error("parameterized media path accepted");
 
           const duplicate = {valid};
           duplicate.videos[0].sources = [

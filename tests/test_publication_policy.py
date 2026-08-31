@@ -105,9 +105,15 @@ class TestPublicationPolicy(unittest.TestCase):
 
     def test_live_app_urls_allow_only_relative_or_absolute_https(self):
         schema = load(ROOT / "channel.schema.json")
-        pattern = schema["$defs"]["publication"]["properties"]["live"]["properties"][
+        app_schema = schema["$defs"]["publication"]["properties"]["live"]["properties"][
             "scenes"
-        ]["items"]["properties"]["app"]["pattern"]
+        ]["items"]["properties"]["app"]
+        absolute_pattern = app_schema["oneOf"][0]["pattern"]
+        relative_pattern = app_schema["oneOf"][1]["pattern"]
+        schema_allows = lambda value: any(
+            re.fullmatch(pattern, value)
+            for pattern in (absolute_pattern, relative_pattern)
+        )
         safe = [
             "../app/index.html",
             "/apps/demo.html?mode=live#start",
@@ -123,15 +129,17 @@ class TestPublicationPolicy(unittest.TestCase):
             "//example.test/app.html",
             "\\\\example.test\\app.html",
             "?app=demo",
+            "https://[",
+            "../app.html;execute",
         ]
         for app in safe:
             with self.subTest(app=app, allowed=True):
                 self.assertTrue(VALIDATOR.safe_app_url(app))
-                self.assertIsNotNone(re.fullmatch(pattern, app))
+                self.assertTrue(schema_allows(app))
         for app in unsafe:
             with self.subTest(app=app, allowed=False):
                 self.assertFalse(VALIDATOR.safe_app_url(app))
-                self.assertIsNone(re.fullmatch(pattern, app))
+                self.assertFalse(schema_allows(app))
                 channel = copy.deepcopy(self.valid)
                 channel["videos"][0]["live"]["scenes"][1]["app"] = app
                 self.assertTrue(any(
@@ -167,11 +175,11 @@ class TestPublicationPolicy(unittest.TestCase):
         source_rules = schema["$defs"]["source"]["allOf"]
         self.assertEqual(
             source_rules[0]["then"]["properties"]["src"]["pattern"],
-            "^[^?#]*\\.mp4(?:[?#].*)?$",
+            "^(?![^?#]*;)[^?#]*\\.mp4(?:[?#].*)?$",
         )
         self.assertEqual(
             source_rules[1]["then"]["properties"]["src"]["pattern"],
-            "^[^?#]*\\.webm(?:[?#].*)?$",
+            "^(?![^?#]*;)[^?#]*\\.webm(?:[?#].*)?$",
         )
         self.assertIsNotNone(re.search(
             source_rules[0]["then"]["properties"]["src"]["pattern"],
@@ -180,6 +188,51 @@ class TestPublicationPolicy(unittest.TestCase):
         self.assertIsNone(re.search(
             source_rules[0]["then"]["properties"]["src"]["pattern"],
             "media/clip.exe?download=clip.mp4",
+        ))
+
+    def test_parameterized_media_path_is_rejected_and_preserved_for_local_probe(self):
+        channel = copy.deepcopy(self.valid)
+        channel["videos"][0]["sources"][0]["src"] = "paired.mp4;served-as-html"
+        errors = self.validate(channel)
+        self.assertTrue(any("pathname parameters are not allowed" in error for error in errors))
+        self.assertTrue(any("video/mp4 requires a .mp4 pathname" in error for error in errors))
+
+        schema = load(ROOT / "channel.schema.json")
+        pattern = schema["$defs"]["source"]["allOf"][0]["then"]["properties"]["src"][
+            "pattern"
+        ]
+        self.assertIsNone(re.search(pattern, "paired.mp4;served-as-html"))
+
+        represented = VALIDATOR.local_media_path(
+            ROOT / "channel.json",
+            "media/rock-tumbler-showcase.mp4;served-as-html",
+        )
+        self.assertEqual(
+            represented.name,
+            "rock-tumbler-showcase.mp4;served-as-html",
+        )
+        calls = []
+
+        def runner(command, **_kwargs):
+            calls.append(command)
+            return subprocess.CompletedProcess(command, 0, stdout='{"streams":[]}', stderr="")
+
+        probe_errors = VALIDATOR.ffprobe_local_media(
+            {
+                "videos": [{
+                    "sources": [{
+                        "src": "media/rock-tumbler-showcase.mp4;served-as-html",
+                        "type": "video/mp4",
+                    }],
+                }],
+            },
+            ROOT / "channel.json",
+            runner=runner,
+        )
+        self.assertEqual(calls, [])
+        self.assertTrue(any(
+            "rock-tumbler-showcase.mp4;served-as-html" in error
+            for error in probe_errors
         ))
 
     def test_optional_ffprobe_path_checks_repository_owned_codecs(self):

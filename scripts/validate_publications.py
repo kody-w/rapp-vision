@@ -13,7 +13,7 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import Any
-from urllib.parse import unquote, urldefrag, urljoin, urlparse
+from urllib.parse import unquote, urljoin, urlparse, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 
 
@@ -66,7 +66,12 @@ def safe_app_url(value: Any) -> bool:
         return False
     if re.search(r"\s", value) or "\\" in value or value.startswith("//"):
         return False
-    parsed = urlparse(value)
+    try:
+        parsed = urlsplit(value)
+    except ValueError:
+        return False
+    if ";" in parsed.path:
+        return False
     if parsed.scheme:
         return value.startswith("https://") and parsed.scheme == "https" and bool(parsed.netloc)
     return not parsed.netloc and bool(parsed.path)
@@ -243,11 +248,29 @@ def validate_publication(video: Any, path: str, source_url: str) -> list[str]:
                 errors.append(f"{source_path}.src: must be a non-empty string")
                 source_url_value = ""
             else:
-                source_url_value = urljoin(source_url, source["src"])
-                comparable_url = urldefrag(source_url_value).url
+                try:
+                    source_url_value = urljoin(source_url, source["src"])
+                    parsed_source = urlsplit(source_url_value)
+                except ValueError:
+                    errors.append(f"{source_path}.src: must resolve to a valid URL")
+                    source_url_value = ""
+                    parsed_source = None
+                comparable_url = (
+                    urlunsplit((
+                        parsed_source.scheme,
+                        parsed_source.netloc,
+                        parsed_source.path,
+                        parsed_source.query,
+                        "",
+                    ))
+                    if parsed_source else ""
+                )
                 if comparable_url in resolved_sources:
                     errors.append(f"{source_path}.src: media source URLs must be distinct")
-                resolved_sources.add(comparable_url)
+                if comparable_url:
+                    resolved_sources.add(comparable_url)
+                if parsed_source and ";" in parsed_source.path:
+                    errors.append(f"{source_path}.src: pathname parameters are not allowed")
             source_type = source.get("type")
             if not nonempty_string(source_type):
                 errors.append(f"{source_path}.type: must be a non-empty media type")
@@ -261,7 +284,8 @@ def validate_publication(video: Any, path: str, source_url: str) -> list[str]:
                 expected_extension = f".{match.group(1)}"
                 if (
                     not source_url_value
-                    or not urlparse(source_url_value).path.endswith(expected_extension)
+                    or not parsed_source
+                    or not parsed_source.path.endswith(expected_extension)
                 ):
                     errors.append(
                         f"{source_path}.src: {media_type} requires a {expected_extension} pathname"
@@ -308,7 +332,10 @@ def publication_digest(publication: Any) -> str:
 
 
 def local_media_path(channel_path: Path, source: str) -> Path | None:
-    parsed = urlparse(source)
+    try:
+        parsed = urlsplit(source)
+    except ValueError:
+        return None
     if parsed.scheme or parsed.netloc:
         return None
     candidate = (channel_path.parent / unquote(parsed.path)).resolve()

@@ -286,6 +286,7 @@ const safeAppUrl = value => {
   try {
     const absolute = /^[A-Za-z][A-Za-z0-9+.-]*:/.test(value);
     const parsed = new URL(value, "https://relative.invalid/channel.json");
+    if (parsed.pathname.includes(";")) return false;
     return absolute ? value.startsWith("https://") && parsed.protocol === "https:" && !!parsed.host
                     : parsed.origin === "https://relative.invalid" && !!parsed.pathname;
   } catch { return false; }
@@ -417,6 +418,8 @@ function validatePairedPublication(v, path, sourceUrl) {
         if (resolvedSources.has(mediaUrl.href))
           out.push(`${sp}.src: media source URLs must be distinct`);
         resolvedSources.add(mediaUrl.href);
+        if (mediaUrl.pathname.includes(";"))
+          out.push(`${sp}.src: pathname parameters are not allowed`);
       } catch { out.push(`${sp}.src: must resolve to a valid URL`); }
     }
     if (!rvString(s.type)) out.push(`${sp}.type: must be a non-empty media type`);

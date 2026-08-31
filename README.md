@@ -234,6 +234,8 @@ not ship WebM support. MIME bases are canonical lowercase (`video/mp4` and
 `video/webm`) in the schema and both validators. The two sources must resolve
 to distinct URLs, and their URL pathnames must end in the matching lowercase
 `.mp4` and `.webm` extensions; query strings and fragments are allowed.
+Semicolon pathname parameters are not allowed and are never stripped before
+validation or local probing.
 
 For repository-owned files, optionally verify the actual video streams:
 
