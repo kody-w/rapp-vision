@@ -1,0 +1,34 @@
+{
+  "schema": "rapp-vision-channel/2.0",
+  "id": "bad-media",
+  "name": "Bad Media",
+  "videos": [
+    {
+      "id": "bad",
+      "title": "Bad",
+      "duration": 5,
+      "sources": [
+        {
+          "src": "bad.mov",
+          "type": "video/quicktime"
+        },
+        {
+          "src": "bad.webm",
+          "type": "video/webm"
+        }
+      ],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 5,
+            "card": {
+              "title": "Card"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

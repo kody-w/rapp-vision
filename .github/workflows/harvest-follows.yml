@@ -21,6 +21,14 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
+
+concurrency:
+  group: automation-harvest-follows
+  cancel-in-progress: false
+
+env:
+  AUTOMATION_BRANCH: automation/harvest-follows
 
 jobs:
   harvest:
@@ -29,6 +37,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Reset automation branch from current main
+        run: |
+          git fetch origin main
+          echo "AUTOMATION_REMOTE_SHA=$(git ls-remote --heads origin "$AUTOMATION_BRANCH" | awk '{print $1}')" >> "$GITHUB_ENV"
+          git checkout -B "$AUTOMATION_BRANCH" origin/main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -50,20 +67,23 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add state/follow-index.json
-          git commit -m "chore(follows): refresh follow index snapshot [skip ci]"
+          git commit -m "chore(follows): refresh follow index snapshot"
 
-          for attempt in 1 2 3; do
-            if ! git pull --rebase origin main; then
-              git rebase --abort 2>/dev/null || true
-              echo "::error::rebase conflict on the follow index - refusing to guess"
-              exit 1
-            fi
-            if git push origin main; then
-              echo "Pushed on attempt $attempt."
-              exit 0
-            fi
-            echo "Push rejected - main moved. Retrying."
-            sleep 5
-          done
-          echo "::error::could not push the snapshot after 3 attempts"
-          exit 1
+          if [ -n "$AUTOMATION_REMOTE_SHA" ]; then
+            git push --force-with-lease="refs/heads/$AUTOMATION_BRANCH:$AUTOMATION_REMOTE_SHA" \
+              origin "HEAD:$AUTOMATION_BRANCH"
+          else
+            git push origin "HEAD:$AUTOMATION_BRANCH"
+          fi
+
+          PR_URL=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$AUTOMATION_BRANCH" \
+            --state open --json url --jq '.[0].url')
+          if [ -n "$PR_URL" ]; then
+            echo "$PR_URL"
+          else
+            gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$AUTOMATION_BRANCH" \
+              --title "chore(follows): refresh follow index snapshot" \
+              --body "Automated follow-index refresh. Review and merge through the protected main branch; no automation bypass is requested."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

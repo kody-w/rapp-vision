@@ -1,0 +1,42 @@
+{
+  "schema": "rapp-vision-channel/2.0",
+  "id": "bad-replay-shape",
+  "name": "Bad Replay Shape",
+  "videos": [
+    {
+      "id": "bad",
+      "title": "Bad",
+      "duration": 5,
+      "sources": [
+        {
+          "src": "bad.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "bad.webm",
+          "type": "video/webm"
+        }
+      ],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 5,
+            "app": "app.html",
+            "ready": {
+              "selector": "#go",
+              "text": "Go"
+            },
+            "actions": [
+              {
+                "at": 6,
+                "do": "click"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "rapp-vision-channel/2.0",
+  "id": "null-optionals",
+  "name": "Null Optionals",
+  "videos": [
+    {
+      "id": "bad",
+      "title": "Bad",
+      "duration": 5,
+      "chapters": null,
+      "sources": [
+        {
+          "src": "bad.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "bad.webm",
+          "type": "video/webm"
+        }
+      ],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "duration": null,
+        "chapters": null,
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 5,
+            "card": {
+              "title": "Card"
+            },
+            "actions": null
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -178,7 +178,9 @@ class TestPlayerDirectLinks(unittest.TestCase):
     def test_direct_watch_lookup_uses_the_full_catalog(self):
         source = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
         self.assertIn("let ALL_VIDEOS = []", source)
-        self.assertIn("|| ALL_VIDEOS.find(v => v.id === id)", source)
+        self.assertIn("const catalog = ALL_VIDEOS.length ? ALL_VIDEOS : VIDEOS", source)
+        self.assertIn("catalog.find(v => vkey(v) === value)", source)
+        self.assertIn("return unscopedVideo(value)", source)
         self.assertIn("ALL_VIDEOS = CHANNELS.flatMap", source)
         self.assertIn("VIDEOS = ALL_VIDEOS.filter", source)
 

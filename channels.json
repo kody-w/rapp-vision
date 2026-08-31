@@ -15,13 +15,15 @@
       "id": "rock-tumbler",
       "name": "Rock Tumbler",
       "url": "channel.json",
-      "repo": "https://github.com/kody-w/rapp-vision"
+      "repo": "https://github.com/kody-w/rapp-vision",
+      "legacy": "legacy-publications-2026-08-31"
     },
     {
       "id": "localfirsttools",
       "name": "Local First Tools",
       "url": "../localFirstTools/rappvision/channel.json",
       "repo": "https://github.com/kody-w/localFirstTools",
+      "legacy": "legacy-publications-2026-08-31",
       "_why": "Origin-relative on purpose: kody-w.github.io serves every repo from one origin, so this resolves in production AND in local testing. It also keeps the player same-origin with the apps, which is what makes live replay possible."
     },
     {
@@ -29,6 +31,7 @@
       "name": "Learn with Kody",
       "url": "../learnwithkody/rappvision/channel.json",
       "repo": "https://github.com/kody-w/kody-w.github.io",
+      "legacy": "legacy-publications-2026-08-31",
       "_why": "Origin-relative, like the others: the channel lives in the site repo next to the examples it documents, and still plays here."
     },
     {
@@ -36,6 +39,7 @@
       "name": "Catch-up",
       "url": "../catchup/rappvision/channel.json",
       "repo": "https://github.com/kody-w/catchup",
+      "legacy": "legacy-publications-2026-08-31",
       "_why": "Origin-relative, like the others: the channel lives in the repo that already serves the video file, so the player and the media stay same-origin."
     },
     {
@@ -43,6 +47,7 @@
       "name": "Field Notes",
       "url": "../rappvision-field-notes/rappvision/channel.json",
       "repo": "https://github.com/kody-w/rappvision-field-notes",
+      "legacy": "legacy-publications-2026-08-31",
       "_why": "Origin-relative, like the others: kody-w.github.io serves every repo from one origin, so this resolves in production and in local testing, and keeps the player same-origin with the media."
     },
     {
@@ -50,6 +55,7 @@
       "name": "Rooms",
       "url": "../localFirstTools/rappvision/rooms/channel.json",
       "repo": "https://github.com/kody-w/localFirstTools",
+      "legacy": "legacy-publications-2026-08-31",
       "_why": "Ships no video at all — every entry is a live script over a real WebGL room in the same repo. The proof that live replay is a medium and not just a demo."
     },
     {
@@ -57,6 +63,7 @@
       "name": "Arcade",
       "url": "../localFirstTools/rappvision/arcade/channel.json",
       "repo": "https://github.com/kody-w/localFirstTools",
+      "legacy": "legacy-publications-2026-08-31",
       "_why": "Games and emulators, booted and played live. Pause any entry and you are holding the controller."
     },
     {
@@ -64,6 +71,7 @@
       "name": "The Workbench",
       "url": "../localFirstTools/rappvision/workbench/channel.json",
       "repo": "https://github.com/kody-w/localFirstTools",
+      "legacy": "legacy-publications-2026-08-31",
       "_why": "Production tools — a DAW, a vector editor, a spreadsheet — driven live. A tool demo you can seize control of is a different thing from a tool demo you watch."
     },
     {
@@ -71,6 +79,7 @@
       "name": "OpenRappter Training",
       "url": "openrappter-training/channel.json",
       "repo": "https://github.com/kody-w/openrappter",
+      "legacy": "legacy-publications-2026-08-31",
       "_why": "Relative like rock-tumbler, because the channel lives in THIS repo — it documents a sibling project but ships from here. Eight card-only modules with no media file of any kind: the lesson is the description, and every command in it was run before it was written."
     },
     {
@@ -78,6 +87,7 @@
       "name": "The Tumbler",
       "url": "../rapp-vision-neighborhood/tumbler/channel.json",
       "repo": "https://github.com/kody-w/rapp-vision-neighborhood",
+      "legacy": "legacy-publications-2026-08-31",
       "_why": "Origin-relative, like the others. Written by a hatched twin rather than a person: a daily tumble report whose every claim is a number it fetched. On a day nothing moved it publishes nothing, which is the point - a channel that always has content teaches you to skim it."
     },
     {
@@ -85,6 +95,7 @@
       "name": "Field Guide",
       "url": "../rapp-vision-neighborhood/fieldguide/channel.json",
       "repo": "https://github.com/kody-w/rapp-vision-neighborhood",
+      "legacy": "legacy-publications-2026-08-31",
       "_why": "The other half of the same experiment: a second twin, pointed outward instead of inward. Each episode covers one app no channel here has covered, described only with facts fetched from the app itself. Both channels are watched by sentinels for the failure that hides - up, serving 200, quietly stopped posting."
     },
     {
@@ -92,6 +103,7 @@
       "name": "Prompt Frontier",
       "url": "../rappvision-prompt-frontier/channel.json",
       "repo": "https://github.com/kody-w/rappvision-prompt-frontier",
+      "legacy": "legacy-publications-2026-08-31",
       "_why": "Evidence-backed RappterBox experiments: exact prompts become visible worlds, institutions, languages, crises, and receipts. Static HyperFrames films and live title-card or app replays share one channel."
     },
     {
@@ -99,6 +111,7 @@
       "name": "RappterBox Experiments",
       "url": "../rappvision-rappterbox/channel.json",
       "repo": "https://github.com/kody-w/rappvision-rappterbox",
+      "legacy": "legacy-publications-2026-08-31",
       "_why": "QC-approved films from bounded RappterBox experiments. Every static entry ships both MP4 and WebM sources, labels synthetic constructs, and preserves an evidence-first production trail."
     },
     {
@@ -106,6 +119,7 @@
       "name": "Dada Collective",
       "url": "dada/channel.json",
       "repo": "https://github.com/kody-w/rapp-vision",
+      "legacy": "legacy-publications-2026-08-31",
       "_why": "Verified Dada works mirrored from the Public Art Collective."
     },
     {
@@ -113,6 +127,7 @@
       "name": "Frame Chains",
       "url": "frame-chains/channel.json",
       "repo": "https://github.com/kody-w/frame-chains",
+      "legacy": "legacy-publications-2026-08-31",
       "_why": "Ten public synthetic showcase apps replayed live from GitHub Pages, including focused adversarial proofs for branching, identity, provenance, and timeline integrity."
     }
   ]
