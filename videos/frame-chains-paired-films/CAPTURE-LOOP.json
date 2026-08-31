@@ -1,0 +1,100 @@
+{
+  "schema": "rapp-vision.capture-loop/1",
+  "loop": 1,
+  "frame_count": 10,
+  "merge_strategy": "git merge --no-ff",
+  "squash": false,
+  "output_root": "assets/proof-clips",
+  "frames": [
+    {
+      "frame": 1,
+      "slug": "01-many-worlds",
+      "branch": "frame-film/01-many-worlds-capture",
+      "source": "https://kody-w.github.io/frame-chains/showcase/01-many-worlds/",
+      "owned_path": "assets/proof-clips/01-many-worlds",
+      "actions": ["#guided-btn", "#mutate-btn"],
+      "outcome": "Three valid branches are built; the altered parent-hash branch is isolated and rejected."
+    },
+    {
+      "frame": 2,
+      "slug": "02-soul-passport",
+      "branch": "frame-film/02-soul-passport-capture",
+      "source": "https://kody-w.github.io/frame-chains/showcase/02-soul-passport/",
+      "owned_path": "assets/proof-clips/02-soul-passport",
+      "actions": ["#guided-button", "#forge-button", "#verify-button"],
+      "outcome": "Identity migration completes; the counterfeit is independently rejected while the accepted head is preserved."
+    },
+    {
+      "frame": 3,
+      "slug": "03-mars-colony",
+      "branch": "frame-film/03-mars-colony-capture",
+      "source": "https://kody-w.github.io/frame-chains/showcase/03-mars-colony/",
+      "owned_path": "assets/proof-clips/03-mars-colony",
+      "actions": ["#nextButton ×8", "#resetButton", "#injectButton", "#scanButton", "#sweepButton"],
+      "outcome": "The colony completes its guided recovery, then rejects a correctly hashed overbroad repair."
+    },
+    {
+      "frame": 4,
+      "slug": "04-five-realities",
+      "branch": "frame-film/04-five-realities-capture",
+      "source": "https://kody-w.github.io/frame-chains/showcase/04-five-realities/",
+      "owned_path": "assets/proof-clips/04-five-realities",
+      "actions": ["#guideBtn", "#mutationBtn"],
+      "outcome": "Five projections converge from one history; one mutated projector is visibly isolated."
+    },
+    {
+      "frame": 5,
+      "slug": "05-causal-detective",
+      "branch": "frame-film/05-causal-detective-capture",
+      "source": "https://kody-w.github.io/frame-chains/showcase/05-causal-detective/",
+      "owned_path": "assets/proof-clips/05-causal-detective",
+      "actions": ["#guidedBtn", "E02", "E03", "E04", "E06", "E07", "#accuseBtn", "#mutateBtn"],
+      "outcome": "The supported accusation remains accepted while a correctly hashed impossible clue turns the semantic oracle red."
+    },
+    {
+      "frame": 6,
+      "slug": "06-space-station",
+      "branch": "frame-film/06-space-station-capture",
+      "source": "https://kody-w.github.io/frame-chains/showcase/06-space-station/",
+      "owned_path": "assets/proof-clips/06-space-station",
+      "actions": ["#guided", "#mutate-overwrite"],
+      "outcome": "The station reattaches with 5/6 fidelity and preserves both airlock alternatives; overwrite is rejected."
+    },
+    {
+      "frame": 7,
+      "slug": "07-constitution",
+      "branch": "frame-film/07-constitution-capture",
+      "source": "https://kody-w.github.io/frame-chains/showcase/07-constitution/",
+      "owned_path": "assets/proof-clips/07-constitution",
+      "actions": ["#guidedBtn", "#forkBtn", "#tyrantBtn"],
+      "outcome": "Two lawful societies remain visible while replay refuses the tyrant frame under the exact superseding law."
+    },
+    {
+      "frame": 8,
+      "slug": "08-teleporting-roguelike",
+      "branch": "frame-film/08-teleporting-roguelike-capture",
+      "source": "https://kody-w.github.io/frame-chains/showcase/08-teleporting-roguelike/",
+      "owned_path": "assets/proof-clips/08-teleporting-roguelike",
+      "actions": ["#runDemo", "#forgeItem", "#forgeParent"],
+      "outcome": "The dungeon transfers live to another device; forged inventory and parent provenance are refused."
+    },
+    {
+      "frame": 9,
+      "slug": "09-attack-timeline",
+      "branch": "frame-film/09-attack-timeline-capture",
+      "source": "https://kody-w.github.io/frame-chains/showcase/09-attack-timeline/",
+      "owned_path": "assets/proof-clips/09-attack-timeline",
+      "actions": ["#controlBtn", "#attackAllBtn", "#replayBtn"],
+      "outcome": "The control passes, nine hostile candidates are rejected, and replay reconstructs the receipt."
+    },
+    {
+      "frame": 10,
+      "slug": "10-futures-museum",
+      "branch": "frame-film/10-futures-museum-capture",
+      "source": "https://kody-w.github.io/frame-chains/showcase/10-futures-museum/",
+      "owned_path": "assets/proof-clips/10-futures-museum",
+      "actions": ["#playBtn", "#forkBtn", "#mergeBtn", "#mutateBtn"],
+      "outcome": "The exhibit branches and merges, then identifies corrupt frame F02 while preserving independent accepted futures."
+    }
+  ]
+}
