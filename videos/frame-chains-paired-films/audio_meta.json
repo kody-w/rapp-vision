@@ -1,5 +1,11 @@
 {
-  "bgm": null,
+  "bgm": {
+    "path": "assets/bgm/track.wav",
+    "volume": 0.16,
+    "mode": "generate-original",
+    "query": "restrained cinematic technology pulse, curious then confident, no trailer bombast",
+    "duration_s": 105.344
+  },
   "bgm_pending": false,
   "voices": [
     {
