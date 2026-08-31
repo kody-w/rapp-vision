@@ -1,6 +1,7 @@
 {
   "schema": "rapp-vision.capture-loop/1",
   "loop": 1,
+  "base_commit": "0ed78fd1549c02c047aa7357ebdc0dbc73c8856c",
   "frame_count": 10,
   "merge_strategy": "git merge --no-ff",
   "squash": false,
