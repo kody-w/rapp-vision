@@ -373,7 +373,7 @@ function validatePairedPublication(v, path) {
   const duration = rvNumber(v.duration) && v.duration > 0 && v.duration <= MAX_PUBLICATION_DURATION
     ? v.duration : 0;
   if (!duration) out.push(`${path}.duration: must be greater than zero and at most ${MAX_PUBLICATION_DURATION}`);
-  else out.push(...validateModeChapters(v.chapters, duration, `${path}.chapters`));
+  if ("chapters" in v) out.push(...validateModeChapters(v.chapters, duration, `${path}.chapters`));
   const types = new Set();
   if (!Array.isArray(v.sources) || !v.sources.length) out.push(`${path}.sources: must be a non-empty array`);
   else v.sources.forEach((s, i) => {

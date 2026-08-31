@@ -90,8 +90,6 @@ def validate_action(action: Any, duration: float, path: str) -> list[str]:
 
 def validate_chapters(chapters: Any, duration: float, path: str) -> list[str]:
     errors: list[str] = []
-    if chapters is None:
-        return errors
     if not isinstance(chapters, list):
         return [f"{path}: must be an array"]
     previous = -1.0
@@ -168,8 +166,9 @@ def validate_live(live: Any, path: str) -> list[str]:
         if is_number(start):
             cursor = float(start) + float(scene_duration)
 
+    explicit_duration_present = "duration" in live
     explicit_duration = live.get("duration")
-    if explicit_duration is not None and (
+    if explicit_duration_present and (
         not is_number(explicit_duration)
         or explicit_duration <= 0
         or explicit_duration > MAX_DURATION
@@ -179,7 +178,7 @@ def validate_live(live: Any, path: str) -> list[str]:
         )
         replay_duration = cursor
     else:
-        replay_duration = float(explicit_duration) if explicit_duration is not None else cursor
+        replay_duration = float(explicit_duration) if explicit_duration_present else cursor
     if replay_duration <= 0 or replay_duration > MAX_DURATION:
         errors.append(
             f"{path}.scenes: derived replay duration must be greater than zero and at most {MAX_DURATION}"
@@ -188,7 +187,8 @@ def validate_live(live: Any, path: str) -> list[str]:
         errors.append(
             f"{path}.scenes: must fill replay duration {replay_duration:g}; ended at {cursor:g}"
         )
-    errors.extend(validate_chapters(live.get("chapters"), replay_duration, f"{path}.chapters"))
+    if "chapters" in live:
+        errors.extend(validate_chapters(live["chapters"], replay_duration, f"{path}.chapters"))
     return errors
 
 
@@ -203,8 +203,11 @@ def validate_publication(video: Any, path: str) -> list[str]:
     duration = video.get("duration")
     if not is_number(duration) or duration <= 0 or duration > MAX_DURATION:
         errors.append(f"{path}.duration: must be greater than zero and at most {MAX_DURATION}")
+        duration_for_chapters = 0.0
     else:
-        errors.extend(validate_chapters(video.get("chapters"), float(duration), f"{path}.chapters"))
+        duration_for_chapters = float(duration)
+    if "chapters" in video:
+        errors.extend(validate_chapters(video["chapters"], duration_for_chapters, f"{path}.chapters"))
 
     sources = video.get("sources")
     media_types: set[str] = set()

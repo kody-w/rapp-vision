@@ -4,6 +4,8 @@ import copy
 import importlib.util
 import json
 import re
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 from urllib.parse import urljoin
@@ -70,6 +72,7 @@ class TestPublicationPolicy(unittest.TestCase):
             "invalid-scene-gap.json": "scenes must be contiguous",
             "invalid-ready-action.json": "requires exactly one non-empty selector or text",
             "invalid-media-type.json": "only video/mp4 and video/webm are allowed",
+            "invalid-null-optionals.json": ".chapters: must be an array",
         }
         for name, expected in cases.items():
             with self.subTest(name=name):
@@ -99,6 +102,30 @@ class TestPublicationPolicy(unittest.TestCase):
         pattern = schema["$defs"]["source"]["properties"]["type"]["pattern"]
         self.assertIsNone(re.fullmatch(pattern, "Video/MP4"))
         self.assertIsNotNone(re.fullmatch(pattern, "video/mp4; codecs=\"avc1\""))
+
+    def test_explicit_null_optionals_fail_cli_and_schema(self):
+        fixture = FIXTURES / "invalid-null-optionals.json"
+        errors = self.validate(load(fixture))
+        self.assertTrue(any("videos[0].chapters: must be an array" in error for error in errors))
+        self.assertTrue(any("live.duration: must be greater than zero" in error for error in errors))
+        self.assertTrue(any("live.chapters: must be an array" in error for error in errors))
+
+        completed = subprocess.run(
+            [sys.executable, str(VALIDATOR_PATH), str(fixture)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertIn("live.duration: must be greater than zero", completed.stderr)
+
+        schema = load(ROOT / "channel.schema.json")
+        publication = schema["$defs"]["publication"]["properties"]
+        live = publication["live"]["properties"]
+        self.assertEqual(publication["chapters"]["type"], "array")
+        self.assertEqual(live["chapters"]["type"], "array")
+        self.assertEqual(live["duration"]["type"], "number")
 
     def test_frozen_legacy_identity_source_and_content_are_all_required(self):
         legacy = load(ROOT / "frame-chains" / "channel.json")

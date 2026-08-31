@@ -48,12 +48,19 @@ jobs:
           BASE_SHA: ${{ github.event.before }}
           CANDIDATE_SHA: ${{ github.sha }}
         run: |
-          if git cat-file -e "$BASE_SHA:scripts/trusted_legacy_freeze.py"; then
+          ZERO_SHA=0000000000000000000000000000000000000000
+          if [ "$BASE_SHA" = "$ZERO_SHA" ]; then
+            python3 scripts/trusted_legacy_freeze.py \
+              --bootstrap-check \
+              --candidate-ref "$CANDIDATE_SHA"
+          elif git cat-file -e "$BASE_SHA:scripts/trusted_legacy_freeze.py" &&
+               git cat-file -e "$BASE_SHA:.github/workflows/legacy-freeze.yml"; then
             git show "$BASE_SHA:scripts/trusted_legacy_freeze.py" |
               python3 - --repo "$PWD" --baseline-ref "$BASE_SHA" --candidate-ref "$CANDIDATE_SHA"
           else
-            echo "::notice::Bootstrapping the trusted verifier on its first protected-main installation"
+            echo "::notice::Checking reviewed first-stage trust-root installation"
             python3 scripts/trusted_legacy_freeze.py \
+              --bootstrap-check \
               --baseline-ref "$BASE_SHA" \
               --candidate-ref "$CANDIDATE_SHA"
           fi

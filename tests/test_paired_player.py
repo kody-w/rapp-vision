@@ -153,6 +153,30 @@ class TestPairedPlayer(unittest.TestCase):
         """
         self.run_node(script)
 
+    def test_browser_rejects_explicit_null_optionals(self):
+        nulls = json.dumps(json.loads(
+            (ROOT / "tests/fixtures/publications/invalid-null-optionals.json").read_text()
+        ))
+        script = f"""
+        if (!globalThis.crypto) globalThis.crypto = require("crypto").webcrypto;
+        let LEGACY_POLICY = {{channels:[]}};
+        {contract_block()}
+        (async () => {{
+          const errors = await validateChannelContract(
+            {nulls}, "https://example.test/channel.json"
+          );
+          for (const expected of [
+            "videos[0].chapters: must be an array",
+            "live.duration: must be greater than zero",
+            "live.chapters: must be an array"
+          ]) {{
+            if (!errors.some(error => error.includes(expected)))
+              throw new Error(`browser accepted explicit null: ${{expected}}`);
+          }}
+        }})().catch(error => {{ console.error(error); process.exit(1); }});
+        """
+        self.run_node(script)
+
     def test_same_permalink_switch_defaults_to_video_and_cleans_up(self):
         self.assertIn('mountMode(hasVideo ? "video" : "live", false)', INDEX)
         self.assertIn(">Try live replay</button>", INDEX)

@@ -42,6 +42,20 @@ baseline. The browser and CLI reject an allowlisted id whose content no longer
 matches its digest. Once migrated to v2, a publication follows the paired
 contract.
 
+### Two-stage trust-root bootstrap
+
+The initial installation is intentionally split:
+
+1. Push a manually reviewed commit containing only
+   `.github/workflows/legacy-freeze.yml` and
+   `scripts/trusted_legacy_freeze.py`. `--bootstrap-check` rejects a policy in
+   this commit.
+2. Push the policy implementation. The trusted stage-one verifier permits
+   `policy/legacy-publications.json` only when its raw SHA-256 is exactly
+   `1ec1cf780bf6f31c593da19d7ff4008313b5ed39add09137ec1c539169cd8a50`.
+3. From then on, the verifier requires byte identity for the workflow, verifier,
+   and policy. Modification or deletion of any trust-root file is rejected.
+
 ## Rationale
 
 Encoded media makes the work dependable and approachable. The live replay makes

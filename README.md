@@ -43,6 +43,10 @@ checkout—not the proposed branch—and protected pushes compare against
 contribution therefore cannot self-authorize v1 content. These are examples of
 the network's history, not templates for new publication:
 
+The trust root is installed in two pushes: first only the protected workflow
+and minimal verifier, then the exact policy bytes whose SHA-256 is baked into
+that verifier. See [`PUBLICATION_POLICY.md`](PUBLICATION_POLICY.md).
+
 | Channel | | What it is |
 |---|---|---|
 | **Rooms** | 🕯️ | Nine ambient places that do not exist — a canoe at dawn, a cabin under the aurora, a cave lit by larvae. Slow TV where the rain is simulated, so it never falls the same way twice. |
