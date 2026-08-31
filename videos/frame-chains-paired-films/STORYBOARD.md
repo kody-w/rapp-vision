@@ -62,7 +62,7 @@ keyMessage: The film teaches; the live replay hands over control.
 - sfx: whoosh-short, error
 
 Adapt: keep the held proof-window shape; replace screen cycling with authored source cuts from migration to counterfeit to independent verdict.
-Scene 1 (0.0–3.2s): the real migration view arrives as a large right-anchored editorial window, with “Identity carries its history” revealing on the left in two cues; rule-of-thirds, source window ≥60% of frame. Window and headline settle via smooth spring-pop entrance (`spring-pop-entrance`, no overshoot).
+Scene 1 (0.0–3.2s): the real migration view arrives as a large right-anchored editorial window, with “Identity carries its history” revealing on the left in two cues; rule-of-thirds, source window ≥60% of frame. Window and headline use the blueprint's restrained smooth entrance and settle without overshoot.
 Scene 2 (3.2–7.4s): on “branches offline, and returns,” cut within the footage at matched velocity to the completed migration state; a three-node path draws beneath the headline (`svg-path-draw`) while the accepted head remains visible.
 Scene 3 (7.4–10.3s): on “the verifier rejects the counterfeit,” zoom to the real `REJECTED` receipt (`coordinate-target-zoom`) and rack-focus the surrounding UI (`depth-of-field-blur`); one blue hairline connects verdict to preserved head.
 Scene 4 (10.3–11.243s): hold the rejection and “accepted head preserved” mono label completely still.
