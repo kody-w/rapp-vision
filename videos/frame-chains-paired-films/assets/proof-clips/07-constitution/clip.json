@@ -2,6 +2,22 @@
   "schema": "rapp-vision.proof-clip/1",
   "frame": 7,
   "slug": "07-constitution",
+  "title": "The Executable Constitution",
+  "source_url": "https://kody-w.github.io/frame-chains/showcase/07-constitution/",
+  "duration": 24.533,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "selectors": [
+    "#guidedBtn",
+    "#forkBtn",
+    "#tyrantBtn"
+  ],
+  "positive_outcome": "Guided history completes and two lawful societies remain visible while the derived society stays preserved at valid frame 7.",
+  "failure_outcome": "Replay refuses frame 8 because the action cites superseded LAW-TREASURY-1 while LAW-TREASURY-2 is the active authority.",
+  "sha256": "db0e1f7bbdbb823b7dc1c610dfce417fd21bbf4953a6ea52f12550123453b3d6",
+  "synthetic_only": true,
+  "audio": false,
   "provenance": {
     "source_url": "https://kody-w.github.io/frame-chains/showcase/07-constitution/",
     "source_kind": "public-app-browser-capture",
