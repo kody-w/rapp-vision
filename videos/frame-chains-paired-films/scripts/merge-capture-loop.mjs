@@ -65,6 +65,20 @@ for (const frame of plan.frames) {
     fail(`${frame.slug}: clip metadata identity mismatch`);
   }
   if (
+    typeof clip.title !== "string"
+    || !clip.title.trim()
+    || clip.source_url !== frame.source
+    || !Array.isArray(clip.selectors)
+    || clip.selectors.length === 0
+    || typeof clip.positive_outcome !== "string"
+    || !clip.positive_outcome.trim()
+    || typeof clip.failure_outcome !== "string"
+    || !clip.failure_outcome.trim()
+    || !/^[a-f0-9]{64}$/.test(clip.sha256 || "")
+  ) {
+    fail(`${frame.slug}: clip provenance or outcome contract mismatch`);
+  }
+  if (
     clip.synthetic_only !== true
     || clip.audio !== false
     || clip.width !== 1920
@@ -81,6 +95,9 @@ for (const frame of plan.frames) {
     ["show", `${branchHead}:${prefix}source.webm`],
     { cwd: repoRoot, maxBuffer: 100 * 1024 * 1024 },
   );
+  if (sourceBytes.length === 0 || sourceBytes.length > 40 * 1024 * 1024) {
+    fail(`${frame.slug}: source.webm must be within (0, 40 MiB]`);
+  }
   if (sha256(sourceBytes) !== clip.sha256) {
     fail(`${frame.slug}: source.webm sha256 does not match clip.json`);
   }
