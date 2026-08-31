@@ -1,7 +1,25 @@
 {
   "schema": "rapp-vision.proof-clip/1",
+  "frame": 10,
   "slug": "10-futures-museum",
   "title": "The Museum of Possible Futures — Branch, Merge, and Corruption Isolation",
+  "source_url": "https://kody-w.github.io/frame-chains/showcase/10-futures-museum/",
+  "duration": 34.8,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "selectors": [
+    "#playBtn",
+    "#forkBtn",
+    "#compareSelect",
+    "#mergeBtn",
+    "#mutateBtn"
+  ],
+  "positive_outcome": "The exhibit completes its guided replay, forks V01, compares with D02, and merges both accepted histories into U01.",
+  "failure_outcome": "Mutation identifies F02 as the first corrupt frame and freezes the affected path on F01 while independent accepted branches remain verified.",
+  "sha256": "ede83f71c59b322ba20c1f3fc7ed85afe9170f535bb247fe54d7785d14942153",
+  "synthetic_only": true,
+  "audio": false,
   "provenance": {
     "sourceUrl": "https://kody-w.github.io/frame-chains/showcase/10-futures-museum/?scoutTheme=light",
     "sourceType": "public synthetic interactive proof",
@@ -72,7 +90,7 @@
     ],
     "integrityBanner": "First corrupt frame: F02. Frozen on last valid F01; accepted branches remain intact."
   },
-  "sha256": {
+  "checksums": {
     "source.webm": "ede83f71c59b322ba20c1f3fc7ed85afe9170f535bb247fe54d7785d14942153",
     "poster.jpg": "bcebfb4879f7930989ee8e827d8c223ad820594cf63d01834df17ba90ce0badc",
     "capture.mjs": "48995ff3d0fdc849b6e62f559cbf515a1720c1343bc165ad94f175ed4cea7629"
