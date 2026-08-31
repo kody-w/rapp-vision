@@ -1,0 +1,885 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-400.woff2") format("woff2");
+      font-style: normal; font-weight: 400;
+    }
+
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-700.woff2") format("woff2");
+      font-style: normal; font-weight: 700;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #242424;
+      font-family: "Inter", sans-serif;
+    }
+
+    .f06-ground {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .f06-grid {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 896px;
+      opacity: 0.52;
+      background-image:
+        linear-gradient(rgba(36, 36, 36, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(36, 36, 36, 0.045) 1px, transparent 1px);
+      background-size: 64px 64px;
+    }
+
+    .f06-orbit-ring {
+      position: absolute;
+      top: -310px;
+      right: -280px;
+      width: 880px;
+      height: 880px;
+      border: 1px solid rgba(36, 36, 36, 0.11);
+      border-radius: 50%;
+      transform-origin: 50% 50%;
+    }
+
+    .f06-orbit-ring::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: -7px;
+      width: 14px;
+      height: 14px;
+      margin-top: -7px;
+      border-radius: 50%;
+      background: #0067b8;
+    }
+
+    .f06-proof-frame {
+      position: absolute;
+      left: 62px;
+      top: 132px;
+      width: 1204px;
+      height: 680px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 12px;
+      background: #151718;
+      box-shadow: 0 1px 3px rgba(36, 36, 36, 0.08), 0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    .f06-proof-frame::before {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+    }
+
+    .f06-overlay {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 896px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .f06-header {
+      position: absolute;
+      left: 64px;
+      top: 34px;
+      width: 1792px;
+      height: 72px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(36, 36, 36, 0.16);
+      padding-bottom: 15px;
+    }
+
+    .f06-title-stack {
+      display: flex;
+      align-items: baseline;
+      gap: 30px;
+      min-width: 0;
+    }
+
+    .f06-kicker {
+      flex: 0 0 auto;
+      color: #242424;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .f06-kicker-mark {
+      color: #0067b8;
+      display: inline-block;
+      width: 28px;
+    }
+
+    .f06-headline {
+      min-width: 0;
+      color: #242424;
+      font-size: 56px;
+      font-weight: 400;
+      line-height: 0.95;
+      letter-spacing: -0.022em;
+      white-space: nowrap;
+    }
+
+    .f06-header-meta {
+      flex: 0 0 auto;
+      color: rgba(36, 36, 36, 0.74);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 19px;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .f06-live-label {
+      position: absolute;
+      left: 84px;
+      top: 154px;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 6px;
+      color: rgba(255, 255, 255, 0.88);
+      background: rgba(21, 23, 24, 0.84);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 17px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .f06-live-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #5db872;
+    }
+
+    .f06-panel {
+      position: absolute;
+      left: 1296px;
+      top: 132px;
+      width: 560px;
+      height: 680px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      color: #ffffff;
+      background: #151718;
+      box-shadow: 0 1px 3px rgba(36, 36, 36, 0.08), 0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    .f06-panel-chrome {
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+      background: #202325;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 17px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .f06-panel-chip {
+      color: rgba(255, 255, 255, 0.64);
+    }
+
+    .f06-counter-stage {
+      position: absolute;
+      left: 24px;
+      top: 76px;
+      width: 512px;
+      height: 214px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      transform-origin: 50% 0%;
+    }
+
+    .f06-counter-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      padding: 20px 22px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      background: #1b1d1f;
+    }
+
+    .f06-counter-wrap {
+      display: flex;
+      align-items: baseline;
+      width: 100%;
+      min-height: 104px;
+    }
+
+    .f06-counter {
+      display: inline-block;
+      width: 112px;
+      color: #ffffff;
+      font-size: 102px;
+      font-weight: 400;
+      font-variant-numeric: tabular-nums;
+      line-height: 0.92;
+      letter-spacing: -0.04em;
+      transform-origin: 0% 70%;
+    }
+
+    .f06-counter-label {
+      color: rgba(255, 255, 255, 0.7);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .f06-rails-stage {
+      position: absolute;
+      left: 24px;
+      top: 270px;
+      width: 512px;
+      height: 206px;
+      opacity: 0;
+    }
+
+    .f06-rails-heading {
+      margin-bottom: 15px;
+      color: rgba(255, 255, 255, 0.64);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 16px;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .f06-rail-svg {
+      position: absolute;
+      left: 0;
+      top: 43px;
+      width: 512px;
+      height: 142px;
+      overflow: visible;
+    }
+
+    .f06-rail-line {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.74);
+      stroke-width: 3;
+      stroke-linecap: round;
+    }
+
+    .f06-rail-node {
+      fill: #151718;
+      stroke: rgba(255, 255, 255, 0.8);
+      stroke-width: 2;
+    }
+
+    .f06-rail-card {
+      position: absolute;
+      top: 47px;
+      width: 222px;
+      height: 126px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 16px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      background: #202325;
+      opacity: 0;
+    }
+
+    .f06-rail-card-left {
+      left: 0;
+    }
+
+    .f06-rail-card-right {
+      right: 0;
+    }
+
+    .f06-pressure {
+      color: #ffffff;
+      font-size: 42px;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .f06-pressure-unit {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 19px;
+      letter-spacing: 0.02em;
+    }
+
+    .f06-pressure-owner {
+      margin-top: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 15px;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .f06-reject-stage {
+      position: absolute;
+      left: 24px;
+      top: 490px;
+      width: 512px;
+      height: 158px;
+      opacity: 0;
+    }
+
+    .f06-reject-burst {
+      position: absolute;
+      left: 130px;
+      top: 21px;
+      width: 252px;
+      height: 72px;
+      z-index: 1;
+      border-radius: 9999px;
+      background: rgba(0, 103, 184, 0.38);
+      filter: blur(28px);
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+
+    .f06-reject-label {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 88px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 8px;
+      color: #ffffff;
+      background: #0067b8;
+      box-shadow: 0 11px 26px rgba(36, 36, 36, 0.24);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transform-origin: 50% 50%;
+    }
+
+    .f06-reject-detail {
+      margin-top: 16px;
+      color: rgba(255, 255, 255, 0.72);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 16px;
+      line-height: 1.35;
+      letter-spacing: 0.035em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .f06-receipt {
+      position: absolute;
+      left: 24px;
+      top: 72px;
+      z-index: 5;
+      width: 512px;
+      height: 188px;
+      display: grid;
+      grid-template-columns: 202px 1fr;
+      align-items: center;
+      padding: 22px 24px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: #202325;
+      opacity: 0;
+      transform-origin: 50% 0%;
+    }
+
+    .f06-receipt-number {
+      color: #ffffff;
+      font-size: 94px;
+      font-weight: 400;
+      font-variant-numeric: tabular-nums;
+      line-height: 0.9;
+      letter-spacing: -0.05em;
+    }
+
+    .f06-receipt-copy {
+      padding-left: 24px;
+      border-left: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .f06-receipt-label {
+      color: #ffffff;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .f06-receipt-sub {
+      margin-top: 12px;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 23px;
+      line-height: 1.25;
+    }
+
+    .f06-source-note {
+      position: absolute;
+      left: 82px;
+      top: 826px;
+      color: rgba(36, 36, 36, 0.64);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 17px;
+      letter-spacing: 0.045em;
+      text-transform: uppercase;
+    }
+
+    .f06-proof-thesis {
+      position: absolute;
+      right: 64px;
+      top: 826px;
+      color: #242424;
+      font-size: 28px;
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: -0.012em;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="06-preserve-disagreement"
+    data-duration="10.112"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div
+      id="f06-ground"
+      class="clip f06-ground"
+      data-start="0"
+      data-duration="10.112"
+      data-track-index="0"
+    >
+      <div class="f06-grid"></div>
+      <div id="f06-orbit-ring" class="f06-orbit-ring"></div>
+    </div>
+
+    <div
+      id="f06-proof-frame"
+      class="clip f06-proof-frame"
+      data-start="0"
+      data-duration="10.112"
+      data-track-index="1"
+    ></div>
+
+    <video
+      id="f06-video-build"
+      class="clip"
+      src="assets/proof-clips/06-space-station/source.webm"
+      data-frame-video="approved"
+      data-frame-video-x="70"
+      data-frame-video-y="140"
+      data-frame-video-width="1188"
+      data-frame-video-height="664"
+      data-frame-video-fit="cover"
+      data-start="0"
+      data-duration="3"
+      data-media-start="1.2"
+      data-track-index="2"
+      muted
+      playsinline
+    ></video>
+
+    <video
+      id="f06-video-alternatives"
+      class="clip"
+      src="assets/proof-clips/06-space-station/source.webm"
+      data-frame-video="approved"
+      data-frame-video-x="70"
+      data-frame-video-y="140"
+      data-frame-video-width="1188"
+      data-frame-video-height="664"
+      data-frame-video-fit="cover"
+      data-start="3"
+      data-duration="3.8"
+      data-media-start="4.2"
+      data-track-index="2"
+      muted
+      playsinline
+    ></video>
+
+    <video
+      id="f06-video-rejection"
+      class="clip"
+      src="assets/proof-clips/06-space-station/source.webm"
+      data-frame-video="approved"
+      data-frame-video-x="70"
+      data-frame-video-y="140"
+      data-frame-video-width="1188"
+      data-frame-video-height="664"
+      data-frame-video-fit="cover"
+      data-start="6.8"
+      data-duration="2.5"
+      data-media-start="7.2"
+      data-track-index="2"
+      muted
+      playsinline
+    ></video>
+
+    <video
+      id="f06-video-receipt"
+      class="clip"
+      src="assets/proof-clips/06-space-station/source.webm"
+      data-frame-video="approved"
+      data-frame-video-x="70"
+      data-frame-video-y="140"
+      data-frame-video-width="1188"
+      data-frame-video-height="664"
+      data-frame-video-fit="cover"
+      data-start="9.3"
+      data-duration="0.812"
+      data-media-start="10.1"
+      data-track-index="2"
+      muted
+      playsinline
+    ></video>
+
+    <div
+      id="f06-overlay"
+      class="clip f06-overlay"
+      data-start="0"
+      data-duration="10.112"
+      data-track-index="3"
+    >
+      <header class="f06-header">
+        <div class="f06-title-stack">
+          <div id="f06-kicker" class="f06-kicker">
+            <span id="f06-kicker-mark" class="f06-kicker-mark">✱</span> Frame 06 · swarm proof
+          </div>
+          <h1 id="f06-headline" class="f06-headline">Disagreement, preserved.</h1>
+        </div>
+        <div id="f06-header-meta" class="f06-header-meta">Public synthetic replay · SHA-256 linked</div>
+      </header>
+
+      <div id="f06-live-label" class="f06-live-label">
+        <span class="f06-live-dot"></span>
+        Real browser capture
+      </div>
+
+      <aside id="f06-panel" class="f06-panel">
+        <div class="f06-panel-chrome">
+          <span>Merge receipt</span>
+          <span class="f06-panel-chip">35 frames</span>
+        </div>
+
+        <div id="f06-counter-stage" class="f06-counter-stage">
+          <div class="f06-counter-card">
+            <div class="f06-counter-wrap">
+              <span id="f06-agent-counter" class="f06-counter">0</span>
+            </div>
+            <div id="f06-agent-label" class="f06-counter-label">Agents</div>
+          </div>
+          <div class="f06-counter-card">
+            <div class="f06-counter-wrap">
+              <span id="f06-station-counter" class="f06-counter">0</span>
+            </div>
+            <div id="f06-station-label" class="f06-counter-label">Station</div>
+          </div>
+        </div>
+
+        <div id="f06-rails-stage" class="f06-rails-stage">
+          <div class="f06-rails-heading">Equal, content-addressed alternatives</div>
+          <svg class="f06-rail-svg" viewBox="0 0 512 142" aria-hidden="true">
+            <path id="f06-rail-left" class="f06-rail-line" d="M 111 70 L 244 70" />
+            <path id="f06-rail-right" class="f06-rail-line" d="M 268 70 L 401 70" />
+            <circle class="f06-rail-node" cx="256" cy="70" r="11" />
+          </svg>
+          <div id="f06-rail-card-left" class="f06-rail-card f06-rail-card-left">
+            <div class="f06-pressure">68 <span class="f06-pressure-unit">kPa</span></div>
+            <div class="f06-pressure-owner">Life support</div>
+          </div>
+          <div id="f06-rail-card-right" class="f06-rail-card f06-rail-card-right">
+            <div class="f06-pressure">72 <span class="f06-pressure-unit">kPa</span></div>
+            <div class="f06-pressure-owner">Docking</div>
+          </div>
+        </div>
+
+        <div id="f06-reject-stage" class="f06-reject-stage">
+          <div id="f06-reject-burst" class="f06-reject-burst"></div>
+          <div id="f06-reject-label" class="f06-reject-label">Overwrite rejected</div>
+          <div id="f06-reject-detail" class="f06-reject-detail">1 of 2 verified claim frames would be lost</div>
+        </div>
+
+        <div id="f06-receipt" class="f06-receipt">
+          <div class="f06-receipt-number">5 / 6</div>
+          <div class="f06-receipt-copy">
+            <div class="f06-receipt-label">Fidelity</div>
+            <div class="f06-receipt-sub">Both alternatives preserved</div>
+          </div>
+        </div>
+      </aside>
+
+      <div id="f06-source-note" class="f06-source-note">Source · Space Station showcase · viewport capture</div>
+      <div id="f06-proof-thesis" class="f06-proof-thesis">Conflict stays explicit. The system keeps moving.</div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const tl = gsap.timeline({ paused: true });
+
+      const agentCounter = document.getElementById("f06-agent-counter"), stationCounter = document.getElementById("f06-station-counter");
+      const agentState = { value: 0 };
+      const stationState = { value: 0 };
+
+      document.querySelectorAll(".f06-rail-line").forEach((path) => {
+        const length = path.getTotalLength();
+        path.style.strokeDasharray = `${length}`;
+        path.style.strokeDashoffset = `${length}`;
+      });
+
+      tl.fromTo(
+        "#f06-kicker",
+        { x: -26, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.44, ease: "power3.out" },
+        0.02,
+      );
+      tl.fromTo(
+        "#f06-kicker-mark",
+        { scale: 0.92, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.5)" },
+        0.08,
+      );
+      tl.fromTo(
+        "#f06-headline",
+        { y: -20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.56, ease: "power2.out" },
+        0.1,
+      );
+      tl.fromTo(
+        "#f06-header-meta",
+        { x: 30, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.48, ease: "power1.out" },
+        0.22,
+      );
+      tl.fromTo(
+        "#f06-proof-frame",
+        { scale: 0.985, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.62, ease: "power3.out" },
+        0.12,
+      );
+      tl.fromTo(
+        "#f06-panel",
+        { x: 52, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.66, ease: "power2.out" },
+        0.18,
+      );
+      tl.fromTo(
+        "#f06-live-label",
+        { y: -12, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: "power1.out" },
+        0.42,
+      );
+      tl.fromTo(
+        "#f06-orbit-ring",
+        { rotation: -5, opacity: 0.35 },
+        { rotation: 13, opacity: 0.7, duration: 10.112, ease: "none" },
+        0,
+      );
+
+      tl.to(
+        agentState,
+        {
+          value: 6,
+          duration: 1.45,
+          ease: "power3.out",
+          onUpdate: () => {
+            agentCounter.textContent = Math.round(agentState.value).toString();
+          },
+        },
+        0.48,
+      );
+      tl.fromTo(
+        "#f06-agent-counter",
+        { scale: 0.5, opacity: 0.35 },
+        { scale: 1, opacity: 1, duration: 1.45, ease: "power3.out" },
+        0.48,
+      );
+      tl.fromTo(
+        "#f06-agent-label",
+        { y: 12, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.48, ease: "power2.out" },
+        0.66,
+      );
+
+      tl.to(
+        stationState,
+        {
+          value: 1,
+          duration: 1.15,
+          ease: "power3.out",
+          onUpdate: () => {
+            stationCounter.textContent = Math.round(stationState.value).toString();
+          },
+        },
+        1.34,
+      );
+      tl.fromTo(
+        "#f06-station-counter",
+        { scale: 0.5, opacity: 0.35 },
+        { scale: 1, opacity: 1, duration: 1.15, ease: "power3.out" },
+        1.34,
+      );
+      tl.fromTo(
+        "#f06-station-label",
+        { y: 12, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.48, ease: "power2.out" },
+        1.48,
+      );
+
+      tl.to(
+        "#f06-counter-stage",
+        { y: -12, scale: 0.76, opacity: 0.34, duration: 0.68, ease: "power2.inOut" },
+        2.92,
+      );
+      tl.fromTo(
+        "#f06-rails-stage",
+        { y: 24, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.54, ease: "power3.out" },
+        3.02,
+      );
+      tl.to(
+        "#f06-rail-left",
+        { strokeDashoffset: 0, duration: 0.78, ease: "power2.out" },
+        3.28,
+      );
+      tl.to(
+        "#f06-rail-right",
+        { strokeDashoffset: 0, duration: 0.78, ease: "power2.out" },
+        3.28,
+      );
+      tl.fromTo(
+        "#f06-rail-card-left",
+        { x: -18, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.58, ease: "power2.out" },
+        3.48,
+      );
+      tl.fromTo(
+        "#f06-rail-card-right",
+        { x: 18, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.58, ease: "power2.out" },
+        3.48,
+      );
+
+      tl.fromTo(
+        "#f06-reject-stage",
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.56, ease: "power3.out" },
+        6.82,
+      );
+      tl.to(
+        "#f06-reject-label",
+        {
+          scale: 0.92,
+          boxShadow: "0 3px 8px rgba(36, 36, 36, 0.2)",
+          duration: 0.18,
+          ease: "power1.in",
+        },
+        7.36,
+      );
+      tl.to(
+        "#f06-reject-label",
+        {
+          scale: 1,
+          boxShadow: "0 11px 26px rgba(36, 36, 36, 0.24)",
+          duration: 0.62,
+          ease: "back.out(1.9)",
+        },
+        7.54,
+      );
+      tl.fromTo(
+        "#f06-reject-burst",
+        { scale: 1, opacity: 0 },
+        { scale: 3.4, opacity: 0.72, duration: 0.46, ease: "power2.out" },
+        7.54,
+      );
+      tl.to(
+        "#f06-reject-burst",
+        { opacity: 0, duration: 0.54, ease: "power2.in" },
+        8,
+      );
+      tl.fromTo(
+        "#f06-reject-detail",
+        { y: 10, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.42, ease: "power1.out" },
+        7.76,
+      );
+
+      tl.to(
+        "#f06-counter-stage",
+        { opacity: 0, y: -30, duration: 0.32, ease: "power2.in" },
+        9.26,
+      );
+      tl.fromTo(
+        "#f06-receipt",
+        { y: 22, scale: 0.96, opacity: 0 },
+        { y: 0, scale: 1, opacity: 1, duration: 0.46, ease: "power3.out" },
+        9.3,
+      );
+      tl.fromTo(
+        "#f06-source-note",
+        { x: -18, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.42, ease: "power2.out" },
+        9.34,
+      );
+      tl.fromTo(
+        "#f06-proof-thesis",
+        { x: 18, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.42, ease: "power2.out" },
+        9.42,
+      );
+
+      window.__timelines["06-preserve-disagreement"] = tl; })();
+  </script>
+</template>
