@@ -1,0 +1,53 @@
+{
+  "schema": "rapp-vision.proof-clip/1",
+  "frame": 7,
+  "slug": "07-constitution",
+  "provenance": {
+    "source_url": "https://kody-w.github.io/frame-chains/showcase/07-constitution/",
+    "source_kind": "public-app-browser-capture",
+    "captured_at": "2026-08-31T16:32:15.570Z",
+    "capture_script": "capture.mjs",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "actions": [
+      "#guidedBtn",
+      "#forkBtn",
+      "#tyrantBtn"
+    ]
+  },
+  "outcome": "Two lawful societies remain visible while replay refuses the tyrant frame under the exact superseding law.",
+  "observed_outcomes": [
+    "Guided history completed with LAW-TREASURY-1 superseded by active LAW-TREASURY-2.",
+    "Canal Commonwealth and Clinic Compact remained visible as two lawful descendants.",
+    "Replay refused frame 8: Action cites superseded law LAW-TREASURY-1; LAW-TREASURY-2 is the active authority.",
+    "Replay stopped before frame 8; the visible society remains at valid frame 7.",
+    "The derived chain head remained 26993139c3db, the hash shown for valid frame 7."
+  ],
+  "media": {
+    "source": {
+      "file": "source.webm",
+      "sha256": "db0e1f7bbdbb823b7dc1c610dfce417fd21bbf4953a6ea52f12550123453b3d6",
+      "bytes": 3352110,
+      "duration_seconds": 24.533,
+      "codec": "vp9",
+      "width": 1920,
+      "height": 1080,
+      "frame_rate": "30/1",
+      "audio_streams": 0
+    },
+    "poster": {
+      "file": "poster.jpg",
+      "sha256": "2cc26d452b476b55b2cd2bbbc008fadb9a4de8640a802397f6ec447195ca527b",
+      "bytes": 261651,
+      "width": 1920,
+      "height": 1080
+    },
+    "capture_script": {
+      "file": "capture.mjs",
+      "sha256": "112ebbda6b28083d7956b001e43d77048cbf4977c5a2a5bb4398d6f4cade29a9",
+      "bytes": 9975
+    }
+  }
+}
