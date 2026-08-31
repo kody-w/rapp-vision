@@ -1,0 +1,21 @@
+{
+  "frame": 1,
+  "slug": "01-many-worlds",
+  "title": "Many-Worlds Mission Control — Isolated Rescue Rejection",
+  "source_url": "https://kody-w.github.io/frame-chains/showcase/01-many-worlds/",
+  "duration": 28.866,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "selectors": [
+    "#guided-btn",
+    "#mutate-btn",
+    ".branch-card.invalid",
+    ".assertion.fail"
+  ],
+  "positive_outcome": "Three deterministic branches verify from the same canonical parent and merge at 3/5 fidelity.",
+  "failure_outcome": "Rescue SABLE-2 alone fails after its parent hash is mutated; independent branch verification fails while isolation passes.",
+  "sha256": "c081e0fcf6f16de5eee2cd37413385d95827b431b9ce91de4b0073b9e59e0d62",
+  "synthetic_only": true,
+  "audio": false
+}
