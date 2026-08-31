@@ -1,7 +1,26 @@
 {
   "schema": "rapp-vision.proof-clip/1",
   "id": "03-mars-colony",
+  "frame": 3,
+  "slug": "03-mars-colony",
   "title": "Mars Colony — Semantic Repair Rejection",
+  "source_url": "https://kody-w.github.io/frame-chains/showcase/03-mars-colony/",
+  "duration": 33.166,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "selectors": [
+    "#nextButton",
+    "#resetButton",
+    "#injectButton",
+    "#scanButton",
+    "#sweepButton"
+  ],
+  "positive_outcome": "Scenario complete: the colony converged, succession honored the roster, and research reattached without contradiction.",
+  "failure_outcome": "Valid-hash mutation 75819c85 rejected: 12 actual targets exceeded the linked report delta of 3; accepted head f0af35b1 stayed intact.",
+  "sha256": "ffb1624c2f4d28c61030e3400333f6f9473c91f3f423816cd71c8c0a371be760",
+  "synthetic_only": true,
+  "audio": false,
   "description": "Eight-step colony recovery followed by rejection of a correctly hashed but semantically overbroad repair.",
   "source": {
     "url": "https://kody-w.github.io/frame-chains/showcase/03-mars-colony/",
