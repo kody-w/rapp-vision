@@ -48,7 +48,7 @@ for (const frame of plan.frames) {
   }
 
   const html = git(["show", `${branchHead}:${repoPath}`]);
-  const expectedAsset = `../../${frame.asset}`;
+  const expectedAsset = frame.asset;
   for (const [label, expression] of [
     ["template", /<template[\s>]/i],
     [
