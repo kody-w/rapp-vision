@@ -1,7 +1,24 @@
 {
   "schema": "rapp-vision.proof-clip/1",
   "id": "09-attack-timeline",
+  "frame": 9,
+  "slug": "09-attack-timeline",
   "title": "Attack the Timeline",
+  "source_url": "https://kody-w.github.io/frame-chains/showcase/09-attack-timeline/",
+  "duration": 29.333,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "selectors": [
+    "#controlBtn",
+    "#attackAllBtn",
+    "#replayBtn"
+  ],
+  "positive_outcome": "The control passes with all nine detector layers measured green while the trusted projection remains unchanged.",
+  "failure_outcome": "Nine hostile candidates are quarantined, all detector layers observe red, and replay reconstructs the Provenance rejection receipt without changing the trusted head or high-water mark.",
+  "sha256": "f9a75c4a595e8fde6b9c274245b3f91251bec918dcc6b9b00df2a7822035c386",
+  "synthetic_only": true,
+  "audio": false,
   "provenance": {
     "source_url": "https://kody-w.github.io/frame-chains/showcase/09-attack-timeline/",
     "source_title": "Attack the Timeline · Frame 09",
