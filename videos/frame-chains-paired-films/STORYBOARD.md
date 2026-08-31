@@ -24,7 +24,7 @@ music: "restrained cinematic technology pulse, curious at first, increasingly co
 - voiceover: "An interactive proof can still confuse a newcomer. So RAPP Vision pairs every live replay with a real film: understand it first, then take the controls."
 - duration: 10.731s
 - transition_in: cut
-- status: outline
+- status: animated
 - src: compositions/frames/01-understand-operate.html
 - type: hook
 - persuasion: Pain validation resolved by category definition
@@ -50,7 +50,7 @@ keyMessage: The film teaches; the live replay hands over control.
 - voiceover: "One identity crosses devices, branches offline, and returns. The film shows the journey; the verifier rejects the counterfeit without moving the accepted head."
 - duration: 11.243s
 - transition_in: push-slide LEFT
-- status: outline
+- status: animated
 - src: compositions/frames/02-identity-history.html
 - type: feature_showcase
 - persuasion: Show-don't-tell proof
@@ -76,7 +76,7 @@ keyMessage: A counterfeit can look right and still fail independent verification
 - voiceover: "On Mars, a correctly hashed repair still fails. The chain proves exactly which three systems were authorized—and preserves the colony's last good state."
 - duration: 10.645s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/03-correct-hash-wrong-repair.html
 - type: feature_showcase
 - persuasion: Risk reversal through semantic verification
@@ -102,7 +102,7 @@ keyMessage: Valid structure does not grant valid scope.
 - voiceover: "One history becomes five interfaces. When Command lies, four honest projections still agree, and the broken lens isolates itself."
 - duration: 9.6s
 - transition_in: push-slide RIGHT
-- status: outline
+- status: animated
 - src: compositions/frames/04-five-realities.html
 - type: benefit_highlight
 - persuasion: Friction reduction through rebuildable projections
@@ -128,7 +128,7 @@ keyMessage: A broken view does not corrupt the shared history.
 - voiceover: "The detective accepts only a theory backed by exact earlier causes. Forge one plausible clue, and cryptography stays green while causality turns red."
 - duration: 10.752s
 - transition_in: zoom-through
-- status: outline
+- status: animated
 - src: compositions/frames/05-cryptography-causality.html
 - type: feature_showcase
 - persuasion: Negative contrast
@@ -154,7 +154,7 @@ keyMessage: A plausible, correctly hashed event can still be impossible.
 - voiceover: "Six agents build one station without flattening disagreement. Two airlock pressures survive in parallel; an overwrite that erases one is refused."
 - duration: 10.112s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/06-preserve-disagreement.html
 - type: feature_showcase
 - persuasion: Feature-to-benefit translation
@@ -180,7 +180,7 @@ keyMessage: Conflicts can remain explicit without stopping the system.
 - voiceover: "Here, law is executable history. Two societies can fork lawfully—but a tyrant citing a superseded rule is stopped at replay."
 - duration: 9.493s
 - transition_in: push-slide LEFT
-- status: outline
+- status: animated
 - src: compositions/frames/07-law-executes.html
 - type: feature_showcase
 - persuasion: Authority made inspectable
@@ -206,7 +206,7 @@ keyMessage: Authority is accepted only when the active law permits it.
 - voiceover: "A dungeon teleports between devices as verified state, not pixels. Possession isn't enough: forged inventory and broken parent provenance both fail."
 - duration: 11.221s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/08-state-not-pixels.html
 - type: benefit_highlight
 - persuasion: Future pacing grounded in proof
@@ -232,7 +232,7 @@ keyMessage: Portable state must carry a valid history.
 - voiceover: "Now attack the timeline nine different ways. Every hostile candidate reaches the exact red boundary that explains its rejection, then replay rebuilds the receipt."
 - duration: 11.179s
 - transition_in: zoom-through
-- status: outline
+- status: animated
 - src: compositions/frames/09-attack-boundaries.html
 - type: social_proof
 - persuasion: Adversarial proof
@@ -258,7 +258,7 @@ keyMessage: Rejection is explainable at the exact boundary that caused it.
 - voiceover: "The museum turns immutable futures into art, then corrupts one branch on purpose. Watch the film to learn the proof. Open the live replay to touch it."
 - duration: 10.368s
 - transition_in: blur-crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/10-film-plus-proof.html
 - type: cta
 - persuasion: Risk reversal plus direct invitation
