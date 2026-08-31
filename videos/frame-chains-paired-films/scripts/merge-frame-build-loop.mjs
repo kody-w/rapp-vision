@@ -67,8 +67,20 @@ for (const frame of plan.frames) {
   ]) {
     if (!expression.test(html)) fail(`${frame.slug}: missing ${label}`);
   }
-  if (/(?:Date\.now|Math\.random|repeat\s*:\s*-1|<script[^>]+src=["']https?:)/i.test(html)) {
-    fail(`${frame.slug}: non-deterministic or external runtime code detected`);
+  if (/(?:Date\.now|Math\.random|repeat\s*:\s*-1)/i.test(html)) {
+    fail(`${frame.slug}: non-deterministic runtime code detected`);
+  }
+  const externalScripts = [
+    ...html.matchAll(/<script[^>]+src=["'](https?:[^"']+)["']/gi),
+  ].map((match) => match[1]);
+  if (
+    externalScripts.some(
+      (url) =>
+        url
+        !== "https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js",
+    )
+  ) {
+    fail(`${frame.slug}: unapproved external runtime script detected`);
   }
 
   git(["merge", "--no-ff", "--no-edit", frame.branch]);
