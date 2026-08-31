@@ -55,17 +55,21 @@ for (const frame of plan.frames) {
       "composition id",
       new RegExp(`data-composition-id=["']${frame.slug}["']`),
     ],
-    [
-      "timeline registration",
-      new RegExp(
-        `__timelines\\s*\\[\\s*["']${frame.slug}["']\\s*\\]`,
-      ),
-    ],
     ["real proof footage", new RegExp(expectedAsset.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))],
     ["video element", /<video[\s>]/i],
     ["paused GSAP timeline", /gsap\.timeline\(\s*\{\s*paused:\s*true/i],
   ]) {
     if (!expression.test(html)) fail(`${frame.slug}: missing ${label}`);
+  }
+  const directTimeline = new RegExp(
+    `__timelines\\s*\\[\\s*["']${frame.slug}["']\\s*\\]`,
+  ).test(html);
+  const namedTimeline = new RegExp(
+    `const\\s+compositionId\\s*=\\s*["']${frame.slug}["'][\\s\\S]*`
+      + `__timelines\\s*\\[\\s*compositionId\\s*\\]`,
+  ).test(html);
+  if (!directTimeline && !namedTimeline) {
+    fail(`${frame.slug}: missing timeline registration`);
   }
   if (/(?:Date\.now|Math\.random|repeat\s*:\s*-1)/i.test(html)) {
     fail(`${frame.slug}: non-deterministic runtime code detected`);
