@@ -28,7 +28,8 @@
             "dur": 5,
             "card": {
               "title": "Card"
-            }
+            },
+            "actions": null
           }
         ]
       }

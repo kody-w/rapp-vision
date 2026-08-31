@@ -109,6 +109,7 @@ class TestPublicationPolicy(unittest.TestCase):
         self.assertTrue(any("videos[0].chapters: must be an array" in error for error in errors))
         self.assertTrue(any("live.duration: must be greater than zero" in error for error in errors))
         self.assertTrue(any("live.chapters: must be an array" in error for error in errors))
+        self.assertTrue(any("scenes[0].actions: must be an array" in error for error in errors))
 
         completed = subprocess.run(
             [sys.executable, str(VALIDATOR_PATH), str(fixture)],
@@ -123,9 +124,11 @@ class TestPublicationPolicy(unittest.TestCase):
         schema = load(ROOT / "channel.schema.json")
         publication = schema["$defs"]["publication"]["properties"]
         live = publication["live"]["properties"]
+        scene = live["scenes"]["items"]["properties"]
         self.assertEqual(publication["chapters"]["type"], "array")
         self.assertEqual(live["chapters"]["type"], "array")
         self.assertEqual(live["duration"]["type"], "number")
+        self.assertEqual(scene["actions"]["type"], "array")
 
     def test_frozen_legacy_identity_source_and_content_are_all_required(self):
         legacy = load(ROOT / "frame-chains" / "channel.json")

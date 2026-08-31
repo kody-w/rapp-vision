@@ -168,7 +168,8 @@ class TestPairedPlayer(unittest.TestCase):
           for (const expected of [
             "videos[0].chapters: must be an array",
             "live.duration: must be greater than zero",
-            "live.chapters: must be an array"
+            "live.chapters: must be an array",
+            "scenes[0].actions: must be an array"
           ]) {{
             if (!errors.some(error => error.includes(expected)))
               throw new Error(`browser accepted explicit null: ${{expected}}`);

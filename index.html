@@ -346,7 +346,7 @@ function validateLiveReplay(live, path) {
       else if ("enabled" in scene.ready && typeof scene.ready.enabled !== "boolean")
         out.push(`${sp}.ready.enabled: must be boolean`);
     }
-    const actions = scene.actions || [];
+    const actions = "actions" in scene ? scene.actions : [];
     if (!Array.isArray(actions)) out.push(`${sp}.actions: must be an array`);
     else {
       if (actions.length && !appScene) out.push(`${sp}.actions: card scenes cannot contain actions`);
