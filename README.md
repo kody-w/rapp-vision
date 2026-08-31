@@ -185,6 +185,10 @@ The player validates the fetched channel before rendering it. For a paired
 entry, encoded video is always the initial mode; live replay is a switch on the
 same entry, not a second card.
 
+Channel and publication ids use one collision-safe grammar:
+`[A-Za-z0-9][A-Za-z0-9._-]*`. Slashes, percent escapes, whitespace, and control
+characters are invalid.
+
 Entry `duration` and `chapters` describe the encoded film. The replay may be
 longer or shorter: its duration is derived from the contiguous scene endpoints,
 or declared as `live.duration` and checked against them. Optional
@@ -197,7 +201,9 @@ A scene is either a **card** (`card: {title, sub, note}`) or an **app**
 (`app`, plus optional `lower: {title, bench, bug, fix}` for the lower third).
 App URLs must be safe relative URLs or absolute `https://` URLs. Executable,
 local, blob, data, plain-HTTP, and protocol-relative schemes are rejected both
-before and after resolution.
+before and after resolution. Authorities and ports are parsed with browser
+semantics, and pathnames are percent-decoded before encoded separators,
+backslashes, semicolon parameters, or control characters are checked.
 
 `ready: { selector }` or `ready: { text }` declares what "this app is usable"
 means. Every `at` is measured from the moment that becomes true, not from scene
@@ -231,7 +237,8 @@ Two things that will silently cost you a scene:
 coverage: headless Chromium commonly has no H.264 decoder, so WebM makes the
 guided layer verifiable in CI, while MP4 covers browsers and devices that do
 not ship WebM support. MIME bases are canonical lowercase (`video/mp4` and
-`video/webm`) in the schema and both validators. The two sources must resolve
+`video/webm`) in the schema and both validators; surrounding base whitespace is
+trimmed consistently before validation and codec probing. The two sources must resolve
 to distinct URLs, and their URL pathnames must end in the matching lowercase
 `.mp4` and `.webm` extensions; query strings and fragments are allowed.
 Semicolon pathname parameters are not allowed and are never stripped before

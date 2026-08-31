@@ -277,24 +277,39 @@ const LIVE_REPLAY_KIND = "rapp-vision-live/1.0";
 const MAX_PUBLICATION_DURATION = 86400;
 const rvObject = v => !!v && typeof v === "object" && !Array.isArray(v);
 const rvString = v => typeof v === "string" && !!v.trim();
+const rvId = v => typeof v === "string" && /^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(v);
 const rvNumber = v => typeof v === "number" && Number.isFinite(v);
 const rvPoint = v => Array.isArray(v) && v.length === 2 && v.every(rvNumber);
 const rvTarget = v => rvObject(v) && (rvString(v.selector) !== rvString(v.text));
+const decodedUrlPath = parsed => {
+  if (/%(?:2[fF]|5[cC])/.test(parsed.pathname))
+    return { path: "", error: "encoded path separators or backslashes are not allowed" };
+  let path;
+  try { path = decodeURIComponent(parsed.pathname); }
+  catch { return { path: "", error: "pathname contains invalid percent encoding" }; }
+  if (path.includes(";")) return { path, error: "pathname parameters are not allowed" };
+  if (path.includes("\\")) return { path: "", error: "encoded path separators or backslashes are not allowed" };
+  if ([...path].some(char => char.charCodeAt(0) < 32 || /\s/.test(char)))
+    return { path: "", error: "pathname contains encoded whitespace or control characters" };
+  return { path, error: "" };
+};
 const safeAppUrl = value => {
   if (!rvString(value) || value !== value.trim() || /\s|\\/.test(value) || value.startsWith("//"))
     return false;
   try {
     const absolute = /^[A-Za-z][A-Za-z0-9+.-]*:/.test(value);
     const parsed = new URL(value, "https://relative.invalid/channel.json");
-    if (parsed.pathname.includes(";")) return false;
+    const decoded = decodedUrlPath(parsed);
+    if (decoded.error) return false;
     return absolute ? value.startsWith("https://") && parsed.protocol === "https:" && !!parsed.host
-                    : parsed.origin === "https://relative.invalid" && !!parsed.pathname;
+                    : parsed.origin === "https://relative.invalid" && !!decoded.path;
   } catch { return false; }
 };
 const safeResolvedAppUrl = (raw, resolved, base) => {
   if (!safeAppUrl(raw)) return "";
   try {
     const target = new URL(resolved), channel = new URL(base);
+    if (decodedUrlPath(target).error) return "";
     if (/^https:/i.test(raw)) return target.protocol === "https:" ? target.href : "";
     return target.origin === channel.origin && /^(https?|http):$/.test(target.protocol)
       ? target.href : "";
@@ -303,6 +318,7 @@ const safeResolvedAppUrl = (raw, resolved, base) => {
 const renderableAppUrl = value => {
   try {
     const target = new URL(value, location.href);
+    if (decodedUrlPath(target).error) return "";
     if (target.protocol === "https:") return target.href;
     return target.protocol === "http:" && target.origin === location.origin ? target.href : "";
   } catch { return ""; }
@@ -398,7 +414,7 @@ function validateLiveReplay(live, path) {
 function validatePairedPublication(v, path, sourceUrl) {
   const out = [];
   if (!rvObject(v)) return [`${path}: must be an object`];
-  ["id", "title"].forEach(k => { if (!rvString(v[k])) out.push(`${path}.${k}: must be a non-empty string`); });
+  if (!rvString(v.title)) out.push(`${path}.title: must be a non-empty string`);
   const duration = rvNumber(v.duration) && v.duration > 0 && v.duration <= MAX_PUBLICATION_DURATION
     ? v.duration : 0;
   if (!duration) out.push(`${path}.duration: must be greater than zero and at most ${MAX_PUBLICATION_DURATION}`);
@@ -411,6 +427,7 @@ function validatePairedPublication(v, path, sourceUrl) {
     if (!rvObject(s)) { out.push(`${sp}: must be an object`); return; }
     if (!rvString(s.src)) out.push(`${sp}.src: must be a non-empty string`);
     let mediaUrl = null;
+    let mediaPath = "";
     if (rvString(s.src)) {
       try {
         mediaUrl = new URL(s.src, sourceUrl);
@@ -418,19 +435,20 @@ function validatePairedPublication(v, path, sourceUrl) {
         if (resolvedSources.has(mediaUrl.href))
           out.push(`${sp}.src: media source URLs must be distinct`);
         resolvedSources.add(mediaUrl.href);
-        if (mediaUrl.pathname.includes(";"))
-          out.push(`${sp}.src: pathname parameters are not allowed`);
+        const decoded = decodedUrlPath(mediaUrl);
+        if (decoded.error) out.push(`${sp}.src: ${decoded.error}`);
+        mediaPath = decoded.path;
       } catch { out.push(`${sp}.src: must resolve to a valid URL`); }
     }
     if (!rvString(s.type)) out.push(`${sp}.type: must be a non-empty media type`);
     else {
-      const match = /^video\/(mp4|webm)(?:\s*;.*)?$/.exec(s.type);
+      const match = /^\s*video\/(mp4|webm)\s*(?:;.*)?$/.exec(s.type);
       if (!match)
         out.push(`${sp}.type: only video/mp4 and video/webm are allowed`);
       else {
         const mediaType = `video/${match[1]}`;
         types.add(mediaType);
-        if (!mediaUrl || !mediaUrl.pathname.endsWith(`.${match[1]}`))
+        if (!mediaUrl || !mediaPath || !mediaPath.endsWith(`.${match[1]}`))
           out.push(`${sp}.src: ${mediaType} requires a .${match[1]} pathname`);
       }
     }
@@ -467,12 +485,17 @@ function legacyPublicationDigest(record, publicationId) {
 async function validateChannelContract(channel, sourceUrl, policy = LEGACY_POLICY) {
   const out = [];
   if (!rvObject(channel)) return ["channel: must be an object"];
-  if (!rvString(channel.id)) out.push("channel.id: must be a non-empty string");
+  if (!rvId(channel.id))
+    out.push("channel.id: must start alphanumeric and contain only alphanumeric, dot, underscore, or hyphen");
   if (!rvString(channel.name)) out.push("channel.name: must be a non-empty string");
   const videos = Array.isArray(channel.videos) ? channel.videos : [];
   if (!videos.length) out.push("channel.videos: must be a non-empty array");
   const ids = videos.filter(rvObject).map(v => v.id);
   if (new Set(ids).size !== ids.length) out.push("channel.videos: publication ids must be unique");
+  videos.forEach((v, i) => {
+    if (rvObject(v) && !rvId(v.id))
+      out.push(`channel.videos[${i}].id: must start alphanumeric and contain only alphanumeric, dot, underscore, or hyphen`);
+  });
   if (channel.schema === CURRENT_CHANNEL_SCHEMA)
     videos.forEach((v, i) => out.push(
       ...validatePairedPublication(v, `channel.videos[${i}]`, sourceUrl)

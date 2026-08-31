@@ -191,7 +191,9 @@ class TestPairedPlayer(unittest.TestCase):
             "javascript:alert(1)", "data:text/html,bad", "blob:https://example.test/id",
             "file:///tmp/app.html", "http://example.test/app.html",
             "//example.test/app.html", "\\\\\\\\example.test\\\\app.html",
-            "https://[", "../app.html;execute"
+            "https://[", "../app.html;execute", "../app.html%3Bexecute",
+            "../app%2Fchild.html", "../app%5Cchild.html",
+            "https://example.test:999999/app.html"
           ]) {{
             const channel = {valid};
             channel.videos[0].live.scenes[1].app = app;
@@ -228,6 +230,22 @@ class TestPairedPlayer(unittest.TestCase):
           if (!errors.some(error => error.includes("pathname parameters are not allowed")))
             throw new Error("parameterized media path accepted");
 
+          const encoded = {valid};
+          encoded.videos[0].sources[0].src = "paired.mp4%3Bserved-as-html";
+          errors = await validateChannelContract(
+            encoded, "https://example.test/channel.json"
+          );
+          if (!errors.some(error => error.includes("pathname parameters are not allowed")))
+            throw new Error("encoded parameterized media path accepted");
+
+          const whitespaceMime = {valid};
+          whitespaceMime.videos[0].sources[0].type = "video/mp4 ; codecs=\\\"avc1\\\"";
+          errors = await validateChannelContract(
+            whitespaceMime, "https://example.test/channel.json"
+          );
+          if (errors.some(error => error.includes("only video/mp4 and video/webm")))
+            throw new Error("trimmed lowercase MIME was rejected");
+
           const duplicate = {valid};
           duplicate.videos[0].sources = [
             {{src:"same.mp4#one",type:"video/mp4"}},
@@ -239,6 +257,33 @@ class TestPairedPlayer(unittest.TestCase):
           );
           if (!errors.some(error => error.includes("media source URLs must be distinct")))
             throw new Error("duplicate media URL accepted");
+        }})().catch(error => {{ console.error(error); process.exit(1); }});
+        """
+        self.run_node(script)
+
+    def test_browser_rejects_scoped_identity_separator_collisions(self):
+        valid = json.dumps(json.loads(
+            (ROOT / "tests/fixtures/publications/valid-paired.json").read_text()
+        ))
+        script = f"""
+        if (!globalThis.crypto) globalThis.crypto = require("crypto").webcrypto;
+        let LEGACY_POLICY = {{channels:[]}};
+        {contract_block()}
+        (async () => {{
+          const channelSlash = {valid};
+          channelSlash.id = "a/b";
+          let errors = await validateChannelContract(
+            channelSlash, "https://example.test/channel.json"
+          );
+          if (!errors.some(error => error.includes("channel.id: must start alphanumeric")))
+            throw new Error("channel slash collision accepted");
+          const publicationSlash = {valid};
+          publicationSlash.videos[0].id = "b/c";
+          errors = await validateChannelContract(
+            publicationSlash, "https://example.test/channel.json"
+          );
+          if (!errors.some(error => error.includes("videos[0].id: must start alphanumeric")))
+            throw new Error("publication slash collision accepted");
         }})().catch(error => {{ console.error(error); process.exit(1); }});
         """
         self.run_node(script)

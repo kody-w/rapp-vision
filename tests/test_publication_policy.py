@@ -102,6 +102,34 @@ class TestPublicationPolicy(unittest.TestCase):
         pattern = schema["$defs"]["source"]["properties"]["type"]["pattern"]
         self.assertIsNone(re.fullmatch(pattern, "Video/MP4"))
         self.assertIsNotNone(re.fullmatch(pattern, "video/mp4; codecs=\"avc1\""))
+        self.assertIsNotNone(re.fullmatch(pattern, "video/mp4 ; codecs=\"avc1\""))
+        whitespace = copy.deepcopy(self.valid)
+        whitespace["videos"][0]["sources"][0]["type"] = "video/mp4 ; codecs=\"avc1\""
+        self.assertEqual(self.validate(whitespace), [])
+
+    def test_channel_and_publication_ids_use_one_collision_safe_grammar(self):
+        schema = load(ROOT / "channel.schema.json")
+        channel_pattern = schema["properties"]["id"]["pattern"]
+        publication_pattern = schema["$defs"]["publication"]["properties"]["id"]["pattern"]
+        self.assertEqual(channel_pattern, publication_pattern)
+
+        for record in self.policy["channels"]:
+            self.assertTrue(VALIDATOR.valid_id(record["id"]), record["id"])
+            self.assertIsNotNone(re.fullmatch(channel_pattern, record["id"]))
+            for publication in record["publications"]:
+                self.assertTrue(VALIDATOR.valid_id(publication["id"]), publication["id"])
+                self.assertIsNotNone(re.fullmatch(publication_pattern, publication["id"]))
+
+        for invalid in ("a/b", "b/c", "percent%2Fid", "two words", "\ncontrol"):
+            with self.subTest(invalid=invalid):
+                self.assertFalse(VALIDATOR.valid_id(invalid))
+                self.assertIsNone(re.fullmatch(channel_pattern, invalid))
+                channel = copy.deepcopy(self.valid)
+                channel["id"] = invalid
+                self.assertTrue(any("channel.id: must start alphanumeric" in error for error in self.validate(channel)))
+                channel = copy.deepcopy(self.valid)
+                channel["videos"][0]["id"] = invalid
+                self.assertTrue(any("videos[0].id: must start alphanumeric" in error for error in self.validate(channel)))
 
     def test_live_app_urls_allow_only_relative_or_absolute_https(self):
         schema = load(ROOT / "channel.schema.json")
@@ -131,6 +159,10 @@ class TestPublicationPolicy(unittest.TestCase):
             "?app=demo",
             "https://[",
             "../app.html;execute",
+            "../app.html%3Bexecute",
+            "../app%2Fchild.html",
+            "../app%5Cchild.html",
+            "https://example.test:999999/app.html",
         ]
         for app in safe:
             with self.subTest(app=app, allowed=True):
@@ -175,11 +207,11 @@ class TestPublicationPolicy(unittest.TestCase):
         source_rules = schema["$defs"]["source"]["allOf"]
         self.assertEqual(
             source_rules[0]["then"]["properties"]["src"]["pattern"],
-            "^(?![^?#]*;)[^?#]*\\.mp4(?:[?#].*)?$",
+            "^(?![^?#]*(?:;|%3[bB]|%2[fF]|%5[cC]))[^?#]*\\.mp4(?:[?#].*)?$",
         )
         self.assertEqual(
             source_rules[1]["then"]["properties"]["src"]["pattern"],
-            "^(?![^?#]*;)[^?#]*\\.webm(?:[?#].*)?$",
+            "^(?![^?#]*(?:;|%3[bB]|%2[fF]|%5[cC]))[^?#]*\\.webm(?:[?#].*)?$",
         )
         self.assertIsNotNone(re.search(
             source_rules[0]["then"]["properties"]["src"]["pattern"],
@@ -191,17 +223,28 @@ class TestPublicationPolicy(unittest.TestCase):
         ))
 
     def test_parameterized_media_path_is_rejected_and_preserved_for_local_probe(self):
-        channel = copy.deepcopy(self.valid)
-        channel["videos"][0]["sources"][0]["src"] = "paired.mp4;served-as-html"
-        errors = self.validate(channel)
-        self.assertTrue(any("pathname parameters are not allowed" in error for error in errors))
-        self.assertTrue(any("video/mp4 requires a .mp4 pathname" in error for error in errors))
+        for source in (
+            "paired.mp4;served-as-html",
+            "paired.mp4%3Bserved-as-html",
+            "dir%2Fpaired.mp4",
+            "dir%5Cpaired.mp4",
+        ):
+            with self.subTest(source=source):
+                channel = copy.deepcopy(self.valid)
+                channel["videos"][0]["sources"][0]["src"] = source
+                errors = self.validate(channel)
+                self.assertTrue(any(
+                    "pathname parameters are not allowed" in error
+                    or "encoded path separators or backslashes are not allowed" in error
+                    for error in errors
+                ))
 
         schema = load(ROOT / "channel.schema.json")
         pattern = schema["$defs"]["source"]["allOf"][0]["then"]["properties"]["src"][
             "pattern"
         ]
         self.assertIsNone(re.search(pattern, "paired.mp4;served-as-html"))
+        self.assertIsNone(re.search(pattern, "paired.mp4%3Bserved-as-html"))
 
         represented = VALIDATOR.local_media_path(
             ROOT / "channel.json",
@@ -211,6 +254,18 @@ class TestPublicationPolicy(unittest.TestCase):
             represented.name,
             "rock-tumbler-showcase.mp4;served-as-html",
         )
+        encoded_represented = VALIDATOR.local_media_path(
+            ROOT / "channel.json",
+            "media/rock-tumbler-showcase.mp4%3Bserved-as-html",
+        )
+        self.assertEqual(
+            encoded_represented.name,
+            "rock-tumbler-showcase.mp4;served-as-html",
+        )
+        self.assertIsNone(VALIDATOR.local_media_path(
+            ROOT / "channel.json",
+            "media%2Frock-tumbler-showcase.mp4",
+        ))
         calls = []
 
         def runner(command, **_kwargs):
@@ -272,14 +327,25 @@ class TestPublicationPolicy(unittest.TestCase):
                 command, 0, stdout='{"streams":[{"codec_name":"mpeg4"}]}', stderr=""
             )
 
+        whitespace_type = copy.deepcopy(channel)
+        whitespace_type["videos"][0]["sources"][0][
+            "type"
+        ] = "video/mp4 ; codecs=\"avc1\""
+        calls = []
+
+        def whitespace_runner(command, **_kwargs):
+            calls.append(command)
+            return wrong_runner(command)
+
         self.assertTrue(any(
             "expected ['h264'] video codec" in error
             for error in VALIDATOR.ffprobe_local_media(
-                {"videos": [{"sources": [channel["videos"][0]["sources"][0]]}]},
+                {"videos": [{"sources": [whitespace_type["videos"][0]["sources"][0]]}]},
                 ROOT / "channel.json",
-                runner=wrong_runner,
+                runner=whitespace_runner,
             )
         ))
+        self.assertEqual(len(calls), 1)
 
     def test_explicit_null_optionals_fail_cli_and_schema(self):
         fixture = FIXTURES / "invalid-null-optionals.json"

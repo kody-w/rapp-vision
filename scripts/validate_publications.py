@@ -31,6 +31,7 @@ EXPECTED_VIDEO_CODECS = {
     "video/mp4": {"h264"},
     "video/webm": {"vp9"},
 }
+ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 
 def is_object(value: Any) -> bool:
@@ -43,6 +44,27 @@ def is_number(value: Any) -> bool:
 
 def nonempty_string(value: Any) -> bool:
     return isinstance(value, str) and bool(value.strip())
+
+
+def valid_id(value: Any) -> bool:
+    return isinstance(value, str) and bool(ID_PATTERN.fullmatch(value))
+
+
+def decoded_url_path(parsed) -> tuple[str | None, str | None]:
+    raw_path = parsed.path
+    if re.search(r"%(?:2[fF]|5[cC])", raw_path):
+        return None, "encoded path separators or backslashes are not allowed"
+    try:
+        decoded = unquote(raw_path, errors="strict")
+    except UnicodeDecodeError:
+        return None, "pathname contains invalid percent encoding"
+    if ";" in decoded:
+        return decoded, "pathname parameters are not allowed"
+    if "\\" in decoded:
+        return None, "encoded path separators or backslashes are not allowed"
+    if any(ord(char) < 32 or char.isspace() for char in decoded):
+        return None, "pathname contains encoded whitespace or control characters"
+    return decoded, None
 
 
 def target_shape(value: Any) -> bool:
@@ -68,13 +90,15 @@ def safe_app_url(value: Any) -> bool:
         return False
     try:
         parsed = urlsplit(value)
+        parsed.port
     except ValueError:
         return False
-    if ";" in parsed.path:
+    decoded_path, path_error = decoded_url_path(parsed)
+    if path_error:
         return False
     if parsed.scheme:
         return value.startswith("https://") and parsed.scheme == "https" and bool(parsed.netloc)
-    return not parsed.netloc and bool(parsed.path)
+    return not parsed.netloc and bool(decoded_path)
 
 
 def validate_action(action: Any, duration: float, path: str) -> list[str]:
@@ -220,9 +244,8 @@ def validate_publication(video: Any, path: str, source_url: str) -> list[str]:
     errors: list[str] = []
     if not is_object(video):
         return [f"{path}: must be an object"]
-    for field in ("id", "title"):
-        if not nonempty_string(video.get(field)):
-            errors.append(f"{path}.{field}: must be a non-empty string")
+    if not nonempty_string(video.get("title")):
+        errors.append(f"{path}.title: must be a non-empty string")
 
     duration = video.get("duration")
     if not is_number(duration) or duration <= 0 or duration > MAX_DURATION:
@@ -244,6 +267,8 @@ def validate_publication(video: Any, path: str, source_url: str) -> list[str]:
             if not is_object(source):
                 errors.append(f"{source_path}: must be an object")
                 continue
+            parsed_source = None
+            decoded_path = None
             if not nonempty_string(source.get("src")):
                 errors.append(f"{source_path}.src: must be a non-empty string")
                 source_url_value = ""
@@ -251,6 +276,7 @@ def validate_publication(video: Any, path: str, source_url: str) -> list[str]:
                 try:
                     source_url_value = urljoin(source_url, source["src"])
                     parsed_source = urlsplit(source_url_value)
+                    parsed_source.port
                 except ValueError:
                     errors.append(f"{source_path}.src: must resolve to a valid URL")
                     source_url_value = ""
@@ -269,13 +295,15 @@ def validate_publication(video: Any, path: str, source_url: str) -> list[str]:
                     errors.append(f"{source_path}.src: media source URLs must be distinct")
                 if comparable_url:
                     resolved_sources.add(comparable_url)
-                if parsed_source and ";" in parsed_source.path:
-                    errors.append(f"{source_path}.src: pathname parameters are not allowed")
+                if parsed_source:
+                    decoded_path, path_error = decoded_url_path(parsed_source)
+                    if path_error:
+                        errors.append(f"{source_path}.src: {path_error}")
             source_type = source.get("type")
             if not nonempty_string(source_type):
                 errors.append(f"{source_path}.type: must be a non-empty media type")
                 continue
-            match = re.fullmatch(r"video/(mp4|webm)(?:\s*;.*)?", source_type)
+            match = re.fullmatch(r"\s*video/(mp4|webm)\s*(?:;.*)?", source_type)
             if not match:
                 errors.append(f"{source_path}.type: only video/mp4 and video/webm are allowed")
             else:
@@ -285,7 +313,8 @@ def validate_publication(video: Any, path: str, source_url: str) -> list[str]:
                 if (
                     not source_url_value
                     or not parsed_source
-                    or not parsed_source.path.endswith(expected_extension)
+                    or not decoded_path
+                    or not decoded_path.endswith(expected_extension)
                 ):
                     errors.append(
                         f"{source_path}.src: {media_type} requires a {expected_extension} pathname"
@@ -334,11 +363,18 @@ def publication_digest(publication: Any) -> str:
 def local_media_path(channel_path: Path, source: str) -> Path | None:
     try:
         parsed = urlsplit(source)
+        parsed.port
     except ValueError:
         return None
     if parsed.scheme or parsed.netloc:
         return None
-    candidate = (channel_path.parent / unquote(parsed.path)).resolve()
+    if re.search(r"%(?:2[fF]|5[cC])", parsed.path):
+        return None
+    try:
+        exact_path = unquote(parsed.path, errors="strict")
+    except UnicodeDecodeError:
+        return None
+    candidate = (channel_path.parent / exact_path).resolve()
     try:
         candidate.relative_to(ROOT)
     except ValueError:
@@ -367,7 +403,7 @@ def ffprobe_local_media(
             if not media_path.is_file():
                 errors.append(f"{path}.src: local media file does not exist: {media_path}")
                 continue
-            source_type = str(source.get("type", "")).split(";", 1)[0]
+            source_type = str(source.get("type", "")).split(";", 1)[0].strip()
             expected = EXPECTED_VIDEO_CODECS.get(source_type)
             if not expected:
                 continue
@@ -422,8 +458,10 @@ def validate_channel(
     errors: list[str] = []
     if not is_object(channel):
         return ["channel: must be an object"]
-    if not nonempty_string(channel.get("id")):
-        errors.append("channel.id: must be a non-empty string")
+    if not valid_id(channel.get("id")):
+        errors.append(
+            "channel.id: must start alphanumeric and contain only alphanumeric, dot, underscore, or hyphen"
+        )
     if not nonempty_string(channel.get("name")):
         errors.append("channel.name: must be a non-empty string")
     videos = channel.get("videos")
@@ -434,6 +472,11 @@ def validate_channel(
     ids = [video.get("id") for video in videos if is_object(video)]
     if len(ids) != len(set(ids)):
         errors.append("channel.videos: publication ids must be unique")
+    for index, video in enumerate(videos):
+        if is_object(video) and not valid_id(video.get("id")):
+            errors.append(
+                f"channel.videos[{index}].id: must start alphanumeric and contain only alphanumeric, dot, underscore, or hyphen"
+            )
 
     schema = channel.get("schema")
     if schema == CURRENT_SCHEMA:

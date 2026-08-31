@@ -6,7 +6,10 @@
   "required": ["schema", "id", "name", "videos"],
   "properties": {
     "schema": { "const": "rapp-vision-channel/2.0" },
-    "id": { "type": "string", "minLength": 1 },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
     "name": { "type": "string", "minLength": 1 },
     "videos": {
       "type": "array",
@@ -22,29 +25,29 @@
         "src": { "type": "string", "minLength": 1 },
         "type": {
           "type": "string",
-          "pattern": "^video/(mp4|webm)(?:\\s*;.*)?$"
+          "pattern": "^\\s*video/(mp4|webm)\\s*(?:;.*)?$"
         }
       },
       "allOf": [
         {
           "if": {
-            "properties": { "type": { "pattern": "^video/mp4(?:\\s*;.*)?$" } },
+            "properties": { "type": { "pattern": "^\\s*video/mp4\\s*(?:;.*)?$" } },
             "required": ["type"]
           },
           "then": {
             "properties": {
-              "src": { "pattern": "^(?![^?#]*;)[^?#]*\\.mp4(?:[?#].*)?$" }
+              "src": { "pattern": "^(?![^?#]*(?:;|%3[bB]|%2[fF]|%5[cC]))[^?#]*\\.mp4(?:[?#].*)?$" }
             }
           }
         },
         {
           "if": {
-            "properties": { "type": { "pattern": "^video/webm(?:\\s*;.*)?$" } },
+            "properties": { "type": { "pattern": "^\\s*video/webm\\s*(?:;.*)?$" } },
             "required": ["type"]
           },
           "then": {
             "properties": {
-              "src": { "pattern": "^(?![^?#]*;)[^?#]*\\.webm(?:[?#].*)?$" }
+              "src": { "pattern": "^(?![^?#]*(?:;|%3[bB]|%2[fF]|%5[cC]))[^?#]*\\.webm(?:[?#].*)?$" }
             }
           }
         }
@@ -72,7 +75,10 @@
       "type": "object",
       "required": ["id", "title", "duration", "sources", "live"],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
         "title": { "type": "string", "minLength": 1 },
         "duration": { "type": "number", "exclusiveMinimum": 0, "maximum": 86400 },
         "chapters": {
@@ -127,10 +133,10 @@
                     "oneOf": [
                       {
                         "format": "uri",
-                        "pattern": "^https://(?:[A-Za-z0-9.-]+|\\[[0-9A-Fa-f:.]+\\])(?::[0-9]+)?(?![^?#]*;)[^\\s\\\\]*$"
+                        "pattern": "^https://(?:[A-Za-z0-9.-]+|\\[[0-9A-Fa-f:.]+\\])(?::(?:[0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))?(?![^?#]*(?:;|%3[bB]|%2[fF]|%5[cC]))(?:/[^\\s\\\\?#]*)?(?:[?#][^\\s\\\\]*)?$"
                       },
                       {
-                        "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:|//)(?!.*\\\\)(?![^?#]*;)[^\\s?#][^\\s]*$"
+                        "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:|//)(?!.*\\\\)(?![^?#]*(?:;|%3[bB]|%2[fF]|%5[cC]))[^\\s?#][^\\s]*$"
                       }
                     ]
                   },
