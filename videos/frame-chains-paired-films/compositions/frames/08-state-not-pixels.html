@@ -1,0 +1,597 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-400.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-700.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #242424;
+      font-family: "Inter", sans-serif;
+    }
+
+    .f08-state-not-pixels-ground {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: #ffffff;
+    }
+
+    .f08-state-not-pixels-viewport {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      width: 1872px;
+      height: 836px;
+      overflow: hidden;
+      z-index: 1;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 12px;
+      background: #151718;
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    .f08-state-not-pixels-world {
+      position: absolute;
+      top: -24px;
+      left: -24px;
+      width: 1920px;
+      height: 1080px;
+      transform-origin: 50% 50%;
+      will-change: transform;
+    }
+
+    .f08-state-not-pixels-media-layer {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      will-change: transform, opacity;
+    }
+
+    .f08-state-not-pixels-proof-video {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      object-fit: cover;
+    }
+
+    .f08-state-not-pixels-route {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      z-index: 4;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    .f08-state-not-pixels-route path {
+      fill: none;
+      stroke: #0067b8;
+      stroke-width: 7px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .f08-state-not-pixels-route circle {
+      fill: #ffffff;
+      stroke: #0067b8;
+      stroke-width: 5px;
+    }
+
+    .f08-state-not-pixels-state-card {
+      position: absolute;
+      top: 62px;
+      left: 66px;
+      width: 520px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .f08-state-not-pixels-state-inner {
+      padding: 18px 24px 22px;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    .f08-state-not-pixels-index {
+      margin-bottom: 8px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .f08-state-not-pixels-state-title {
+      font-size: 58px;
+      font-weight: 400;
+      line-height: 1.02;
+      letter-spacing: -0.022em;
+    }
+
+    .f08-state-not-pixels-proof-tag {
+      position: absolute;
+      top: 80px;
+      right: 72px;
+      z-index: 11;
+      pointer-events: none;
+    }
+
+    .f08-state-not-pixels-proof-tag-inner {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 248px;
+      padding: 15px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 8px;
+      background: rgba(21, 23, 24, 0.94);
+      color: #ffffff;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .f08-state-not-pixels-proof-tag-x {
+      color: #f8d5e0;
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .f08-state-not-pixels-preserved {
+      position: absolute;
+      right: 72px;
+      bottom: 246px;
+      z-index: 12;
+      width: 560px;
+      pointer-events: none;
+    }
+
+    .f08-state-not-pixels-preserved-inner {
+      padding: 20px 24px;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.97);
+      color: #242424;
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 25px;
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .f08-state-not-pixels-preserved-rule {
+      display: block;
+      width: 100%;
+      height: 1px;
+      margin-bottom: 14px;
+      background: rgba(36, 36, 36, 0.2);
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="08-state-not-pixels"
+    data-width="1920"
+    data-height="1080"
+    data-duration="11.221"
+  >
+    <div
+      id="f08-state-not-pixels-ground"
+      class="clip f08-state-not-pixels-ground"
+      data-start="0"
+      data-duration="11.221"
+      data-track-index="0"
+    ></div>
+
+    <div class="f08-state-not-pixels-viewport">
+      <div
+        id="f08-state-not-pixels-world"
+        class="f08-state-not-pixels-world"
+        data-layout-allow-overflow
+      >
+        <div
+          id="f08-state-not-pixels-transfer-layer"
+          class="f08-state-not-pixels-media-layer"
+        >
+          <video
+            id="f08-state-not-pixels-transfer-video"
+            class="clip f08-state-not-pixels-proof-video"
+            src="assets/proof-clips/08-teleporting-roguelike/source.webm"
+            data-start="0"
+            data-duration="6.5"
+            data-media-start="2.5"
+            data-playback-rate="0.6"
+            data-track-index="1"
+            muted
+            playsinline
+            preload="auto"
+          ></video>
+        </div>
+
+        <div
+          id="f08-state-not-pixels-item-layer"
+          class="f08-state-not-pixels-media-layer"
+        >
+          <video
+            id="f08-state-not-pixels-item-video"
+            class="clip f08-state-not-pixels-proof-video"
+            src="assets/proof-clips/08-teleporting-roguelike/source.webm"
+            data-start="6.5"
+            data-duration="2.4"
+            data-media-start="9"
+            data-track-index="2"
+            muted
+            playsinline
+            preload="auto"
+          ></video>
+        </div>
+
+        <div
+          id="f08-state-not-pixels-parent-layer"
+          class="f08-state-not-pixels-media-layer"
+        >
+          <video
+            id="f08-state-not-pixels-parent-video"
+            class="clip f08-state-not-pixels-proof-video"
+            src="assets/proof-clips/08-teleporting-roguelike/source.webm"
+            data-start="8.9"
+            data-duration="2.321"
+            data-media-start="17.7"
+            data-track-index="3"
+            muted
+            playsinline
+            preload="auto"
+          ></video>
+        </div>
+
+        <svg
+          class="f08-state-not-pixels-route"
+          viewBox="0 0 1920 1080"
+          aria-hidden="true"
+        >
+          <path
+            id="f08-state-not-pixels-route-path"
+            d="M 682 842 C 710 790, 744 790, 774 842"
+          ></path>
+          <circle cx="682" cy="842" r="10"></circle>
+          <circle cx="774" cy="842" r="10"></circle>
+        </svg>
+      </div>
+    </div>
+
+    <div
+      id="f08-state-not-pixels-state-card"
+      class="clip f08-state-not-pixels-state-card"
+      data-start="0"
+      data-duration="6.5"
+      data-track-index="4"
+    >
+      <div
+        id="f08-state-not-pixels-state-inner"
+        class="f08-state-not-pixels-state-inner"
+      >
+        <div class="f08-state-not-pixels-index">Frame 08</div>
+        <div class="f08-state-not-pixels-state-title">State, not pixels</div>
+      </div>
+    </div>
+
+    <div
+      id="f08-state-not-pixels-item-clip"
+      class="clip f08-state-not-pixels-proof-tag"
+      data-start="6.5"
+      data-duration="2.4"
+      data-track-index="5"
+    >
+      <div
+        id="f08-state-not-pixels-item-tag"
+        class="f08-state-not-pixels-proof-tag-inner"
+      >
+        <span>ITEM</span>
+        <span class="f08-state-not-pixels-proof-tag-x">✕</span>
+      </div>
+    </div>
+
+    <div
+      id="f08-state-not-pixels-parent-clip"
+      class="clip f08-state-not-pixels-proof-tag"
+      data-start="8.9"
+      data-duration="2.321"
+      data-track-index="6"
+    >
+      <div
+        id="f08-state-not-pixels-parent-tag"
+        class="f08-state-not-pixels-proof-tag-inner"
+      >
+        <span>PARENT</span>
+        <span class="f08-state-not-pixels-proof-tag-x">✕</span>
+      </div>
+    </div>
+
+    <div
+      id="f08-state-not-pixels-preserved-clip"
+      class="clip f08-state-not-pixels-preserved"
+      data-start="8.9"
+      data-duration="2.321"
+      data-track-index="7"
+    >
+      <div
+        id="f08-state-not-pixels-preserved-inner"
+        class="f08-state-not-pixels-preserved-inner"
+      >
+        <span class="f08-state-not-pixels-preserved-rule"></span>
+        Last good head preserved
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script>
+    (() => {
+      const world = document.getElementById("f08-state-not-pixels-world");
+      const routePath = document.getElementById(
+        "f08-state-not-pixels-route-path",
+      );
+      const transferLayer = document.getElementById(
+        "f08-state-not-pixels-transfer-layer",
+      );
+      const itemLayer = document.getElementById(
+        "f08-state-not-pixels-item-layer",
+      );
+      const parentLayer = document.getElementById(
+        "f08-state-not-pixels-parent-layer",
+      );
+      const stateInner = document.getElementById(
+        "f08-state-not-pixels-state-inner",
+      );
+      const itemTag = document.getElementById(
+        "f08-state-not-pixels-item-tag",
+      );
+      const parentTag = document.getElementById(
+        "f08-state-not-pixels-parent-tag",
+      );
+      const preservedInner = document.getElementById(
+        "f08-state-not-pixels-preserved-inner",
+      );
+      const cam = { scale: 1.35, x: 452, y: 123 };
+
+      const applyCamera = () => {
+        gsap.set(world, {
+          x: cam.x,
+          y: cam.y,
+          scale: cam.scale,
+          transformOrigin: "50% 50%",
+        });
+      };
+
+      applyCamera();
+
+      const routeLength = routePath.getTotalLength();
+      routePath.style.strokeDasharray = `${routeLength}`;
+      routePath.style.strokeDashoffset = `${routeLength}`;
+
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo(
+        stateInner,
+        { y: -26, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.48,
+          ease: "power3.out",
+          immediateRender: false,
+        },
+        0.08,
+      );
+
+      tl.to(
+        cam,
+        {
+          scale: 0.9,
+          x: 0,
+          y: -90,
+          duration: 2.45,
+          ease: "power2.inOut",
+          onUpdate: applyCamera,
+        },
+        0.55,
+      );
+
+      tl.to(
+        routePath,
+        {
+          strokeDashoffset: 0,
+          duration: 0.72,
+          ease: "power2.out",
+        },
+        3.35,
+      );
+
+      tl.to(
+        cam,
+        {
+          scale: 1.25,
+          x: 0,
+          y: -453,
+          duration: 1.55,
+          ease: "power4.out",
+          onUpdate: applyCamera,
+        },
+        3.25,
+      );
+
+      tl.to(
+        cam,
+        {
+          scale: 1.28,
+          y: -466,
+          duration: 1.55,
+          ease: "power1.inOut",
+          onUpdate: applyCamera,
+        },
+        4.82,
+      );
+
+      tl.to(
+        cam,
+        {
+          scale: 1.7,
+          x: 568,
+          y: -312,
+          duration: 0.86,
+          ease: "power4.out",
+          onUpdate: applyCamera,
+        },
+        6.5,
+      );
+
+      tl.fromTo(
+        itemTag,
+        { x: 72, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.5,
+          ease: "power4.out",
+          immediateRender: false,
+        },
+        6.82,
+      );
+
+      tl.to(
+        cam,
+        {
+          scale: 1.73,
+          x: 575,
+          y: -320,
+          duration: 1.25,
+          ease: "power1.inOut",
+          onUpdate: applyCamera,
+        },
+        7.42,
+      );
+
+      tl.to(
+        itemLayer,
+        {
+          x: -150,
+          opacity: 0,
+          duration: 0.22,
+          ease: "power4.in",
+        },
+        8.68,
+      );
+      tl.set(itemLayer, { opacity: 0 }, 8.9);
+
+      tl.set(parentLayer, { x: 150, opacity: 0.35 }, 8.9);
+      tl.to(
+        parentLayer,
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.34,
+          ease: "power4.out",
+        },
+        8.9,
+      );
+
+      tl.fromTo(
+        parentTag,
+        { x: 72, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.42,
+          ease: "power4.out",
+          immediateRender: false,
+        },
+        9.08,
+      );
+
+      tl.to(
+        cam,
+        {
+          scale: 1.76,
+          x: 580,
+          y: -326,
+          duration: 1.16,
+          ease: "power1.inOut",
+          onUpdate: applyCamera,
+        },
+        9.2,
+      );
+
+      tl.fromTo(
+        preservedInner,
+        { y: 34, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.62,
+          ease: "power3.out",
+          immediateRender: false,
+        },
+        9.62,
+      );
+
+      tl.to(
+        cam,
+        {
+          scale: 1.78,
+          x: 584,
+          y: -330,
+          duration: 0.861,
+          ease: "none",
+          onUpdate: applyCamera,
+        },
+        10.36,
+      );
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["08-state-not-pixels"] = tl;
+    })();
+  </script>
+</template>
