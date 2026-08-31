@@ -1,4 +1,5 @@
 node_modules/
+.venv-bgm/
 renders/
 snapshots/
 .hyperframes/frame-comments.json

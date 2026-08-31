@@ -1,0 +1,9 @@
+{
+  "provider": "kokoro",
+  "lines": [],
+  "bgm": {
+    "mode": "generate",
+    "query": "restrained cinematic technology pulse, curious then confident, no trailer bombast",
+    "prompt": "Instrumental documentary technology score, restrained pulse, warm analog synth bed, light precise percussion, curious opening that grows into calm confidence, no vocals, no trailer booms, no heroic brass, seamless under narration"
+  }
+}

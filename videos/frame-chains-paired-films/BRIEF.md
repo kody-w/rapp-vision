@@ -7,7 +7,7 @@ destination: rapp-vision
 aspect: 1920x1080
 language: en
 audience: "Newcomers to Frame Chains and RAPP Vision who need context before operating an interactive proof"
-length: 90s
+length: 105s
 angle: "Show-it-as-is documentary trailer built from real captured application footage"
 narration: yes
 ---
@@ -15,7 +15,7 @@ narration: yes
 ## Intent
 
 Produce a real encoded-video suite for the five existing Frame Chains RAPP Vision
-entries. The flagship is a 75-90 second narrated film, **Ten Impossible Worlds,
+entries. The flagship is a roughly 105-second narrated film, **Ten Impossible Worlds,
 One Verifiable History**, built from actual browser footage of all ten public
 showcase applications. Four focused 45-60 second films cover Many Worlds, AI
 Soul Passport, Teleporting Roguelike, and Attack the Timeline.
@@ -56,3 +56,4 @@ same RAPP Vision publication; neither format is complete by itself.
 - The opening must explain the paired model in plain language: watch the film to understand it, then open the live replay to operate it.
 - The most typical direction deliberately rejected is a silent product tour that assumes the viewer already understands Frame Chains.
 - Remembered user defaults applied: 1920x1080, English, automation, and no storyboard checkpoint.
+- The local narrator's measured ten-line delivery is 105.344 seconds, so the flagship target was expanded from 90 seconds rather than unnaturally accelerating the voice.
