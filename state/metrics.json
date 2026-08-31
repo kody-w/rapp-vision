@@ -280,6 +280,101 @@
       "url": "https://github.com/kody-w/rapp-vision/discussions/34",
       "number": 34
     },
+    "frame-chains/ai-soul-passport": {
+      "channel": "frame-chains",
+      "video": "ai-soul-passport",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/55",
+      "number": 55
+    },
+    "frame-chains/attack-the-timeline": {
+      "channel": "frame-chains",
+      "video": "attack-the-timeline",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/56",
+      "number": 56
+    },
+    "frame-chains/frame-chains-ten-frame-loop": {
+      "channel": "frame-chains",
+      "video": "frame-chains-ten-frame-loop",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/57",
+      "number": 57
+    },
+    "frame-chains/many-worlds-mission-control": {
+      "channel": "frame-chains",
+      "video": "many-worlds-mission-control",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/58",
+      "number": 58
+    },
+    "frame-chains/teleporting-roguelike": {
+      "channel": "frame-chains",
+      "video": "teleporting-roguelike",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/59",
+      "number": 59
+    },
     "learnwithkody/lwk-apex-live": {
       "channel": "learnwithkody",
       "video": "lwk-apex-live",
@@ -602,6 +697,25 @@
       },
       "url": "https://github.com/kody-w/rapp-vision/discussions/39",
       "number": 39
+    },
+    "rappterbox/genesis-251-founding-four-draft": {
+      "channel": "rappterbox",
+      "video": "genesis-251-founding-four-draft",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/60",
+      "number": 60
     },
     "rappterbox/veridion-proof-trailer": {
       "channel": "rappterbox",
@@ -1037,6 +1151,86 @@
         "actor": "human"
       }
     },
+    "frame-chains/ai-soul-passport": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 6,
+      "checks_total": 6,
+      "not_applicable": 2,
+      "notes": [],
+      "record_sha8": "9a432a8e",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "frame-chains/attack-the-timeline": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 6,
+      "checks_total": 6,
+      "not_applicable": 2,
+      "notes": [],
+      "record_sha8": "e5a993c8",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "frame-chains/frame-chains-ten-frame-loop": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [],
+      "record_sha8": "4b038a53",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "frame-chains/many-worlds-mission-control": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 6,
+      "checks_total": 6,
+      "not_applicable": 2,
+      "notes": [],
+      "record_sha8": "926b7ebf",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "frame-chains/teleporting-roguelike": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 6,
+      "checks_total": 6,
+      "not_applicable": 2,
+      "notes": [],
+      "record_sha8": "59cadeba",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
     "learnwithkody/lwk-apex-live": {
       "by": "rapp-vision-rubric/1.0",
       "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
@@ -1308,6 +1502,22 @@
       "not_applicable": 2,
       "notes": [],
       "record_sha8": "6e9fab83",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "rappterbox/genesis-251-founding-four-draft": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 6,
+      "checks_total": 6,
+      "not_applicable": 2,
+      "notes": [],
+      "record_sha8": "7c627ca6",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
