@@ -1,0 +1,22 @@
+{
+  "frame": 2,
+  "slug": "02-soul-passport",
+  "title": "The AI Soul Passport — Counterfeit Rejected",
+  "source_url": "https://kody-w.github.io/frame-chains/showcase/02-soul-passport/",
+  "duration": 26.2,
+  "dimensions": {
+    "width": 1920,
+    "height": 1080
+  },
+  "fps": 30,
+  "selectors": [
+    "#guided-button",
+    "#forge-button",
+    "#verify-button"
+  ],
+  "positive_outcome": "Identity migrates across three synthetic devices, an isolated offline frame is deterministically reattached, and the accepted head remains verified.",
+  "failure_outcome": "Independent verification rejects the copied-appearance counterfeit for content address, morphology seed, and state-read-address failures while preserving the verified head and hologram source.",
+  "sha256": "b4e372b05923436b179d9884780d045bb3a2c4778f55061e50b58caa135d72c8",
+  "synthetic_only": true,
+  "audio": false
+}
