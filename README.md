@@ -37,9 +37,11 @@ MP4-only, and WebM-only entries are rejected. See
 The default registry includes pre-constitution material in several formats.
 Those exact channel URL + publication id identities remain playable through a
 frozen legacy allowlist whose normalized publication objects are SHA-256
-pinned. CI compares that policy to the trusted git base, so changing the
-allowlist in the same contribution cannot self-authorize v1 content. These are
-examples of the network's history, not templates for new publication:
+pinned. A `pull_request_target` gate executes the verifier from the trusted base
+checkout—not the proposed branch—and protected pushes compare against
+`github.event.before`. Changing the validator or allowlist in the same
+contribution therefore cannot self-authorize v1 content. These are examples of
+the network's history, not templates for new publication:
 
 | Channel | | What it is |
 |---|---|---|
@@ -227,7 +229,8 @@ not ship WebM support. MIME bases are canonical lowercase (`video/mp4` and
 - **Aggregated home feed** across every channel you've subscribed to
 - **Separate resume points**, per film and replay, in `localStorage`
 - **Channel-scoped identity** for routes, history, likes, and Watch later; old
-  unscoped links and state migrate to their original first match
+  unscoped links and state migrate only to a unique publication or a frozen
+  legacy owner—ambiguous ids remain unmigrated instead of following subscription order
 - **Mode-specific chapters**, keyboard shortcuts, PiP, playback rate
 - **Watch later / liked**, exportable and importable as JSON
 - **Live replay** with a real transport (play/pause/seek) over a running app

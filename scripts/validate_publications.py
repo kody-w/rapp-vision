@@ -559,6 +559,28 @@ def registry_local_path(registry_path: Path, raw_url: str) -> Path | None:
     return candidate if candidate.is_file() else None
 
 
+def validate_registry_channel_identity(
+    entry: dict[str, Any],
+    channel: dict[str, Any],
+    resolved_ids: dict[Any, str],
+    path: str,
+) -> list[str]:
+    errors: list[str] = []
+    entry_id = entry.get("id")
+    channel_id = channel.get("id")
+    if entry_id != channel_id:
+        errors.append(
+            f"{path}.id: registry id {entry_id!r} must equal fetched channel id {channel_id!r}"
+        )
+    if channel_id in resolved_ids:
+        errors.append(
+            f"{path}: fetched channel id {channel_id!r} duplicates {resolved_ids[channel_id]}"
+        )
+    else:
+        resolved_ids[channel_id] = path
+    return errors
+
+
 def validate_registry(
     registry_path: Path,
     policy: dict[str, Any],
@@ -576,6 +598,7 @@ def validate_registry(
 
     policy_id = policy.get("id")
     base = policy.get("registry_base", "")
+    resolved_ids: dict[Any, str] = {}
     for index, entry in enumerate(entries):
         path = f"registry.channels[{index}]"
         if not is_object(entry):
@@ -609,6 +632,7 @@ def validate_registry(
             except Exception as exc:  # deterministic message, no traceback
                 errors.append(f"{path}: could not load {canonical}: {exc}")
                 continue
+        errors.extend(validate_registry_channel_identity(entry, channel, resolved_ids, path))
         channel_errors = validate_channel(channel, canonical, policy)
         errors.extend(f"{path} -> {error}" for error in channel_errors)
     return errors

@@ -34,10 +34,13 @@ three values match the frozen
 The exception is an allowlist of existing identities, not permission to publish
 new v1 material. Adding a URL to `channels.json`, copying the legacy marker, or
 adding a new publication to an allowlisted channel does not confer legacy
-status. CI reconstructs the legacy set from the trusted git base and rejects
-policy additions or digest changes authored by the proposed commit. The browser
-and CLI reject an allowlisted id whose content no longer matches its digest.
-Once migrated to v2, a publication follows the paired contract.
+status. A dedicated `pull_request_target` gate checks out the trusted base and
+runs only its minimal freeze verifier against the candidate git object; it
+never executes the PR's validator. Protected-branch pushes source that verifier
+from `github.event.before`, so multi-commit pushes cannot choose their own
+baseline. The browser and CLI reject an allowlisted id whose content no longer
+matches its digest. Once migrated to v2, a publication follows the paired
+contract.
 
 ## Rationale
 

@@ -15,21 +15,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Freeze legacy policy against pull request base
-        if: github.event_name == 'pull_request'
-        run: python3 scripts/validate_publications.py --check-legacy-baseline "origin/${{ github.base_ref }}"
-
-      - name: Freeze legacy policy against previous commit
-        if: github.event_name != 'pull_request'
-        run: python3 scripts/validate_publications.py --check-legacy-baseline HEAD^
 
       - name: Validate paired template
         run: python3 scripts/validate_publications.py template/channel.json

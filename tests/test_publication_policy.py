@@ -218,11 +218,25 @@ class TestPublicationPolicy(unittest.TestCase):
 
     def test_ci_uses_full_git_history_and_checks_the_trusted_base(self):
         workflow = (
-            ROOT / ".github" / "workflows" / "publication-policy.yml"
+            ROOT / ".github" / "workflows" / "legacy-freeze.yml"
         ).read_text(encoding="utf-8")
         self.assertIn("fetch-depth: 0", workflow)
-        self.assertIn("--check-legacy-baseline", workflow)
-        self.assertIn('origin/${{ github.base_ref }}', workflow)
+        self.assertIn("pull_request_target:", workflow)
+        self.assertIn("github.event.before", workflow)
+
+    def test_registry_entry_and_resolved_channel_ids_must_be_equal_and_unique(self):
+        resolved = {}
+        self.assertEqual(
+            VALIDATOR.validate_registry_channel_identity(
+                {"id": "alpha"}, {"id": "alpha"}, resolved, "registry.channels[0]"
+            ),
+            [],
+        )
+        errors = VALIDATOR.validate_registry_channel_identity(
+            {"id": "beta"}, {"id": "alpha"}, resolved, "registry.channels[1]"
+        )
+        self.assertTrue(any("must equal fetched channel id" in error for error in errors))
+        self.assertTrue(any("duplicates registry.channels[0]" in error for error in errors))
 
     def test_digest_baseline_is_immutable_after_bootstrap(self):
         baseline = copy.deepcopy(self.policy)

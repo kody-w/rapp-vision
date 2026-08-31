@@ -24,6 +24,12 @@ def identity_block():
     return INDEX[start:end]
 
 
+def registry_identity_block():
+    start = INDEX.index("/* registry identity:start */")
+    end = INDEX.index("/* registry identity:end */") + len("/* registry identity:end */")
+    return INDEX[start:end]
+
+
 @unittest.skipUnless(NODE, "node not available; exact player validation test skipped")
 class TestPairedPlayer(unittest.TestCase):
     def run_node(self, body):
@@ -77,13 +83,19 @@ class TestPairedPlayer(unittest.TestCase):
 
     def test_channel_scoped_routes_state_and_collision_migration(self):
         script = f"""
+        const rvObject = v => !!v && typeof v === "object" && !Array.isArray(v);
         let VIDEOS = [], ALL_VIDEOS = [], state = {{history: {{}}, liked: [], later: []}};
+        let LEGACY_POLICY = {{channels:[{{
+          id:"alpha", publications:[{{id:"shared",sha256:"unused"}}]
+        }}]}};
         {identity_block()}
         const channelA = {{id:"alpha"}}, channelB = {{id:"beta"}};
         const a = {{id:"shared", _ch:channelA, sources:[{{src:"a.mp4"}}], live:{{scenes:[]}}}};
         const b = {{id:"shared", _ch:channelB, sources:[{{src:"b.mp4"}}], live:{{scenes:[]}}}};
-        VIDEOS = [a, b]; ALL_VIDEOS = [a, b];
-        if (byId("shared") !== a) throw new Error("old link did not retain first-match migration");
+        ALL_VIDEOS = [a, b]; VIDEOS = [b, a];
+        if (byId("shared") !== a) throw new Error("frozen owner mapping ignored");
+        VIDEOS = [a, b];
+        if (byId("shared") !== a) throw new Error("subscription reorder changed migration");
         if (byId("beta/shared") !== b) throw new Error("scoped route collision");
         if (historyKey(a, "video") !== "alpha/shared::video") throw new Error("alpha history key");
         if (historyKey(b, "live") !== "beta/shared::live") throw new Error("beta history key");
@@ -99,6 +111,10 @@ class TestPairedPlayer(unittest.TestCase):
         if (stateHasVideo(state.liked, b)) throw new Error("old like leaked across collision");
         state.later = ["beta/shared"];
         if (stateVideos(state.later)[0] !== b) throw new Error("scoped watch-later collision");
+        LEGACY_POLICY = {{channels:[]}};
+        if (byId("shared") !== undefined) throw new Error("ambiguous old link was silently assigned");
+        if (stateHasVideo(["shared"], a) || stateHasVideo(["shared"], b))
+          throw new Error("ambiguous old state was silently migrated");
         """
         self.run_node(script)
 
@@ -150,6 +166,24 @@ class TestPairedPlayer(unittest.TestCase):
         self.assertIn('mode === "live" ? replayDuration(v.live) : v.duration', INDEX)
         self.assertIn('href="#/watch/${encodeURIComponent(vkey(v))}"', INDEX)
         self.assertIn('href="#/watch/${encodeURIComponent(vkey(x))}"', INDEX)
+
+    def test_browser_rejects_registry_id_mismatch_and_duplicate_resolved_channels(self):
+        self.assertIn("entry._registry && entry.id !== c.id", INDEX)
+        script = f"""
+        {registry_identity_block()}
+        const duplicate = {{id:"resolved"}};
+        const result = collectUniqueChannels(
+          [
+            {{status:"fulfilled",value:duplicate}},
+            {{status:"fulfilled",value:duplicate}}
+          ],
+          [{{id:"first"}},{{id:"second"}}]
+        );
+        if (result.channels.length !== 1) throw new Error("duplicate channel loaded twice");
+        if (result.failed.length !== 1 || result.failed[0] !== "second")
+          throw new Error("duplicate channel was not rejected deterministically");
+        """
+        self.run_node(script)
 
 
 if __name__ == "__main__":

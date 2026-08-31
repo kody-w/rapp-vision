@@ -1,0 +1,59 @@
+name: Trusted Legacy Freeze
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out trusted base
+        if: github.event_name == 'pull_request_target'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+
+      - name: Fetch candidate object without checking it out
+        if: github.event_name == 'pull_request_target'
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: git fetch --no-tags origin "pull/$PR_NUMBER/head"
+
+      - name: Run verifier from trusted base checkout
+        if: github.event_name == 'pull_request_target'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          CANDIDATE_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python3 scripts/trusted_legacy_freeze.py \
+            --baseline-ref "$BASE_SHA" \
+            --candidate-ref "$CANDIDATE_SHA"
+
+      - name: Check out pushed commit
+        if: github.event_name == 'push'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run verifier sourced from pre-push commit
+        if: github.event_name == 'push'
+        env:
+          BASE_SHA: ${{ github.event.before }}
+          CANDIDATE_SHA: ${{ github.sha }}
+        run: |
+          if git cat-file -e "$BASE_SHA:scripts/trusted_legacy_freeze.py"; then
+            git show "$BASE_SHA:scripts/trusted_legacy_freeze.py" |
+              python3 - --repo "$PWD" --baseline-ref "$BASE_SHA" --candidate-ref "$CANDIDATE_SHA"
+          else
+            echo "::notice::Bootstrapping the trusted verifier on its first protected-main installation"
+            python3 scripts/trusted_legacy_freeze.py \
+              --baseline-ref "$BASE_SHA" \
+              --candidate-ref "$CANDIDATE_SHA"
+          fi
