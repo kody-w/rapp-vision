@@ -1,8 +1,8 @@
 {
   "advisories": [],
   "coverage": {
-    "channels_in_registry": 14,
-    "channels_loaded": 14,
+    "channels_in_registry": 15,
+    "channels_loaded": 15,
     "channels_unreachable": [],
     "queue_channels_not_loaded": [],
     "signals_available": true
@@ -145,7 +145,7 @@
           "The AIs watched their own movie—and caught each other making things up"
         ]
       },
-      "gap_closed": false,
+      "gap_closed": true,
       "generated_by": {
         "adapter": "dryrun-structural/1.0.0",
         "judgment": false,
@@ -206,7 +206,7 @@
   },
   "totals": {
     "advisories": 0,
-    "open": 5,
+    "open": 4,
     "proposals": 6
   }
 }
