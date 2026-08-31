@@ -1,0 +1,100 @@
+{
+  "schema": "rapp-vision.proof-clip/1",
+  "frame": 8,
+  "slug": "08-teleporting-roguelike",
+  "provenance": {
+    "source_url": "https://kody-w.github.io/frame-chains/showcase/08-teleporting-roguelike/",
+    "source_kind": "public live browser application",
+    "capture_method": "Playwright headless Chromium viewport recording with no browser or desktop chrome",
+    "captured_at_utc": "2026-08-31T16:28:17.495Z",
+    "repository_branch": "frame-film/08-teleporting-roguelike-capture",
+    "repository_commit": "0ed78fd1549c02c047aa7357ebdc0dbc73c8856c",
+    "capture_script": "capture.mjs",
+    "selectors_run_in_order": [
+      "#runDemo",
+      "#forgeItem",
+      "#forgeParent"
+    ],
+    "viewport_css_pixels": {
+      "width": 1920,
+      "height": 1080
+    },
+    "synthetic_public_content_only": true
+  },
+  "media": {
+    "file": "source.webm",
+    "container": "webm",
+    "video_codec": "vp9",
+    "pixel_format": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "frame_rate": "30/1",
+    "duration_seconds": 23.433,
+    "audio_streams": 0,
+    "size_bytes": 1979643,
+    "sha256": "1af26be6e46be30819b9285e22c797945d944299b86980a1c26b3920032ceb7e"
+  },
+  "poster": {
+    "file": "poster.jpg",
+    "width": 1920,
+    "height": 1080,
+    "size_bytes": 193993,
+    "depicts": "final parent-provenance rejection with the last good head preserved",
+    "sha256": "6b86ecfadcbd4a26ed038509b0a1fc9fbc3d1f34e66b12f698440439d8d7af9b"
+  },
+  "capture_script": {
+    "file": "capture.mjs",
+    "sha256": "2363013c077c03337a4f5486a3c3cb60db8abc03b5be466e3844cd6a8cb2e60c"
+  },
+  "outcome": {
+    "expected": "The dungeon transfers live to another device; forged inventory and parent provenance are refused.",
+    "observed": {
+      "transfer": {
+        "active_device": "LIVE · DEVICE B",
+        "device_b_state": "LIVE",
+        "transfer_assertion_passed": true,
+        "a_b_assertion": "A/B world bytes are identical"
+      },
+      "verified_head_sha256": "263b5fe854c971ada63b8c36ec5431946e1e4b883c8d084f23bd456e75edbc0b",
+      "displayed_world_sha256": "1ae74f930d0a…",
+      "accepted_chain_size": "6 FRAMES",
+      "inventory_forgery": {
+        "status_exact": "Inventory forgery refused at candidate frame 6: forged inventory item. Last good head preserved.",
+        "rejected": true,
+        "last_good_head_preserved": true
+      },
+      "parent_provenance_forgery": {
+        "status_exact": "Parent forgery refused at candidate frame 6: parent provenance is not the previous verified frame. Last good head preserved.",
+        "rejected": true,
+        "last_good_head_preserved": true
+      },
+      "final_assertions": {
+        "hashes": {
+          "label": "Canonical SHA-256 chain verifies",
+          "passed": true
+        },
+        "derived": {
+          "label": "World derives from frames only",
+          "passed": true
+        },
+        "transfer": {
+          "label": "A/B world bytes are identical",
+          "passed": true
+        },
+        "clock": {
+          "label": "Skewed clocks cannot reorder parents",
+          "passed": true
+        },
+        "fork": {
+          "label": "C reattaches by declared reads",
+          "passed": true
+        },
+        "mutation": {
+          "label": "Forgery refused; good head preserved",
+          "passed": true
+        }
+      }
+    },
+    "all_required_paths_asserted": true
+  }
+}
