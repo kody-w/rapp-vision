@@ -1,0 +1,95 @@
+{
+  "schema": "rapp-vision.proof-clip/1",
+  "id": "09-attack-timeline",
+  "frame": 9,
+  "slug": "09-attack-timeline",
+  "title": "Attack the Timeline",
+  "source_url": "https://kody-w.github.io/frame-chains/showcase/09-attack-timeline/",
+  "duration": 29.333,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "selectors": [
+    "#controlBtn",
+    "#attackAllBtn",
+    "#replayBtn"
+  ],
+  "positive_outcome": "The control passes with all nine detector layers measured green while the trusted projection remains unchanged.",
+  "failure_outcome": "Nine hostile candidates are quarantined, all detector layers observe red, and replay reconstructs the Provenance rejection receipt without changing the trusted head or high-water mark.",
+  "sha256": "f9a75c4a595e8fde6b9c274245b3f91251bec918dcc6b9b00df2a7822035c386",
+  "synthetic_only": true,
+  "audio": false,
+  "provenance": {
+    "source_url": "https://kody-w.github.io/frame-chains/showcase/09-attack-timeline/",
+    "source_title": "Attack the Timeline · Frame 09",
+    "captured_at": "2026-08-31T16:32:06Z",
+    "capture_method": "Playwright Chromium viewport recording, normalized with FFmpeg",
+    "viewport_only": true,
+    "public_synthetic_data_only": true,
+    "actions": [
+      "#controlBtn",
+      "#attackAllBtn",
+      "#replayBtn"
+    ]
+  },
+  "media": {
+    "source": {
+      "path": "source.webm",
+      "container": "webm",
+      "video_codec": "vp9",
+      "width": 1920,
+      "height": 1080,
+      "frame_rate": "30/1",
+      "duration_seconds": 29.333,
+      "audio": false,
+      "bytes": 6517973,
+      "sha256": "f9a75c4a595e8fde6b9c274245b3f91251bec918dcc6b9b00df2a7822035c386"
+    },
+    "poster": {
+      "path": "poster.jpg",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 236105,
+      "sha256": "4fbfce772bc7e0372ec2c7ae4fe2c220e6cfe142fa7c0e96ae6ae463994b525e"
+    },
+    "capture_script": {
+      "path": "capture.mjs",
+      "sha256": "ac28f58a4df717297ac0effa50472494aea4d4767e99a46e08545f27a6bb4b20"
+    }
+  },
+  "outcome": {
+    "control": {
+      "verdict": "ACCEPT",
+      "fact": "Control run verified with all nine detector layers measured green."
+    },
+    "attack_all": {
+      "verdict": "REJECT",
+      "quarantined_candidates": 9,
+      "all_detectors_observed_red": true,
+      "detectors": [
+        "Bytes",
+        "Payload hash",
+        "Frame hash",
+        "Sequence",
+        "Predecessor",
+        "Semantics",
+        "Causality",
+        "Concurrency / high-water",
+        "Provenance"
+      ]
+    },
+    "preserved_projection": {
+      "world": "World 5 · stable",
+      "head": "head b8145a790fee67f7fbd8eb…",
+      "high_water": "#4",
+      "unchanged_after_attack": true,
+      "unchanged_after_replay": true
+    },
+    "replay": {
+      "verdict": "REJECT",
+      "receipt": "Provenance stopped the candidate",
+      "detail": "Expected first boundary: Provenance. Frame 5 branch ancestry cannot be proven.",
+      "last_verified_projection_preserved": true
+    }
+  }
+}
