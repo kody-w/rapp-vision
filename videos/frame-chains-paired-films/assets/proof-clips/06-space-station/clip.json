@@ -1,6 +1,28 @@
 {
   "schema": "rapp-vision.proof-clip/1",
+  "frame": 6,
   "slug": "06-space-station",
+  "title": "Swarm-Built Space Station",
+  "source_url": "https://kody-w.github.io/frame-chains/showcase/06-space-station/",
+  "duration": 22.066,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "selectors": [
+    "#guided",
+    "#head-count",
+    "#station-status",
+    "#fidelity",
+    "#alternatives",
+    "details:has(#mutate-overwrite)",
+    "#mutate-overwrite",
+    "#mutation-result"
+  ],
+  "positive_outcome": "The station reattaches across 35 verified frames with 5/6 fidelity while preserving both the 68 kPa and 72 kPa airlock alternatives.",
+  "failure_outcome": "The silent overwrite is rejected because it would preserve only 1 of 2 verified claim frames; the accepted ledger remains unchanged.",
+  "sha256": "bd5b7047a45d9f18fedb55053c623e556b6d5e1d506fb3b49fe527384735cf9b",
+  "synthetic_only": true,
+  "audio": false,
   "provenance": {
     "source_url": "https://kody-w.github.io/frame-chains/showcase/06-space-station/",
     "source_scope": "Public synthetic showcase state; viewport-only browser capture.",
@@ -10,16 +32,6 @@
     "browser": "Chromium 151.0.7922.34",
     "captured_at": "2026-08-31T16:30:16.490Z",
     "invocation": "node assets/proof-clips/06-space-station/capture.mjs"
-  },
-  "selectors": {
-    "guided_action": "#guided",
-    "verified_frames": "#head-count",
-    "station_status": "#station-status",
-    "fidelity": "#fidelity",
-    "alternatives": "#alternatives",
-    "mutation_drawer": "details:has(#mutate-overwrite)",
-    "overwrite_action": "#mutate-overwrite",
-    "overwrite_result": "#mutation-result"
   },
   "outcomes": {
     "station_status": "PASS · REATTACHED",
@@ -52,8 +64,20 @@
       "viewport_only": true
     }
   },
-  "sha256": {
-    "source.webm": "bd5b7047a45d9f18fedb55053c623e556b6d5e1d506fb3b49fe527384735cf9b",
-    "poster.jpg": "c070a0bfe64a0fc5f05db631edd04e204c29f2a29b914f790f5034d8efd2ca8d"
+  "details": {
+    "selector_map": {
+      "guided_action": "#guided",
+      "verified_frames": "#head-count",
+      "station_status": "#station-status",
+      "fidelity": "#fidelity",
+      "alternatives": "#alternatives",
+      "mutation_drawer": "details:has(#mutate-overwrite)",
+      "overwrite_action": "#mutate-overwrite",
+      "overwrite_result": "#mutation-result"
+    },
+    "artifact_sha256": {
+      "source.webm": "bd5b7047a45d9f18fedb55053c623e556b6d5e1d506fb3b49fe527384735cf9b",
+      "poster.jpg": "c070a0bfe64a0fc5f05db631edd04e204c29f2a29b914f790f5034d8efd2ca8d"
+    }
   }
 }
