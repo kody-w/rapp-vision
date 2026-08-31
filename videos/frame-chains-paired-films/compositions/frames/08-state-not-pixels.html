@@ -38,89 +38,135 @@
       font-family: "Inter", sans-serif;
     }
 
-    .f08-state-not-pixels-ground {
+    .f08-ground {
       position: absolute;
       inset: 0;
-      z-index: 0;
+      z-index: -10;
       background: #ffffff;
     }
 
-    .f08-state-not-pixels-viewport {
+    .f08-proof-video {
+      position: absolute;
+      object-fit: fill;
+    }
+
+    .f08-edge-matte {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .f08-edge {
+      position: absolute;
+      background: #ffffff;
+    }
+
+    .f08-edge-top {
+      top: 0;
+      left: 0;
+      width: 1920px;
+      height: 24px;
+    }
+
+    .f08-edge-bottom {
+      top: 860px;
+      left: 0;
+      width: 1920px;
+      height: 220px;
+    }
+
+    .f08-edge-left {
+      top: 24px;
+      left: 0;
+      width: 24px;
+      height: 836px;
+    }
+
+    .f08-edge-right {
+      top: 24px;
+      right: 0;
+      width: 24px;
+      height: 836px;
+    }
+
+    .f08-stage-border {
       position: absolute;
       top: 24px;
       left: 24px;
       width: 1872px;
       height: 836px;
-      overflow: hidden;
-      z-index: 1;
+      z-index: 21;
       border: 1px solid rgba(36, 36, 36, 0.2);
       border-radius: 12px;
-      background: #151718;
       box-shadow:
         0 1px 3px rgba(36, 36, 36, 0.08),
         0 4px 16px rgba(36, 36, 36, 0.04);
-    }
-
-    .f08-state-not-pixels-world {
-      position: absolute;
-      top: -24px;
-      left: -24px;
-      width: 1920px;
-      height: 1080px;
-      transform-origin: 50% 50%;
-      will-change: transform;
-    }
-
-    .f08-state-not-pixels-media-layer {
-      position: absolute;
-      inset: 0;
-      width: 1920px;
-      height: 1080px;
-      will-change: transform, opacity;
-    }
-
-    .f08-state-not-pixels-proof-video {
-      position: absolute;
-      inset: 0;
-      width: 1920px;
-      height: 1080px;
-      object-fit: cover;
-    }
-
-    .f08-state-not-pixels-route {
-      position: absolute;
-      inset: 0;
-      width: 1920px;
-      height: 1080px;
-      z-index: 4;
-      overflow: visible;
       pointer-events: none;
     }
 
-    .f08-state-not-pixels-route path {
-      fill: none;
-      stroke: #0067b8;
-      stroke-width: 7px;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+    .f08-opening-mask {
+      position: absolute;
+      inset: 0;
+      z-index: 8;
+      pointer-events: none;
     }
 
-    .f08-state-not-pixels-route circle {
-      fill: #ffffff;
-      stroke: #0067b8;
-      stroke-width: 5px;
+    .f08-opening-shade {
+      position: absolute;
+      background: rgba(21, 23, 24, 0.88);
+      will-change: transform;
     }
 
-    .f08-state-not-pixels-state-card {
+    .f08-opening-left {
+      top: 24px;
+      left: 24px;
+      width: 250px;
+      height: 836px;
+    }
+
+    .f08-opening-right {
+      top: 24px;
+      left: 1015px;
+      width: 881px;
+      height: 836px;
+    }
+
+    .f08-opening-top {
+      top: 24px;
+      left: 274px;
+      width: 741px;
+      height: 44px;
+    }
+
+    .f08-opening-bottom {
+      top: 612px;
+      left: 274px;
+      width: 741px;
+      height: 248px;
+    }
+
+    .f08-opening-frame {
+      position: absolute;
+      top: 68px;
+      left: 274px;
+      width: 741px;
+      height: 544px;
+      border: 1px solid rgba(255, 255, 255, 0.44);
+      border-radius: 8px;
+      will-change: transform, opacity;
+    }
+
+    .f08-state-card {
       position: absolute;
       top: 62px;
       left: 66px;
       width: 520px;
-      z-index: 10;
+      z-index: 12;
       pointer-events: none;
     }
 
-    .f08-state-not-pixels-state-inner {
+    .f08-state-inner {
       padding: 18px 24px 22px;
       border: 1px solid rgba(36, 36, 36, 0.2);
       border-radius: 12px;
@@ -130,7 +176,7 @@
         0 4px 16px rgba(36, 36, 36, 0.04);
     }
 
-    .f08-state-not-pixels-index {
+    .f08-index {
       margin-bottom: 8px;
       font-family: "JetBrains Mono", monospace;
       font-size: 22px;
@@ -139,22 +185,77 @@
       text-transform: uppercase;
     }
 
-    .f08-state-not-pixels-state-title {
+    .f08-title {
       font-size: 58px;
       font-weight: 400;
       line-height: 1.02;
       letter-spacing: -0.022em;
     }
 
-    .f08-state-not-pixels-proof-tag {
+    .f08-device-overlay {
       position: absolute;
-      top: 80px;
-      right: 72px;
-      z-index: 11;
+      inset: 0;
+      z-index: 10;
       pointer-events: none;
     }
 
-    .f08-state-not-pixels-proof-tag-inner {
+    .f08-device-focus {
+      position: absolute;
+      top: 694px;
+      left: 278px;
+      width: 452px;
+      height: 146px;
+      border: 3px solid #0067b8;
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.74);
+      will-change: transform, opacity;
+    }
+
+    .f08-route {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: visible;
+    }
+
+    .f08-route path {
+      fill: none;
+      stroke: #0067b8;
+      stroke-width: 7px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .f08-route circle {
+      fill: #ffffff;
+      stroke: #0067b8;
+      stroke-width: 5px;
+    }
+
+    .f08-receipt-group {
+      position: absolute;
+      inset: 0;
+      z-index: 13;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+
+    .f08-receipt-frame {
+      position: absolute;
+      top: 445px;
+      left: 298px;
+      width: 1328px;
+      height: 126px;
+      border: 2px solid rgba(255, 255, 255, 0.82);
+      border-radius: 8px;
+      box-shadow: 0 0 0 1px rgba(36, 36, 36, 0.24);
+    }
+
+    .f08-proof-tag {
+      position: absolute;
+      top: 80px;
+      right: 72px;
       display: flex;
       align-items: center;
       gap: 14px;
@@ -170,22 +271,22 @@
       letter-spacing: 0.04em;
     }
 
-    .f08-state-not-pixels-proof-tag-x {
+    .f08-proof-x {
       color: #f8d5e0;
       font-size: 34px;
       line-height: 1;
     }
 
-    .f08-state-not-pixels-preserved {
+    .f08-preserved {
       position: absolute;
+      top: 612px;
       right: 72px;
-      bottom: 246px;
-      z-index: 12;
       width: 560px;
+      z-index: 14;
       pointer-events: none;
     }
 
-    .f08-state-not-pixels-preserved-inner {
+    .f08-preserved-inner {
       padding: 20px 24px;
       border: 1px solid rgba(36, 36, 36, 0.2);
       border-radius: 12px;
@@ -202,7 +303,7 @@
       text-transform: uppercase;
     }
 
-    .f08-state-not-pixels-preserved-rule {
+    .f08-preserved-rule {
       display: block;
       width: 100%;
       height: 1px;
@@ -219,194 +320,208 @@
     data-duration="11.221"
   >
     <div
-      id="f08-state-not-pixels-ground"
-      class="clip f08-state-not-pixels-ground"
+      id="f08-ground"
+      class="clip f08-ground"
       data-start="0"
       data-duration="11.221"
       data-track-index="0"
     ></div>
 
-    <div class="f08-state-not-pixels-viewport">
-      <div
-        id="f08-state-not-pixels-world"
-        class="f08-state-not-pixels-world"
-        data-layout-allow-overflow
-      >
-        <div
-          id="f08-state-not-pixels-transfer-layer"
-          class="f08-state-not-pixels-media-layer"
-        >
-          <video
-            id="f08-state-not-pixels-transfer-video"
-            class="clip f08-state-not-pixels-proof-video"
-            src="assets/proof-clips/08-teleporting-roguelike/source.webm"
-            data-start="0"
-            data-duration="6.5"
-            data-media-start="2.5"
-            data-playback-rate="0.6"
-            data-track-index="1"
-            muted
-            playsinline
-            preload="auto"
-          ></video>
-        </div>
-
-        <div
-          id="f08-state-not-pixels-item-layer"
-          class="f08-state-not-pixels-media-layer"
-        >
-          <video
-            id="f08-state-not-pixels-item-video"
-            class="clip f08-state-not-pixels-proof-video"
-            src="assets/proof-clips/08-teleporting-roguelike/source.webm"
-            data-start="6.5"
-            data-duration="2.4"
-            data-media-start="9"
-            data-track-index="2"
-            muted
-            playsinline
-            preload="auto"
-          ></video>
-        </div>
-
-        <div
-          id="f08-state-not-pixels-parent-layer"
-          class="f08-state-not-pixels-media-layer"
-        >
-          <video
-            id="f08-state-not-pixels-parent-video"
-            class="clip f08-state-not-pixels-proof-video"
-            src="assets/proof-clips/08-teleporting-roguelike/source.webm"
-            data-start="8.9"
-            data-duration="2.321"
-            data-media-start="17.7"
-            data-track-index="3"
-            muted
-            playsinline
-            preload="auto"
-          ></video>
-        </div>
-
-        <svg
-          class="f08-state-not-pixels-route"
-          viewBox="0 0 1920 1080"
-          aria-hidden="true"
-        >
-          <path
-            id="f08-state-not-pixels-route-path"
-            d="M 682 842 C 710 790, 744 790, 774 842"
-          ></path>
-          <circle cx="682" cy="842" r="10"></circle>
-          <circle cx="774" cy="842" r="10"></circle>
-        </svg>
-      </div>
-    </div>
-
-    <div
-      id="f08-state-not-pixels-state-card"
-      class="clip f08-state-not-pixels-state-card"
+    <video
+      id="f08-transfer-video"
+      class="clip f08-proof-video"
+      src="assets/proof-clips/08-teleporting-roguelike/source.webm"
+      style="left: 24px; top: -72px; width: 1872px; height: 1053px"
+      data-frame-video="approved"
+      data-frame-video-x="24"
+      data-frame-video-y="-72"
+      data-frame-video-width="1872"
+      data-frame-video-height="1053"
+      data-frame-video-fit="fill"
       data-start="0"
       data-duration="6.5"
+      data-media-start="2"
+      data-track-index="1"
+      muted
+      playsinline
+      preload="auto"
+      aria-label="The live dungeon and Device A to Device B transfer"
+    ></video>
+
+    <video
+      id="f08-item-video"
+      class="clip f08-proof-video"
+      src="assets/proof-clips/08-teleporting-roguelike/source.webm"
+      style="left: -104px; top: -690px; width: 3264px; height: 1836px"
+      data-frame-video="approved"
+      data-frame-video-x="-104"
+      data-frame-video-y="-690"
+      data-frame-video-width="3264"
+      data-frame-video-height="1836"
+      data-frame-video-fit="fill"
+      data-start="6.5"
+      data-duration="2.4"
+      data-media-start="9"
+      data-track-index="2"
+      muted
+      playsinline
+      preload="auto"
+      aria-label="Inventory forgery refusal receipt"
+    ></video>
+
+    <video
+      id="f08-parent-video"
+      class="clip f08-proof-video"
+      src="assets/proof-clips/08-teleporting-roguelike/source.webm"
+      style="left: -104px; top: -690px; width: 3264px; height: 1836px"
+      data-frame-video="approved"
+      data-frame-video-x="-104"
+      data-frame-video-y="-690"
+      data-frame-video-width="3264"
+      data-frame-video-height="1836"
+      data-frame-video-fit="fill"
+      data-start="8.9"
+      data-duration="2.321"
+      data-media-start="17.7"
+      data-track-index="3"
+      muted
+      playsinline
+      preload="auto"
+      aria-label="Parent provenance forgery refusal receipt"
+    ></video>
+
+    <div
+      id="f08-opening-mask"
+      class="clip f08-opening-mask"
+      data-start="0"
+      data-duration="3.2"
       data-track-index="4"
     >
       <div
-        id="f08-state-not-pixels-state-inner"
-        class="f08-state-not-pixels-state-inner"
-      >
-        <div class="f08-state-not-pixels-index">Frame 08</div>
-        <div class="f08-state-not-pixels-state-title">State, not pixels</div>
-      </div>
+        id="f08-opening-left"
+        class="f08-opening-shade f08-opening-left"
+        data-layout-allow-overflow
+      ></div>
+      <div
+        id="f08-opening-right"
+        class="f08-opening-shade f08-opening-right"
+        data-layout-allow-overflow
+      ></div>
+      <div
+        id="f08-opening-top"
+        class="f08-opening-shade f08-opening-top"
+        data-layout-allow-overflow
+      ></div>
+      <div
+        id="f08-opening-bottom"
+        class="f08-opening-shade f08-opening-bottom"
+        data-layout-allow-overflow
+      ></div>
+      <div id="f08-opening-frame" class="f08-opening-frame"></div>
     </div>
 
     <div
-      id="f08-state-not-pixels-item-clip"
-      class="clip f08-state-not-pixels-proof-tag"
-      data-start="6.5"
-      data-duration="2.4"
+      id="f08-state-card"
+      class="clip f08-state-card"
+      data-start="0"
+      data-duration="6.5"
       data-track-index="5"
     >
-      <div
-        id="f08-state-not-pixels-item-tag"
-        class="f08-state-not-pixels-proof-tag-inner"
-      >
-        <span>ITEM</span>
-        <span class="f08-state-not-pixels-proof-tag-x">✕</span>
+      <div id="f08-state-inner" class="f08-state-inner">
+        <div class="f08-index">Frame 08</div>
+        <div class="f08-title">State, not pixels</div>
       </div>
     </div>
 
     <div
-      id="f08-state-not-pixels-parent-clip"
-      class="clip f08-state-not-pixels-proof-tag"
-      data-start="8.9"
-      data-duration="2.321"
+      id="f08-device-overlay"
+      class="clip f08-device-overlay"
+      data-start="3.2"
+      data-duration="3.3"
       data-track-index="6"
     >
-      <div
-        id="f08-state-not-pixels-parent-tag"
-        class="f08-state-not-pixels-proof-tag-inner"
-      >
-        <span>PARENT</span>
-        <span class="f08-state-not-pixels-proof-tag-x">✕</span>
+      <div id="f08-device-focus" class="f08-device-focus"></div>
+      <svg class="f08-route" viewBox="0 0 1920 1080" aria-hidden="true">
+        <path id="f08-route-path" d="M 704 772 C 728 716, 752 716, 778 772"></path>
+        <circle cx="704" cy="772" r="10"></circle>
+        <circle cx="778" cy="772" r="10"></circle>
+      </svg>
+    </div>
+
+    <div
+      id="f08-item-clip"
+      class="clip f08-receipt-group"
+      data-start="6.5"
+      data-duration="2.4"
+      data-track-index="7"
+      data-layout-allow-overflow
+    >
+      <div class="f08-receipt-frame"></div>
+      <div id="f08-item-tag" class="f08-proof-tag">
+        <span>ITEM</span>
+        <span class="f08-proof-x">✕</span>
       </div>
     </div>
 
     <div
-      id="f08-state-not-pixels-preserved-clip"
-      class="clip f08-state-not-pixels-preserved"
+      id="f08-parent-clip"
+      class="clip f08-receipt-group"
       data-start="8.9"
       data-duration="2.321"
-      data-track-index="7"
+      data-track-index="8"
+      data-layout-allow-overflow
     >
-      <div
-        id="f08-state-not-pixels-preserved-inner"
-        class="f08-state-not-pixels-preserved-inner"
-      >
-        <span class="f08-state-not-pixels-preserved-rule"></span>
+      <div class="f08-receipt-frame"></div>
+      <div id="f08-parent-tag" class="f08-proof-tag">
+        <span>PARENT</span>
+        <span class="f08-proof-x">✕</span>
+      </div>
+    </div>
+
+    <div
+      id="f08-preserved-clip"
+      class="clip f08-preserved"
+      data-start="8.9"
+      data-duration="2.321"
+      data-track-index="9"
+    >
+      <div id="f08-preserved-inner" class="f08-preserved-inner">
+        <span class="f08-preserved-rule"></span>
         Last good head preserved
       </div>
+    </div>
+
+    <div
+      id="f08-edge-matte"
+      class="clip f08-edge-matte"
+      data-start="0"
+      data-duration="11.221"
+      data-track-index="10"
+    >
+      <div class="f08-edge f08-edge-top"></div>
+      <div class="f08-edge f08-edge-bottom"></div>
+      <div class="f08-edge f08-edge-left"></div>
+      <div class="f08-edge f08-edge-right"></div>
+      <div class="f08-stage-border"></div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
   <script>
     (() => {
-      const world = document.getElementById("f08-state-not-pixels-world");
-      const routePath = document.getElementById(
-        "f08-state-not-pixels-route-path",
-      );
-      const transferLayer = document.getElementById(
-        "f08-state-not-pixels-transfer-layer",
-      );
-      const itemLayer = document.getElementById(
-        "f08-state-not-pixels-item-layer",
-      );
-      const parentLayer = document.getElementById(
-        "f08-state-not-pixels-parent-layer",
-      );
-      const stateInner = document.getElementById(
-        "f08-state-not-pixels-state-inner",
-      );
-      const itemTag = document.getElementById(
-        "f08-state-not-pixels-item-tag",
-      );
-      const parentTag = document.getElementById(
-        "f08-state-not-pixels-parent-tag",
-      );
-      const preservedInner = document.getElementById(
-        "f08-state-not-pixels-preserved-inner",
-      );
-      const cam = { scale: 1.35, x: 452, y: 123 };
-
-      const applyCamera = () => {
-        gsap.set(world, {
-          x: cam.x,
-          y: cam.y,
-          scale: cam.scale,
-          transformOrigin: "50% 50%",
-        });
-      };
-
-      applyCamera();
+      const stateInner = document.getElementById("f08-state-inner");
+      const openingLeft = document.getElementById("f08-opening-left");
+      const openingRight = document.getElementById("f08-opening-right");
+      const openingTop = document.getElementById("f08-opening-top");
+      const openingBottom = document.getElementById("f08-opening-bottom");
+      const openingFrame = document.getElementById("f08-opening-frame");
+      const deviceFocus = document.getElementById("f08-device-focus");
+      const routePath = document.getElementById("f08-route-path");
+      const itemClip = document.getElementById("f08-item-clip");
+      const itemTag = document.getElementById("f08-item-tag");
+      const parentClip = document.getElementById("f08-parent-clip");
+      const parentTag = document.getElementById("f08-parent-tag");
+      const preservedInner = document.getElementById("f08-preserved-inner");
 
       const routeLength = routePath.getTotalLength();
       routePath.style.strokeDasharray = `${routeLength}`;
@@ -428,18 +543,48 @@
       );
 
       tl.to(
-        cam,
-        {
-          scale: 0.9,
-          x: 0,
-          y: -90,
-          duration: 2.45,
-          ease: "power2.inOut",
-          onUpdate: applyCamera,
-        },
+        openingLeft,
+        { x: -270, duration: 2.35, ease: "power2.inOut" },
         0.55,
       );
+      tl.to(
+        openingRight,
+        { x: 910, duration: 2.35, ease: "power2.inOut" },
+        0.55,
+      );
+      tl.to(
+        openingTop,
+        { y: -70, duration: 2.35, ease: "power2.inOut" },
+        0.55,
+      );
+      tl.to(
+        openingBottom,
+        { y: 280, duration: 2.35, ease: "power2.inOut" },
+        0.55,
+      );
+      tl.to(
+        openingFrame,
+        {
+          scale: 1.08,
+          opacity: 0,
+          duration: 1.4,
+          ease: "power2.inOut",
+        },
+        1.42,
+      );
 
+      tl.fromTo(
+        deviceFocus,
+        { x: 0, opacity: 0.3 },
+        {
+          x: 455,
+          opacity: 1,
+          duration: 1.6,
+          ease: "power4.out",
+          immediateRender: false,
+        },
+        3.2,
+      );
       tl.to(
         routePath,
         {
@@ -449,43 +594,10 @@
         },
         3.35,
       );
-
       tl.to(
-        cam,
-        {
-          scale: 1.25,
-          x: 0,
-          y: -453,
-          duration: 1.55,
-          ease: "power4.out",
-          onUpdate: applyCamera,
-        },
-        3.25,
-      );
-
-      tl.to(
-        cam,
-        {
-          scale: 1.28,
-          y: -466,
-          duration: 1.55,
-          ease: "power1.inOut",
-          onUpdate: applyCamera,
-        },
+        deviceFocus,
+        { x: 461, duration: 1.56, ease: "power1.inOut" },
         4.82,
-      );
-
-      tl.to(
-        cam,
-        {
-          scale: 1.7,
-          x: 568,
-          y: -312,
-          duration: 0.86,
-          ease: "power4.out",
-          onUpdate: applyCamera,
-        },
-        6.5,
       );
 
       tl.fromTo(
@@ -500,22 +612,21 @@
         },
         6.82,
       );
-
-      tl.to(
-        cam,
+      tl.fromTo(
+        itemClip.querySelector(".f08-receipt-frame"),
+        { y: 22, opacity: 0 },
         {
-          scale: 1.73,
-          x: 575,
-          y: -320,
-          duration: 1.25,
-          ease: "power1.inOut",
-          onUpdate: applyCamera,
+          y: 0,
+          opacity: 1,
+          duration: 0.54,
+          ease: "power3.out",
+          immediateRender: false,
         },
-        7.42,
+        6.62,
       );
 
       tl.to(
-        itemLayer,
+        itemClip,
         {
           x: -150,
           opacity: 0,
@@ -524,20 +635,20 @@
         },
         8.68,
       );
-      tl.set(itemLayer, { opacity: 0 }, 8.9);
+      tl.set(itemClip, { opacity: 0 }, 8.9);
 
-      tl.set(parentLayer, { x: 150, opacity: 0.35 }, 8.9);
-      tl.to(
-        parentLayer,
+      tl.fromTo(
+        parentClip,
+        { x: 150, opacity: 0.35 },
         {
           x: 0,
           opacity: 1,
           duration: 0.34,
           ease: "power4.out",
+          immediateRender: false,
         },
         8.9,
       );
-
       tl.fromTo(
         parentTag,
         { x: 72, opacity: 0 },
@@ -550,20 +661,6 @@
         },
         9.08,
       );
-
-      tl.to(
-        cam,
-        {
-          scale: 1.76,
-          x: 580,
-          y: -326,
-          duration: 1.16,
-          ease: "power1.inOut",
-          onUpdate: applyCamera,
-        },
-        9.2,
-      );
-
       tl.fromTo(
         preservedInner,
         { y: 34, opacity: 0 },
@@ -576,18 +673,14 @@
         },
         9.62,
       );
-
       tl.to(
-        cam,
+        preservedInner,
         {
-          scale: 1.78,
-          x: 584,
-          y: -330,
-          duration: 0.861,
+          y: -4,
+          duration: 0.98,
           ease: "none",
-          onUpdate: applyCamera,
         },
-        10.36,
+        10.24,
       );
 
       window.__timelines = window.__timelines || {};
