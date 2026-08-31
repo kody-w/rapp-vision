@@ -178,11 +178,70 @@ class TestPairedPlayer(unittest.TestCase):
         """
         self.run_node(script)
 
+    def test_browser_rejects_unsafe_apps_and_fake_dual_sources(self):
+        valid = json.dumps(json.loads(
+            (ROOT / "tests/fixtures/publications/valid-paired.json").read_text()
+        ))
+        script = f"""
+        if (!globalThis.crypto) globalThis.crypto = require("crypto").webcrypto;
+        let LEGACY_POLICY = {{channels:[]}};
+        {contract_block()}
+        (async () => {{
+          for (const app of [
+            "javascript:alert(1)", "data:text/html,bad", "blob:https://example.test/id",
+            "file:///tmp/app.html", "http://example.test/app.html",
+            "//example.test/app.html", "\\\\\\\\example.test\\\\app.html"
+          ]) {{
+            const channel = {valid};
+            channel.videos[0].live.scenes[1].app = app;
+            const errors = await validateChannelContract(
+              channel, "https://example.test/channel.json"
+            );
+            if (!errors.some(error => error.includes("safe relative URL or absolute HTTPS URL")))
+              throw new Error(`unsafe app accepted: ${{app}}`);
+          }}
+          if (!safeResolvedAppUrl(
+            "../app.html",
+            "https://example.test/app.html",
+            "https://example.test/channel.json"
+          )) throw new Error("safe relative app resolution rejected");
+          if (safeResolvedAppUrl(
+            "javascript:alert(1)",
+            "javascript:alert(1)",
+            "https://example.test/channel.json"
+          )) throw new Error("unsafe resolved app accepted");
+
+          const wrong = {valid};
+          wrong.videos[0].sources[0].src = "paired.webm";
+          let errors = await validateChannelContract(
+            wrong, "https://example.test/channel.json"
+          );
+          if (!errors.some(error => error.includes("video/mp4 requires a .mp4 pathname")))
+            throw new Error("mismatched extension accepted");
+
+          const duplicate = {valid};
+          duplicate.videos[0].sources = [
+            {{src:"same.mp4#one",type:"video/mp4"}},
+            {{src:"same.mp4#two",type:"video/mp4"}},
+            {{src:"other.webm",type:"video/webm"}}
+          ];
+          errors = await validateChannelContract(
+            duplicate, "https://example.test/channel.json"
+          );
+          if (!errors.some(error => error.includes("media source URLs must be distinct")))
+            throw new Error("duplicate media URL accepted");
+        }})().catch(error => {{ console.error(error); process.exit(1); }});
+        """
+        self.run_node(script)
+
     def test_same_permalink_switch_defaults_to_video_and_cleans_up(self):
         self.assertIn('mountMode(hasVideo ? "video" : "live", false)', INDEX)
         self.assertIn(">Try live replay</button>", INDEX)
         self.assertIn(">Watch guided video</button>", INDEX)
-        self.assertIn("function mountMode(next, announce = true) {\n    cleanupMode();", INDEX)
+        self.assertIn(
+            "function mountMode(next, announce = true, userInitiated = false) {\n    cleanupMode();",
+            INDEX,
+        )
         self.assertIn('document.removeEventListener("keydown", live.keys);', INDEX)
         self.assertIn("retryTimers.forEach(clearTimeout);", INDEX)
         self.assertIn('host.dataset.watchMode = mode;', INDEX)
@@ -191,6 +250,13 @@ class TestPairedPlayer(unittest.TestCase):
         self.assertIn('mode === "live" ? replayDuration(v.live) : v.duration', INDEX)
         self.assertIn('href="#/watch/${encodeURIComponent(vkey(v))}"', INDEX)
         self.assertIn('href="#/watch/${encodeURIComponent(vkey(x))}"', INDEX)
+        self.assertIn("const appSrc = renderableAppUrl(s.app);", INDEX)
+        self.assertIn("frame.src = appSrc;", INDEX)
+        self.assertIn("sc.app = safeResolvedAppUrl(rawApp, resolvedApp, url);", INDEX)
+        self.assertIn("c._trustedLive = !!entry._registry;", INDEX)
+        self.assertIn("let liveAuthorized = !!v._ch._trustedLive;", INDEX)
+        self.assertIn("Start live replay", INDEX)
+        self.assertIn('mountMode(hasVideo ? "video" : "live", false);', INDEX)
 
     def test_browser_rejects_registry_id_mismatch_and_duplicate_resolved_channels(self):
         self.assertIn("entry._registry && entry.id !== c.id", INDEX)

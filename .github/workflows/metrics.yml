@@ -38,6 +38,7 @@ on:
 
 permissions:
   contents: write # commit the refreshed metrics snapshot
+  pull-requests: write # open/update the review-ready automation PR
   discussions: write # seed threads and provision signal surfaces
 
 concurrency:
@@ -70,6 +71,7 @@ env:
   # testing." A CI checkout has only this repo, so those paths resolve to
   # nothing — see "Materialise the sibling channels" below.
   RAPP_VISION_SITE_ORIGIN: https://kody-w.github.io
+  AUTOMATION_BRANCH: automation/metrics
 
 jobs:
   # ─── OFFLINE UNIT TESTS (every push and PR) ─────────────────────────────────
@@ -184,11 +186,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # Full history. This job's entire purpose is to land a commit on a
-          # branch another session also pushes to, and `git pull --rebase` on a
-          # shallow clone is the kind of thing that works until the day main has
-          # moved. The repo is nine commits deep; there is nothing to save here.
+          ref: main
           fetch-depth: 0
+
+      - name: Reset automation branch from current main
+        run: |
+          git fetch origin main
+          echo "AUTOMATION_REMOTE_SHA=$(git ls-remote --heads origin "$AUTOMATION_BRANCH" | awk '{print $1}')" >> "$GITHUB_ENV"
+          git checkout -B "$AUTOMATION_BRANCH" origin/main
 
       # Enumeration is filesystem-only ON PURPOSE (resolve_channel_ref refuses
       # http(s) URLs), so the cross-repo channels' channel.json files must
@@ -559,28 +564,22 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add $FILES
-          # [skip ci] so the snapshot commit does not retrigger this workflow's
-          # own push-triggered test job every time a number moves.
-          git commit -m "chore(metrics): refresh channel metrics snapshot [skip ci]"
+          git commit -m "chore(metrics): refresh channel metrics snapshot"
+          if [ -n "$AUTOMATION_REMOTE_SHA" ]; then
+            git push --force-with-lease="refs/heads/$AUTOMATION_BRANCH:$AUTOMATION_REMOTE_SHA" \
+              origin "HEAD:$AUTOMATION_BRANCH"
+          else
+            git push origin "HEAD:$AUTOMATION_BRANCH"
+          fi
 
-          # Another session pushes to this repo, so main can move under us between
-          # checkout and push. Rebase rather than merge keeps the history a
-          # straight line; the retry covers the narrow race where somebody lands a
-          # commit between our pull and our push.
-          for attempt in 1 2 3; do
-            if ! git pull --rebase origin main; then
-              git rebase --abort 2>/dev/null || true
-              echo "::error::rebase conflict on the snapshot - refusing to guess which counts are real"
-              echo "Nothing is lost: the snapshot is rebuilt from the live API on every run,"
-              echo "so the next run (or a manual dispatch) produces the correct file."
-              exit 1
-            fi
-            if git push origin main; then
-              echo "Pushed on attempt $attempt."
-              exit 0
-            fi
-            echo "Push rejected - main moved. Retrying."
-            sleep 5
-          done
-          echo "::error::could not push the snapshot after 3 attempts"
-          exit 1
+          PR_URL=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$AUTOMATION_BRANCH" \
+            --state open --json url --jq '.[0].url')
+          if [ -n "$PR_URL" ]; then
+            echo "$PR_URL"
+          else
+            gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$AUTOMATION_BRANCH" \
+              --title "chore(metrics): refresh channel metrics snapshot" \
+              --body "Automated metrics snapshot refresh. Review and merge through protected main; the workflow has no ruleset bypass."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

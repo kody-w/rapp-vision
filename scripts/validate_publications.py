@@ -13,7 +13,7 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import Any
-from urllib.parse import urljoin, urlparse
+from urllib.parse import unquote, urldefrag, urljoin, urlparse
 from urllib.request import Request, urlopen
 
 
@@ -27,6 +27,10 @@ ACTION_KINDS = {"click", "key", "keydown", "keyup", "type", "drag", "scroll"}
 LEGACY_POLICY_ID = "legacy-publications-2026-08-31"
 LEGACY_FROZEN_AT = "2026-08-31T16:24:12Z"
 TRUSTED_REGISTRY_BASE = "https://kody-w.github.io/rapp-vision/channels.json"
+EXPECTED_VIDEO_CODECS = {
+    "video/mp4": {"h264"},
+    "video/webm": {"vp9"},
+}
 
 
 def is_object(value: Any) -> bool:
@@ -55,6 +59,17 @@ def point_shape(value: Any) -> bool:
         and len(value) == 2
         and all(is_number(item) for item in value)
     )
+
+
+def safe_app_url(value: Any) -> bool:
+    if not nonempty_string(value) or value != value.strip():
+        return False
+    if re.search(r"\s", value) or "\\" in value or value.startswith("//"):
+        return False
+    parsed = urlparse(value)
+    if parsed.scheme:
+        return value.startswith("https://") and parsed.scheme == "https" and bool(parsed.netloc)
+    return not parsed.netloc and bool(parsed.path)
 
 
 def validate_action(action: Any, duration: float, path: str) -> list[str]:
@@ -140,6 +155,10 @@ def validate_live(live: Any, path: str) -> list[str]:
         has_app = nonempty_string(scene.get("app"))
         if has_card == has_app:
             errors.append(f"{scene_path}: must contain exactly one card object or non-empty app")
+        if has_app and not safe_app_url(scene.get("app")):
+            errors.append(
+                f"{scene_path}.app: must be a safe relative URL or absolute HTTPS URL"
+            )
         if "ready" in scene:
             ready = scene["ready"]
             if not has_app:
@@ -192,7 +211,7 @@ def validate_live(live: Any, path: str) -> list[str]:
     return errors
 
 
-def validate_publication(video: Any, path: str) -> list[str]:
+def validate_publication(video: Any, path: str, source_url: str) -> list[str]:
     errors: list[str] = []
     if not is_object(video):
         return [f"{path}: must be an object"]
@@ -211,6 +230,7 @@ def validate_publication(video: Any, path: str) -> list[str]:
 
     sources = video.get("sources")
     media_types: set[str] = set()
+    resolved_sources: set[str] = set()
     if not isinstance(sources, list) or not sources:
         errors.append(f"{path}.sources: must be a non-empty array")
     else:
@@ -221,6 +241,13 @@ def validate_publication(video: Any, path: str) -> list[str]:
                 continue
             if not nonempty_string(source.get("src")):
                 errors.append(f"{source_path}.src: must be a non-empty string")
+                source_url_value = ""
+            else:
+                source_url_value = urljoin(source_url, source["src"])
+                comparable_url = urldefrag(source_url_value).url
+                if comparable_url in resolved_sources:
+                    errors.append(f"{source_path}.src: media source URLs must be distinct")
+                resolved_sources.add(comparable_url)
             source_type = source.get("type")
             if not nonempty_string(source_type):
                 errors.append(f"{source_path}.type: must be a non-empty media type")
@@ -229,7 +256,16 @@ def validate_publication(video: Any, path: str) -> list[str]:
             if not match:
                 errors.append(f"{source_path}.type: only video/mp4 and video/webm are allowed")
             else:
-                media_types.add(f"video/{match.group(1)}")
+                media_type = f"video/{match.group(1)}"
+                media_types.add(media_type)
+                expected_extension = f".{match.group(1)}"
+                if (
+                    not source_url_value
+                    or not urlparse(source_url_value).path.endswith(expected_extension)
+                ):
+                    errors.append(
+                        f"{source_path}.src: {media_type} requires a {expected_extension} pathname"
+                    )
     for required_type in ("video/mp4", "video/webm"):
         if required_type not in media_types:
             errors.append(f"{path}.sources: missing required {required_type} source")
@@ -271,6 +307,81 @@ def publication_digest(publication: Any) -> str:
     return hashlib.sha256(canonical).hexdigest()
 
 
+def local_media_path(channel_path: Path, source: str) -> Path | None:
+    parsed = urlparse(source)
+    if parsed.scheme or parsed.netloc:
+        return None
+    candidate = (channel_path.parent / unquote(parsed.path)).resolve()
+    try:
+        candidate.relative_to(ROOT)
+    except ValueError:
+        return None
+    return candidate
+
+
+def ffprobe_local_media(
+    channel: dict[str, Any],
+    channel_path: Path,
+    *,
+    runner=subprocess.run,
+    executable: str = "ffprobe",
+) -> list[str]:
+    errors: list[str] = []
+    for video_index, video in enumerate(channel.get("videos", [])):
+        if not is_object(video):
+            continue
+        for source_index, source in enumerate(video.get("sources", [])):
+            if not is_object(source) or not nonempty_string(source.get("src")):
+                continue
+            media_path = local_media_path(channel_path, source["src"])
+            if media_path is None:
+                continue
+            path = f"channel.videos[{video_index}].sources[{source_index}]"
+            if not media_path.is_file():
+                errors.append(f"{path}.src: local media file does not exist: {media_path}")
+                continue
+            source_type = str(source.get("type", "")).split(";", 1)[0]
+            expected = EXPECTED_VIDEO_CODECS.get(source_type)
+            if not expected:
+                continue
+            try:
+                completed = runner(
+                    [
+                        executable,
+                        "-v",
+                        "error",
+                        "-select_streams",
+                        "v:0",
+                        "-show_entries",
+                        "stream=codec_name",
+                        "-of",
+                        "json",
+                        str(media_path),
+                    ],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                )
+            except OSError as exc:
+                errors.append(f"{path}.src: ffprobe failed: {exc}")
+                continue
+            if completed.returncode:
+                errors.append(
+                    f"{path}.src: ffprobe failed: {completed.stderr.strip() or completed.returncode}"
+                )
+                continue
+            try:
+                streams = json.loads(completed.stdout).get("streams", [])
+                codec = streams[0].get("codec_name") if streams else None
+            except (AttributeError, IndexError, json.JSONDecodeError):
+                codec = None
+            if codec not in expected:
+                errors.append(
+                    f"{path}.src: expected {sorted(expected)} video codec, found {codec!r}"
+                )
+    return errors
+
+
 def legacy_publication_record(record: dict[str, Any], publication_id: Any) -> dict[str, Any] | None:
     for publication in record.get("publications", []):
         if is_object(publication) and publication.get("id") == publication_id:
@@ -300,7 +411,9 @@ def validate_channel(
     schema = channel.get("schema")
     if schema == CURRENT_SCHEMA:
         for index, video in enumerate(videos):
-            errors.extend(validate_publication(video, f"channel.videos[{index}]"))
+            errors.extend(
+                validate_publication(video, f"channel.videos[{index}]", source_url)
+            )
     elif schema == LEGACY_SCHEMA:
         record = legacy_record(legacy_policy, channel.get("id"), source_url)
         if not record:
@@ -670,6 +783,11 @@ def main(argv: list[str] | None = None) -> int:
         metavar="GIT_REF",
         help="reject any legacy-policy change not authorized by the trusted git baseline",
     )
+    parser.add_argument(
+        "--ffprobe-local",
+        action="store_true",
+        help="ffprobe repository-owned local MP4/WebM files and verify their video codecs",
+    )
     args = parser.parse_args(argv)
 
     policy = load_json(args.legacy_policy)
@@ -683,9 +801,13 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--source-url requires exactly one channel file")
     for channel_path in args.channels:
         source_url = args.source_url or channel_path.resolve().as_uri()
+        channel = load_json(channel_path)
+        errors = validate_channel(channel, source_url, policy)
+        if args.ffprobe_local:
+            errors.extend(ffprobe_local_media(channel, channel_path.resolve()))
         ok = print_result(
             str(channel_path),
-            validate_channel(load_json(channel_path), source_url, policy),
+            errors,
         ) and ok
     if args.registry:
         ok = print_result(

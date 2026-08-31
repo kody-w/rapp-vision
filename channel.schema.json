@@ -24,7 +24,31 @@
           "type": "string",
           "pattern": "^video/(mp4|webm)(?:\\s*;.*)?$"
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "pattern": "^video/mp4(?:\\s*;.*)?$" } },
+            "required": ["type"]
+          },
+          "then": {
+            "properties": {
+              "src": { "pattern": "^[^?#]*\\.mp4(?:[?#].*)?$" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "pattern": "^video/webm(?:\\s*;.*)?$" } },
+            "required": ["type"]
+          },
+          "then": {
+            "properties": {
+              "src": { "pattern": "^[^?#]*\\.webm(?:[?#].*)?$" }
+            }
+          }
+        }
+      ]
     },
     "chapter": {
       "type": "object",
@@ -98,7 +122,10 @@
                   "t": { "type": "number", "minimum": 0 },
                   "dur": { "type": "number", "exclusiveMinimum": 0 },
                   "card": { "type": "object" },
-                  "app": { "type": "string", "minLength": 1 },
+                  "app": {
+                    "type": "string",
+                    "pattern": "^(?:https://[^\\s\\\\]+|(?![A-Za-z][A-Za-z0-9+.-]*:|//)(?!.*\\\\)[^\\s?#][^\\s]*)$"
+                  },
                   "ready": { "type": "object" },
                   "actions": {
                     "type": "array",

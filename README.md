@@ -47,6 +47,10 @@ The trust root is installed in two pushes: first only the protected workflow
 and minimal verifier, then the exact policy bytes whose SHA-256 is baked into
 that verifier. See [`PUBLICATION_POLICY.md`](PUBLICATION_POLICY.md).
 
+Scheduled snapshot publishers also respect protected `main`: they update stable
+automation branches and open review-ready pull requests. See
+[`docs/AUTOMATION-PRS.md`](docs/AUTOMATION-PRS.md).
+
 | Channel | | What it is |
 |---|---|---|
 | **Rooms** | 🕯️ | Nine ambient places that do not exist — a canoe at dawn, a cabin under the aurora, a cave lit by larvae. Slow TV where the rain is simulated, so it never falls the same way twice. |
@@ -191,6 +195,9 @@ position and duration history.
 
 A scene is either a **card** (`card: {title, sub, note}`) or an **app**
 (`app`, plus optional `lower: {title, bench, bug, fix}` for the lower third).
+App URLs must be safe relative URLs or absolute `https://` URLs. Executable,
+local, blob, data, plain-HTTP, and protocol-relative schemes are rejected both
+before and after resolution.
 
 `ready: { selector }` or `ready: { text }` declares what "this app is usable"
 means. Every `at` is measured from the moment that becomes true, not from scene
@@ -224,7 +231,19 @@ Two things that will silently cost you a scene:
 coverage: headless Chromium commonly has no H.264 decoder, so WebM makes the
 guided layer verifiable in CI, while MP4 covers browsers and devices that do
 not ship WebM support. MIME bases are canonical lowercase (`video/mp4` and
-`video/webm`) in the schema and both validators.
+`video/webm`) in the schema and both validators. The two sources must resolve
+to distinct URLs, and their URL pathnames must end in the matching lowercase
+`.mp4` and `.webm` extensions; query strings and fragments are allowed.
+
+For repository-owned files, optionally verify the actual video streams:
+
+```bash
+python3 scripts/validate_publications.py --ffprobe-local /path/to/channel.json
+```
+
+This checks H.264 for MP4 and VP9 for WebM. Channels added outside the default
+registry never load a live iframe automatically: the viewer must explicitly
+choose **Try live replay** or **Start live replay**.
 
 ---
 

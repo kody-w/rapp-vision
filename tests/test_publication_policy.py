@@ -103,6 +103,131 @@ class TestPublicationPolicy(unittest.TestCase):
         self.assertIsNone(re.fullmatch(pattern, "Video/MP4"))
         self.assertIsNotNone(re.fullmatch(pattern, "video/mp4; codecs=\"avc1\""))
 
+    def test_live_app_urls_allow_only_relative_or_absolute_https(self):
+        schema = load(ROOT / "channel.schema.json")
+        pattern = schema["$defs"]["publication"]["properties"]["live"]["properties"][
+            "scenes"
+        ]["items"]["properties"]["app"]["pattern"]
+        safe = [
+            "../app/index.html",
+            "/apps/demo.html?mode=live#start",
+            "app.html",
+            "https://example.test/app/",
+        ]
+        unsafe = [
+            "javascript:alert(1)",
+            "data:text/html,<script>alert(1)</script>",
+            "blob:https://example.test/id",
+            "file:///Users/me/app.html",
+            "http://example.test/app.html",
+            "//example.test/app.html",
+            "\\\\example.test\\app.html",
+            "?app=demo",
+        ]
+        for app in safe:
+            with self.subTest(app=app, allowed=True):
+                self.assertTrue(VALIDATOR.safe_app_url(app))
+                self.assertIsNotNone(re.fullmatch(pattern, app))
+        for app in unsafe:
+            with self.subTest(app=app, allowed=False):
+                self.assertFalse(VALIDATOR.safe_app_url(app))
+                self.assertIsNone(re.fullmatch(pattern, app))
+                channel = copy.deepcopy(self.valid)
+                channel["videos"][0]["live"]["scenes"][1]["app"] = app
+                self.assertTrue(any(
+                    ".app: must be a safe relative URL or absolute HTTPS URL" in error
+                    for error in self.validate(channel)
+                ))
+
+    def test_media_sources_require_distinct_matching_extensions(self):
+        positive = copy.deepcopy(self.valid)
+        positive["videos"][0]["sources"][0]["src"] += "?download=1#video"
+        positive["videos"][0]["sources"][1]["src"] += "?download=1#video"
+        self.assertEqual(self.validate(positive), [])
+
+        wrong_extension = copy.deepcopy(self.valid)
+        wrong_extension["videos"][0]["sources"][0]["src"] = "paired.webm"
+        self.assertTrue(any(
+            "video/mp4 requires a .mp4 pathname" in error
+            for error in self.validate(wrong_extension)
+        ))
+
+        duplicate = copy.deepcopy(self.valid)
+        duplicate["videos"][0]["sources"] = [
+            {"src": "same.mp4#one", "type": "video/mp4"},
+            {"src": "same.mp4#two", "type": "video/mp4"},
+            {"src": "other.webm", "type": "video/webm"},
+        ]
+        self.assertTrue(any(
+            "media source URLs must be distinct" in error
+            for error in self.validate(duplicate)
+        ))
+
+        schema = load(ROOT / "channel.schema.json")
+        source_rules = schema["$defs"]["source"]["allOf"]
+        self.assertEqual(
+            source_rules[0]["then"]["properties"]["src"]["pattern"],
+            "^[^?#]*\\.mp4(?:[?#].*)?$",
+        )
+        self.assertEqual(
+            source_rules[1]["then"]["properties"]["src"]["pattern"],
+            "^[^?#]*\\.webm(?:[?#].*)?$",
+        )
+        self.assertIsNotNone(re.search(
+            source_rules[0]["then"]["properties"]["src"]["pattern"],
+            "media/clip.mp4?download=1#video",
+        ))
+        self.assertIsNone(re.search(
+            source_rules[0]["then"]["properties"]["src"]["pattern"],
+            "media/clip.exe?download=clip.mp4",
+        ))
+
+    def test_optional_ffprobe_path_checks_repository_owned_codecs(self):
+        channel = {
+            "videos": [{
+                "sources": [
+                    {
+                        "src": "media/rock-tumbler-showcase.mp4",
+                        "type": "video/mp4",
+                    },
+                    {
+                        "src": "media/rock-tumbler-showcase.webm",
+                        "type": "video/webm",
+                    },
+                ],
+            }],
+        }
+        calls = []
+
+        def runner(command, **_kwargs):
+            calls.append(command)
+            codec = "h264" if command[-1].endswith(".mp4") else "vp9"
+            return subprocess.CompletedProcess(
+                command, 0, stdout=json.dumps({"streams": [{"codec_name": codec}]}),
+                stderr="",
+            )
+
+        self.assertEqual(
+            VALIDATOR.ffprobe_local_media(channel, ROOT / "channel.json", runner=runner),
+            [],
+        )
+        self.assertEqual(len(calls), 2)
+        self.assertTrue(all(command[0] == "ffprobe" for command in calls))
+
+        def wrong_runner(command, **_kwargs):
+            return subprocess.CompletedProcess(
+                command, 0, stdout='{"streams":[{"codec_name":"mpeg4"}]}', stderr=""
+            )
+
+        self.assertTrue(any(
+            "expected ['h264'] video codec" in error
+            for error in VALIDATOR.ffprobe_local_media(
+                {"videos": [{"sources": [channel["videos"][0]["sources"][0]]}]},
+                ROOT / "channel.json",
+                runner=wrong_runner,
+            )
+        ))
+
     def test_explicit_null_optionals_fail_cli_and_schema(self):
         fixture = FIXTURES / "invalid-null-optionals.json"
         errors = self.validate(load(fixture))
@@ -267,6 +392,38 @@ class TestPublicationPolicy(unittest.TestCase):
         )
         self.assertTrue(any("must equal fetched channel id" in error for error in errors))
         self.assertTrue(any("duplicates registry.channels[0]" in error for error in errors))
+
+    def test_scheduled_publishers_use_stable_branches_and_pull_requests(self):
+        workflows = {
+            "harvest-follows.yml": "automation/harvest-follows",
+            "metrics.yml": "automation/metrics",
+            "content-machine.yml": "automation/content-machine",
+        }
+        for filename, branch in workflows.items():
+            with self.subTest(workflow=filename):
+                source = (
+                    ROOT / ".github" / "workflows" / filename
+                ).read_text(encoding="utf-8")
+                self.assertIn("contents: write", source)
+                self.assertIn("pull-requests: write", source)
+                self.assertIn(f"AUTOMATION_BRANCH: {branch}", source)
+                self.assertIn("git fetch origin main", source)
+                self.assertIn('git checkout -B "$AUTOMATION_BRANCH" origin/main', source)
+                self.assertIn("--force-with-lease=", source)
+                self.assertIn('origin "HEAD:$AUTOMATION_BRANCH"', source)
+                self.assertIn("gh pr list", source)
+                self.assertIn("--state open", source)
+                self.assertIn("gh pr create", source)
+                self.assertIn("--base main", source)
+                self.assertIn("GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}", source)
+                self.assertNotRegex(source, r"git push[^\n]*(?:HEAD:main|origin main)")
+                self.assertNotIn("git pull --rebase origin main", source)
+
+        operations = (ROOT / "docs" / "AUTOMATION-PRS.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("review-ready", operations)
+        self.assertIn("Do not work around", operations)
 
     def test_digest_baseline_is_immutable_after_bootstrap(self):
         baseline = copy.deepcopy(self.policy)
