@@ -1,0 +1,73 @@
+{
+  "schema": "rapp-vision.proof-clip/1",
+  "id": "03-mars-colony",
+  "title": "Mars Colony — Semantic Repair Rejection",
+  "description": "Eight-step colony recovery followed by rejection of a correctly hashed but semantically overbroad repair.",
+  "source": {
+    "url": "https://kody-w.github.io/frame-chains/showcase/03-mars-colony/",
+    "resolved_url": "https://kody-w.github.io/frame-chains/showcase/03-mars-colony/",
+    "public": true,
+    "synthetic": true,
+    "application_title": "Mars Colony Immune System — Frame 03"
+  },
+  "provenance": {
+    "captured_at": "2026-08-31T16:27:52.945Z",
+    "branch": "frame-film/03-mars-colony-capture",
+    "capture_script": "capture.mjs",
+    "capture_tool": "Playwright",
+    "playwright_version": "1.62.1",
+    "browser": "Chromium",
+    "browser_version": "151.0.7922.34",
+    "recording_mode": "headless page-only browser context",
+    "desktop_or_browser_chrome_captured": false,
+    "private_data_captured": false,
+    "network_source": "public GitHub Pages application",
+    "actions": [
+      "#nextButton ×8",
+      "#resetButton",
+      "#injectButton",
+      "#scanButton",
+      "#sweepButton"
+    ]
+  },
+  "evidence": {
+    "guided_completion": "Scenario complete",
+    "semantic_result": "Valid-hash mutation 75819c85 rejected: 12 actual targets exceeded the linked report delta of 3; accepted head f0af35b1 stayed intact.",
+    "correctly_hashed_candidate": "75819c85",
+    "authorized_delta_count": 3,
+    "authorized_delta_modules": [
+      "agriculture",
+      "oxygen",
+      "water"
+    ],
+    "accepted_head_preserved": "f0af35b1",
+    "accepted_ledger_preserved": true,
+    "accepted_ledger_rows": 16,
+    "assertion": "Correctly hashed candidate 75819c85 was refused: authorized [agriculture, oxygen, water], actual/batch [agriculture, communications, habitat, medical, navigation, oxygen, power, research, rover-bay, storage, thermal, water]. Writer scope_valid=true was ignored; accepted head f0af35b1 and prior module state stayed intact."
+  },
+  "video": {
+    "file": "source.webm",
+    "container": "matroska,webm",
+    "codec": "vp9",
+    "profile": "Profile 0",
+    "pixel_format": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "frame_rate": "30/1",
+    "frames": 995,
+    "duration_seconds": 33.166,
+    "bit_rate": 763737,
+    "audio_streams": 0,
+    "size_bytes": 3166266,
+    "sha256": "ffb1624c2f4d28c61030e3400333f6f9473c91f3f423816cd71c8c0a371be760"
+  },
+  "poster": {
+    "file": "poster.jpg",
+    "format": "jpeg",
+    "width": 1920,
+    "height": 1080,
+    "state": "correctly hashed overbroad repair rejected",
+    "size_bytes": 207107,
+    "sha256": "b59793f8951ca684a42df0dd099eec5c416477ad6aae8396ad831dec49a31c87"
+  }
+}
