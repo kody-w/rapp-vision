@@ -1,0 +1,509 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-400.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-700.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #242424;
+      font-family: "Inter", sans-serif;
+    }
+
+    #root * {
+      box-sizing: border-box;
+    }
+
+    .film-proof-ground {
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+      z-index: 0;
+    }
+
+    .film-proof-paper-grid {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      opacity: 0.32;
+      background-image:
+        linear-gradient(rgba(36, 36, 36, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(36, 36, 36, 0.055) 1px, transparent 1px);
+      background-size: 80px 80px;
+      pointer-events: none;
+    }
+
+    .film-proof-frame {
+      position: absolute;
+      left: 80px;
+      top: 46px;
+      width: 1760px;
+      height: 794px;
+      overflow: hidden;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 12px;
+      background: transparent;
+      box-shadow: 0 1px 3px rgba(36, 36, 36, 0.08), 0 4px 16px rgba(36, 36, 36, 0.04);
+      transform-origin: 50% 50%;
+      z-index: 5;
+      will-change: transform;
+      pointer-events: none;
+    }
+
+    .film-proof-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 50%;
+    }
+
+    .film-proof-vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      box-shadow: inset 0 0 0 1px rgba(36, 36, 36, 0.08);
+    }
+
+    .film-proof-display-line {
+      position: absolute;
+      left: 124px;
+      top: 680px;
+      z-index: 6;
+      width: 1120px;
+      padding: 22px 30px 24px;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 1px 3px rgba(36, 36, 36, 0.08), 0 4px 16px rgba(36, 36, 36, 0.04);
+      font-size: 58px;
+      font-weight: 400;
+      line-height: 1.04;
+      letter-spacing: -0.025em;
+      white-space: nowrap;
+    }
+
+    .film-proof-display-line::before {
+      content: "✱";
+      display: inline-block;
+      margin-right: 18px;
+      color: #0067b8;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 32px;
+      vertical-align: 10px;
+    }
+
+    .film-proof-marker {
+      position: absolute;
+      left: 396px;
+      top: 480px;
+      z-index: 7;
+      width: 126px;
+      height: 70px;
+      border: 5px solid #0067b8;
+      border-radius: 50%;
+      transform-origin: 50% 50%;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.72);
+    }
+
+    .film-proof-marker::after {
+      content: "";
+      position: absolute;
+      inset: -10px 7px -7px -8px;
+      border: 2px solid rgba(0, 103, 184, 0.72);
+      border-radius: 48%;
+    }
+
+    .film-proof-marker-label {
+      position: absolute;
+      left: 407px;
+      top: 434px;
+      z-index: 7;
+      padding: 7px 12px;
+      border-radius: 9999px;
+      background: #0067b8;
+      color: #ffffff;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .film-proof-wash {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      background: rgba(255, 255, 255, 0.82);
+      pointer-events: none;
+    }
+
+    .film-proof-cta-shell {
+      position: absolute;
+      left: 330px;
+      top: 250px;
+      width: 1260px;
+      height: 516px;
+      z-index: 8;
+    }
+
+    .film-proof-mode-rail {
+      position: absolute;
+      left: 150px;
+      top: 0;
+      width: 960px;
+      height: 60px;
+      display: grid;
+      grid-template-columns: 1fr 88px 1fr;
+      align-items: center;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.96);
+      color: #242424;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(36, 36, 36, 0.08), 0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    .film-proof-mode-arrow {
+      color: rgba(36, 36, 36, 0.56);
+      font-size: 16px;
+      letter-spacing: 0.14em;
+    }
+
+    .film-proof-card {
+      position: absolute;
+      inset: 86px 0 0;
+      height: 430px;
+      overflow: hidden;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.97);
+      box-shadow: 0 1px 3px rgba(36, 36, 36, 0.08), 0 4px 16px rgba(36, 36, 36, 0.04);
+      transform-origin: 50% 50%;
+    }
+
+    .film-proof-card-index {
+      position: absolute;
+      left: 54px;
+      top: 44px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+    }
+
+    .film-proof-card-rule {
+      position: absolute;
+      left: 54px;
+      right: 54px;
+      top: 92px;
+      height: 1px;
+      background: rgba(36, 36, 36, 0.2);
+      transform-origin: 0 50%;
+    }
+
+    .film-proof-card-title {
+      position: absolute;
+      left: 54px;
+      right: 54px;
+      top: 126px;
+      font-size: 92px;
+      font-weight: 700;
+      line-height: 0.98;
+      letter-spacing: -0.036em;
+    }
+
+    .film-proof-card-subline {
+      position: absolute;
+      left: 58px;
+      top: 246px;
+      font-size: 36px;
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.014em;
+    }
+
+    .film-proof-action-pill {
+      position: absolute;
+      left: 58px;
+      top: 320px;
+      min-width: 342px;
+      height: 66px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 28px;
+      border-radius: 9999px;
+      background: #0067b8;
+      color: #ffffff;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      transform-origin: 50% 50%;
+    }
+
+    .film-proof-action-pill span {
+      margin-left: 18px;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .film-proof-watch-card {
+      z-index: 1;
+    }
+
+    .film-proof-replay-card {
+      z-index: 2;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="10-film-plus-proof"
+    data-duration="10.368"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div
+      id="film-proof-ground"
+      class="clip film-proof-ground"
+      data-start="0"
+      data-duration="10.368"
+      data-track-index="0"
+    ></div>
+
+    <div class="film-proof-paper-grid" data-layout-ignore></div>
+
+    <div id="film-proof-frame" class="film-proof-frame" data-layout-allow-overflow>
+      <video
+        id="film-proof-video-branch"
+        class="clip film-proof-video"
+        src="assets/proof-clips/10-futures-museum/source.webm"
+        data-frame-video="approved"
+        data-frame-video-x="80"
+        data-frame-video-y="46"
+        data-frame-video-width="1760"
+        data-frame-video-height="794"
+        data-frame-video-fit="cover"
+        data-start="0"
+        data-duration="3.2"
+        data-media-start="23"
+        data-track-index="2"
+        muted
+        playsinline
+        preload="auto"
+      ></video>
+      <video
+        id="film-proof-video-corrupt"
+        class="clip film-proof-video"
+        src="assets/proof-clips/10-futures-museum/source.webm"
+        data-frame-video="approved"
+        data-frame-video-x="80"
+        data-frame-video-y="46"
+        data-frame-video-width="1760"
+        data-frame-video-height="794"
+        data-frame-video-fit="cover"
+        data-start="3.2"
+        data-duration="3.1"
+        data-media-start="29"
+        data-track-index="2"
+        muted
+        playsinline
+        preload="auto"
+      ></video>
+      <video
+        id="film-proof-video-hold"
+        class="clip film-proof-video"
+        src="assets/proof-clips/10-futures-museum/source.webm"
+        data-frame-video="approved"
+        data-frame-video-x="115"
+        data-frame-video-y="-50"
+        data-frame-video-width="1690"
+        data-frame-video-height="794"
+        data-frame-video-fit="cover"
+        data-start="6.3"
+        data-duration="4.068"
+        data-media-start="30.5"
+        data-track-index="2"
+        muted
+        playsinline
+        preload="auto"
+      ></video>
+      <div class="film-proof-vignette" data-layout-ignore></div>
+    </div>
+
+    <div id="film-proof-line" class="film-proof-display-line">Immutable futures become art</div>
+    <div id="film-proof-marker" class="film-proof-marker" aria-hidden="true"></div>
+    <div id="film-proof-marker-label" class="film-proof-marker-label">F02</div>
+    <div id="film-proof-wash" class="film-proof-wash" data-layout-ignore></div>
+
+    <div id="film-proof-cta-shell" class="film-proof-cta-shell">
+      <div id="film-proof-mode-rail" class="film-proof-mode-rail">
+        <span>WATCH THE FILM</span>
+        <span class="film-proof-mode-arrow">THEN →</span>
+        <span>TRY THE LIVE REPLAY</span>
+      </div>
+
+      <section id="film-proof-watch-card" class="film-proof-card film-proof-watch-card">
+        <div class="film-proof-card-index">MODE 01 · UNDERSTAND</div>
+        <div class="film-proof-card-rule"></div>
+        <div class="film-proof-card-title">WATCH THE FILM</div>
+        <div class="film-proof-card-subline">Learn what the proof means.</div>
+      </section>
+
+      <section id="film-proof-replay-card" class="film-proof-card film-proof-replay-card">
+        <div class="film-proof-card-index">MODE 02 · OPERATE</div>
+        <div class="film-proof-card-rule"></div>
+        <div class="film-proof-card-title">TRY THE LIVE REPLAY</div>
+        <div id="film-proof-replay-subline" class="film-proof-card-subline">Operate the proof yourself.</div>
+        <div id="film-proof-action-pill" class="film-proof-action-pill">
+          OPEN THE PROOF <span>→</span>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+
+    gsap.set("#film-proof-frame", { x: 0, y: 0, scale: 1 });
+    gsap.set("#film-proof-line", { autoAlpha: 0 });
+    gsap.set(["#film-proof-marker", "#film-proof-marker-label"], { autoAlpha: 0 });
+    gsap.set("#film-proof-wash", { autoAlpha: 0 });
+    gsap.set("#film-proof-cta-shell", { autoAlpha: 0 });
+    gsap.set("#film-proof-watch-card", { autoAlpha: 1, scale: 1 });
+    gsap.set("#film-proof-replay-card", { autoAlpha: 0, scale: 0.74 });
+    gsap.set(["#film-proof-replay-subline", "#film-proof-action-pill"], { autoAlpha: 0 });
+
+    const tl = gsap.timeline({ paused: true });
+
+    tl.fromTo(
+      "#film-proof-line",
+      { autoAlpha: 0, x: -34 },
+      { autoAlpha: 1, x: 0, duration: 0.62, ease: "power3.out" },
+      0.16
+    );
+    tl.to(
+      "#film-proof-frame",
+      { scale: 1.045, duration: 2.7, ease: "power1.inOut" },
+      0.24
+    );
+
+    tl.set("#film-proof-line", { autoAlpha: 0 }, 3.2);
+    tl.set("#film-proof-frame", { scale: 1, x: 0, y: 0 }, 3.2);
+    tl.fromTo(
+      "#film-proof-marker",
+      { autoAlpha: 0, scale: 0.72, rotation: -5 },
+      { autoAlpha: 1, scale: 1, rotation: -2, duration: 0.58, ease: "power2.out" },
+      3.28
+    );
+    tl.fromTo(
+      "#film-proof-marker-label",
+      { autoAlpha: 0, y: -12 },
+      { autoAlpha: 1, y: 0, duration: 0.42, ease: "power3.out" },
+      3.52
+    );
+    tl.to(
+      "#film-proof-marker",
+      { scale: 1.025, duration: 0.3, ease: "power1.inOut", repeat: 1, yoyo: true },
+      4.72
+    );
+
+    tl.set(["#film-proof-marker", "#film-proof-marker-label"], { autoAlpha: 0 }, 6.3);
+    tl.fromTo(
+      "#film-proof-wash",
+      { autoAlpha: 0 },
+      { autoAlpha: 1, duration: 0.34, ease: "power1.out" },
+      6.3
+    );
+    tl.to(
+      "#film-proof-frame",
+      { y: -96, scale: 0.965, duration: 0.62, ease: "power3.out" },
+      6.3
+    );
+    tl.set("#film-proof-cta-shell", { autoAlpha: 1 }, 6.3);
+    tl.fromTo(
+      "#film-proof-mode-rail",
+      { autoAlpha: 0, y: -10 },
+      { autoAlpha: 1, y: 0, duration: 0.42, ease: "power3.out" },
+      6.34
+    );
+    tl.fromTo(
+      "#film-proof-watch-card .film-proof-card-rule",
+      { scaleX: 0 },
+      { scaleX: 1, duration: 0.52, ease: "power2.out" },
+      6.42
+    );
+
+    tl.to(
+      "#film-proof-watch-card",
+      { scale: 0.74, autoAlpha: 0, duration: 0.34, ease: "power2.in" },
+      8.5
+    );
+    tl.fromTo(
+      "#film-proof-replay-card",
+      { scale: 0.74, autoAlpha: 0 },
+      { scale: 1, autoAlpha: 1, duration: 0.54, ease: "power3.out" },
+      8.68
+    );
+    tl.fromTo(
+      "#film-proof-replay-subline",
+      { autoAlpha: 0, y: 16 },
+      { autoAlpha: 1, y: 0, duration: 0.38, ease: "power3.out" },
+      8.88
+    );
+    tl.fromTo(
+      "#film-proof-action-pill",
+      { autoAlpha: 0, y: 12 },
+      { autoAlpha: 1, y: 0, duration: 0.38, ease: "power3.out" },
+      9.02
+    );
+    tl.to(
+      "#film-proof-action-pill",
+      { scale: 0.97, y: 2, duration: 0.1, ease: "power2.in" },
+      9.46
+    );
+    tl.to(
+      "#film-proof-action-pill",
+      { scale: 1, y: 0, duration: 0.16, ease: "power2.out" },
+      9.56
+    );
+
+    window.__timelines["10-film-plus-proof"] = tl;
+  </script>
+</template>
