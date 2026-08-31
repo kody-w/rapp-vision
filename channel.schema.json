@@ -26,6 +26,14 @@
         }
       }
     },
+    "chapter": {
+      "type": "object",
+      "required": ["t", "label"],
+      "properties": {
+        "t": { "type": "number", "minimum": 0 },
+        "label": { "type": "string", "minLength": 1 }
+      }
+    },
     "publication": {
       "type": "object",
       "required": ["id", "title", "duration", "sources", "live"],
@@ -33,6 +41,10 @@
         "id": { "type": "string", "minLength": 1 },
         "title": { "type": "string", "minLength": 1 },
         "duration": { "type": "number", "exclusiveMinimum": 0, "maximum": 86400 },
+        "chapters": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/chapter" }
+        },
         "sources": {
           "type": "array",
           "minItems": 2,
@@ -57,6 +69,15 @@
           "required": ["kind", "scenes"],
           "properties": {
             "kind": { "const": "rapp-vision-live/1.0" },
+            "duration": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 86400
+            },
+            "chapters": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/chapter" }
+            },
             "scenes": {
               "type": "array",
               "minItems": 1,

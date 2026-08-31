@@ -81,7 +81,31 @@ def validate_action(action: Any, duration: float, path: str) -> list[str]:
     return errors
 
 
-def validate_live(live: Any, duration: float, path: str) -> list[str]:
+def validate_chapters(chapters: Any, duration: float, path: str) -> list[str]:
+    errors: list[str] = []
+    if chapters is None:
+        return errors
+    if not isinstance(chapters, list):
+        return [f"{path}: must be an array"]
+    previous = -1.0
+    for index, chapter in enumerate(chapters):
+        chapter_path = f"{path}[{index}]"
+        if not is_object(chapter):
+            errors.append(f"{chapter_path}: must be an object")
+            continue
+        start = chapter.get("t")
+        if not is_number(start) or start < 0 or start >= duration:
+            errors.append(f"{chapter_path}.t: must be within the mode duration")
+        elif start <= previous:
+            errors.append(f"{chapter_path}.t: chapters must be strictly increasing")
+        else:
+            previous = float(start)
+        if not nonempty_string(chapter.get("label")):
+            errors.append(f"{chapter_path}.label: must be a non-empty string")
+    return errors
+
+
+def validate_live(live: Any, path: str) -> list[str]:
     errors: list[str] = []
     if not is_object(live):
         return [f"{path}: must be an object"]
@@ -137,8 +161,27 @@ def validate_live(live: Any, duration: float, path: str) -> list[str]:
         if is_number(start):
             cursor = float(start) + float(scene_duration)
 
-    if abs(cursor - duration) > EPSILON:
-        errors.append(f"{path}.scenes: must fill publication duration {duration:g}; ended at {cursor:g}")
+    explicit_duration = live.get("duration")
+    if explicit_duration is not None and (
+        not is_number(explicit_duration)
+        or explicit_duration <= 0
+        or explicit_duration > MAX_DURATION
+    ):
+        errors.append(
+            f"{path}.duration: must be greater than zero and at most {MAX_DURATION}"
+        )
+        replay_duration = cursor
+    else:
+        replay_duration = float(explicit_duration) if explicit_duration is not None else cursor
+    if replay_duration <= 0 or replay_duration > MAX_DURATION:
+        errors.append(
+            f"{path}.scenes: derived replay duration must be greater than zero and at most {MAX_DURATION}"
+        )
+    elif abs(cursor - replay_duration) > EPSILON:
+        errors.append(
+            f"{path}.scenes: must fill replay duration {replay_duration:g}; ended at {cursor:g}"
+        )
+    errors.extend(validate_chapters(live.get("chapters"), replay_duration, f"{path}.chapters"))
     return errors
 
 
@@ -153,9 +196,8 @@ def validate_publication(video: Any, path: str) -> list[str]:
     duration = video.get("duration")
     if not is_number(duration) or duration <= 0 or duration > MAX_DURATION:
         errors.append(f"{path}.duration: must be greater than zero and at most {MAX_DURATION}")
-        duration_for_live = 0.0
     else:
-        duration_for_live = float(duration)
+        errors.extend(validate_chapters(video.get("chapters"), float(duration), f"{path}.chapters"))
 
     sources = video.get("sources")
     media_types: set[str] = set()
@@ -182,7 +224,7 @@ def validate_publication(video: Any, path: str) -> list[str]:
         if required_type not in media_types:
             errors.append(f"{path}.sources: missing required {required_type} source")
 
-    errors.extend(validate_live(video.get("live"), duration_for_live, f"{path}.live"))
+    errors.extend(validate_live(video.get("live"), f"{path}.live"))
     return errors
 
 

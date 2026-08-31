@@ -10,6 +10,11 @@ Every new RAPP Vision publication is one work with two inseparable modes:
 A publication missing either mode is invalid. MP4-only, WebM-only, static-only,
 and replay-only submissions are rejected.
 
+The modes share identity, not necessarily runtime. Entry `duration` and
+`chapters` describe the default encoded film. Replay length is derived from its
+scenes unless `live.duration` states it explicitly; `live.chapters` is optional
+and belongs only to the replay.
+
 The current contract is `rapp-vision-channel/2.0`, documented by
 [`channel.schema.json`](channel.schema.json) and enforced by
 [`scripts/validate_publications.py`](scripts/validate_publications.py). The

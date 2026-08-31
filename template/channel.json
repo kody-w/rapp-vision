@@ -11,7 +11,7 @@
       "url": "https://github.com/your-github-handle"
     }
   ],
-  "_howto": "Every new publication is one paired entry. MP4 and WebM provide the default guided video; live is the take-the-wheel replay available from the same permalink. Every src, thumb, and app resolves relative to this file.",
+  "_howto": "Every new publication is one paired entry. MP4 and WebM provide the default guided video; live is the take-the-wheel replay available from the same permalink. Entry duration/chapters describe the film; live duration/chapters describe the replay and may differ. Every src, thumb, and app resolves relative to this file.",
   "videos": [
     {
       "id": "my-first-publication",
@@ -49,6 +49,17 @@
       ],
       "live": {
         "kind": "rapp-vision-live/1.0",
+        "duration": 36,
+        "chapters": [
+          {
+            "t": 0,
+            "label": "Replay briefing"
+          },
+          {
+            "t": 6,
+            "label": "Drive the real app"
+          }
+        ],
         "scenes": [
           {
             "t": 0,
@@ -61,7 +72,7 @@
           },
           {
             "t": 6,
-            "dur": 24,
+            "dur": 30,
             "app": "../my-app.html",
             "ready": {
               "selector": "#start-button"

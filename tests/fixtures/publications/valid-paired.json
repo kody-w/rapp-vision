@@ -19,6 +19,17 @@
       ],
       "live": {
         "kind": "rapp-vision-live/1.0",
+        "duration": 12,
+        "chapters": [
+          {
+            "t": 0,
+            "label": "Replay intro"
+          },
+          {
+            "t": 2,
+            "label": "Replay app"
+          }
+        ],
         "scenes": [
           {
             "t": 0,
@@ -29,7 +40,7 @@
           },
           {
             "t": 2,
-            "dur": 8,
+            "dur": 10,
             "app": "app.html",
             "ready": {
               "selector": "#go"

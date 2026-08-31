@@ -143,10 +143,15 @@ to rot.
       "chapters": [ { "t": 0, "label": "Intro" } ],
       "live": {
         "kind": "rapp-vision-live/1.0",
+        "duration": 96,
+        "chapters": [
+          { "t": 0, "label": "Replay briefing" },
+          { "t": 6, "label": "Drive the app" }
+        ],
         "scenes": [
           { "t": 0, "dur": 6, "card": { "title": "Take the wheel", "sub": "This is the live proof." } },
           {
-            "t": 6, "dur": 84,
+            "t": 6, "dur": 90,
             "app": "../localFirstTools/apex-driving-simulator.html",
             "ready":  { "selector": "#startBtn" },
             "lower":  { "title": "Apex", "bench": "vs Gran Turismo 7", "fix": "W is throttle — take the wheel" },
@@ -167,6 +172,12 @@ to rot.
 The player validates the fetched channel before rendering it. For a paired
 entry, encoded video is always the initial mode; live replay is a switch on the
 same entry, not a second card.
+
+Entry `duration` and `chapters` describe the encoded film. The replay may be
+longer or shorter: its duration is derived from the contiguous scene endpoints,
+or declared as `live.duration` and checked against them. Optional
+`live.chapters` are shown only in replay mode. Each mode keeps its own resume
+position and duration history.
 
 ### Scenes
 
@@ -208,8 +219,8 @@ not ship WebM support.
 ## What the player does
 
 - **Aggregated home feed** across every channel you've subscribed to
-- **Resume where you left off**, per video, in `localStorage`
-- **Chapters**, keyboard shortcuts, PiP, playback rate
+- **Separate resume points**, per film and replay, in `localStorage`
+- **Mode-specific chapters**, keyboard shortcuts, PiP, playback rate
 - **Watch later / liked**, exportable and importable as JSON
 - **Live replay** with a real transport (play/pause/seek) over a running app
 - **Zero telemetry.** Your watch history never leaves the device.

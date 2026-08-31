@@ -47,6 +47,12 @@ class TestPairedPlayer(unittest.TestCase):
         const valid = validateChannelContract({valid}, "https://example.test/channel.json");
         const invalid = validateChannelContract({invalid}, "https://example.test/channel.json");
         if (valid.length) throw new Error(valid.join("\\n"));
+        if (replayDuration({valid}.videos[0].live) !== 12)
+          throw new Error("browser validator reused the 10 second film duration");
+        const derivedReplay = JSON.parse(JSON.stringify({valid}.videos[0].live));
+        delete derivedReplay.duration;
+        if (replayDuration(derivedReplay) !== 12)
+          throw new Error("browser player did not derive replay duration from scenes");
         if (!invalid.some(e => e.includes("missing required video/webm")))
           throw new Error("browser validator accepted an MP4-only publication");
         """
@@ -59,6 +65,11 @@ class TestPairedPlayer(unittest.TestCase):
         const paired = {id:"proof", sources:[{src:"proof.mp4"}], live:{scenes:[]}};
         if (historyKey(paired, "video") !== "proof::video") throw new Error("video key");
         if (historyKey(paired, "live") !== "proof::live") throw new Error("live key");
+        const history = {};
+        history[historyKey(paired, "video")] = {t:9,d:10};
+        history[historyKey(paired, "live")] = {t:11,d:12};
+        if (history["proof::video"].d === history["proof::live"].d) throw new Error("shared duration");
+        if (history["proof::video"].t !== 9 || history["proof::live"].t !== 11) throw new Error("shared progress");
         if (historyKey({id:"legacy", sources:[]}, "live") !== "legacy") throw new Error("legacy key");
         """
         self.run_node(script)
@@ -71,6 +82,9 @@ class TestPairedPlayer(unittest.TestCase):
         self.assertIn('document.removeEventListener("keydown", live.keys);', INDEX)
         self.assertIn("retryTimers.forEach(clearTimeout);", INDEX)
         self.assertIn('host.dataset.watchMode = mode;', INDEX)
+        self.assertIn("const total = replayDuration(v.live);", INDEX)
+        self.assertIn('next === "live" ? ((v.live && v.live.chapters) || [])', INDEX)
+        self.assertIn('mode === "live" ? replayDuration(v.live) : v.duration', INDEX)
 
 
 if __name__ == "__main__":

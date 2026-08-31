@@ -280,6 +280,28 @@ const rvString = v => typeof v === "string" && !!v.trim();
 const rvNumber = v => typeof v === "number" && Number.isFinite(v);
 const rvPoint = v => Array.isArray(v) && v.length === 2 && v.every(rvNumber);
 const rvTarget = v => rvObject(v) && (rvString(v.selector) !== rvString(v.text));
+const replayDuration = live => rvNumber(live && live.duration) &&
+  live.duration > 0 && live.duration <= MAX_PUBLICATION_DURATION
+  ? live.duration
+  : ((live && live.scenes) || []).reduce((m, s) =>
+      Math.max(m, rvObject(s) && rvNumber(s.t) && rvNumber(s.dur) ? s.t + s.dur : 0), 0);
+
+function validateModeChapters(chapters, duration, path) {
+  const out = [];
+  if (chapters === undefined) return out;
+  if (!Array.isArray(chapters)) return [`${path}: must be an array`];
+  let previous = -1;
+  chapters.forEach((chapter, i) => {
+    const cp = `${path}[${i}]`;
+    if (!rvObject(chapter)) { out.push(`${cp}: must be an object`); return; }
+    if (!rvNumber(chapter.t) || chapter.t < 0 || chapter.t >= duration)
+      out.push(`${cp}.t: must be within the mode duration`);
+    else if (chapter.t <= previous) out.push(`${cp}.t: chapters must be strictly increasing`);
+    else previous = chapter.t;
+    if (!rvString(chapter.label)) out.push(`${cp}.label: must be a non-empty string`);
+  });
+  return out;
+}
 
 function validateReplayAction(a, dur, path) {
   const out = [];
@@ -302,7 +324,7 @@ function validateReplayAction(a, dur, path) {
   return out;
 }
 
-function validateLiveReplay(live, duration, path) {
+function validateLiveReplay(live, path) {
   const out = [];
   if (!rvObject(live)) return [`${path}: must be an object`];
   if (live.kind !== LIVE_REPLAY_KIND) out.push(`${path}.kind: must equal "${LIVE_REPLAY_KIND}"`);
@@ -332,8 +354,15 @@ function validateLiveReplay(live, duration, path) {
     }
     if (rvNumber(scene.t)) cursor = scene.t + scene.dur;
   });
-  if (Math.abs(cursor - duration) > 1e-6)
-    out.push(`${path}.scenes: must fill publication duration ${duration}; ended at ${cursor}`);
+  const explicit = live.duration;
+  if (explicit !== undefined && (!rvNumber(explicit) || explicit <= 0 || explicit > MAX_PUBLICATION_DURATION))
+    out.push(`${path}.duration: must be greater than zero and at most ${MAX_PUBLICATION_DURATION}`);
+  const duration = explicit !== undefined && rvNumber(explicit) && explicit > 0 ? explicit : cursor;
+  if (duration <= 0 || duration > MAX_PUBLICATION_DURATION)
+    out.push(`${path}.scenes: derived replay duration must be greater than zero and at most ${MAX_PUBLICATION_DURATION}`);
+  else if (Math.abs(cursor - duration) > 1e-6)
+    out.push(`${path}.scenes: must fill replay duration ${duration}; ended at ${cursor}`);
+  out.push(...validateModeChapters(live.chapters, duration, `${path}.chapters`));
   return out;
 }
 
@@ -344,6 +373,7 @@ function validatePairedPublication(v, path) {
   const duration = rvNumber(v.duration) && v.duration > 0 && v.duration <= MAX_PUBLICATION_DURATION
     ? v.duration : 0;
   if (!duration) out.push(`${path}.duration: must be greater than zero and at most ${MAX_PUBLICATION_DURATION}`);
+  else out.push(...validateModeChapters(v.chapters, duration, `${path}.chapters`));
   const types = new Set();
   if (!Array.isArray(v.sources) || !v.sources.length) out.push(`${path}.sources: must be a non-empty array`);
   else v.sources.forEach((s, i) => {
@@ -361,7 +391,7 @@ function validatePairedPublication(v, path) {
   ["video/mp4", "video/webm"].forEach(type => {
     if (!types.has(type)) out.push(`${path}.sources: missing required ${type} source`);
   });
-  out.push(...validateLiveReplay(v.live, duration, `${path}.live`));
+  out.push(...validateLiveReplay(v.live, `${path}.live`));
   return out;
 }
 
@@ -722,7 +752,8 @@ function cardHTML(v) {
 function matches(v, q) {
   if (!q) return true;
   const hay = [v.title, v.description, (v.tags || []).join(" "),
-               (v.chapters || []).map(c => c.label).join(" ")].join(" ").toLowerCase();
+               (v.chapters || []).map(c => c.label).join(" "),
+               ((v.live && v.live.chapters) || []).map(c => c.label).join(" ")].join(" ").toLowerCase();
   return q.toLowerCase().split(/\s+/).filter(Boolean).every(w => hay.includes(w));
 }
 
@@ -917,7 +948,7 @@ function fmtBytes(n) {
 
 function mountLive(v, host, progressKey = v.id) {
   const scenes = (v.live.scenes || []).slice().sort((a, b) => a.t - b.t);
-  const total = v.duration || scenes.reduce((m, s) => Math.max(m, s.t + (s.dur || 0)), 0);
+  const total = replayDuration(v.live);
 
   host.innerHTML = `
     <div class="stage" id="stage"><div class="shade" id="shade"></div></div>
@@ -1224,6 +1255,13 @@ function mountLive(v, host, progressKey = v.id) {
     $("#ls i", host).style.width = (clock / total * 100).toFixed(2) + "%";
     const s = sceneAt(clock);
     if (s) shade.style.opacity = clock > s.t + (s.dur || 0) - 0.5 ? 0.55 : 0;
+    const chapters = v.live.chapters || [];
+    const btns = app.querySelectorAll(".chapters button");
+    if (chapters.length && btns.length) {
+      let active = 0;
+      chapters.forEach((chapter, i) => { if (clock >= chapter.t - 0.25) active = i; });
+      btns.forEach((button, i) => button.classList.toggle("on", i === active));
+    }
   }
 
   function seek(t) {
@@ -1412,14 +1450,10 @@ function viewWatch(id) {
         </div>
       </div>
       <div class="desc">
-        <div class="stat">${[esc(ago(v.published)), fmt(v.duration), (v.width && v.height ? v.width + "×" + v.height : ""), (v.tags || []).map(t => "#" + t).join(" ")].filter(Boolean).join(" · ")}</div>
+        <div class="stat">${[esc(ago(v.published)), `<span id="mode-duration">${fmt(v.duration)}</span>`, (v.width && v.height ? v.width + "×" + v.height : ""), (v.tags || []).map(t => "#" + t).join(" ")].filter(Boolean).join(" · ")}</div>
         ${esc(v.description)}
       </div>
-      ${(v.chapters || []).length ? `<div class="chapters">
-        <h2 class="sec" style="margin-bottom:8px">Chapters</h2>
-        <ol>${v.chapters.map((c, i) => `<li><button data-t="${c.t}" data-i="${i}">
-          <time>${fmt(c.t)}</time><span>${esc(c.label)}</span></button></li>`).join("")}</ol>
-      </div>` : ""}
+      <div id="chapters-slot"></div>
       <div id="community" data-vk="${esc(vkey(v))}">${communityHTML(mget(v))}</div>
     </div>
     <aside>
@@ -1437,8 +1471,19 @@ function viewWatch(id) {
 
   bindCommon(id);
   const host = $("#host"), tools = $("#mode-tools"), status = $("#mode-status");
+  const chaptersSlot = $("#chapters-slot");
+  const modeDuration = $("#mode-duration");
   let mounted = null;
   let mode = "";
+
+  function renderModeChapters(next) {
+    const chapters = next === "live" ? ((v.live && v.live.chapters) || []) : (v.chapters || []);
+    chaptersSlot.innerHTML = chapters.length ? `<div class="chapters">
+      <h2 class="sec" style="margin-bottom:8px">${next === "live" ? "Replay chapters" : "Film chapters"}</h2>
+      <ol>${chapters.map((c, i) => `<li><button data-t="${c.t}" data-i="${i}">
+        <time>${fmt(c.t)}</time><span>${esc(c.label)}</span></button></li>`).join("")}</ol>
+    </div>` : "";
+  }
 
   function cleanupMode() {
     if (mounted) mounted.destroy();
@@ -1450,6 +1495,8 @@ function viewWatch(id) {
     cleanupMode();
     mode = next;
     host.dataset.watchMode = mode;
+    modeDuration.textContent = fmt(mode === "live" ? replayDuration(v.live) : v.duration);
+    renderModeChapters(mode);
     if (mode === "live") {
       tools.innerHTML = `
         ${paired ? `<button class="tbtn mode-switch" id="b-switch" aria-label="Watch guided video">Watch guided video</button>` : ""}

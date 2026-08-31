@@ -31,10 +31,36 @@ class TestPublicationPolicy(unittest.TestCase):
 
     def test_positive_fixture_and_template_are_valid(self):
         self.assertEqual(self.validate(self.valid), [])
+        self.assertEqual(self.valid["videos"][0]["duration"], 10)
+        self.assertEqual(self.valid["videos"][0]["live"]["duration"], 12)
         self.assertEqual(
             self.validate(load(ROOT / "template" / "channel.json")),
             [],
         )
+
+    def test_replay_duration_is_explicit_or_derived_never_the_film_duration(self):
+        derived = copy.deepcopy(self.valid)
+        del derived["videos"][0]["live"]["duration"]
+        self.assertEqual(self.validate(derived), [])
+
+        wrong_replay_duration = copy.deepcopy(self.valid)
+        wrong_replay_duration["videos"][0]["live"]["duration"] = 10
+        errors = self.validate(wrong_replay_duration)
+        self.assertTrue(any("must fill replay duration 10; ended at 12" in error for error in errors))
+
+    def test_film_and_replay_chapters_use_their_own_duration_bounds(self):
+        film_bad = copy.deepcopy(self.valid)
+        film_bad["videos"][0]["chapters"] = [{"t": 11, "label": "Outside film"}]
+        self.assertTrue(any(
+            ".chapters[0].t: must be within the mode duration" in error
+            for error in self.validate(film_bad)
+        ))
+
+        replay_ok = copy.deepcopy(self.valid)
+        replay_ok["videos"][0]["live"]["chapters"].append(
+            {"t": 11, "label": "Still inside replay"}
+        )
+        self.assertEqual(self.validate(replay_ok), [])
 
     def test_negative_fixtures_are_rejected_for_the_named_reason(self):
         cases = {
