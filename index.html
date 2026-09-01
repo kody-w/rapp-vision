@@ -1953,6 +1953,13 @@ async function fetchChannel(entry) {
   const c = await r.json();
   if (entry._registry && entry.id !== c.id)
     throw new Error(`registry id ${entry.id} does not match fetched channel id ${c.id}`);
+  if (entry._registry) {
+    const expectedSchema = entry.legacy ? LEGACY_CHANNEL_SCHEMA : entry.contract;
+    if (expectedSchema && c.schema !== expectedSchema)
+      throw new Error(
+        `registry declaration requires channel schema ${expectedSchema}`,
+      );
+  }
   const sourceIdentity = entry.legacy === LEGACY_POLICY.id && LEGACY_POLICY.registry_base
     ? absolutise(entry.url, LEGACY_POLICY.registry_base)
     : url;
