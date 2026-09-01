@@ -1,0 +1,662 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-400.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-700.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #242424;
+      font-family: "Inter", sans-serif;
+    }
+
+    #root * {
+      box-sizing: border-box;
+    }
+
+    .correct-hash-wrong-repair-ground {
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+    }
+
+    .correct-hash-wrong-repair-world {
+      position: absolute;
+      inset: 0;
+      overflow: visible;
+      transform-origin: 50% 50%;
+      will-change: transform;
+    }
+
+    .correct-hash-wrong-repair-stage {
+      position: absolute;
+      left: 70px;
+      top: 55px;
+      width: 1780px;
+      height: 805px;
+      overflow: hidden;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 12px;
+      background: #151718;
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    .correct-hash-wrong-repair-rail {
+      position: absolute;
+      z-index: 8;
+      left: 0;
+      top: 0;
+      width: 300px;
+      height: 805px;
+      padding: 42px 34px;
+      border-right: 1px solid rgba(36, 36, 36, 0.2);
+      background: #ffffff;
+    }
+
+    .correct-hash-wrong-repair-index {
+      color: rgba(36, 36, 36, 0.62);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .correct-hash-wrong-repair-title {
+      margin-top: 80px;
+      font-size: 68px;
+      font-weight: 400;
+      letter-spacing: -0.028em;
+      line-height: 0.98;
+    }
+
+    .correct-hash-wrong-repair-withheld {
+      margin-top: 16px;
+      color: rgba(36, 36, 36, 0.56);
+      font-size: 44px;
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: -0.018em;
+      line-height: 1.04;
+    }
+
+    .correct-hash-wrong-repair-thesis {
+      position: absolute;
+      left: 34px;
+      bottom: 44px;
+      width: 224px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(36, 36, 36, 0.2);
+      color: rgba(36, 36, 36, 0.68);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+      line-height: 1.55;
+      text-transform: uppercase;
+    }
+
+    .correct-hash-wrong-repair-thesis span {
+      display: block;
+    }
+
+    .correct-hash-wrong-repair-video {
+      position: absolute;
+      z-index: 1;
+      left: 300px;
+      top: 0;
+      width: 1480px;
+      height: 805px;
+      object-fit: contain;
+      background: #151718;
+    }
+
+    #correct-hash-wrong-repair-rejection-video {
+      z-index: 2;
+    }
+
+    .correct-hash-wrong-repair-proof-chrome {
+      position: absolute;
+      z-index: 4;
+      left: 324px;
+      top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 6px;
+      background: rgba(21, 23, 24, 0.9);
+      color: rgba(255, 255, 255, 0.82);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 17px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .correct-hash-wrong-repair-proof-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #5db872;
+    }
+
+    .correct-hash-wrong-repair-wrong-wrap {
+      position: absolute;
+      z-index: 7;
+      right: 70px;
+      top: 84px;
+      width: 330px;
+      height: 118px;
+      display: grid;
+      place-items: center;
+    }
+
+    .correct-hash-wrong-repair-wrong-label {
+      position: relative;
+      z-index: 2;
+      padding: 12px 20px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.94);
+      color: #242424;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 25px;
+      font-weight: 700;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .correct-hash-wrong-repair-marker {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .correct-hash-wrong-repair-marker ellipse {
+      fill: none;
+      stroke: #0067b8;
+      stroke-linecap: round;
+      stroke-width: 5;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    .correct-hash-wrong-repair-authorization {
+      position: absolute;
+      z-index: 7;
+      left: 380px;
+      right: 48px;
+      bottom: 112px;
+      min-height: 164px;
+      padding: 20px 24px;
+      border: 1px solid rgba(36, 36, 36, 0.12);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    .correct-hash-wrong-repair-authorized-label {
+      color: rgba(36, 36, 36, 0.68);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .correct-hash-wrong-repair-chips {
+      display: flex;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .correct-hash-wrong-repair-chip {
+      min-width: 176px;
+      padding: 13px 18px;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 8px;
+      background: #f8d5e0;
+      color: #242424;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .correct-hash-wrong-repair-unauthorized {
+      margin-top: 13px;
+      color: rgba(36, 36, 36, 0.68);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .correct-hash-wrong-repair-preserved {
+      position: absolute;
+      z-index: 9;
+      left: 326px;
+      right: 28px;
+      bottom: 26px;
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+      padding: 17px 22px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      background: #151718;
+      color: #ffffff;
+    }
+
+    .correct-hash-wrong-repair-preserved-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.005em;
+      text-transform: uppercase;
+    }
+
+    .correct-hash-wrong-repair-head {
+      flex: 0 0 auto;
+      color: rgba(255, 255, 255, 0.74);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 19px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="03-correct-hash-wrong-repair"
+    data-start="0"
+    data-duration="10.645"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div
+      id="correct-hash-wrong-repair-ground"
+      class="clip correct-hash-wrong-repair-ground"
+      data-start="0"
+      data-duration="10.645"
+      data-track-index="0"
+    ></div>
+
+    <div
+      id="correct-hash-wrong-repair-world"
+      class="correct-hash-wrong-repair-world"
+      data-layout-allow-overflow
+    >
+      <div class="correct-hash-wrong-repair-stage">
+        <video
+          id="correct-hash-wrong-repair-healthy-video"
+          class="clip correct-hash-wrong-repair-video"
+          data-start="0"
+          data-duration="3.1"
+          data-track-index="1"
+          data-media-start="15.5"
+          data-frame-video="approved"
+          data-frame-video-x="370"
+          data-frame-video-y="55"
+          data-frame-video-width="1480"
+          data-frame-video-height="805"
+          data-frame-video-fit="contain"
+          src="assets/proof-clips/03-mars-colony/source.webm"
+          muted
+          playsinline
+          preload="auto"
+        ></video>
+
+        <video
+          id="correct-hash-wrong-repair-rejection-video"
+          class="clip correct-hash-wrong-repair-video"
+          data-start="3.1"
+          data-duration="7.545"
+          data-track-index="2"
+          data-media-start="23.4"
+          data-frame-video="approved"
+          data-frame-video-x="370"
+          data-frame-video-y="55"
+          data-frame-video-width="1480"
+          data-frame-video-height="805"
+          data-frame-video-fit="contain"
+          src="assets/proof-clips/03-mars-colony/source.webm"
+          muted
+          playsinline
+          preload="auto"
+        ></video>
+
+        <div
+          id="correct-hash-wrong-repair-rail"
+          class="correct-hash-wrong-repair-rail"
+        >
+          <div
+            id="correct-hash-wrong-repair-index"
+            class="correct-hash-wrong-repair-index"
+          >
+            Mars / frame 03
+          </div>
+          <div
+            id="correct-hash-wrong-repair-title"
+            class="correct-hash-wrong-repair-title"
+          >
+            Correct hash
+          </div>
+          <div
+            id="correct-hash-wrong-repair-withheld"
+            class="correct-hash-wrong-repair-withheld"
+          >
+            isn't enough
+          </div>
+          <div class="correct-hash-wrong-repair-thesis">
+            <span>Valid structure</span>
+            <span>does not grant</span>
+            <span>valid scope</span>
+          </div>
+        </div>
+
+        <div
+          id="correct-hash-wrong-repair-proof-chrome"
+          class="correct-hash-wrong-repair-proof-chrome"
+        >
+          <span class="correct-hash-wrong-repair-proof-dot"></span>
+          Real deterministic replay
+        </div>
+
+        <div
+          id="correct-hash-wrong-repair-wrong-wrap"
+          class="correct-hash-wrong-repair-wrong-wrap"
+        >
+          <div class="correct-hash-wrong-repair-wrong-label">Wrong repair</div>
+          <svg
+            class="correct-hash-wrong-repair-marker"
+            viewBox="0 0 330 118"
+            aria-hidden="true"
+          >
+            <ellipse
+              id="correct-hash-wrong-repair-marker-ring"
+              pathLength="1"
+              cx="165"
+              cy="59"
+              rx="156"
+              ry="49"
+            ></ellipse>
+          </svg>
+        </div>
+
+        <div
+          id="correct-hash-wrong-repair-authorization"
+          class="correct-hash-wrong-repair-authorization"
+        >
+          <div class="correct-hash-wrong-repair-authorized-label">
+            Exact authorized delta · 3 systems
+          </div>
+          <div class="correct-hash-wrong-repair-chips">
+            <div
+              id="correct-hash-wrong-repair-chip-agriculture"
+              class="correct-hash-wrong-repair-chip"
+            >
+              Agriculture
+            </div>
+            <div
+              id="correct-hash-wrong-repair-chip-oxygen"
+              class="correct-hash-wrong-repair-chip"
+            >
+              Oxygen
+            </div>
+            <div
+              id="correct-hash-wrong-repair-chip-water"
+              class="correct-hash-wrong-repair-chip"
+            >
+              Water
+            </div>
+          </div>
+          <div class="correct-hash-wrong-repair-unauthorized">
+            Dimmed outside scope · communications · habitat · medical ·
+            navigation · power · research · rover bay · storage · thermal
+          </div>
+        </div>
+
+        <div
+          id="correct-hash-wrong-repair-preserved"
+          class="correct-hash-wrong-repair-preserved"
+        >
+          <div class="correct-hash-wrong-repair-preserved-title">
+            Last good state preserved
+          </div>
+          <div class="correct-hash-wrong-repair-head">
+            Accepted head · f0af35b1
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script>
+    (() => {
+      const compositionId = "03-correct-hash-wrong-repair";
+      const world = document.getElementById(
+        "correct-hash-wrong-repair-world",
+      );
+      const marker = document.getElementById(
+        "correct-hash-wrong-repair-marker-ring",
+      );
+      const chips = [
+        "#correct-hash-wrong-repair-chip-agriculture",
+        "#correct-hash-wrong-repair-chip-oxygen",
+        "#correct-hash-wrong-repair-chip-water",
+      ].map((selector) => document.querySelector(selector));
+      const tl = gsap.timeline({ paused: true });
+
+      const camera = { scale: 1.055, x: -12, y: -8 };
+      const drift = { phase: 0 };
+      const applyCamera = () => {
+        const dx = Math.sin(drift.phase) * 2.6;
+        const dy = Math.sin(drift.phase * 1.3) * 1.4;
+        world.style.transform =
+          `translate(${camera.x + dx}px, ${camera.y + dy}px) ` +
+          `scale(${camera.scale})`;
+      };
+      applyCamera();
+
+      tl.set(
+        "#correct-hash-wrong-repair-withheld, " +
+          "#correct-hash-wrong-repair-wrong-wrap, " +
+          "#correct-hash-wrong-repair-authorization, " +
+          ".correct-hash-wrong-repair-chip, " +
+          "#correct-hash-wrong-repair-preserved",
+        { opacity: 0 },
+        0,
+      );
+
+      tl.to(
+        camera,
+        {
+          scale: 1,
+          x: 0,
+          y: 0,
+          duration: 1.05,
+          ease: "power3.out",
+          onUpdate: applyCamera,
+        },
+        0,
+      );
+      tl.to(
+        camera,
+        {
+          scale: 1.13,
+          x: -96,
+          y: -52,
+          duration: 1.45,
+          ease: "power2.inOut",
+          onUpdate: applyCamera,
+        },
+        3.1,
+      );
+      tl.to(
+        camera,
+        {
+          scale: 1.16,
+          x: -118,
+          y: -64,
+          duration: 2.2,
+          ease: "power2.out",
+          onUpdate: applyCamera,
+        },
+        6.8,
+      );
+      tl.to(
+        camera,
+        {
+          scale: 1,
+          x: 0,
+          y: 0,
+          duration: 0.72,
+          ease: "power4.out",
+          onUpdate: applyCamera,
+        },
+        9.7,
+      );
+      tl.to(
+        drift,
+        {
+          phase: Math.PI * 2,
+          duration: 10.645,
+          ease: "none",
+          onUpdate: applyCamera,
+        },
+        0,
+      );
+
+      tl.fromTo(
+        "#correct-hash-wrong-repair-rail",
+        { x: -30, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.46, ease: "power3.out" },
+        0.06,
+      );
+      tl.fromTo(
+        "#correct-hash-wrong-repair-title",
+        { y: 18, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.44, ease: "power3.out" },
+        0.18,
+      );
+      tl.fromTo(
+        "#correct-hash-wrong-repair-proof-chrome",
+        { y: -12, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" },
+        0.34,
+      );
+      tl.fromTo(
+        "#correct-hash-wrong-repair-withheld",
+        { y: 14, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.48, ease: "power2.out" },
+        2.18,
+      );
+
+      tl.fromTo(
+        "#correct-hash-wrong-repair-wrong-wrap",
+        { y: -18, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.5,
+          ease: "power3.out",
+          immediateRender: false,
+        },
+        3.62,
+      );
+      tl.to(
+        marker,
+        {
+          strokeDashoffset: 0,
+          duration: 0.72,
+          ease: "power2.inOut",
+        },
+        4.02,
+      );
+
+      tl.fromTo(
+        "#correct-hash-wrong-repair-authorization",
+        { y: 24, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.48,
+          ease: "power3.out",
+          immediateRender: false,
+        },
+        6.68,
+      );
+      chips.forEach((chip, index) => {
+        tl.fromTo(
+          chip,
+          { y: 16, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.42,
+            ease: "power3.out",
+            immediateRender: false,
+          },
+          7.05 + index * 0.58,
+        );
+      });
+
+      tl.fromTo(
+        "#correct-hash-wrong-repair-preserved",
+        { y: 22, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.5,
+          ease: "power4.out",
+          immediateRender: false,
+        },
+        9.72,
+      );
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[compositionId] = tl;
+    })();
+  </script>
+</template>

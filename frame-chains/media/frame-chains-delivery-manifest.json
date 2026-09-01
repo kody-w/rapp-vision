@@ -1,0 +1,207 @@
+{
+  "schema": "rapp-vision.delivery-media/1",
+  "source": "frame-chains-ten-frame-loop.mp4",
+  "generated_from_frames": [
+    {
+      "frame": 1,
+      "start": 0,
+      "end": 10.731,
+      "duration": 10.731
+    },
+    {
+      "frame": 2,
+      "start": 10.731,
+      "end": 21.974,
+      "duration": 11.243
+    },
+    {
+      "frame": 3,
+      "start": 21.974,
+      "end": 32.619,
+      "duration": 10.645
+    },
+    {
+      "frame": 4,
+      "start": 32.619,
+      "end": 42.219,
+      "duration": 9.6
+    },
+    {
+      "frame": 5,
+      "start": 42.219,
+      "end": 52.971000000000004,
+      "duration": 10.752
+    },
+    {
+      "frame": 6,
+      "start": 52.971000000000004,
+      "end": 63.083000000000006,
+      "duration": 10.112
+    },
+    {
+      "frame": 7,
+      "start": 63.083000000000006,
+      "end": 72.57600000000001,
+      "duration": 9.493
+    },
+    {
+      "frame": 8,
+      "start": 72.57600000000001,
+      "end": 83.79700000000001,
+      "duration": 11.221
+    },
+    {
+      "frame": 9,
+      "start": 83.79700000000001,
+      "end": 94.97600000000001,
+      "duration": 11.179
+    },
+    {
+      "frame": 10,
+      "start": 94.97600000000001,
+      "end": 105.34400000000001,
+      "duration": 10.368
+    }
+  ],
+  "videos": [
+    {
+      "id": "frame-chains-ten-frame-loop",
+      "title": "Ten Impossible Worlds, One Verifiable History",
+      "segments": [
+        {
+          "start": 0,
+          "end": 105.34400000000001
+        }
+      ],
+      "duration_s": 105.4,
+      "mp4": {
+        "path": "media/frame-chains-ten-frame-loop.mp4",
+        "bytes": 40705459,
+        "sha256": "7ba54725407c038cde2d59823c411439148446b21e793c9316277f7dbd188b40"
+      },
+      "webm": {
+        "path": "media/frame-chains-ten-frame-loop.webm",
+        "bytes": 14308521,
+        "sha256": "d480c9da4d413d836c2f76f6e5e011b08d12da132ec1972a8f43c29b069753c3"
+      }
+    },
+    {
+      "id": "many-worlds-mission-control",
+      "title": "Many Worlds Mission Control",
+      "segments": [
+        {
+          "start": 0,
+          "end": 10.731
+        },
+        {
+          "start": 101.84400000000001,
+          "end": 105.34400000000001
+        }
+      ],
+      "duration_s": 14.3,
+      "mp4": {
+        "path": "media/many-worlds-mission-control.mp4",
+        "bytes": 1468168,
+        "sha256": "4d9fbac36e42bfa75bbcb7d1c7b89fb77731551c91b8fcd2292bc259fc475dd2"
+      },
+      "webm": {
+        "path": "media/many-worlds-mission-control.webm",
+        "bytes": 1041736,
+        "sha256": "523a4c76cdd9acb590f1c15c5e9310fc246611c373a8213b985f2e41ff17cd5b"
+      }
+    },
+    {
+      "id": "ai-soul-passport",
+      "title": "AI Soul Passport",
+      "segments": [
+        {
+          "start": 0,
+          "end": 3.5
+        },
+        {
+          "frame": 2,
+          "start": 10.731,
+          "end": 21.974,
+          "duration": 11.243
+        },
+        {
+          "start": 101.84400000000001,
+          "end": 105.34400000000001
+        }
+      ],
+      "duration_s": 18.3,
+      "mp4": {
+        "path": "media/ai-soul-passport.mp4",
+        "bytes": 3251173,
+        "sha256": "f85cd0a5a0ee3e06386e40270bf5dc35891f0794894fc64c585e5b8659f57db4"
+      },
+      "webm": {
+        "path": "media/ai-soul-passport.webm",
+        "bytes": 2128473,
+        "sha256": "7dbd75552ad93b799a9a72419940d20743237b8375a3e2553b4e301231859ce6"
+      }
+    },
+    {
+      "id": "teleporting-roguelike",
+      "title": "Teleporting Roguelike",
+      "segments": [
+        {
+          "start": 0,
+          "end": 3.5
+        },
+        {
+          "frame": 8,
+          "start": 72.57600000000001,
+          "end": 83.79700000000001,
+          "duration": 11.221
+        },
+        {
+          "start": 101.84400000000001,
+          "end": 105.34400000000001
+        }
+      ],
+      "duration_s": 18.3,
+      "mp4": {
+        "path": "media/teleporting-roguelike.mp4",
+        "bytes": 2505841,
+        "sha256": "8c929ef86902cf22fb73f258b6eae35b0c43ae96ae45fb794896907651f168f3"
+      },
+      "webm": {
+        "path": "media/teleporting-roguelike.webm",
+        "bytes": 1699182,
+        "sha256": "b4f69878ddab7797030b9341f9a488fb0bdabb6404b0b3fef497f7d95c8f8239"
+      }
+    },
+    {
+      "id": "attack-the-timeline",
+      "title": "Attack the Timeline",
+      "segments": [
+        {
+          "start": 0,
+          "end": 3.5
+        },
+        {
+          "frame": 9,
+          "start": 83.79700000000001,
+          "end": 94.97600000000001,
+          "duration": 11.179
+        },
+        {
+          "start": 101.84400000000001,
+          "end": 105.34400000000001
+        }
+      ],
+      "duration_s": 18.3,
+      "mp4": {
+        "path": "media/attack-the-timeline.mp4",
+        "bytes": 5154006,
+        "sha256": "fd59d1e73842347196444a466a6823065030db7fa798f5405c5722a45faaf5db"
+      },
+      "webm": {
+        "path": "media/attack-the-timeline.webm",
+        "bytes": 3488821,
+        "sha256": "0edcce9807e4f12fb4ac514770066286c76543a165289925736a2f0c2b28721d"
+      }
+    }
+  ]
+}

@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js" integrity="sha384-sG0Hv1tP1lZCk9KQmrIbY/XNwi+OY84GQqhMscbnsoBFqAz8KNCil1kvfL3Hbbk2" crossorigin="anonymous"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #000;
+      }
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #ffffff;
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="105.344"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div
+        id="el-01-understand-operate"
+        class="scene"
+        data-composition-id="01-understand-operate"
+        data-composition-src="compositions/frames/01-understand-operate.html"
+        data-start="0"
+        data-duration="11.231"
+        data-track-index="0"
+      ></div>
+      <audio
+        id="el-01-understand-operate-voice"
+        src="assets/voice/01.wav"
+        data-start="0"
+        data-duration="10.731"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-02-identity-history"
+        class="scene"
+        data-composition-id="02-identity-history"
+        data-composition-src="compositions/frames/02-identity-history.html"
+        data-start="10.731"
+        data-duration="11.743"
+        data-track-index="1"
+      ></div>
+      <audio
+        id="el-02-identity-history-voice"
+        src="assets/voice/02.wav"
+        data-start="10.731"
+        data-duration="11.243"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-03-correct-hash-wrong-repair"
+        class="scene"
+        data-composition-id="03-correct-hash-wrong-repair"
+        data-composition-src="compositions/frames/03-correct-hash-wrong-repair.html"
+        data-start="21.974"
+        data-duration="11.145"
+        data-track-index="0"
+      ></div>
+      <audio
+        id="el-03-correct-hash-wrong-repair-voice"
+        src="assets/voice/03.wav"
+        data-start="21.974"
+        data-duration="10.645"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-04-five-realities"
+        class="scene"
+        data-composition-id="04-five-realities"
+        data-composition-src="compositions/frames/04-five-realities.html"
+        data-start="32.619"
+        data-duration="10"
+        data-track-index="1"
+      ></div>
+      <audio
+        id="el-04-five-realities-voice"
+        src="assets/voice/04.wav"
+        data-start="32.619"
+        data-duration="9.6"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-05-cryptography-causality"
+        class="scene"
+        data-composition-id="05-cryptography-causality"
+        data-composition-src="compositions/frames/05-cryptography-causality.html"
+        data-start="42.219"
+        data-duration="11.252"
+        data-track-index="0"
+      ></div>
+      <audio
+        id="el-05-cryptography-causality-voice"
+        src="assets/voice/05.wav"
+        data-start="42.219"
+        data-duration="10.752"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-06-preserve-disagreement"
+        class="scene"
+        data-composition-id="06-preserve-disagreement"
+        data-composition-src="compositions/frames/06-preserve-disagreement.html"
+        data-start="52.971000000000004"
+        data-duration="10.612"
+        data-track-index="1"
+      ></div>
+      <audio
+        id="el-06-preserve-disagreement-voice"
+        src="assets/voice/06.wav"
+        data-start="52.971000000000004"
+        data-duration="10.112"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-07-law-executes"
+        class="scene"
+        data-composition-id="07-law-executes"
+        data-composition-src="compositions/frames/07-law-executes.html"
+        data-start="63.083000000000006"
+        data-duration="9.993"
+        data-track-index="0"
+      ></div>
+      <audio
+        id="el-07-law-executes-voice"
+        src="assets/voice/07.wav"
+        data-start="63.083000000000006"
+        data-duration="9.493"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-08-state-not-pixels"
+        class="scene"
+        data-composition-id="08-state-not-pixels"
+        data-composition-src="compositions/frames/08-state-not-pixels.html"
+        data-start="72.57600000000001"
+        data-duration="11.621"
+        data-track-index="1"
+      ></div>
+      <audio
+        id="el-08-state-not-pixels-voice"
+        src="assets/voice/08.wav"
+        data-start="72.57600000000001"
+        data-duration="11.221"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-09-attack-boundaries"
+        class="scene"
+        data-composition-id="09-attack-boundaries"
+        data-composition-src="compositions/frames/09-attack-boundaries.html"
+        data-start="83.79700000000001"
+        data-duration="11.779"
+        data-track-index="0"
+      ></div>
+      <audio
+        id="el-09-attack-boundaries-voice"
+        src="assets/voice/09.wav"
+        data-start="83.79700000000001"
+        data-duration="11.179"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-10-film-plus-proof"
+        class="scene"
+        data-composition-id="10-film-plus-proof"
+        data-composition-src="compositions/frames/10-film-plus-proof.html"
+        data-start="94.97600000000001"
+        data-duration="10.368"
+        data-track-index="1"
+      ></div>
+      <audio
+        id="el-10-film-plus-proof-voice"
+        src="assets/voice/10.wav"
+        data-start="94.97600000000001"
+        data-duration="10.368"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <video id="f01-proof-tight" src="assets/proof-clips/01-many-worlds/source.webm" preload="auto" data-media-start="23" muted playsinline
+        class="clip"
+        style="position:absolute;left:-760px;top:48px;width:2200px;height:1238px;object-fit:cover"
+        data-start="0"
+        data-duration="2.6"
+        data-track-index="1001"
+      ></video>
+
+      <video id="f01-proof-wide" src="assets/proof-clips/01-many-worlds/source.webm" preload="auto" data-media-start="20.735" muted playsinline
+        class="clip"
+        style="position:absolute;left:-270px;top:90px;width:1420px;height:750px;object-fit:cover"
+        data-start="2.6"
+        data-duration="8.131"
+        data-track-index="1001"
+      ></video>
+
+      <video id="f02-identity-history-migration" src="assets/proof-clips/02-soul-passport/source.webm" data-media-start="1.9" muted playsinline
+        class="clip"
+        style="position:absolute;left:646px;top:82px;width:1194px;height:672px;object-fit:cover"
+        data-start="10.731"
+        data-duration="3.2"
+        data-track-index="2002"
+      ></video>
+
+      <video id="f02-identity-history-history" src="assets/proof-clips/02-soul-passport/source.webm" data-media-start="5.4" muted playsinline
+        class="clip"
+        style="position:absolute;left:646px;top:82px;width:1194px;height:672px;object-fit:cover"
+        data-start="13.931"
+        data-duration="4.2"
+        data-track-index="2003"
+      ></video>
+
+      <video id="f02-identity-history-rejection-context" src="assets/proof-clips/02-soul-passport/source.webm" data-media-start="19.2" muted playsinline
+        class="clip"
+        style="position:absolute;left:646px;top:82px;width:1194px;height:672px;object-fit:cover"
+        data-start="18.131"
+        data-duration="1.18"
+        data-track-index="2004"
+      ></video>
+
+      <video id="f02-identity-history-rejection-close" src="assets/proof-clips/02-soul-passport/source.webm" data-media-start="20.38" muted playsinline
+        class="clip"
+        style="position:absolute;left:-1057px;top:-1042px;width:3456px;height:1944px;object-fit:cover"
+        data-start="19.311"
+        data-duration="2.663"
+        data-track-index="2005"
+      ></video>
+
+      <video id="correct-hash-wrong-repair-healthy-video" src="assets/proof-clips/03-mars-colony/source.webm" preload="auto" data-media-start="15.5" muted playsinline
+        class="clip"
+        style="position:absolute;left:370px;top:55px;width:1480px;height:805px;object-fit:contain"
+        data-start="21.974"
+        data-duration="3.1"
+        data-track-index="3001"
+      ></video>
+
+      <video id="correct-hash-wrong-repair-rejection-video" src="assets/proof-clips/03-mars-colony/source.webm" preload="auto" data-media-start="23.4" muted playsinline
+        class="clip"
+        style="position:absolute;left:370px;top:55px;width:1480px;height:805px;object-fit:contain"
+        data-start="25.074"
+        data-duration="7.545"
+        data-track-index="3002"
+      ></video>
+
+      <video id="f04-wide-video" src="assets/proof-clips/04-five-realities/source.webm" preload="auto" data-media-start="9.8" muted playsinline
+        class="clip"
+        style="position:absolute;left:80px;top:222px;width:1760px;height:538px;object-fit:cover"
+        data-start="32.619"
+        data-duration="2.8"
+        data-track-index="4001"
+      ></video>
+
+      <video id="f04-agree-left-video" src="assets/proof-clips/04-five-realities/source.webm" preload="auto" data-media-start="11.4" muted playsinline
+        class="clip"
+        style="position:absolute;left:80px;top:214px;width:1080px;height:566px;object-fit:cover"
+        data-start="35.419"
+        data-duration="3.6"
+        data-track-index="4001"
+      ></video>
+
+      <video id="f04-agree-command-video" src="assets/proof-clips/04-five-realities/source.webm" preload="auto" data-media-start="11.4" muted playsinline
+        class="clip"
+        style="position:absolute;left:1240px;top:214px;width:600px;height:566px;object-fit:cover"
+        data-start="35.419"
+        data-duration="3.599"
+        data-track-index="4002"
+      ></video>
+
+      <video id="f04-diverge-left-video" src="assets/proof-clips/04-five-realities/source.webm" preload="auto" data-media-start="18" muted playsinline
+        class="clip"
+        style="position:absolute;left:80px;top:214px;width:1080px;height:566px;object-fit:cover"
+        data-start="39.019"
+        data-duration="3.2"
+        data-track-index="4001"
+      ></video>
+
+      <video id="f04-diverge-command-video" src="assets/proof-clips/04-five-realities/source.webm" preload="auto" data-media-start="18" muted playsinline
+        class="clip"
+        style="position:absolute;left:1240px;top:214px;width:600px;height:566px;object-fit:cover"
+        data-start="39.019"
+        data-duration="3.199"
+        data-track-index="4002"
+      ></video>
+
+      <video id="fc05-accepted-video" src="assets/proof-clips/05-causal-detective/source.webm" data-media-start="11.8" muted playsinline
+        class="clip"
+        style="position:absolute;left:580px;top:78px;width:1260px;height:709px;object-fit:cover"
+        data-start="42.219"
+        data-duration="3.1"
+        data-track-index="5001"
+      ></video>
+
+      <video id="fc05-forged-video" src="assets/proof-clips/05-causal-detective/source.webm" data-media-start="15.7" muted playsinline
+        class="clip"
+        style="position:absolute;left:580px;top:78px;width:1260px;height:709px;object-fit:cover"
+        data-start="45.319"
+        data-duration="7.652"
+        data-track-index="5001"
+      ></video>
+
+      <video id="f06-video-build" src="assets/proof-clips/06-space-station/source.webm" data-media-start="1.2" muted playsinline
+        class="clip"
+        style="position:absolute;left:70px;top:140px;width:1188px;height:664px;object-fit:cover"
+        data-start="52.971"
+        data-duration="3"
+        data-track-index="6002"
+      ></video>
+
+      <video id="f06-video-alternatives" src="assets/proof-clips/06-space-station/source.webm" data-media-start="4.2" muted playsinline
+        class="clip"
+        style="position:absolute;left:70px;top:140px;width:1188px;height:664px;object-fit:cover"
+        data-start="55.971"
+        data-duration="3.8"
+        data-track-index="6002"
+      ></video>
+
+      <video id="f06-video-rejection" src="assets/proof-clips/06-space-station/source.webm" data-media-start="7.2" muted playsinline
+        class="clip"
+        style="position:absolute;left:70px;top:140px;width:1188px;height:664px;object-fit:cover"
+        data-start="59.771"
+        data-duration="2.5"
+        data-track-index="6002"
+      ></video>
+
+      <video id="f06-video-receipt" src="assets/proof-clips/06-space-station/source.webm" data-media-start="10.1" muted playsinline
+        class="clip"
+        style="position:absolute;left:70px;top:140px;width:1188px;height:664px;object-fit:cover"
+        data-start="62.271"
+        data-duration="0.812"
+        data-track-index="6002"
+      ></video>
+
+      <video id="f07-law-executes-ledger-video" src="assets/proof-clips/07-constitution/source.webm" data-media-start="7.1" muted playsinline
+        class="clip"
+        style="position:absolute;left:100px;top:250px;width:1720px;height:470px;object-fit:cover"
+        data-start="63.083"
+        data-duration="3.15"
+        data-track-index="7002"
+      ></video>
+
+      <video id="f07-law-executes-left-video" src="assets/proof-clips/07-constitution/source.webm" data-media-start="10.2" muted playsinline
+        class="clip"
+        style="position:absolute;left:100px;top:330px;width:730px;height:400px;object-fit:cover"
+        data-start="66.233"
+        data-duration="6.343"
+        data-track-index="7003"
+      ></video>
+
+      <video id="f07-law-executes-right-video" src="assets/proof-clips/07-constitution/source.webm" data-media-start="10.24" muted playsinline
+        class="clip"
+        style="position:absolute;left:1090px;top:330px;width:730px;height:400px;object-fit:cover"
+        data-start="66.433"
+        data-duration="6.143"
+        data-track-index="7004"
+      ></video>
+
+      <video id="f07-law-executes-refusal-video" src="assets/proof-clips/07-constitution/source.webm" data-media-start="16.8" muted playsinline
+        class="clip"
+        style="position:absolute;left:720px;top:330px;width:480px;height:360px;object-fit:cover"
+        data-start="69.433"
+        data-duration="3.143"
+        data-track-index="7005"
+      ></video>
+
+      <video id="f08-transfer-video" src="assets/proof-clips/08-teleporting-roguelike/source.webm" preload="auto" aria-label="The live dungeon and Device A to Device B transfer" data-media-start="2" muted playsinline
+        class="clip"
+        style="position:absolute;left:24px;top:-72px;width:1872px;height:1053px;object-fit:fill"
+        data-start="72.576"
+        data-duration="6.5"
+        data-track-index="8001"
+      ></video>
+
+      <video id="f08-item-video" src="assets/proof-clips/08-teleporting-roguelike/source.webm" preload="auto" aria-label="Inventory forgery refusal receipt" data-media-start="9" muted playsinline
+        class="clip"
+        style="position:absolute;left:-104px;top:-690px;width:3264px;height:1836px;object-fit:fill"
+        data-start="79.076"
+        data-duration="2.4"
+        data-track-index="8002"
+      ></video>
+
+      <video id="f08-parent-video" src="assets/proof-clips/08-teleporting-roguelike/source.webm" preload="auto" aria-label="Parent provenance forgery refusal receipt" data-media-start="17.7" muted playsinline
+        class="clip"
+        style="position:absolute;left:-104px;top:-690px;width:3264px;height:1836px;object-fit:fill"
+        data-start="81.476"
+        data-duration="2.321"
+        data-track-index="8003"
+      ></video>
+
+      <video id="f09-attack-boundaries-control-video" src="assets/proof-clips/09-attack-timeline/source.webm" data-media-start="5.2" muted playsinline
+        class="clip"
+        style="position:absolute;left:0px;top:0px;width:1920px;height:1080px;object-fit:cover"
+        data-start="83.797"
+        data-duration="2.4"
+        data-track-index="9001"
+      ></video>
+
+      <video id="f09-attack-boundaries-attack-video" src="assets/proof-clips/09-attack-timeline/source.webm" data-media-start="7.8" muted playsinline
+        class="clip"
+        style="position:absolute;left:0px;top:0px;width:1920px;height:1080px;object-fit:cover"
+        data-start="86.197"
+        data-duration="4.8"
+        data-track-index="9001"
+      ></video>
+
+      <video id="f09-attack-boundaries-detector-video" src="assets/proof-clips/09-attack-timeline/source.webm" data-media-start="9.5" muted playsinline
+        class="clip"
+        style="position:absolute;left:0px;top:0px;width:1920px;height:1080px;object-fit:cover"
+        data-start="90.997"
+        data-duration="2.6"
+        data-track-index="9001"
+      ></video>
+
+      <video id="f09-attack-boundaries-replay-video" src="assets/proof-clips/09-attack-timeline/source.webm" data-media-start="21.2" muted playsinline
+        class="clip"
+        style="position:absolute;left:0px;top:0px;width:1920px;height:1080px;object-fit:cover"
+        data-start="93.597"
+        data-duration="1.379"
+        data-track-index="9001"
+      ></video>
+
+      <video id="film-proof-video-branch" src="assets/proof-clips/10-futures-museum/source.webm" preload="auto" data-media-start="23" muted playsinline
+        class="clip"
+        style="position:absolute;left:80px;top:46px;width:1760px;height:794px;object-fit:cover"
+        data-start="94.976"
+        data-duration="3.2"
+        data-track-index="10002"
+      ></video>
+
+      <video id="film-proof-video-corrupt" src="assets/proof-clips/10-futures-museum/source.webm" preload="auto" data-media-start="29" muted playsinline
+        class="clip"
+        style="position:absolute;left:80px;top:46px;width:1760px;height:794px;object-fit:cover"
+        data-start="98.176"
+        data-duration="3.1"
+        data-track-index="10002"
+      ></video>
+
+      <!-- BGM -->
+      <audio
+        id="el-bgm"
+        src="assets/bgm/track.wav"
+        data-start="0"
+        data-duration="105.344"
+        data-track-index="11"
+        data-volume="0.16"
+      ></audio>
+
+      <!-- captions -->
+      <div
+        id="el-captions"
+        class="scene"
+        data-composition-id="captions"
+        data-composition-src="compositions/captions.html"
+        data-start="0"
+        data-duration="105.344"
+        data-track-index="2"
+      ></div>
+
+      <!-- SFX -->
+      <audio
+        id="el-sfx-0"
+        src="assets/sfx/whoosh-short.mp3"
+        data-start="0"
+        data-duration="0.57"
+        data-track-index="20"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-1"
+        src="assets/sfx/click-soft.mp3"
+        data-start="0"
+        data-duration="0.37"
+        data-track-index="21"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-2"
+        src="assets/sfx/whoosh-short.mp3"
+        data-start="10.731"
+        data-duration="0.57"
+        data-track-index="22"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-3"
+        src="assets/sfx/error.mp3"
+        data-start="10.731"
+        data-duration="1.62"
+        data-track-index="23"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-4"
+        src="assets/sfx/click-soft.mp3"
+        data-start="21.974"
+        data-duration="0.37"
+        data-track-index="24"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-5"
+        src="assets/sfx/error.mp3"
+        data-start="21.974"
+        data-duration="1.62"
+        data-track-index="25"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-6"
+        src="assets/sfx/whoosh-short.mp3"
+        data-start="32.619"
+        data-duration="0.57"
+        data-track-index="26"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-7"
+        src="assets/sfx/error.mp3"
+        data-start="32.619"
+        data-duration="1.62"
+        data-track-index="27"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-8"
+        src="assets/sfx/click-soft.mp3"
+        data-start="42.219"
+        data-duration="0.37"
+        data-track-index="28"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-9"
+        src="assets/sfx/glitch-2.mp3"
+        data-start="42.219"
+        data-duration="3.5"
+        data-track-index="29"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-10"
+        src="assets/sfx/error.mp3"
+        data-start="42.219"
+        data-duration="1.62"
+        data-track-index="30"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-11"
+        src="assets/sfx/whoosh-short.mp3"
+        data-start="52.971"
+        data-duration="0.57"
+        data-track-index="31"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-12"
+        src="assets/sfx/error.mp3"
+        data-start="52.971"
+        data-duration="1.62"
+        data-track-index="32"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-13"
+        src="assets/sfx/whoosh-short.mp3"
+        data-start="63.083"
+        data-duration="0.57"
+        data-track-index="33"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-14"
+        src="assets/sfx/error.mp3"
+        data-start="63.083"
+        data-duration="1.62"
+        data-track-index="34"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-15"
+        src="assets/sfx/whoosh-cinematic.mp3"
+        data-start="72.576"
+        data-duration="5.54"
+        data-track-index="35"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-16"
+        src="assets/sfx/error.mp3"
+        data-start="72.576"
+        data-duration="1.62"
+        data-track-index="36"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-17"
+        src="assets/sfx/riser.mp3"
+        data-start="83.797"
+        data-duration="10.03"
+        data-track-index="37"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-18"
+        src="assets/sfx/error.mp3"
+        data-start="83.797"
+        data-duration="1.62"
+        data-track-index="38"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-19"
+        src="assets/sfx/chime.mp3"
+        data-start="83.797"
+        data-duration="2.5"
+        data-track-index="39"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-20"
+        src="assets/sfx/whoosh-short.mp3"
+        data-start="94.976"
+        data-duration="0.57"
+        data-track-index="40"
+        data-volume="0.35"
+      ></audio>
+      <audio
+        id="el-sfx-21"
+        src="assets/sfx/click-soft.mp3"
+        data-start="94.976"
+        data-duration="0.37"
+        data-track-index="41"
+        data-volume="0.35"
+      ></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+      // ── frame transitions (injected by transitions.mjs) ──
+      (function () { var tl = window.__timelines["main"];
+        tl.to("#el-01-understand-operate", { x: -1920, duration: 0.5, ease: "power3.inOut" }, 10.731);
+        tl.fromTo("#el-02-identity-history", { x: 1920, opacity: 1 }, { x: 0, duration: 0.5, ease: "power3.inOut" }, 10.731);
+        tl.to("#el-02-identity-history", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 21.974);
+        tl.fromTo("#el-03-correct-hash-wrong-repair", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 21.974);
+        tl.to("#el-03-correct-hash-wrong-repair", { x: 1920, duration: 0.5, ease: "power3.inOut" }, 32.619);
+        tl.fromTo("#el-04-five-realities", { x: -1920, opacity: 1 }, { x: 0, duration: 0.5, ease: "power3.inOut" }, 32.619);
+        tl.to("#el-04-five-realities", { scale: 2.5, opacity: 0, filter: "blur(8px)", duration: 0.4, ease: "power3.in" }, 42.219);
+        tl.fromTo("#el-05-cryptography-causality", { scale: 0.5, opacity: 0, filter: "blur(8px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 42.219);
+        tl.to("#el-05-cryptography-causality", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 52.971);
+        tl.fromTo("#el-06-preserve-disagreement", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 52.971);
+        tl.to("#el-06-preserve-disagreement", { x: -1920, duration: 0.5, ease: "power3.inOut" }, 63.083);
+        tl.fromTo("#el-07-law-executes", { x: 1920, opacity: 1 }, { x: 0, duration: 0.5, ease: "power3.inOut" }, 63.083);
+        tl.to("#el-07-law-executes", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 72.576);
+        tl.fromTo("#el-08-state-not-pixels", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 72.576);
+        tl.to("#el-08-state-not-pixels", { scale: 2.5, opacity: 0, filter: "blur(8px)", duration: 0.4, ease: "power3.in" }, 83.797);
+        tl.fromTo("#el-09-attack-boundaries", { scale: 0.5, opacity: 0, filter: "blur(8px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 83.797);
+        tl.to("#el-09-attack-boundaries", { filter: "blur(10px)", scale: 1.03, opacity: 0, duration: 0.6, ease: "power2.inOut" }, 94.976);
+        tl.fromTo("#el-10-film-plus-proof", { filter: "blur(10px)", scale: 0.97, opacity: 0 }, { filter: "blur(0px)", scale: 1, opacity: 1, duration: 0.6, ease: "power2.inOut" }, 94.976);
+        tl.to({}, { duration: 105.344 }, 0); // full-span anchor — main.duration() == composition total (Studio master duration)
+      })();
+    </script>
+  </body>
+</html>

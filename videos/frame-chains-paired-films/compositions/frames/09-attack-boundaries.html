@@ -1,0 +1,496 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-400.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-700.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #242424;
+      font-family: "Inter", sans-serif;
+    }
+
+    .f09-attack-boundaries-ground {
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+    }
+
+    .f09-attack-boundaries-proof-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .f09-attack-boundaries-scene {
+      position: absolute;
+      inset: 0 0 184px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .f09-attack-boundaries-control-lockup {
+      position: absolute;
+      top: 76px;
+      left: 80px;
+      width: 430px;
+      min-height: 164px;
+      padding: 28px 32px 30px;
+      box-sizing: border-box;
+      border: 1px solid rgba(36, 36, 36, 0.16);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 1px 3px rgba(36, 36, 36, 0.08), 0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    .f09-attack-boundaries-mono {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 25px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .f09-attack-boundaries-control-word {
+      margin-top: 18px;
+      font-size: 72px;
+      font-weight: 400;
+      line-height: 0.96;
+      letter-spacing: -0.022em;
+    }
+
+    .f09-attack-boundaries-progress-track {
+      width: 100%;
+      height: 6px;
+      margin-top: 24px;
+      overflow: hidden;
+      border-radius: 9999px;
+      background: rgba(36, 36, 36, 0.12);
+    }
+
+    .f09-attack-boundaries-progress-fill {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: #0067b8;
+      transform-origin: 0 50%;
+    }
+
+    .f09-attack-boundaries-detector-plane {
+      --dof: 0px;
+      position: absolute;
+      top: 62px;
+      left: 72px;
+      width: 610px;
+      padding: 26px;
+      box-sizing: border-box;
+      border: 1px solid rgba(36, 36, 36, 0.16);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 1px 3px rgba(36, 36, 36, 0.08), 0 4px 16px rgba(36, 36, 36, 0.04);
+      filter: blur(var(--dof));
+      will-change: filter;
+    }
+
+    .f09-attack-boundaries-detector-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 4px 18px;
+      border-bottom: 1px solid rgba(36, 36, 36, 0.12);
+    }
+
+    .f09-attack-boundaries-detector-title {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 23px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .f09-attack-boundaries-counter {
+      position: relative;
+      width: 122px;
+      height: 31px;
+      color: #c64545;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 34px;
+      font-weight: 700;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+    }
+
+    .f09-attack-boundaries-counter span {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      white-space: nowrap;
+    }
+
+    .f09-attack-boundaries-detector-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .f09-attack-boundaries-detector {
+      min-height: 78px;
+      padding: 13px 12px;
+      box-sizing: border-box;
+      border: 1px solid rgba(198, 69, 69, 0.38);
+      border-radius: 8px;
+      background: #ffffff;
+      color: #242424;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+    }
+
+    .f09-attack-boundaries-detector::before {
+      content: "";
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      margin-right: 9px;
+      border-radius: 50%;
+      background: #c64545;
+      vertical-align: 2px;
+    }
+
+    .f09-attack-boundaries-route {
+      position: absolute;
+      inset: 0;
+    }
+
+    .f09-attack-boundaries-route svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .f09-attack-boundaries-route path {
+      fill: none;
+      stroke: #c64545;
+      stroke-width: 5px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .f09-attack-boundaries-route-node {
+      position: absolute;
+      min-width: 190px;
+      padding: 15px 18px;
+      box-sizing: border-box;
+      border: 1px solid rgba(198, 69, 69, 0.42);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.96);
+      color: #242424;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0.08em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .f09-attack-boundaries-route-candidate {
+      top: 438px;
+      left: 152px;
+    }
+
+    .f09-attack-boundaries-route-boundary {
+      top: 576px;
+      left: 1324px;
+      color: #c64545;
+    }
+
+    .f09-attack-boundaries-final-lockup {
+      position: absolute;
+      left: 80px;
+      right: 80px;
+      bottom: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 142px;
+      padding: 28px 40px;
+      box-sizing: border-box;
+      border: 1px solid rgba(36, 36, 36, 0.18);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 1px 3px rgba(36, 36, 36, 0.08), 0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    .f09-attack-boundaries-rejected {
+      color: #c64545;
+      font-size: 76px;
+      font-weight: 400;
+      line-height: 0.96;
+      letter-spacing: -0.026em;
+    }
+
+    .f09-attack-boundaries-preserved {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="09-attack-boundaries"
+    data-width="1920"
+    data-height="1080"
+    data-duration="11.779"
+  >
+    <div
+      id="f09-attack-boundaries-ground"
+      class="clip f09-attack-boundaries-ground"
+      data-start="0"
+      data-duration="11.779"
+      data-track-index="0"
+    ></div>
+
+    <!-- approved frame video hoisted by assemble-index -->
+
+    <!-- approved frame video hoisted by assemble-index -->
+
+    <!-- approved frame video hoisted by assemble-index -->
+
+    <!-- approved frame video hoisted by assemble-index -->
+
+    <section
+      id="f09-attack-boundaries-control-scene"
+      class="clip f09-attack-boundaries-scene"
+      data-start="0"
+      data-duration="2.4"
+      data-track-index="3"
+    >
+      <div
+        id="f09-attack-boundaries-control-lockup"
+        class="f09-attack-boundaries-control-lockup"
+      >
+        <div class="f09-attack-boundaries-mono">Control</div>
+        <div class="f09-attack-boundaries-control-word">Accept</div>
+        <div class="f09-attack-boundaries-progress-track">
+          <div
+            id="f09-attack-boundaries-progress-fill"
+            class="f09-attack-boundaries-progress-fill"
+          ></div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="f09-attack-boundaries-detector-scene"
+      class="clip f09-attack-boundaries-scene"
+      data-start="2.4"
+      data-duration="7.4"
+      data-track-index="3"
+    >
+      <div
+        id="f09-attack-boundaries-detector-plane"
+        class="f09-attack-boundaries-detector-plane"
+      >
+        <div class="f09-attack-boundaries-detector-head">
+          <div class="f09-attack-boundaries-detector-title">Red boundaries</div>
+          <div
+            id="f09-attack-boundaries-counter"
+            class="f09-attack-boundaries-counter"
+          >
+            <span>00 / 09</span>
+            <span>01 / 09</span>
+            <span>02 / 09</span>
+            <span>03 / 09</span>
+            <span>04 / 09</span>
+            <span>05 / 09</span>
+            <span>06 / 09</span>
+            <span>07 / 09</span>
+            <span>08 / 09</span>
+            <span>09 / 09</span>
+          </div>
+        </div>
+        <div class="f09-attack-boundaries-detector-grid">
+          <div class="f09-attack-boundaries-detector">Bytes</div>
+          <div class="f09-attack-boundaries-detector">Payload hash</div>
+          <div class="f09-attack-boundaries-detector">Frame hash</div>
+          <div class="f09-attack-boundaries-detector">Sequence</div>
+          <div class="f09-attack-boundaries-detector">Predecessor</div>
+          <div class="f09-attack-boundaries-detector">Semantics</div>
+          <div class="f09-attack-boundaries-detector">Causality</div>
+          <div class="f09-attack-boundaries-detector">High-water</div>
+          <div class="f09-attack-boundaries-detector">Provenance</div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="f09-attack-boundaries-route-scene"
+      class="clip f09-attack-boundaries-scene f09-attack-boundaries-route"
+      data-start="7.2"
+      data-duration="2.6"
+      data-track-index="4"
+    >
+      <svg viewBox="0 0 1920 896" aria-hidden="true">
+        <path
+          id="f09-attack-boundaries-route-path"
+          d="M 342 466 C 650 430, 910 402, 1110 492 S 1275 596, 1324 600"
+        ></path>
+      </svg>
+      <div
+        id="f09-attack-boundaries-route-candidate"
+        class="f09-attack-boundaries-route-node f09-attack-boundaries-route-candidate"
+      >Candidate</div>
+      <div
+        id="f09-attack-boundaries-route-boundary"
+        class="f09-attack-boundaries-route-node f09-attack-boundaries-route-boundary"
+      >Provenance</div>
+    </section>
+
+    <section
+      id="f09-attack-boundaries-final-scene"
+      class="clip f09-attack-boundaries-scene"
+      data-start="9.8"
+      data-duration="1.979"
+      data-track-index="5"
+    >
+      <div
+        id="f09-attack-boundaries-final-lockup"
+        class="f09-attack-boundaries-final-lockup"
+      >
+        <div class="f09-attack-boundaries-rejected">9 rejected</div>
+        <div class="f09-attack-boundaries-preserved">Head preserved</div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const timeline = gsap.timeline({ paused: true });
+    const detectorChips = gsap.utils.toArray(
+      "#f09-attack-boundaries-detector-plane .f09-attack-boundaries-detector",
+    );
+    const counterStates = gsap.utils.toArray(
+      "#f09-attack-boundaries-counter span",
+    );
+    const routePath = document.getElementById("f09-attack-boundaries-route-path");
+    const routeLength = routePath.getTotalLength();
+
+    routePath.style.strokeDasharray = `${routeLength}`;
+    routePath.style.strokeDashoffset = `${routeLength}`;
+
+    timeline.fromTo(
+      "#f09-attack-boundaries-control-lockup",
+      { autoAlpha: 0, y: 28 },
+      { autoAlpha: 1, y: 0, duration: 0.35, ease: "power3.out" },
+      0.1,
+    );
+    timeline.fromTo(
+      "#f09-attack-boundaries-progress-fill",
+      { scaleX: 0 },
+      { scaleX: 1, duration: 1.45, ease: "power2.inOut" },
+      0.45,
+    );
+
+    timeline.set(detectorChips, { opacity: 0 }, 0);
+    timeline.set(counterStates, { autoAlpha: 0 }, 0);
+    timeline.set(counterStates[0], { autoAlpha: 1 }, 0);
+    detectorChips.forEach((chip, index) => {
+      const start = 2.5 + index * 0.195;
+      const offset = index % 3 === 0 ? 72 : index % 3 === 1 ? 48 : 34;
+      const duration = index % 3 === 0 ? 0.18 : index % 3 === 1 ? 0.15 : 0.12;
+
+      timeline.set(chip, { opacity: 1, y: offset }, start);
+      timeline.to(
+        chip,
+        { y: 0, duration, ease: "power4.out" },
+        start,
+      );
+      timeline.set(counterStates[index], { autoAlpha: 0 }, start);
+      timeline.set(counterStates[index + 1], { autoAlpha: 1 }, start);
+      timeline.fromTo(
+        "#f09-attack-boundaries-counter",
+        { scale: 1.08 },
+        { scale: 1, duration: 0.14, ease: "power3.out" },
+        start,
+      );
+    });
+
+    timeline.to(
+      "#f09-attack-boundaries-detector-plane",
+      {
+        "--dof": "10px",
+        opacity: 0.38,
+        duration: 0.75,
+        ease: "power2.inOut",
+      },
+      7.2,
+    );
+    timeline.fromTo(
+      "#f09-attack-boundaries-route-candidate",
+      { autoAlpha: 0, y: 22 },
+      { autoAlpha: 1, y: 0, duration: 0.34, ease: "power3.out" },
+      7.24,
+    );
+    timeline.to(
+      routePath,
+      { strokeDashoffset: 0, duration: 0.82, ease: "power2.out" },
+      7.55,
+    );
+    timeline.fromTo(
+      "#f09-attack-boundaries-route-boundary",
+      { autoAlpha: 0, scale: 0.94 },
+      { autoAlpha: 1, scale: 1, duration: 0.34, ease: "power3.out" },
+      8.28,
+    );
+
+    timeline.fromTo(
+      "#f09-attack-boundaries-final-lockup",
+      { autoAlpha: 0, y: 34 },
+      { autoAlpha: 1, y: 0, duration: 0.42, ease: "power3.out" },
+      9.82,
+    );
+
+    window.__timelines["09-attack-boundaries"] = timeline;
+  </script>
+</template>

@@ -1,0 +1,98 @@
+{
+  "schema": "rapp-vision.proof-clip/1",
+  "frame": 10,
+  "slug": "10-futures-museum",
+  "title": "The Museum of Possible Futures — Branch, Merge, and Corruption Isolation",
+  "source_url": "https://kody-w.github.io/frame-chains/showcase/10-futures-museum/",
+  "duration": 34.8,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "selectors": [
+    "#playBtn",
+    "#forkBtn",
+    "#compareSelect",
+    "#mergeBtn",
+    "#mutateBtn"
+  ],
+  "positive_outcome": "The exhibit completes its guided replay, forks V01, compares with D02, and merges both accepted histories into U01.",
+  "failure_outcome": "Mutation identifies F02 as the first corrupt frame and freezes the affected path on F01 while independent accepted branches remain verified.",
+  "sha256": "ede83f71c59b322ba20c1f3fc7ed85afe9170f535bb247fe54d7785d14942153",
+  "synthetic_only": true,
+  "audio": false,
+  "provenance": {
+    "sourceUrl": "https://kody-w.github.io/frame-chains/showcase/10-futures-museum/?scoutTheme=light",
+    "sourceType": "public synthetic interactive proof",
+    "capturedAt": "2026-08-31T16:28:46.807Z",
+    "captureMethod": "Playwright Chromium viewport recording with deterministic scripted interaction",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "browser": "Chromium 151.0.7922.34",
+    "encoder": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers",
+    "actions": [
+      "Click #playBtn and wait for guided replay completion at 7 / 7 assertions",
+      "Click #forkBtn to create V01 from D03",
+      "Select D02 in #compareSelect",
+      "Click #mergeBtn to create U01 from D02 + V01",
+      "Click #mutateBtn and hold on the F02 corruption boundary frozen at F01"
+    ],
+    "privacy": "Page viewport only; no browser chrome, desktop, local paths, credentials, or private data."
+  },
+  "media": {
+    "video": {
+      "path": "source.webm",
+      "mimeType": "video/webm",
+      "codec": "vp9",
+      "width": 1920,
+      "height": 1080,
+      "framesPerSecond": 30,
+      "durationSeconds": 34.8,
+      "bytes": 8205642,
+      "silent": true,
+      "sha256": "ede83f71c59b322ba20c1f3fc7ed85afe9170f535bb247fe54d7785d14942153"
+    },
+    "poster": {
+      "path": "poster.jpg",
+      "mimeType": "image/jpeg",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 239737,
+      "depicts": "U01 preserved while the integrity banner identifies F02 and freezes the affected history at F01.",
+      "sha256": "bcebfb4879f7930989ee8e827d8c223ad820594cf63d01834df17ba90ce0badc"
+    }
+  },
+  "outcomes": {
+    "guidedReplay": "Completed on D03 with 7 / 7 live assertions passing.",
+    "fork": "Created visitor frame V01 from D03 without altering its source history.",
+    "comparison": "Compared V01 with D02 and confirmed compatible archive/silence vocabulary.",
+    "merge": "Created U01 with exact parents D02 + V01 and preserved both parents.",
+    "corruptionIsolation": "Mutation identified F02 as the first corrupt frame and froze the affected path on F01.",
+    "independentBranches": "S02, S03, D02, D03, V01, and U01 remained verified after the mutation."
+  },
+  "finalState": {
+    "currentFrame": "U01",
+    "mergeParents": [
+      "D02",
+      "V01"
+    ],
+    "firstCorruptFrame": "F02",
+    "frozenOn": "F01",
+    "assertionScore": "7 / 7",
+    "independentAcceptedFrames": [
+      "S02",
+      "S03",
+      "D02",
+      "D03",
+      "V01",
+      "U01"
+    ],
+    "integrityBanner": "First corrupt frame: F02. Frozen on last valid F01; accepted branches remain intact."
+  },
+  "checksums": {
+    "source.webm": "ede83f71c59b322ba20c1f3fc7ed85afe9170f535bb247fe54d7785d14942153",
+    "poster.jpg": "bcebfb4879f7930989ee8e827d8c223ad820594cf63d01834df17ba90ce0badc",
+    "capture.mjs": "48995ff3d0fdc849b6e62f559cbf515a1720c1343bc165ad94f175ed4cea7629"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "schema": "rapp-vision.frame-build-loop/1",
+  "loop": 1,
+  "base_commit": "4ca9de7dccc96f53a071e6ae7de1f054475bfd51",
+  "frame_count": 10,
+  "merge_strategy": "git merge --no-ff",
+  "squash": false,
+  "frames": [
+    {
+      "frame": 1,
+      "slug": "01-understand-operate",
+      "branch": "frame-film/01-many-worlds-capture",
+      "path": "compositions/frames/01-understand-operate.html",
+      "asset": "assets/proof-clips/01-many-worlds/source.webm"
+    },
+    {
+      "frame": 2,
+      "slug": "02-identity-history",
+      "branch": "frame-film/02-soul-passport-capture",
+      "path": "compositions/frames/02-identity-history.html",
+      "asset": "assets/proof-clips/02-soul-passport/source.webm"
+    },
+    {
+      "frame": 3,
+      "slug": "03-correct-hash-wrong-repair",
+      "branch": "frame-film/03-mars-colony-capture",
+      "path": "compositions/frames/03-correct-hash-wrong-repair.html",
+      "asset": "assets/proof-clips/03-mars-colony/source.webm"
+    },
+    {
+      "frame": 4,
+      "slug": "04-five-realities",
+      "branch": "frame-film/04-five-realities-capture",
+      "path": "compositions/frames/04-five-realities.html",
+      "asset": "assets/proof-clips/04-five-realities/source.webm"
+    },
+    {
+      "frame": 5,
+      "slug": "05-cryptography-causality",
+      "branch": "frame-film/05-causal-detective-capture",
+      "path": "compositions/frames/05-cryptography-causality.html",
+      "asset": "assets/proof-clips/05-causal-detective/source.webm"
+    },
+    {
+      "frame": 6,
+      "slug": "06-preserve-disagreement",
+      "branch": "frame-film/06-space-station-capture",
+      "path": "compositions/frames/06-preserve-disagreement.html",
+      "asset": "assets/proof-clips/06-space-station/source.webm"
+    },
+    {
+      "frame": 7,
+      "slug": "07-law-executes",
+      "branch": "frame-film/07-constitution-capture",
+      "path": "compositions/frames/07-law-executes.html",
+      "asset": "assets/proof-clips/07-constitution/source.webm"
+    },
+    {
+      "frame": 8,
+      "slug": "08-state-not-pixels",
+      "branch": "frame-film/08-teleporting-roguelike-capture",
+      "path": "compositions/frames/08-state-not-pixels.html",
+      "asset": "assets/proof-clips/08-teleporting-roguelike/source.webm"
+    },
+    {
+      "frame": 9,
+      "slug": "09-attack-boundaries",
+      "branch": "frame-film/09-attack-timeline-capture",
+      "path": "compositions/frames/09-attack-boundaries.html",
+      "asset": "assets/proof-clips/09-attack-timeline/source.webm"
+    },
+    {
+      "frame": 10,
+      "slug": "10-film-plus-proof",
+      "branch": "frame-film/10-futures-museum-capture",
+      "path": "compositions/frames/10-film-plus-proof.html",
+      "asset": "assets/proof-clips/10-futures-museum/source.webm"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "schema": "rapp-vision.proof-clip/1",
+  "frame": 4,
+  "slug": "04-five-realities",
+  "title": "One History, Five Realities",
+  "source_url": "https://kody-w.github.io/frame-chains/showcase/04-five-realities/",
+  "duration": 27.933,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "selectors": [
+    "#guideBtn",
+    "#mutationBtn"
+  ],
+  "positive_outcome": "The guided replay completes at prefix 9 / 9 with 5 / 5 canonical agreement across all five independently exposed oracle hashes.",
+  "failure_outcome": "The mutation isolates the divergent Command Dashboard while the other four projections remain in canonical agreement.",
+  "sha256": "e9127a60365442a7e7cbfb20f0e97a1c169c5d870833bb0be48b717440eab0e2",
+  "synthetic_only": true,
+  "audio": false,
+  "source": {
+    "url": "https://kody-w.github.io/frame-chains/showcase/04-five-realities/",
+    "pageTitle": "One History, Five Realities",
+    "capturedAt": "2026-08-31T16:29:02.355Z",
+    "publicSyntheticMaterial": true,
+    "captureScope": "Chromium viewport only"
+  },
+  "provenance": {
+    "branch": "frame-film/04-five-realities-capture",
+    "captureScript": "capture.mjs",
+    "captureScriptSha256": "b0a7fab9c55ac63fbb8037ebb9f03fa7204a9db91727276ed07c937c16c8c496",
+    "playwrightVersion": "1.62.1",
+    "browser": "151.0.7922.34",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "deviceScaleFactor": 1
+  },
+  "actions": [
+    {
+      "selector": "#guideBtn",
+      "action": "click",
+      "outcome": "Guided replay advanced the selected immutable history from prefix 0 / 9 through 9 / 9."
+    },
+    {
+      "selector": "#prefixLabel",
+      "action": "wait",
+      "outcome": "9 / 9"
+    },
+    {
+      "selector": "#consensusBadge",
+      "action": "assert after full replay",
+      "outcome": "5 / 5 canonical agreement"
+    },
+    {
+      "selector": "[data-hash]",
+      "action": "assert after full replay",
+      "outcome": "All five independently exposed oracle hashes resolved to 5b81d72d8d70960457382ddd63ad55690da1a215bbf269af6966e2145334091e."
+    },
+    {
+      "selector": "#mutationBtn",
+      "action": "click",
+      "outcome": "The Command projector omitted the relationship event without changing the selected history."
+    },
+    {
+      "selector": "[data-view=\"command\"]",
+      "action": "assert divergence",
+      "outcome": "Command Dashboard was marked divergent with LINK none and hash 3d57c66bde81bda59f2740a4e3a88fadd870ff834eb6f9ed242f7cee227239e5."
+    },
+    {
+      "selector": "[data-hash=\"kanban\"], [data-hash=\"city\"], [data-hash=\"graph\"], [data-hash=\"comic\"]",
+      "action": "assert honest majority",
+      "outcome": "The four honest projections remained in agreement at 5b81d72d8d70960457382ddd63ad55690da1a215bbf269af6966e2145334091e."
+    },
+    {
+      "selector": "#detectorText",
+      "action": "assert isolation",
+      "outcome": "Isolated: Command Dashboard. The other 4 views still resolve to 5b81d72d8d70960457382ddd63ad55690da1a215bbf269af6966e2145334091e"
+    },
+    {
+      "selector": "#assertionList",
+      "action": "assert live contract",
+      "outcome": "Four honest projections still agree; exactly Command is isolated."
+    }
+  ],
+  "outcome": "Five projections converge from one history; one mutated Command projector is visibly isolated while the other four remain in canonical agreement.",
+  "media": {
+    "source.webm": {
+      "sha256": "e9127a60365442a7e7cbfb20f0e97a1c169c5d870833bb0be48b717440eab0e2",
+      "bytes": 4962191,
+      "durationSeconds": 27.933,
+      "format": "matroska,webm",
+      "codec": "vp9",
+      "width": 1920,
+      "height": 1080,
+      "pixelFormat": "yuv420p",
+      "frameRate": "30/1",
+      "audioStreams": 0
+    },
+    "poster.jpg": {
+      "sha256": "7bec116d5ed98383907b62fc66a21c0f9e6bbcea98bedf29792c5e778325c4b7",
+      "bytes": 183462,
+      "codec": "mjpeg",
+      "width": 1920,
+      "height": 1080,
+      "pixelFormat": "yuvj420p",
+      "state": "Full-prefix divergence view showing the Command projector isolated among four matching projections."
+    }
+  }
+}

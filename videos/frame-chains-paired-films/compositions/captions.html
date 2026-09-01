@@ -1,0 +1,223 @@
+<template id="captions-template" data-composition-id="captions" data-width="1920" data-height="1080">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+
+
+<style data-brand-tokens>
+      @font-face { font-family: 'Inter'; src: url('assets/fonts/Inter-400.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: block; }
+      @font-face { font-family: 'Inter'; src: url('assets/fonts/Inter-700.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: block; }
+      :root {
+      --ink: #242424;
+      --cream: #ffffff;
+      --tile: #F8D5E0;
+      --tile-strong: #b11f4b;
+      --coral: #0067b8;
+      --navy: #151718;
+      --navy-soft: #1B1D1F;
+      --navy-elev: #202325;
+      --cap-ink: #242424;
+      --cap-canvas: #ffffff;
+      --cap-accent: #0067b8;
+      --cap-accent-2: #b11f4b;
+      --font-display: "Inter", system-ui, serif;
+      --font-body: "Inter", system-ui, sans-serif;
+      --cap-band-top: 900px;
+      --cap-band-height: 180px;
+      }
+    </style>
+
+<style>
+  #captions-root {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .caption-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+  }
+  /* the keep-out band, from captionBand(H) — frame content stays above it */
+  .caption-stage {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: var(--cap-band-top, 900px);
+    height: var(--cap-band-height, 180px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .caption-group {
+    /* every group is absolutely stacked over the SAME band — exactly one shown at a
+       time via opacity. Must be absolute: in-flow groups would lay out side-by-side. */
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+  }
+
+  /* THE lifted cream card — warm cream fill, 1px hairline ink border, one soft warm
+     shadow (code-editorial's only elevation language), 12px radius, no tilt */
+  .caption-pill {
+    max-width: 78%;
+    padding: 22px 44px 26px;
+    background: var(--cap-canvas, #faf9f5);
+    border: 1px solid color-mix(in srgb, var(--cap-ink, #141413) 12%, transparent);
+    border-radius: 12px;
+    box-shadow:
+      0 1px 3px color-mix(in srgb, var(--cap-ink, #141413) 8%, transparent),
+      0 4px 16px color-mix(in srgb, var(--cap-ink, #141413) 4%, transparent);
+  }
+  .caption-line {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.12em 0.3em;
+    font-family: "Inter", system-ui, sans-serif;
+    font-weight: 500;
+    font-size: clamp(40px, 4.4vw, 56px);
+    line-height: 1.24;
+    letter-spacing: -0.02em;
+  }
+
+  /* upcoming — faint warm ink, no underline */
+  .caption-word {
+    display: inline-block;
+    padding: 0 0.02em 0.06em;
+    color: color-mix(in srgb, var(--cap-ink, #141413) 40%, var(--cap-canvas, #faf9f5));
+    border-bottom: 3px solid transparent;
+  }
+  /* current word — full ink under the coral voltage underline (the brand's signature
+     inline-link gesture; border-bottom = underline without layout shift) */
+  .caption-word.is-active {
+    color: var(--cap-ink, #141413);
+    border-bottom: 3px solid var(--cap-accent, #cc785c);
+  }
+  /* already spoken — solid warm ink, underline cleared */
+  .caption-word.is-spoken {
+    color: var(--cap-ink, #141413);
+    border-bottom: 3px solid transparent;
+  }
+
+  /* optional per-word accents (dormant until a word-classer tags them) */
+  /* brand / key term — the expressive EB Garamond italic */
+  .caption-word.cap-brand {
+    font-style: italic;
+    color: var(--cap-ink, #141413);
+  }
+  .caption-word.cap-brand.is-active {
+    border-bottom: 3px solid var(--cap-accent, #cc785c);
+  }
+  /* numerals / data — slightly recessed warm ink */
+  .caption-word.cap-num {
+    color: color-mix(in srgb, var(--cap-ink, #141413) 72%, var(--cap-canvas, #faf9f5));
+  }
+  /* emphasis — a persistent coral voltage underline */
+  .caption-word.cap-cta {
+    border-bottom: 3px solid var(--cap-accent-2, #b5654a);
+    color: var(--cap-ink, #141413);
+  }
+
+  @media (max-aspect-ratio: 9/16) {
+    .caption-pill {
+      max-width: 92%;
+    }
+    .caption-line {
+      font-size: clamp(34px, 5.4vw, 46px);
+    }
+  }
+</style>
+
+<div
+  id="captions-root"
+  data-composition-id="captions"
+  data-timeline-locked
+  data-start="0"
+  data-duration="105.344"
+  data-fps="30"
+  data-width="1920"
+  data-height="1080"
+>
+  <div class="caption-layer" aria-hidden="true">
+    <div id="caption-stage" class="caption-stage"></div>
+  </div>
+</div>
+
+<script>
+  // captions.mjs injects the engine's scene-aware groups + real duration here.
+  var GROUPS = [{"id":"caption-group-0","frame":1,"start":0.11,"end":1.29,"text":"An interactive proof","words":[{"id":"caption-word-0-0","text":"An","start":0.11,"end":0.14},{"id":"caption-word-0-1","text":"interactive","start":0.14,"end":0.83},{"id":"caption-word-0-2","text":"proof","start":0.93,"end":1.27}]},{"id":"caption-group-1","frame":1,"start":1.29,"end":2.32,"text":"can still confuse","words":[{"id":"caption-word-1-0","text":"can","start":1.29,"end":1.46},{"id":"caption-word-1-1","text":"still","start":1.53,"end":1.83},{"id":"caption-word-1-2","text":"confuse","start":1.83,"end":2.32}]},{"id":"caption-group-2","frame":1,"start":2.32,"end":3.43,"text":"a newcomer.","words":[{"id":"caption-word-2-0","text":"a","start":2.32,"end":2.39},{"id":"caption-word-2-1","text":"newcomer.","start":2.39,"end":3.32}]},{"id":"caption-group-3","frame":1,"start":3.43,"end":3.64,"text":"So,","words":[{"id":"caption-word-3-0","text":"So,","start":3.43,"end":3.64}]},{"id":"caption-group-4","frame":1,"start":3.64,"end":4.78,"text":"RAPP Vision pairs","words":[{"id":"caption-word-4-0","text":"RAPP","start":3.64,"end":3.88},{"id":"caption-word-4-1","text":"Vision","start":3.88,"end":4.37},{"id":"caption-word-4-2","text":"pairs","start":4.37,"end":4.78}]},{"id":"caption-group-5","frame":1,"start":4.78,"end":6.04,"text":"every live replay","words":[{"id":"caption-word-5-0","text":"every","start":4.78,"end":5.18},{"id":"caption-word-5-1","text":"live","start":5.19,"end":5.51},{"id":"caption-word-5-2","text":"replay","start":5.51,"end":6.04}]},{"id":"caption-group-6","frame":1,"start":6.04,"end":6.36,"text":"with","words":[{"id":"caption-word-6-0","text":"with","start":6.04,"end":6.24}]},{"id":"caption-group-7","frame":1,"start":6.54,"end":7.67,"text":"a real film.","words":[{"id":"caption-word-7-0","text":"a","start":6.54,"end":6.61},{"id":"caption-word-7-1","text":"real","start":6.79,"end":7.07},{"id":"caption-word-7-2","text":"film.","start":7.07,"end":7.56}]},{"id":"caption-group-8","frame":1,"start":7.67,"end":9.12,"text":"Understand it first,","words":[{"id":"caption-word-8-0","text":"Understand","start":7.67,"end":8.38},{"id":"caption-word-8-1","text":"it","start":8.38,"end":8.53},{"id":"caption-word-8-2","text":"first,","start":8.56,"end":9.12}]},{"id":"caption-group-9","frame":1,"start":9.12,"end":9.68,"text":"then take","words":[{"id":"caption-word-9-0","text":"then","start":9.12,"end":9.4},{"id":"caption-word-9-1","text":"take","start":9.4,"end":9.68}]},{"id":"caption-group-10","frame":1,"start":9.68,"end":10.61,"text":"the controls.","words":[{"id":"caption-word-10-0","text":"the","start":9.68,"end":9.89},{"id":"caption-word-10-1","text":"controls.","start":9.89,"end":10.49}]},{"id":"caption-group-11","frame":2,"start":10.811,"end":12.371,"text":"One identity crosses","words":[{"id":"caption-word-11-0","text":"One","start":10.811,"end":11.001},{"id":"caption-word-11-1","text":"identity","start":11.001,"end":11.631},{"id":"caption-word-11-2","text":"crosses","start":11.731,"end":12.371}]},{"id":"caption-group-12","frame":2,"start":12.371,"end":13.331,"text":"devices,","words":[{"id":"caption-word-12-0","text":"devices,","start":12.371,"end":13.211}]},{"id":"caption-group-13","frame":2,"start":13.341,"end":14.531,"text":"branches offline,","words":[{"id":"caption-word-13-0","text":"branches","start":13.341,"end":13.821},{"id":"caption-word-13-1","text":"offline,","start":13.901,"end":14.531}]},{"id":"caption-group-14","frame":2,"start":14.531,"end":16.051,"text":"and returns.","words":[{"id":"caption-word-14-0","text":"and","start":14.531,"end":14.791},{"id":"caption-word-14-1","text":"returns.","start":14.861,"end":15.971}]},{"id":"caption-group-15","frame":2,"start":16.051,"end":16.491,"text":"The film","words":[{"id":"caption-word-15-0","text":"The","start":16.051,"end":16.191},{"id":"caption-word-15-1","text":"film","start":16.191,"end":16.441}]},{"id":"caption-group-16","frame":2,"start":16.491,"end":17.931,"text":"shows the journey.","words":[{"id":"caption-word-16-0","text":"shows","start":16.491,"end":16.861},{"id":"caption-word-16-1","text":"the","start":16.861,"end":17.081},{"id":"caption-word-16-2","text":"journey.","start":17.081,"end":17.851}]},{"id":"caption-group-17","frame":2,"start":17.931,"end":19.091,"text":"The verifier rejects","words":[{"id":"caption-word-17-0","text":"The","start":17.931,"end":18.061},{"id":"caption-word-17-1","text":"verifier","start":18.061,"end":18.611},{"id":"caption-word-17-2","text":"rejects","start":18.611,"end":19.091}]},{"id":"caption-group-18","frame":2,"start":19.091,"end":21.261,"text":"the counterfeit without moving","words":[{"id":"caption-word-18-0","text":"the","start":19.091,"end":19.301},{"id":"caption-word-18-1","text":"counterfeit","start":19.301,"end":20.061},{"id":"caption-word-18-2","text":"without","start":20.161,"end":20.721},{"id":"caption-word-18-3","text":"moving","start":20.721,"end":21.261}]},{"id":"caption-group-19","frame":2,"start":21.261,"end":22.054,"text":"the accepted","words":[{"id":"caption-word-19-0","text":"the","start":21.261,"end":21.531},{"id":"caption-word-19-1","text":"accepted","start":21.531,"end":22.241}]},{"id":"caption-group-20","frame":3,"start":22.054,"end":22.241,"text":"On Mars,","words":[{"id":"caption-word-20-0","text":"On","start":22.054,"end":22.154},{"id":"caption-word-20-1","text":"Mars,","start":22.154,"end":22.684}]},{"id":"caption-group-21","frame":2,"start":22.241,"end":22.684,"text":"head.","words":[{"id":"caption-word-21-0","text":"head.","start":22.241,"end":22.891}]},{"id":"caption-group-22","frame":3,"start":22.684,"end":22.824,"text":"a","words":[{"id":"caption-word-22-0","text":"a","start":22.684,"end":22.704}]},{"id":"caption-group-23","frame":3,"start":23.024,"end":26.064,"text":"correctly-hashed repair still fails.","words":[{"id":"caption-word-23-0","text":"correctly-hashed","start":23.024,"end":24.184},{"id":"caption-word-23-1","text":"repair","start":24.254,"end":24.764},{"id":"caption-word-23-2","text":"still","start":24.764,"end":25.214},{"id":"caption-word-23-3","text":"fails.","start":25.214,"end":25.974}]},{"id":"caption-group-24","frame":3,"start":26.064,"end":26.564,"text":"The chain","words":[{"id":"caption-word-24-0","text":"The","start":26.064,"end":26.194},{"id":"caption-word-24-1","text":"chain","start":26.194,"end":26.564}]},{"id":"caption-group-25","frame":3,"start":26.564,"end":26.824,"text":"proves","words":[{"id":"caption-word-25-0","text":"proves","start":26.564,"end":26.704}]},{"id":"caption-group-26","frame":3,"start":27.024,"end":28.264,"text":"exactly which three","words":[{"id":"caption-word-26-0","text":"exactly","start":27.024,"end":27.574},{"id":"caption-word-26-1","text":"which","start":27.574,"end":27.974},{"id":"caption-word-26-2","text":"three","start":27.974,"end":28.264}]},{"id":"caption-group-27","frame":3,"start":28.264,"end":29.604,"text":"systems were authorized","words":[{"id":"caption-word-27-0","text":"systems","start":28.264,"end":28.624},{"id":"caption-word-27-1","text":"were","start":28.704,"end":28.814},{"id":"caption-word-27-2","text":"authorized","start":28.814,"end":29.484}]},{"id":"caption-group-28","frame":3,"start":30.064,"end":30.814,"text":"and preserves","words":[{"id":"caption-word-28-0","text":"and","start":30.064,"end":30.204},{"id":"caption-word-28-1","text":"preserves","start":30.204,"end":30.694}]},{"id":"caption-group-29","frame":3,"start":31.024,"end":32.104,"text":"the colony's last","words":[{"id":"caption-word-29-0","text":"the","start":31.024,"end":31.094},{"id":"caption-word-29-1","text":"colony's","start":31.134,"end":31.734},{"id":"caption-word-29-2","text":"last","start":31.734,"end":32.004}]},{"id":"caption-group-30","frame":3,"start":32.104,"end":32.709,"text":"good state.","words":[{"id":"caption-word-30-0","text":"good","start":32.104,"end":32.334},{"id":"caption-word-30-1","text":"state.","start":32.334,"end":32.844}]},{"id":"caption-group-31","frame":4,"start":32.709,"end":34.029,"text":"one history becomes","words":[{"id":"caption-word-31-0","text":"one","start":32.709,"end":32.869},{"id":"caption-word-31-1","text":"history","start":32.869,"end":33.449},{"id":"caption-word-31-2","text":"becomes","start":33.449,"end":34.029}]},{"id":"caption-group-32","frame":4,"start":34.029,"end":35.569,"text":"five interfaces.","words":[{"id":"caption-word-32-0","text":"five","start":34.029,"end":34.359},{"id":"caption-word-32-1","text":"interfaces.","start":34.359,"end":35.479}]},{"id":"caption-group-33","frame":4,"start":35.569,"end":37.189,"text":"When command lies,","words":[{"id":"caption-word-33-0","text":"When","start":35.569,"end":35.899},{"id":"caption-word-33-1","text":"command","start":35.899,"end":36.619},{"id":"caption-word-33-2","text":"lies,","start":36.619,"end":37.189}]},{"id":"caption-group-34","frame":4,"start":37.189,"end":38.619,"text":"four honest projections","words":[{"id":"caption-word-34-0","text":"four","start":37.189,"end":37.459},{"id":"caption-word-34-1","text":"honest","start":37.459,"end":37.859},{"id":"caption-word-34-2","text":"projections","start":37.859,"end":38.619}]},{"id":"caption-group-35","frame":4,"start":38.619,"end":39.829,"text":"still agree,","words":[{"id":"caption-word-35-0","text":"still","start":38.619,"end":38.939},{"id":"caption-word-35-1","text":"agree,","start":38.939,"end":39.739}]},{"id":"caption-group-36","frame":4,"start":39.829,"end":40.199,"text":"and the","words":[{"id":"caption-word-36-0","text":"and","start":39.829,"end":39.969},{"id":"caption-word-36-1","text":"the","start":39.969,"end":40.199}]},{"id":"caption-group-37","frame":4,"start":40.199,"end":41.579,"text":"broken lens isolates","words":[{"id":"caption-word-37-0","text":"broken","start":40.199,"end":40.649},{"id":"caption-word-37-1","text":"lens","start":40.649,"end":40.889},{"id":"caption-word-37-2","text":"isolates","start":41.019,"end":41.579}]},{"id":"caption-group-38","frame":4,"start":41.579,"end":42.269,"text":"itself.","words":[{"id":"caption-word-38-0","text":"itself.","start":41.579,"end":42.179}]},{"id":"caption-group-39","frame":5,"start":42.269,"end":43.549,"text":"The detective accepts","words":[{"id":"caption-word-39-0","text":"The","start":42.269,"end":42.409},{"id":"caption-word-39-1","text":"detective","start":42.459,"end":43.059},{"id":"caption-word-39-2","text":"accepts","start":43.059,"end":43.549}]},{"id":"caption-group-40","frame":5,"start":43.549,"end":43.989,"text":"only a","words":[{"id":"caption-word-40-0","text":"only","start":43.549,"end":43.809},{"id":"caption-word-40-1","text":"a","start":43.809,"end":43.989}]},{"id":"caption-group-41","frame":5,"start":43.989,"end":44.699,"text":"theory backed","words":[{"id":"caption-word-41-0","text":"theory","start":43.989,"end":44.329},{"id":"caption-word-41-1","text":"backed","start":44.339,"end":44.579}]},{"id":"caption-group-42","frame":5,"start":44.789,"end":46.139,"text":"by exact earlier","words":[{"id":"caption-word-42-0","text":"by","start":44.789,"end":44.929},{"id":"caption-word-42-1","text":"exact","start":44.979,"end":45.419},{"id":"caption-word-42-2","text":"earlier","start":45.449,"end":46.139}]},{"id":"caption-group-43","frame":5,"start":46.139,"end":47.109,"text":"causes.","words":[{"id":"caption-word-43-0","text":"causes.","start":46.139,"end":47.059}]},{"id":"caption-group-44","frame":5,"start":47.109,"end":48.859,"text":"Forge one plausible","words":[{"id":"caption-word-44-0","text":"Forge","start":47.109,"end":47.589},{"id":"caption-word-44-1","text":"one","start":47.589,"end":47.909},{"id":"caption-word-44-2","text":"plausible","start":47.909,"end":48.859}]},{"id":"caption-group-45","frame":5,"start":48.859,"end":50.239,"text":"clue and cryptography","words":[{"id":"caption-word-45-0","text":"clue","start":48.859,"end":49.299},{"id":"caption-word-45-1","text":"and","start":49.299,"end":49.419},{"id":"caption-word-45-2","text":"cryptography","start":49.589,"end":50.239}]},{"id":"caption-group-46","frame":5,"start":50.239,"end":51.659,"text":"stays green while","words":[{"id":"caption-word-46-0","text":"stays","start":50.239,"end":50.659},{"id":"caption-word-46-1","text":"green","start":50.659,"end":51.129},{"id":"caption-word-46-2","text":"while","start":51.229,"end":51.549}]},{"id":"caption-group-47","frame":5,"start":51.659,"end":53.031,"text":"causality turns red.","words":[{"id":"caption-word-47-0","text":"causality","start":51.659,"end":52.249},{"id":"caption-word-47-1","text":"turns","start":52.249,"end":52.629},{"id":"caption-word-47-2","text":"red.","start":52.629,"end":53.119}]},{"id":"caption-group-48","frame":6,"start":53.031,"end":54.051,"text":"Six agents build","words":[{"id":"caption-word-48-0","text":"Six","start":53.031,"end":53.191},{"id":"caption-word-48-1","text":"agents","start":53.251,"end":53.651},{"id":"caption-word-48-2","text":"build","start":53.651,"end":54.021}]},{"id":"caption-group-49","frame":6,"start":54.051,"end":55.201,"text":"one station without","words":[{"id":"caption-word-49-0","text":"one","start":54.051,"end":54.261},{"id":"caption-word-49-1","text":"station","start":54.261,"end":54.811},{"id":"caption-word-49-2","text":"without","start":54.811,"end":55.081}]},{"id":"caption-group-50","frame":6,"start":55.281,"end":57.111,"text":"flattening disagreement.","words":[{"id":"caption-word-50-0","text":"flattening","start":55.281,"end":55.771},{"id":"caption-word-50-1","text":"disagreement.","start":55.771,"end":57.051}]},{"id":"caption-group-51","frame":6,"start":57.111,"end":58.681,"text":"Two airlock pressures","words":[{"id":"caption-word-51-0","text":"Two","start":57.111,"end":57.271},{"id":"caption-word-51-1","text":"airlock","start":57.331,"end":57.901},{"id":"caption-word-51-2","text":"pressures","start":57.901,"end":58.681}]},{"id":"caption-group-52","frame":6,"start":58.681,"end":59.271,"text":"survive","words":[{"id":"caption-word-52-0","text":"survive","start":58.681,"end":59.151}]},{"id":"caption-group-53","frame":6,"start":59.371,"end":60.231,"text":"in parallel,","words":[{"id":"caption-word-53-0","text":"in","start":59.371,"end":59.451},{"id":"caption-word-53-1","text":"parallel,","start":59.451,"end":60.171}]},{"id":"caption-group-54","frame":6,"start":60.231,"end":61.401,"text":"an overwrite that","words":[{"id":"caption-word-54-0","text":"an","start":60.231,"end":60.331},{"id":"caption-word-54-1","text":"overwrite","start":60.331,"end":61.071},{"id":"caption-word-54-2","text":"that","start":61.071,"end":61.401}]},{"id":"caption-group-55","frame":6,"start":61.401,"end":62.401,"text":"erases one is","words":[{"id":"caption-word-55-0","text":"erases","start":61.401,"end":61.891},{"id":"caption-word-55-1","text":"one","start":61.891,"end":62.101},{"id":"caption-word-55-2","text":"is","start":62.141,"end":62.281}]},{"id":"caption-group-56","frame":6,"start":62.491,"end":63.173,"text":"refused.","words":[{"id":"caption-word-56-0","text":"refused.","start":62.491,"end":63.161}]},{"id":"caption-group-57","frame":7,"start":63.173,"end":63.633,"text":"Here,","words":[{"id":"caption-word-57-0","text":"Here,","start":63.173,"end":63.633}]},{"id":"caption-group-58","frame":7,"start":63.633,"end":65.033,"text":"law is executable","words":[{"id":"caption-word-58-0","text":"law","start":63.633,"end":63.873},{"id":"caption-word-58-1","text":"is","start":63.943,"end":64.093},{"id":"caption-word-58-2","text":"executable","start":64.093,"end":65.033}]},{"id":"caption-group-59","frame":7,"start":65.033,"end":66.093,"text":"history.","words":[{"id":"caption-word-59-0","text":"history.","start":65.033,"end":66.003}]},{"id":"caption-group-60","frame":7,"start":66.093,"end":67.803,"text":"Two societies can fork","words":[{"id":"caption-word-60-0","text":"Two","start":66.093,"end":66.283},{"id":"caption-word-60-1","text":"societies","start":66.283,"end":67.143},{"id":"caption-word-60-2","text":"can","start":67.143,"end":67.383},{"id":"caption-word-60-3","text":"fork","start":67.433,"end":67.803}]},{"id":"caption-group-61","frame":7,"start":67.803,"end":68.713,"text":"lawfully,","words":[{"id":"caption-word-61-0","text":"lawfully,","start":67.803,"end":68.623}]},{"id":"caption-group-62","frame":7,"start":68.713,"end":68.963,"text":"but a","words":[{"id":"caption-word-62-0","text":"but","start":68.713,"end":68.883},{"id":"caption-word-62-1","text":"a","start":68.883,"end":68.963}]},{"id":"caption-group-63","frame":7,"start":68.963,"end":70.933,"text":"tyrant citing a superseded","words":[{"id":"caption-word-63-0","text":"tyrant","start":68.963,"end":69.493},{"id":"caption-word-63-1","text":"citing","start":69.493,"end":70.003},{"id":"caption-word-63-2","text":"a","start":70.003,"end":70.143},{"id":"caption-word-63-3","text":"superseded","start":70.143,"end":70.933}]},{"id":"caption-group-64","frame":7,"start":70.933,"end":72.003,"text":"rule is stopped","words":[{"id":"caption-word-64-0","text":"rule","start":70.933,"end":71.403},{"id":"caption-word-64-1","text":"is","start":71.403,"end":71.563},{"id":"caption-word-64-2","text":"stopped","start":71.563,"end":71.973}]},{"id":"caption-group-65","frame":7,"start":72.003,"end":72.656,"text":"at replay.","words":[{"id":"caption-word-65-0","text":"at","start":72.003,"end":72.123},{"id":"caption-word-65-1","text":"replay.","start":72.123,"end":72.673}]},{"id":"caption-group-66","frame":8,"start":72.656,"end":73.916,"text":"A dungeon teleports","words":[{"id":"caption-word-66-0","text":"A","start":72.656,"end":72.696},{"id":"caption-word-66-1","text":"dungeon","start":72.696,"end":73.206},{"id":"caption-word-66-2","text":"teleports","start":73.206,"end":73.916}]},{"id":"caption-group-67","frame":8,"start":73.916,"end":76.136,"text":"between devices as verified","words":[{"id":"caption-word-67-0","text":"between","start":73.916,"end":74.466},{"id":"caption-word-67-1","text":"devices","start":74.466,"end":75.056},{"id":"caption-word-67-2","text":"as","start":75.056,"end":75.216},{"id":"caption-word-67-3","text":"verified","start":75.216,"end":76.066}]},{"id":"caption-group-68","frame":8,"start":76.136,"end":76.916,"text":"state,","words":[{"id":"caption-word-68-0","text":"state,","start":76.136,"end":76.916}]},{"id":"caption-group-69","frame":8,"start":76.916,"end":78.396,"text":"not pixels.","words":[{"id":"caption-word-69-0","text":"not","start":76.916,"end":77.306},{"id":"caption-word-69-1","text":"pixels.","start":77.306,"end":78.276}]},{"id":"caption-group-70","frame":8,"start":78.396,"end":80.096,"text":"Possession isn't enough.","words":[{"id":"caption-word-70-0","text":"Possession","start":78.396,"end":78.976},{"id":"caption-word-70-1","text":"isn't","start":78.976,"end":79.296},{"id":"caption-word-70-2","text":"enough.","start":79.356,"end":79.976}]},{"id":"caption-group-71","frame":8,"start":80.096,"end":81.736,"text":"Forged inventory and broken","words":[{"id":"caption-word-71-0","text":"Forged","start":80.096,"end":80.416},{"id":"caption-word-71-1","text":"inventory","start":80.416,"end":80.976},{"id":"caption-word-71-2","text":"and","start":81.096,"end":81.296},{"id":"caption-word-71-3","text":"broken","start":81.296,"end":81.736}]},{"id":"caption-group-72","frame":8,"start":81.736,"end":83.837,"text":"parent provenance both fail.","words":[{"id":"caption-word-72-0","text":"parent","start":81.736,"end":82.176},{"id":"caption-word-72-1","text":"provenance","start":82.176,"end":82.906},{"id":"caption-word-72-2","text":"both","start":82.906,"end":83.196},{"id":"caption-word-72-3","text":"fail.","start":83.196,"end":83.746}]},{"id":"caption-group-73","frame":9,"start":83.837,"end":84.597,"text":"Now attack","words":[{"id":"caption-word-73-0","text":"Now","start":83.837,"end":84.047},{"id":"caption-word-73-1","text":"attack","start":84.047,"end":84.477}]},{"id":"caption-group-74","frame":9,"start":84.607,"end":85.827,"text":"the timeline nine","words":[{"id":"caption-word-74-0","text":"the","start":84.607,"end":84.797},{"id":"caption-word-74-1","text":"timeline","start":84.817,"end":85.487},{"id":"caption-word-74-2","text":"nine","start":85.487,"end":85.827}]},{"id":"caption-group-75","frame":9,"start":85.827,"end":87.257,"text":"different ways.","words":[{"id":"caption-word-75-0","text":"different","start":85.827,"end":86.387},{"id":"caption-word-75-1","text":"ways.","start":86.557,"end":87.217}]},{"id":"caption-group-76","frame":9,"start":87.257,"end":88.677,"text":"Every hostile candidate","words":[{"id":"caption-word-76-0","text":"Every","start":87.257,"end":87.547},{"id":"caption-word-76-1","text":"hostile","start":87.547,"end":88.037},{"id":"caption-word-76-2","text":"candidate","start":88.037,"end":88.677}]},{"id":"caption-group-77","frame":9,"start":88.677,"end":89.927,"text":"reaches the exact","words":[{"id":"caption-word-77-0","text":"reaches","start":88.677,"end":89.157},{"id":"caption-word-77-1","text":"the","start":89.157,"end":89.357},{"id":"caption-word-77-2","text":"exact","start":89.447,"end":89.807}]},{"id":"caption-group-78","frame":9,"start":89.977,"end":90.207,"text":"red","words":[{"id":"caption-word-78-0","text":"red","start":89.977,"end":90.087}]},{"id":"caption-group-79","frame":9,"start":90.667,"end":91.887,"text":"boundary that explains","words":[{"id":"caption-word-79-0","text":"boundary","start":90.667,"end":90.857},{"id":"caption-word-79-1","text":"that","start":90.897,"end":91.187},{"id":"caption-word-79-2","text":"explains","start":91.187,"end":91.887}]},{"id":"caption-group-80","frame":9,"start":91.887,"end":92.997,"text":"its rejection.","words":[{"id":"caption-word-80-0","text":"its","start":91.887,"end":92.147},{"id":"caption-word-80-1","text":"rejection.","start":92.147,"end":92.957}]},{"id":"caption-group-81","frame":9,"start":92.997,"end":94.177,"text":"Then replay rebuilds","words":[{"id":"caption-word-81-0","text":"Then","start":92.997,"end":93.227},{"id":"caption-word-81-1","text":"replay","start":93.227,"end":93.637},{"id":"caption-word-81-2","text":"rebuilds","start":93.637,"end":94.177}]},{"id":"caption-group-82","frame":9,"start":94.177,"end":95.036,"text":"the receipt.","words":[{"id":"caption-word-82-0","text":"the","start":94.177,"end":94.377},{"id":"caption-word-82-1","text":"receipt.","start":94.377,"end":95.097}]},{"id":"caption-group-83","frame":10,"start":95.036,"end":96.236,"text":"The museum turns","words":[{"id":"caption-word-83-0","text":"The","start":95.036,"end":95.246},{"id":"caption-word-83-1","text":"museum","start":95.246,"end":95.756},{"id":"caption-word-83-2","text":"turns","start":95.796,"end":96.236}]},{"id":"caption-group-84","frame":10,"start":96.236,"end":98.376,"text":"immutable futures into art","words":[{"id":"caption-word-84-0","text":"immutable","start":96.236,"end":96.996},{"id":"caption-word-84-1","text":"futures","start":97.056,"end":97.676},{"id":"caption-word-84-2","text":"into","start":97.676,"end":97.886},{"id":"caption-word-84-3","text":"art","start":97.886,"end":98.376}]},{"id":"caption-group-85","frame":10,"start":98.376,"end":99.616,"text":"then corrupts one","words":[{"id":"caption-word-85-0","text":"then","start":98.376,"end":98.666},{"id":"caption-word-85-1","text":"corrupts","start":98.666,"end":99.356},{"id":"caption-word-85-2","text":"one","start":99.356,"end":99.616}]},{"id":"caption-group-86","frame":10,"start":99.616,"end":101.016,"text":"branch on purpose.","words":[{"id":"caption-word-86-0","text":"branch","start":99.616,"end":100.046},{"id":"caption-word-86-1","text":"on","start":100.176,"end":100.306},{"id":"caption-word-86-2","text":"purpose.","start":100.306,"end":100.956}]},{"id":"caption-group-87","frame":10,"start":101.016,"end":101.626,"text":"Watch the","words":[{"id":"caption-word-87-0","text":"Watch","start":101.016,"end":101.376},{"id":"caption-word-87-1","text":"the","start":101.376,"end":101.626}]},{"id":"caption-group-88","frame":10,"start":101.626,"end":102.186,"text":"film to","words":[{"id":"caption-word-88-0","text":"film","start":101.626,"end":101.966},{"id":"caption-word-88-1","text":"to","start":101.966,"end":102.126}]},{"id":"caption-group-89","frame":10,"start":102.186,"end":103.336,"text":"learn the proof.","words":[{"id":"caption-word-89-0","text":"learn","start":102.186,"end":102.546},{"id":"caption-word-89-1","text":"the","start":102.546,"end":102.686},{"id":"caption-word-89-2","text":"proof.","start":102.856,"end":103.276}]},{"id":"caption-group-90","frame":10,"start":103.336,"end":103.796,"text":"Open the","words":[{"id":"caption-word-90-0","text":"Open","start":103.336,"end":103.576},{"id":"caption-word-90-1","text":"the","start":103.576,"end":103.796}]},{"id":"caption-group-91","frame":10,"start":103.796,"end":104.546,"text":"live replay","words":[{"id":"caption-word-91-0","text":"live","start":103.796,"end":104.056},{"id":"caption-word-91-1","text":"replay","start":104.096,"end":104.546}]},{"id":"caption-group-92","frame":10,"start":104.546,"end":105.596,"text":"to touch it.","words":[{"id":"caption-word-92-0","text":"to","start":104.546,"end":104.696},{"id":"caption-word-92-1","text":"touch","start":104.696,"end":105.006},{"id":"caption-word-92-2","text":"it.","start":105.066,"end":105.476}]}];
+  var DURATION = 105.344;
+
+  (function () {
+    var stage = document.getElementById("caption-stage");
+
+    // build DOM: one .caption-group per group, .caption-word per word
+    GROUPS.forEach(function (group, g) {
+      var groupEl = document.createElement("div");
+      groupEl.className = "caption-group";
+      groupEl.id = "caption-group-" + g;
+      var pill = document.createElement("div");
+      pill.className = "caption-pill";
+      var line = document.createElement("div");
+      line.className = "caption-line";
+      (group.words || []).forEach(function (w, i) {
+        var span = document.createElement("span");
+        span.className = "caption-word";
+        span.id = "caption-word-" + g + "-" + i;
+        span.textContent = String(w.text);
+        line.appendChild(span);
+      });
+      pill.appendChild(line);
+      groupEl.appendChild(pill);
+      stage.appendChild(groupEl);
+    });
+
+    window.__timelines = window.__timelines || {};
+    var tl = gsap.timeline({ paused: true });
+
+    GROUPS.forEach(function (group, g) {
+      var groupEl = document.getElementById("caption-group-" + g);
+      var words = group.words || [];
+      var next = GROUPS[g + 1];
+      var isLast = g === GROUPS.length - 1;
+      var start = Math.max(0, Number(group.start));
+      var end = isLast ? DURATION : Math.min(Number(next.start), Number(group.end) + 0.3);
+      if (end <= start) end = start + 0.01;
+
+      // group on/off — exactly one group visible at a time
+      tl.set(groupEl, { opacity: 1 }, start);
+      tl.set(groupEl, { opacity: 0 }, end);
+
+      // 3-state karaoke via className SETS — seek-safe (gsap.set applies on the
+      // engine's frame-by-frame seek; .call callbacks would NOT fire).
+      words.forEach(function (w, i) {
+        var el = document.getElementById("caption-word-" + g + "-" + i);
+        var at = Math.max(start, Number(w.start));
+        tl.set(el, { className: "caption-word" }, start); // upcoming (also resets on reverse-seek)
+        tl.set(el, { className: "caption-word is-active" }, at); // current
+        tl.fromTo(el, { scale: 0.98 }, { scale: 1, duration: 0.16, ease: "power1.out" }, at);
+        if (i + 1 < words.length) {
+          var nextAt = Math.max(start, Number(words[i + 1].start));
+          tl.set(el, { className: "caption-word is-spoken" }, nextAt); // demote when next activates
+        }
+      });
+      if (words.length) {
+        var lastEl = document.getElementById("caption-word-" + g + "-" + (words.length - 1));
+        var lastSpoken = Math.min(end, Number(words[words.length - 1].end) + 0.1);
+        tl.set(lastEl, { className: "caption-word is-spoken" }, lastSpoken);
+      }
+    });
+
+    // full-span anchor so the sub-comp timeline spans the whole video
+    tl.to({}, { duration: DURATION }, 0);
+    window.__timelines["captions"] = tl;
+  })();
+</script>
+
+<style>
+  .caption-line { line-height: 1.1 !important; }
+</style>
+</template>

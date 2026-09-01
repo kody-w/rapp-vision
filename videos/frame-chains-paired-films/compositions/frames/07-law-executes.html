@@ -1,0 +1,609 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-400.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-700.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #242424;
+      font-family: "Inter", sans-serif;
+    }
+
+    [id="f07-law-executes-ground"] {
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+    }
+
+    [class~="07-law-executes-paper-block"] {
+      position: absolute;
+      border: 1px solid rgba(36, 36, 36, 0.08);
+      border-radius: 12px;
+      background: #f8d5e0;
+      opacity: 0.28;
+    }
+
+    [class~="07-law-executes-paper-block-a"] {
+      width: 430px;
+      height: 620px;
+      left: -120px;
+      top: 185px;
+    }
+
+    [class~="07-law-executes-paper-block-b"] {
+      width: 430px;
+      height: 620px;
+      right: -120px;
+      top: 185px;
+    }
+
+    [id="f07-law-executes-header"] {
+      position: absolute;
+      left: 80px;
+      right: 80px;
+      top: 54px;
+      height: 128px;
+      z-index: 20;
+    }
+
+    [id="f07-law-executes-kicker"] {
+      color: #242424;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    [id="f07-law-executes-kicker-mark"] {
+      color: #0067b8;
+      margin-right: 11px;
+    }
+
+    [id="f07-law-executes-title"] {
+      margin-top: 18px;
+      font-size: 76px;
+      font-weight: 400;
+      letter-spacing: -0.022em;
+      line-height: 0.96;
+    }
+
+    [id="f07-law-executes-rule"] {
+      position: absolute;
+      left: 80px;
+      top: 181px;
+      width: 1760px;
+      height: 655px;
+      z-index: 18;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    [id="f07-law-executes-rule"] path {
+      fill: none;
+      stroke: #0067b8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    [id="f07-law-executes-rule-horizontal"] {
+      stroke-width: 3;
+    }
+
+    [id="f07-law-executes-rule-vertical"] {
+      stroke-width: 2;
+      opacity: 0.58;
+    }
+
+    [id="f07-law-executes-ledger-shell"] {
+      position: absolute;
+      left: 80px;
+      top: 214px;
+      width: 1760px;
+      height: 606px;
+      overflow: hidden;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 12px;
+      background: #151718;
+      box-shadow: 0 1px 3px rgba(36, 36, 36, 0.08), 0 4px 16px rgba(36, 36, 36, 0.04);
+      z-index: 4;
+    }
+
+    [id="f07-law-executes-ledger-video"] {
+      position: absolute;
+      left: 0;
+      top: -188px;
+      width: 1760px;
+      height: 990px;
+      object-fit: cover;
+    }
+
+    [id="f07-law-executes-ledger-label"] {
+      position: absolute;
+      left: 28px;
+      bottom: 24px;
+      padding: 12px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      background: #151718;
+      color: #ffffff;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      letter-spacing: 0.06em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    [id="f07-law-executes-split-stage"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 896px;
+      perspective: 1800px;
+      transform-style: preserve-3d;
+      z-index: 8;
+    }
+
+    [class~="07-law-executes-branch-card"] {
+      position: absolute;
+      top: 258px;
+      width: 770px;
+      height: 518px;
+      overflow: hidden;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 12px;
+      background: #ffffff;
+      transform-style: preserve-3d;
+      will-change: transform, opacity;
+    }
+
+    [id="f07-law-executes-left-card"] {
+      left: 80px;
+      transform-origin: left center;
+      box-shadow: -12px 18px 36px rgba(36, 36, 36, 0.08);
+    }
+
+    [id="f07-law-executes-right-card"] {
+      right: 80px;
+      transform-origin: right center;
+      box-shadow: 12px 18px 36px rgba(36, 36, 36, 0.08);
+    }
+
+    [class~="07-law-executes-branch-video"] {
+      position: absolute;
+      width: 1920px;
+      height: 1080px;
+      max-width: none;
+      object-fit: fill;
+    }
+
+    [id="f07-law-executes-left-video"] {
+      left: -250px;
+      top: -365px;
+    }
+
+    [id="f07-law-executes-right-video"] {
+      left: -900px;
+      top: -365px;
+    }
+
+    [class~="07-law-executes-card-chrome"] {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      top: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border: 1px solid rgba(36, 36, 36, 0.12);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.94);
+      color: #242424;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    [class~="07-law-executes-card-chrome"] span:last-child {
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+    }
+
+    [class~="07-law-executes-inner-badge"] {
+      position: absolute;
+      top: 708px;
+      z-index: 16;
+      min-width: 132px;
+      padding: 11px 16px;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 9999px;
+      background: #ffffff;
+      color: #242424;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      line-height: 1;
+      text-align: center;
+      text-transform: uppercase;
+      box-shadow: 0 1px 3px rgba(36, 36, 36, 0.08), 0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    [id="f07-law-executes-left-badge"] {
+      left: 768px;
+    }
+
+    [id="f07-law-executes-right-badge"] {
+      right: 768px;
+    }
+
+    [id="f07-law-executes-central-proof"] {
+      position: absolute;
+      left: 700px;
+      top: 270px;
+      width: 520px;
+      height: 510px;
+      overflow: hidden;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(36, 36, 36, 0.08), 0 4px 16px rgba(36, 36, 36, 0.04);
+      z-index: 14;
+      will-change: transform, opacity;
+    }
+
+    [id="f07-law-executes-refusal-video"] {
+      position: absolute;
+      left: -1080px;
+      top: -100px;
+      width: 1920px;
+      height: 1080px;
+      max-width: none;
+      object-fit: fill;
+    }
+
+    [id="f07-law-executes-refusal-label"] {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      padding: 13px 15px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      background: #151718;
+      color: #ffffff;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      line-height: 1;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    [id="f07-law-executes-law-switcher"] {
+      position: absolute;
+      left: 660px;
+      top: 202px;
+      z-index: 24;
+      width: 600px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 9999px;
+      background: #ffffff;
+      color: #242424;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.025em;
+      line-height: 1;
+      box-shadow: 0 1px 3px rgba(36, 36, 36, 0.08), 0 4px 16px rgba(36, 36, 36, 0.04);
+      will-change: transform, opacity;
+    }
+
+    [id="f07-law-executes-law-text"] {
+      display: inline-block;
+      min-width: 485px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    [id="f07-law-executes-cursor"] {
+      display: inline-block;
+      width: 13px;
+      margin-left: 5px;
+      color: #0067b8;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="07-law-executes"
+    data-duration="9.993"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div
+      id="f07-law-executes-ground"
+      class="clip"
+      data-start="0"
+      data-duration="9.993"
+      data-track-index="0"
+    >
+      <div class="07-law-executes-paper-block 07-law-executes-paper-block-a"></div>
+      <div class="07-law-executes-paper-block 07-law-executes-paper-block-b"></div>
+    </div>
+
+    <div
+      id="f07-law-executes-header"
+      class="clip"
+      data-start="0"
+      data-duration="9.993"
+      data-track-index="20"
+    >
+      <div id="f07-law-executes-kicker">
+        <span id="f07-law-executes-kicker-mark">✱</span>Constitutional replay
+      </div>
+      <div id="f07-law-executes-title">Law is executable history</div>
+    </div>
+
+    <svg
+      id="f07-law-executes-rule"
+      class="clip"
+      data-start="0"
+      data-duration="9.993"
+      data-track-index="19"
+      viewBox="0 0 1760 655"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path id="f07-law-executes-rule-horizontal" d="M 0 1 H 1760"></path>
+      <path id="f07-law-executes-rule-vertical" d="M 880 1 V 655"></path>
+    </svg>
+
+    <div id="f07-law-executes-ledger-shell">
+      <!-- approved frame video hoisted by assemble-index -->
+      <div id="f07-law-executes-ledger-label">Append-only constitutional ledger</div>
+    </div>
+
+    <div id="f07-law-executes-split-stage">
+      <div id="f07-law-executes-left-card" class="07-law-executes-branch-card">
+        <!-- approved frame video hoisted by assemble-index -->
+        <div class="07-law-executes-card-chrome">
+          <span>Lawful fork A</span><span>Canal Commonwealth</span>
+        </div>
+      </div>
+
+      <div id="f07-law-executes-right-card" class="07-law-executes-branch-card">
+        <!-- approved frame video hoisted by assemble-index -->
+        <div class="07-law-executes-card-chrome">
+          <span>Lawful fork B</span><span>Clinic Compact</span>
+        </div>
+      </div>
+
+      <div id="f07-law-executes-left-badge" class="07-law-executes-inner-badge">Lawful</div>
+      <div id="f07-law-executes-right-badge" class="07-law-executes-inner-badge">Lawful</div>
+
+      <div id="f07-law-executes-law-switcher">
+        <span id="f07-law-executes-law-text"></span><span id="f07-law-executes-cursor">▌</span>
+      </div>
+
+      <div id="f07-law-executes-central-proof">
+        <!-- approved frame video hoisted by assemble-index -->
+        <div id="f07-law-executes-refusal-label">Replay refused · frame 8</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+
+    const lawExecutesTimeline = gsap.timeline({ paused: true });
+    const lawExecutesHorizontal = document.getElementById("f07-law-executes-rule-horizontal");
+    const lawExecutesVertical = document.getElementById("f07-law-executes-rule-vertical");
+
+    [lawExecutesHorizontal, lawExecutesVertical].forEach((path) => {
+      const length = path.getTotalLength();
+      path.style.strokeDasharray = `${length}`;
+      path.style.strokeDashoffset = `${length}`;
+    });
+
+    lawExecutesTimeline.fromTo(
+      "[id='f07-law-executes-ledger-shell']",
+      { opacity: 0, scale: 0.975 },
+      { opacity: 1, scale: 1, duration: 0.65, ease: "power3.out" },
+      0,
+    );
+    lawExecutesTimeline.fromTo(
+      "[id='f07-law-executes-kicker']",
+      { opacity: 0, y: -18 },
+      { opacity: 1, y: 0, duration: 0.58, ease: "power3.out" },
+      0.08,
+    );
+    lawExecutesTimeline.fromTo(
+      "[id='f07-law-executes-title']",
+      { opacity: 0, y: -30 },
+      { opacity: 1, y: 0, duration: 0.82, ease: "power3.out" },
+      0.18,
+    );
+    lawExecutesTimeline.to(
+      lawExecutesHorizontal,
+      { strokeDashoffset: 0, duration: 0.72, ease: "power2.out" },
+      0.38,
+    );
+    lawExecutesTimeline.to(
+      lawExecutesVertical,
+      { strokeDashoffset: 0, duration: 0.88, ease: "power2.out" },
+      0.92,
+    );
+
+    lawExecutesTimeline.to(
+      "[id='f07-law-executes-ledger-shell']",
+      { opacity: 0.14, scale: 0.96, duration: 0.28, ease: "power4.in" },
+      2.72,
+    );
+    lawExecutesTimeline.fromTo(
+      "[id='f07-law-executes-left-card']",
+      { x: -380, rotateY: 22, scale: 0.86, opacity: 0 },
+      { x: 0, rotateY: 12, scale: 1, opacity: 1, duration: 1.05, ease: "power3.out" },
+      2.8,
+    );
+    lawExecutesTimeline.fromTo(
+      "[id='f07-law-executes-right-card']",
+      { x: 380, rotateY: -22, scale: 0.86, opacity: 0 },
+      { x: 0, rotateY: -12, scale: 1, opacity: 1, duration: 1.05, ease: "power3.out" },
+      3.02,
+    );
+    lawExecutesTimeline.fromTo(
+      "[class~='07-law-executes-card-chrome']",
+      { opacity: 0, y: 18 },
+      { opacity: 1, y: 0, duration: 0.58, stagger: 0.14, ease: "power2.out" },
+      3.48,
+    );
+    lawExecutesTimeline.fromTo(
+      "[id='f07-law-executes-left-badge']",
+      { opacity: 0, scale: 0.76 },
+      { opacity: 1, scale: 1, duration: 0.46, ease: "back.out(1.7)" },
+      4.38,
+    );
+    lawExecutesTimeline.fromTo(
+      "[id='f07-law-executes-right-badge']",
+      { opacity: 0, scale: 0.76 },
+      { opacity: 1, scale: 1, duration: 0.46, ease: "back.out(1.7)" },
+      4.67,
+    );
+    lawExecutesTimeline.to(
+      "[id='f07-law-executes-left-card']",
+      { y: -6, duration: 0.76, ease: "sine.inOut", yoyo: true, repeat: 1 },
+      4.42,
+    );
+    lawExecutesTimeline.to(
+      "[id='f07-law-executes-right-card']",
+      { y: 6, duration: 0.76, ease: "sine.inOut", yoyo: true, repeat: 1 },
+      4.42,
+    );
+
+    lawExecutesTimeline.to(
+      "[id='f07-law-executes-left-card']",
+      { x: -36, scale: 0.68, rotateY: 10, duration: 0.62, ease: "power3.out" },
+      6,
+    );
+    lawExecutesTimeline.to(
+      "[id='f07-law-executes-right-card']",
+      { x: 36, scale: 0.68, rotateY: -10, duration: 0.62, ease: "power3.out" },
+      6,
+    );
+    lawExecutesTimeline.to(
+      "[id='f07-law-executes-left-badge']",
+      { x: -118, y: 34, scale: 0.9, duration: 0.55, ease: "power3.out" },
+      6,
+    );
+    lawExecutesTimeline.to(
+      "[id='f07-law-executes-right-badge']",
+      { x: 118, y: 34, scale: 0.9, duration: 0.55, ease: "power3.out" },
+      6,
+    );
+    lawExecutesTimeline.fromTo(
+      "[id='f07-law-executes-central-proof']",
+      { opacity: 0, y: 28, scale: 1.08 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.72, ease: "expo.out" },
+      6.03,
+    );
+    lawExecutesTimeline.fromTo(
+      "[id='f07-law-executes-law-switcher']",
+      { opacity: 0, y: 18, scale: 0.94 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.58, ease: "power3.out" },
+      6.08,
+    );
+
+    const lawExecutesStates = [
+      { t: 0, text: "LAW-TREASURY-1" },
+      { t: 0.72, text: "LAW-TREASURY-1 · SUPERSEDED" },
+      { t: 1.38, text: "LAW-TREASURY-2 · ACTIVE" },
+    ];
+    const lawExecutesText = document.getElementById("f07-law-executes-law-text");
+    const lawExecutesCursor = document.getElementById("f07-law-executes-cursor");
+    const lawExecutesDriver = { t: 0 };
+    const lawExecutesBlink = { p: 0 };
+
+    function lawExecutesTextAt(time) {
+      for (let index = lawExecutesStates.length - 1; index >= 0; index -= 1) {
+        if (time >= lawExecutesStates[index].t) return lawExecutesStates[index].text;
+      }
+      return "";
+    }
+
+    lawExecutesTimeline.to(
+      lawExecutesDriver,
+      {
+        t: 2.2,
+        duration: 2.2,
+        ease: "none",
+        onUpdate: () => {
+          lawExecutesText.textContent = lawExecutesTextAt(lawExecutesDriver.t);
+          lawExecutesText.style.color = lawExecutesDriver.t >= 1.38 ? "#0067b8" : "#242424";
+        },
+      },
+      6.12,
+    );
+    lawExecutesTimeline.to(
+      lawExecutesBlink,
+      {
+        p: Math.PI * 8,
+        duration: 2.2,
+        ease: "none",
+        onUpdate: () => {
+          lawExecutesCursor.style.opacity = Math.sin(lawExecutesBlink.p) > 0 ? "1" : "0";
+        },
+      },
+      6.12,
+    );
+    lawExecutesTimeline.fromTo(
+      "[id='f07-law-executes-refusal-label']",
+      { opacity: 0, y: 16 },
+      { opacity: 1, y: 0, duration: 0.52, ease: "power2.out" },
+      7.58,
+    );
+
+    window.__timelines["07-law-executes"] = lawExecutesTimeline;
+  </script>
+</template>

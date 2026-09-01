@@ -1,8 +1,11 @@
 """Focused offline contract and privacy tests for the Frame Chains channel."""
 
 import json
+import hashlib
 import os
 import re
+import shutil
+import subprocess
 import unittest
 import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
@@ -129,7 +132,7 @@ class TestFrameChainsChannel(unittest.TestCase):
         cls.videos = {video["id"]: video for video in cls.channel["videos"]}
 
     def test_channel_and_registry_contract(self):
-        self.assertEqual(self.channel["schema"], "rapp-vision-channel/1.0")
+        self.assertEqual(self.channel["schema"], "rapp-vision-channel/2.0")
         self.assertEqual(self.channel["id"], "frame-chains")
         self.assertEqual(list(self.videos), VIDEO_IDS)
 
@@ -142,27 +145,42 @@ class TestFrameChainsChannel(unittest.TestCase):
                 "name": "Frame Chains",
                 "url": "frame-chains/channel.json",
                 "repo": "https://github.com/kody-w/frame-chains",
-                "legacy": "legacy-publications-2026-08-31",
+                "contract": "rapp-vision-channel/2.0",
                 "_why": (
-                    "Ten public synthetic showcase apps replayed live from GitHub Pages, "
-                    "including focused adversarial proofs for branching, identity, "
-                    "provenance, and timeline integrity."
+                    "Five paired publications: newcomer-first encoded films plus "
+                    "live executable proofs covering ten synthetic Frame Chains worlds."
                 ),
             }],
         )
         self.assertEqual(registry["channels"][-1]["id"], "frame-chains")
 
-    def test_every_entry_is_a_landscape_live_replay(self):
+    def test_every_entry_is_a_landscape_paired_publication(self):
         for video in self.videos.values():
             with self.subTest(video=video["id"]):
-                self.assertEqual(video["sources"], [])
+                self.assertEqual(
+                    [source["type"] for source in video["sources"]],
+                    ["video/mp4", "video/webm"],
+                )
+                self.assertEqual(len({
+                    source["src"] for source in video["sources"]
+                }), 2)
+                for source in video["sources"]:
+                    media_path = CHANNEL_PATH.parent / source["src"]
+                    self.assertTrue(media_path.is_file(), media_path)
+                    self.assertEqual(
+                        media_path.suffix,
+                        ".mp4" if source["type"] == "video/mp4" else ".webm",
+                    )
                 self.assertEqual(video["live"]["kind"], "rapp-vision-live/1.0")
-                self.assertEqual(video["published"], "2026-08-30")
-                self.assertEqual((video["width"], video["height"]), (1280, 800))
+                self.assertEqual(video["published"], "2026-08-31")
+                self.assertEqual((video["width"], video["height"]), (1920, 1080))
                 self.assertEqual(video["orientation"], "landscape")
                 self.assertTrue(video["chapters"])
                 self.assertEqual(video["chapters"][0]["t"], 0)
+                self.assertTrue(video["live"]["chapters"])
+                self.assertEqual(video["live"]["chapters"][0]["t"], 0)
                 self.assertIn("live", video["description"].lower())
+                self.assertIn("film", video["description"].lower())
                 self.assertTrue(
                     any("captured" in scene["card"].get("sub", "").lower()
                         or "captured" in scene["card"].get("note", "").lower()
@@ -178,7 +196,58 @@ class TestFrameChainsChannel(unittest.TestCase):
                     self.assertEqual(scene["t"], cursor)
                     self.assertGreater(scene["dur"], 0)
                     cursor += scene["dur"]
-            self.assertEqual(cursor, video["duration"])
+            self.assertEqual(cursor, video["live"]["duration"])
+
+    @unittest.skipUnless(shutil.which("ffprobe"), "ffprobe unavailable")
+    def test_encoded_media_matches_delivery_manifest(self):
+        manifest = load_json(
+            CHANNEL_PATH.parent / "media" / "frame-chains-delivery-manifest.json"
+        )
+        deliveries = {video["id"]: video for video in manifest["videos"]}
+        self.assertEqual(set(deliveries), set(self.videos))
+
+        for video_id, video in self.videos.items():
+            delivery = deliveries[video_id]
+            with self.subTest(video=video_id):
+                self.assertAlmostEqual(
+                    video["duration"],
+                    delivery["duration_s"],
+                    delta=0.11,
+                )
+                for kind, expected_codec in (("mp4", "h264"), ("webm", "vp9")):
+                    media = CHANNEL_PATH.parent / delivery[kind]["path"]
+                    self.assertEqual(
+                        hashlib.sha256(media.read_bytes()).hexdigest(),
+                        delivery[kind]["sha256"],
+                    )
+                    probe = json.loads(subprocess.check_output([
+                        "ffprobe",
+                        "-v",
+                        "error",
+                        "-show_streams",
+                        "-show_format",
+                        "-of",
+                        "json",
+                        str(media),
+                    ]))
+                    video_streams = [
+                        stream for stream in probe["streams"]
+                        if stream["codec_type"] == "video"
+                    ]
+                    audio_streams = [
+                        stream for stream in probe["streams"]
+                        if stream["codec_type"] == "audio"
+                    ]
+                    self.assertEqual(len(video_streams), 1)
+                    self.assertEqual(len(audio_streams), 1)
+                    self.assertEqual(video_streams[0]["codec_name"], expected_codec)
+                    self.assertEqual(
+                        (
+                            int(video_streams[0]["width"]),
+                            int(video_streams[0]["height"]),
+                        ),
+                        (1920, 1080),
+                    )
 
     def test_all_app_paths_resolve_to_public_showcase_pages(self):
         for video in self.videos.values():
@@ -372,7 +441,11 @@ class TestFrameChainsChannel(unittest.TestCase):
                         self.assertNotIn("url(http", value.lower())
 
     def test_channel_and_thumbnails_contain_no_private_indicators(self):
-        files = [CHANNEL_PATH, *sorted((CHANNEL_PATH.parent / "thumbs").glob("*.svg"))]
+        files = [
+            CHANNEL_PATH,
+            CHANNEL_PATH.parent / "media" / "frame-chains-delivery-manifest.json",
+            *sorted((CHANNEL_PATH.parent / "thumbs").glob("*.svg")),
+        ]
         for path in files:
             text = path.read_text(encoding="utf-8")
             with self.subTest(path=path.relative_to(ROOT)):

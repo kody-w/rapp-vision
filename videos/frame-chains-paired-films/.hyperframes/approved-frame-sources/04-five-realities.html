@@ -1,0 +1,791 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-400.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-700.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #242424;
+      font-family: "Inter", sans-serif;
+    }
+
+    .f04-ground {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .f04-ground-rule {
+      position: absolute;
+      left: 80px;
+      right: 80px;
+      top: 884px;
+      height: 1px;
+      background: rgba(36, 36, 36, 0.12);
+    }
+
+    .f04-ground-index {
+      position: absolute;
+      top: 61px;
+      right: 80px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 19px;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      color: rgba(36, 36, 36, 0.48);
+    }
+
+    .f04-frame-video {
+      position: absolute;
+      display: block;
+      object-fit: cover;
+      background: #151718;
+    }
+
+    #f04-wide-video {
+      left: 80px;
+      top: 222px;
+      width: 1760px;
+      height: 538px;
+    }
+
+    #f04-agree-left-video,
+    #f04-diverge-left-video {
+      left: 80px;
+      top: 214px;
+      width: 1080px;
+      height: 566px;
+    }
+
+    #f04-agree-command-video,
+    #f04-diverge-command-video {
+      left: 1240px;
+      top: 214px;
+      width: 600px;
+      height: 566px;
+    }
+
+    .f04-overlay {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      perspective: 1800px;
+      pointer-events: none;
+    }
+
+    .f04-kicker {
+      position: absolute;
+      left: 80px;
+      top: 48px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(36, 36, 36, 0.72);
+    }
+
+    .f04-spike {
+      display: inline-grid;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      place-items: center;
+      overflow: hidden;
+      color: #0067b8;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .f04-title {
+      position: absolute;
+      left: 80px;
+      top: 104px;
+      margin: 0;
+      font-size: 104px;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: -0.028em;
+      color: #242424;
+    }
+
+    .f04-wide-shell {
+      position: absolute;
+      left: 80px;
+      top: 222px;
+      width: 1760px;
+      height: 538px;
+      overflow: visible;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 8px;
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    .f04-wide-chrome {
+      position: absolute;
+      right: 0;
+      top: -50px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 13px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 6px;
+      background: rgba(21, 23, 24, 0.86);
+      color: #ffffff;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 17px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .f04-wide-chrome-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background: #5db872;
+    }
+
+    .f04-tick-row {
+      position: absolute;
+      left: 80px;
+      top: 786px;
+      width: 1760px;
+      height: 78px;
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      align-items: end;
+      border-top: 1px solid rgba(36, 36, 36, 0.12);
+    }
+
+    .f04-tick-label {
+      padding-bottom: 8px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 20px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(36, 36, 36, 0.62);
+    }
+
+    .f04-ticks {
+      height: 58px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 28px;
+      padding: 0 4px 8px;
+    }
+
+    .f04-tick {
+      flex: 1;
+      min-width: 120px;
+      border-top: 4px solid #242424;
+      transform-origin: left center;
+    }
+
+    .f04-tick:nth-child(1) {
+      opacity: 0.34;
+    }
+
+    .f04-tick:nth-child(2) {
+      opacity: 0.48;
+    }
+
+    .f04-tick:nth-child(3) {
+      opacity: 0.62;
+    }
+
+    .f04-tick:nth-child(4) {
+      opacity: 0.76;
+    }
+
+    .f04-tick:nth-child(5) {
+      opacity: 1;
+    }
+
+    .f04-split-title {
+      position: absolute;
+      left: 80px;
+      top: 82px;
+      margin: 0;
+      font-size: 76px;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: -0.022em;
+      color: #242424;
+    }
+
+    .f04-split-stage {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+    }
+
+    .f04-card-shell {
+      position: absolute;
+      top: 214px;
+      height: 566px;
+      overflow: hidden;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 8px;
+      transform-style: preserve-3d;
+      will-change: transform;
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    .f04-card-shell-left {
+      left: 80px;
+      width: 1080px;
+      box-shadow:
+        -8px 12px 28px rgba(36, 36, 36, 0.08),
+        0 1px 3px rgba(36, 36, 36, 0.06);
+    }
+
+    .f04-card-shell-right {
+      left: 1240px;
+      width: 600px;
+      box-shadow:
+        8px 12px 28px rgba(36, 36, 36, 0.08),
+        0 1px 3px rgba(36, 36, 36, 0.06);
+    }
+
+    .f04-card-label {
+      position: absolute;
+      top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 13px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      background: rgba(21, 23, 24, 0.88);
+      color: #ffffff;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 17px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .f04-card-shell-left .f04-card-label {
+      left: 16px;
+    }
+
+    .f04-card-shell-right .f04-card-label {
+      right: 16px;
+    }
+
+    .f04-label-mark {
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background: #5db872;
+    }
+
+    .f04-command-mark {
+      background: #f8d5e0;
+    }
+
+    .f04-honest-mask {
+      position: absolute;
+      left: 482px;
+      top: 552px;
+      width: 282px;
+      height: 224px;
+      display: grid;
+      place-content: center;
+      justify-items: center;
+      border: 1px solid rgba(36, 36, 36, 0.12);
+      border-radius: 8px;
+      background: #f8d5e0;
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    .f04-honest-mask strong {
+      font-size: 92px;
+      font-weight: 400;
+      line-height: 0.88;
+      letter-spacing: -0.025em;
+    }
+
+    .f04-honest-mask span {
+      margin-top: 15px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .f04-badge {
+      position: absolute;
+      top: 807px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      padding: 9px 14px;
+      border: 1px solid rgba(36, 36, 36, 0.18);
+      border-radius: 9999px;
+      background: #ffffff;
+      color: #242424;
+      box-shadow: 0 1px 3px rgba(36, 36, 36, 0.08);
+    }
+
+    .f04-badge-left {
+      right: 760px;
+    }
+
+    .f04-badge-right {
+      left: 1260px;
+    }
+
+    .f04-badge strong {
+      font-size: 42px;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .f04-badge span {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .f04-isolation-line {
+      position: absolute;
+      left: 1199px;
+      top: 198px;
+      width: 3px;
+      height: 642px;
+      background: #0067b8;
+      transform-origin: top center;
+    }
+
+    .f04-state-wash {
+      position: absolute;
+      left: 1220px;
+      top: 194px;
+      width: 640px;
+      height: 606px;
+      border-radius: 12px;
+      background: #f8d5e0;
+      mix-blend-mode: color;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="04-five-realities"
+    data-duration="9.6"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div
+      id="f04-ground"
+      class="clip f04-ground"
+      data-start="0"
+      data-duration="9.6"
+      data-track-index="0"
+    >
+      <div class="f04-ground-index">FRAME 04 · FIVE REALITIES</div>
+      <div class="f04-ground-rule"></div>
+    </div>
+
+    <video
+      id="f04-wide-video"
+      class="clip f04-frame-video"
+      src="assets/proof-clips/04-five-realities/source.webm"
+      muted
+      playsinline
+      preload="auto"
+      data-frame-video="approved"
+      data-frame-video-x="80"
+      data-frame-video-y="222"
+      data-frame-video-width="1760"
+      data-frame-video-height="538"
+      data-frame-video-fit="cover"
+      data-start="0"
+      data-duration="2.8"
+      data-media-start="9.8"
+      data-playback-rate="0.8"
+      data-track-index="1"
+    ></video>
+
+    <video
+      id="f04-agree-left-video"
+      class="clip f04-frame-video"
+      src="assets/proof-clips/04-five-realities/source.webm"
+      muted
+      playsinline
+      preload="auto"
+      data-frame-video="approved"
+      data-frame-video-x="80"
+      data-frame-video-y="214"
+      data-frame-video-width="1080"
+      data-frame-video-height="566"
+      data-frame-video-fit="cover"
+      data-start="2.8"
+      data-duration="3.6"
+      data-media-start="11.4"
+      data-playback-rate="0.35"
+      data-track-index="1"
+    ></video>
+
+    <video
+      id="f04-agree-command-video"
+      class="clip f04-frame-video"
+      src="assets/proof-clips/04-five-realities/source.webm"
+      muted
+      playsinline
+      preload="auto"
+      data-frame-video="approved"
+      data-frame-video-x="1240"
+      data-frame-video-y="214"
+      data-frame-video-width="600"
+      data-frame-video-height="566"
+      data-frame-video-fit="cover"
+      data-start="2.8"
+      data-duration="3.599"
+      data-media-start="11.4"
+      data-playback-rate="0.35"
+      data-track-index="2"
+    ></video>
+
+    <video
+      id="f04-diverge-left-video"
+      class="clip f04-frame-video"
+      src="assets/proof-clips/04-five-realities/source.webm"
+      muted
+      playsinline
+      preload="auto"
+      data-frame-video="approved"
+      data-frame-video-x="80"
+      data-frame-video-y="214"
+      data-frame-video-width="1080"
+      data-frame-video-height="566"
+      data-frame-video-fit="cover"
+      data-start="6.4"
+      data-duration="3.2"
+      data-media-start="18"
+      data-playback-rate="0.75"
+      data-track-index="1"
+    ></video>
+
+    <video
+      id="f04-diverge-command-video"
+      class="clip f04-frame-video"
+      src="assets/proof-clips/04-five-realities/source.webm"
+      muted
+      playsinline
+      preload="auto"
+      data-frame-video="approved"
+      data-frame-video-x="1240"
+      data-frame-video-y="214"
+      data-frame-video-width="600"
+      data-frame-video-height="566"
+      data-frame-video-fit="cover"
+      data-start="6.4"
+      data-duration="3.199"
+      data-media-start="18"
+      data-playback-rate="0.75"
+      data-track-index="2"
+    ></video>
+
+    <div
+      id="f04-overlay"
+      class="clip f04-overlay"
+      data-start="0"
+      data-duration="9.6"
+      data-track-index="4"
+    >
+      <div id="f04-intro-copy">
+        <div class="f04-kicker">
+          <span class="f04-spike">✱</span>
+          <span>Projection proof</span>
+        </div>
+        <h1 class="f04-title">One history</h1>
+      </div>
+
+      <div id="f04-wide-shell" class="f04-wide-shell">
+        <div class="f04-wide-chrome">
+          <span class="f04-wide-chrome-dot"></span>
+          <span>5 / 5 canonical agreement</span>
+        </div>
+      </div>
+
+      <div id="f04-tick-row" class="f04-tick-row">
+        <div class="f04-tick-label">One prefix</div>
+        <div class="f04-ticks">
+          <div class="f04-tick"></div>
+          <div class="f04-tick"></div>
+          <div class="f04-tick"></div>
+          <div class="f04-tick"></div>
+          <div class="f04-tick"></div>
+        </div>
+      </div>
+
+      <h2 id="f04-split-title" class="f04-split-title">Five interfaces</h2>
+
+      <div class="f04-split-stage">
+        <div
+          id="f04-left-shell"
+          class="f04-card-shell f04-card-shell-left"
+        >
+          <div class="f04-card-label">
+            <span class="f04-label-mark"></span>
+            <span>Four honest views</span>
+          </div>
+        </div>
+        <div
+          id="f04-right-shell"
+          class="f04-card-shell f04-card-shell-right"
+        >
+          <div class="f04-card-label">
+            <span class="f04-label-mark f04-command-mark"></span>
+            <span>Command view</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="f04-honest-mask" class="f04-honest-mask">
+        <strong>4</strong>
+        <span>Honest lenses</span>
+      </div>
+
+      <div id="f04-badge-left" class="f04-badge f04-badge-left">
+        <strong>4</strong>
+        <span>Agree</span>
+      </div>
+
+      <div id="f04-badge-right" class="f04-badge f04-badge-right">
+        <strong>1</strong>
+        <span>Diverges</span>
+      </div>
+
+      <div id="f04-isolation-line" class="f04-isolation-line"></div>
+      <div id="f04-state-wash" class="f04-state-wash"></div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const root = document.querySelector(
+        '[data-composition-id="04-five-realities"]',
+      );
+      const one = (selector) => root.querySelector(selector);
+      const all = (selector) => root.querySelectorAll(selector);
+      const timeline = gsap.timeline({ paused: true });
+
+      timeline.fromTo(
+        one("#f04-intro-copy"),
+        { y: -34, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.58, ease: "power3.out" },
+        0.04,
+      );
+      timeline.fromTo(
+        one("#f04-wide-shell"),
+        { y: 32, scale: 0.985, opacity: 0 },
+        {
+          y: 0,
+          scale: 1,
+          opacity: 1,
+          duration: 0.72,
+          ease: "power3.out",
+        },
+        0.16,
+      );
+      timeline.fromTo(
+        all(".f04-tick"),
+        { scaleX: 0 },
+        {
+          scaleX: 1,
+          duration: 0.7,
+          ease: "power3.out",
+          stagger: 0.11,
+        },
+        0.74,
+      );
+      timeline.fromTo(
+        one("#f04-tick-row"),
+        { opacity: 0 },
+        { opacity: 1, duration: 0.3, ease: "power2.out" },
+        0.68,
+      );
+
+      timeline.to(
+        [one("#f04-intro-copy"), one("#f04-wide-shell"), one("#f04-tick-row")],
+        {
+          x: -230,
+          opacity: 0,
+          duration: 0.3,
+          ease: "power4.in",
+          stagger: 0.025,
+        },
+        2.5,
+      );
+
+      timeline.fromTo(
+        one("#f04-split-title"),
+        { y: -48, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.66, ease: "power3.out" },
+        2.78,
+      );
+      timeline.fromTo(
+        one("#f04-left-shell"),
+        {
+          x: -360,
+          rotateY: 11,
+          scale: 0.86,
+          opacity: 0,
+        },
+        {
+          x: 0,
+          rotateY: 3,
+          scale: 1,
+          opacity: 1,
+          duration: 0.92,
+          ease: "power3.out",
+        },
+        2.78,
+      );
+      timeline.fromTo(
+        one("#f04-right-shell"),
+        {
+          x: 360,
+          rotateY: -11,
+          scale: 0.86,
+          opacity: 0,
+        },
+        {
+          x: 0,
+          rotateY: -3,
+          scale: 1,
+          opacity: 1,
+          duration: 0.92,
+          ease: "power3.out",
+        },
+        2.98,
+      );
+      timeline.fromTo(
+        one("#f04-honest-mask"),
+        { scale: 0.92, opacity: 0 },
+        {
+          scale: 1,
+          opacity: 1,
+          duration: 0.58,
+          ease: "power2.out",
+        },
+        3.54,
+      );
+
+      timeline.fromTo(
+        one("#f04-state-wash"),
+        { opacity: 0 },
+        {
+          opacity: 0.46,
+          duration: 0.16,
+          ease: "power4.in",
+        },
+        6.35,
+      );
+      timeline.to(
+        one("#f04-state-wash"),
+        {
+          opacity: 0,
+          duration: 0.32,
+          ease: "power4.out",
+        },
+        6.51,
+      );
+      timeline.to(
+        one("#f04-right-shell"),
+        {
+          borderColor: "#0067b8",
+          duration: 0.28,
+          ease: "power2.out",
+        },
+        6.42,
+      );
+      timeline.fromTo(
+        one("#f04-isolation-line"),
+        { scaleY: 0, opacity: 0 },
+        {
+          scaleY: 1,
+          opacity: 1,
+          duration: 0.58,
+          ease: "power3.out",
+        },
+        6.45,
+      );
+      timeline.fromTo(
+        one("#f04-badge-left"),
+        { y: 26, scale: 0.94, opacity: 0 },
+        {
+          y: 0,
+          scale: 1,
+          opacity: 1,
+          duration: 0.5,
+          ease: "power3.out",
+        },
+        6.76,
+      );
+      timeline.fromTo(
+        one("#f04-badge-right"),
+        { y: 26, scale: 0.94, opacity: 0 },
+        {
+          y: 0,
+          scale: 1,
+          opacity: 1,
+          duration: 0.5,
+          ease: "power3.out",
+        },
+        7.38,
+      );
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["04-five-realities"] = timeline;
+    })();
+  </script>
+</template>

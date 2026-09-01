@@ -1,0 +1,83 @@
+{
+  "schema": "rapp-vision.proof-clip/1",
+  "frame": 6,
+  "slug": "06-space-station",
+  "title": "Swarm-Built Space Station",
+  "source_url": "https://kody-w.github.io/frame-chains/showcase/06-space-station/",
+  "duration": 22.066,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "selectors": [
+    "#guided",
+    "#head-count",
+    "#station-status",
+    "#fidelity",
+    "#alternatives",
+    "details:has(#mutate-overwrite)",
+    "#mutate-overwrite",
+    "#mutation-result"
+  ],
+  "positive_outcome": "The station reattaches across 35 verified frames with 5/6 fidelity while preserving both the 68 kPa and 72 kPa airlock alternatives.",
+  "failure_outcome": "The silent overwrite is rejected because it would preserve only 1 of 2 verified claim frames; the accepted ledger remains unchanged.",
+  "sha256": "bd5b7047a45d9f18fedb55053c623e556b6d5e1d506fb3b49fe527384735cf9b",
+  "synthetic_only": true,
+  "audio": false,
+  "provenance": {
+    "source_url": "https://kody-w.github.io/frame-chains/showcase/06-space-station/",
+    "source_scope": "Public synthetic showcase state; viewport-only browser capture.",
+    "branch": "frame-film/06-space-station-capture",
+    "capture_tool": "Playwright Chromium with FFmpeg normalization",
+    "playwright_version": "1.62.1",
+    "browser": "Chromium 151.0.7922.34",
+    "captured_at": "2026-08-31T16:30:16.490Z",
+    "invocation": "node assets/proof-clips/06-space-station/capture.mjs"
+  },
+  "outcomes": {
+    "station_status": "PASS · REATTACHED",
+    "verified_frames": "35 verified frames",
+    "fidelity": "5 / 6",
+    "fidelity_detail": "5 replay-compatible slots / 6 content-addressed slots = 0.833333. Parallel conflict: airlock_pressure.",
+    "alternatives": "Latch · docking airlock_pressure = 72 kPa · 33cf170aa235 Moss · life_support airlock_pressure = 68 kPa · 21cb9042972f",
+    "mutation_result": "PASS · REJECTED: proposal keeps 1 of 2 verified claim frames. Ledger unchanged: true.",
+    "verdict": "PASS · REJECTED"
+  },
+  "media": {
+    "source": {
+      "file": "source.webm",
+      "format": "matroska,webm",
+      "codec": "vp9",
+      "pixel_format": "yuv420p",
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "duration_seconds": 22.066,
+      "audio_streams": 0,
+      "bytes": 1997284,
+      "mebibytes": 1.905
+    },
+    "poster": {
+      "file": "poster.jpg",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 209255,
+      "viewport_only": true
+    }
+  },
+  "details": {
+    "selector_map": {
+      "guided_action": "#guided",
+      "verified_frames": "#head-count",
+      "station_status": "#station-status",
+      "fidelity": "#fidelity",
+      "alternatives": "#alternatives",
+      "mutation_drawer": "details:has(#mutate-overwrite)",
+      "overwrite_action": "#mutate-overwrite",
+      "overwrite_result": "#mutation-result"
+    },
+    "artifact_sha256": {
+      "source.webm": "bd5b7047a45d9f18fedb55053c623e556b6d5e1d506fb3b49fe527384735cf9b",
+      "poster.jpg": "c070a0bfe64a0fc5f05db631edd04e204c29f2a29b914f790f5034d8efd2ca8d"
+    }
+  }
+}

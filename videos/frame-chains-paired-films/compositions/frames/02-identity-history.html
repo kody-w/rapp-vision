@@ -1,0 +1,612 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-400.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-700.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #242424;
+      font-family: "Inter", sans-serif;
+    }
+
+    .ground {
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+    }
+
+    .paper-grid {
+      position: absolute;
+      inset: 0 0 184px;
+      background-image:
+        linear-gradient(rgba(36, 36, 36, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(36, 36, 36, 0.045) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.56), transparent 68%);
+    }
+
+    .editorial {
+      position: absolute;
+      inset: 0;
+      z-index: 8;
+    }
+
+    .copy-column {
+      position: absolute;
+      left: 82px;
+      top: 104px;
+      width: 500px;
+      height: 684px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .kicker {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 25px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .spike {
+      color: #0067b8;
+      font-family: "Inter", sans-serif;
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    .headline {
+      margin: 48px 0 0;
+      width: 500px;
+      font-size: 88px;
+      font-weight: 400;
+      letter-spacing: -0.025em;
+      line-height: 0.99;
+    }
+
+    .headline-line {
+      display: block;
+      width: 100%;
+    }
+
+    .headline-line:last-child {
+      font-style: italic;
+    }
+
+    .thesis {
+      margin: 34px 0 0;
+      width: 420px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(36, 36, 36, 0.16);
+      font-size: 27px;
+      line-height: 1.42;
+    }
+
+    .route {
+      position: absolute;
+      left: 0;
+      top: 448px;
+      width: 470px;
+      height: 146px;
+      overflow: visible;
+    }
+
+    .route path {
+      fill: none;
+      stroke: #0067b8;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .route-node {
+      position: absolute;
+      top: 548px;
+      width: 126px;
+    }
+
+    .route-node::before {
+      content: "";
+      display: block;
+      width: 10px;
+      height: 10px;
+      margin-bottom: 12px;
+      border: 2px solid #0067b8;
+      border-radius: 9999px;
+      background: #ffffff;
+    }
+
+    .route-node strong {
+      display: block;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .route-node span {
+      display: block;
+      margin-top: 6px;
+      color: rgba(36, 36, 36, 0.68);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 16px;
+    }
+
+    .route-node-lumen {
+      left: 0;
+    }
+
+    .route-node-archive {
+      left: 171px;
+    }
+
+    .route-node-field {
+      left: 342px;
+    }
+
+    .proof-outer {
+      position: absolute;
+      left: 646px;
+      top: 82px;
+      width: 1194px;
+      height: 672px;
+      z-index: 4;
+      transform-origin: 50% 50%;
+      will-change: transform;
+    }
+
+    .proof-inner {
+      position: absolute;
+      inset: 0;
+      will-change: transform;
+    }
+
+    .proof-window {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 12px;
+      background: transparent;
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    .window-label {
+      position: absolute;
+      left: 24px;
+      top: 20px;
+      z-index: 9;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid rgba(36, 36, 36, 0.14);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.92);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .window-label-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background: #0067b8;
+    }
+
+    .proof-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #ffffff;
+    }
+
+    .focus-veil {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .focus-plane {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.34);
+      backdrop-filter: blur(5px);
+    }
+
+    .focus-plane-top {
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 535px;
+    }
+
+    .focus-plane-left {
+      left: 0;
+      top: 535px;
+      width: 1187px;
+      height: 104px;
+    }
+
+    .focus-plane-right {
+      left: 1692px;
+      top: 535px;
+      width: 228px;
+      height: 104px;
+    }
+
+    .focus-plane-bottom {
+      left: 0;
+      top: 639px;
+      width: 1920px;
+      height: 257px;
+    }
+
+    .focus-target {
+      position: absolute;
+      left: 1187px;
+      top: 535px;
+      z-index: 11;
+      width: 505px;
+      height: 104px;
+      border: 2px solid #0067b8;
+      border-radius: 8px;
+      transform-origin: 50% 50%;
+      pointer-events: none;
+    }
+
+    .proof-rule {
+      position: absolute;
+      left: 646px;
+      top: 776px;
+      width: 1194px;
+      height: 1px;
+      background: rgba(36, 36, 36, 0.14);
+      transform-origin: 0 50%;
+    }
+
+    .proof-index {
+      position: absolute;
+      right: 80px;
+      top: 796px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 18px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .verdict-callout {
+      position: absolute;
+      left: 706px;
+      top: 760px;
+      z-index: 12;
+      width: 998px;
+      height: 98px;
+      display: flex;
+      align-items: center;
+    }
+
+    .verdict-line {
+      width: 178px;
+      height: 1px;
+      background: #0067b8;
+      transform-origin: 0 50%;
+    }
+
+    .verdict-chip {
+      margin-left: 18px;
+      padding: 17px 22px;
+      border: 1px solid rgba(36, 36, 36, 0.16);
+      border-left: 4px solid #0067b8;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-transform: lowercase;
+    }
+
+    .caption-guard {
+      position: absolute;
+      left: 0;
+      top: 896px;
+      z-index: 30;
+      width: 1920px;
+      height: 184px;
+      background: #ffffff;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="02-identity-history"
+    data-duration="11.743"
+    data-width="1920"
+    data-height="1080"
+    data-fps="30"
+  >
+    <div
+      id="f02-identity-history-ground"
+      class="clip ground"
+      data-start="0"
+      data-duration="11.743"
+      data-track-index="0"
+    >
+      <div class="paper-grid"></div>
+    </div>
+
+    <div
+      id="f02-identity-history-editorial"
+      class="clip editorial"
+      data-start="0"
+      data-duration="11.743"
+      data-track-index="8"
+    >
+      <div class="copy-column" id="f02-identity-history-copy">
+        <div class="kicker" id="f02-identity-history-kicker">
+          <span class="spike">✱</span>
+          <span>Identity proof</span>
+        </div>
+        <h1 class="headline">
+          <span class="headline-line" id="f02-identity-history-line-a"
+            >Identity carries</span
+          >
+          <span class="headline-line" id="f02-identity-history-line-b"
+            >its history</span
+          >
+        </h1>
+        <p class="thesis" id="f02-identity-history-thesis">
+          History, not resemblance.
+        </p>
+
+        <svg
+          class="route"
+          viewBox="0 0 470 146"
+          aria-hidden="true"
+          data-layout-allow-overflow
+        >
+          <path
+            id="f02-identity-history-route"
+            d="M 6 109 C 80 109, 90 54, 177 54 S 273 109, 348 109 S 404 72, 462 72"
+          ></path>
+        </svg>
+        <div
+          class="route-node route-node-lumen"
+          id="f02-identity-history-node-lumen"
+        >
+          <strong>Lumen</strong>
+          <span>origin</span>
+        </div>
+        <div
+          class="route-node route-node-archive"
+          id="f02-identity-history-node-archive"
+        >
+          <strong>Archive</strong>
+          <span>accepted head</span>
+        </div>
+        <div
+          class="route-node route-node-field"
+          id="f02-identity-history-node-field"
+        >
+          <strong>Field</strong>
+          <span>offline branch</span>
+        </div>
+      </div>
+
+      <div class="proof-rule" id="f02-identity-history-proof-rule"></div>
+      <div class="proof-index" id="f02-identity-history-proof-index">
+        real verifier · immutable history
+      </div>
+
+      <div class="focus-veil" id="f02-identity-history-focus-veil">
+        <div class="focus-plane focus-plane-top"></div>
+        <div class="focus-plane focus-plane-left"></div>
+        <div class="focus-plane focus-plane-right"></div>
+        <div class="focus-plane focus-plane-bottom"></div>
+      </div>
+      <div class="focus-target" id="f02-identity-history-focus-target"></div>
+
+      <div class="verdict-callout" id="f02-identity-history-verdict">
+        <div class="verdict-line" id="f02-identity-history-verdict-line"></div>
+        <div class="verdict-chip">accepted head preserved</div>
+      </div>
+
+      <div class="caption-guard" aria-hidden="true"></div>
+    </div>
+
+    <div
+      class="proof-outer"
+      id="f02-identity-history-proof-outer"
+      data-layout-allow-overflow
+    >
+      <div
+        class="proof-inner"
+        id="f02-identity-history-proof-inner"
+        data-layout-allow-overflow
+      >
+        <div class="proof-window">
+          <div class="window-label">
+            <span class="window-label-dot"></span>
+            <span>Public synthetic proof</span>
+          </div>
+
+          <!-- approved frame video hoisted by assemble-index -->
+
+          <!-- approved frame video hoisted by assemble-index -->
+
+          <!-- approved frame video hoisted by assemble-index -->
+
+          <!-- approved frame video hoisted by assemble-index -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script>
+    window.__timelines = window.__timelines || {};
+
+    const timeline = gsap.timeline({ paused: true });
+    const route = document.getElementById("f02-identity-history-route");
+    const routeLength = route.getTotalLength();
+    route.style.strokeDasharray = String(routeLength);
+    route.style.strokeDashoffset = String(routeLength);
+
+    timeline.fromTo(
+      "#f02-identity-history-proof-outer",
+      { x: 104, opacity: 0 },
+      { x: 0, opacity: 1, duration: 0.82, ease: "power3.out" },
+      0.04,
+    );
+    timeline.fromTo(
+      "#f02-identity-history-kicker",
+      { y: 18, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.48, ease: "power2.out" },
+      0.08,
+    );
+    timeline.fromTo(
+      "#f02-identity-history-line-a",
+      { y: 42, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" },
+      0.22,
+    );
+    timeline.fromTo(
+      "#f02-identity-history-line-b",
+      { y: 42, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.72, ease: "power3.out" },
+      0.88,
+    );
+    timeline.fromTo(
+      "#f02-identity-history-thesis",
+      { y: 24, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.64, ease: "power2.out" },
+      1.62,
+    );
+    timeline.fromTo(
+      "#f02-identity-history-proof-rule",
+      { scaleX: 0 },
+      { scaleX: 1, duration: 0.72, ease: "power2.out" },
+      2.28,
+    );
+    timeline.fromTo(
+      "#f02-identity-history-proof-index",
+      { y: 12, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.48, ease: "power2.out" },
+      2.62,
+    );
+
+    timeline.to(
+      route,
+      { strokeDashoffset: 0, duration: 1.28, ease: "power2.out" },
+      3.28,
+    );
+    timeline.fromTo(
+      "#f02-identity-history-node-lumen",
+      { y: 18, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.46, ease: "power2.out" },
+      3.42,
+    );
+    timeline.fromTo(
+      "#f02-identity-history-node-archive",
+      { y: 18, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.46, ease: "power2.out" },
+      4.18,
+    );
+    timeline.fromTo(
+      "#f02-identity-history-node-field",
+      { y: 18, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.46, ease: "power2.out" },
+      4.92,
+    );
+
+    timeline.fromTo(
+      "#f02-identity-history-focus-veil",
+      { opacity: 0 },
+      { opacity: 1, duration: 0.86, ease: "power2.inOut" },
+      7.42,
+    );
+    timeline.fromTo(
+      "#f02-identity-history-focus-target",
+      { scale: 0.92, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 0.86, ease: "power3.inOut" },
+      7.42,
+    );
+    timeline.to(
+      "#f02-identity-history-copy",
+      { opacity: 0.24, duration: 0.82, ease: "power2.inOut" },
+      7.54,
+    );
+    timeline.to(
+      "#f02-identity-history-proof-rule, #f02-identity-history-proof-index",
+      { opacity: 0.2, duration: 0.72, ease: "power2.inOut" },
+      7.58,
+    );
+    timeline.to(
+      "#f02-identity-history-focus-veil, #f02-identity-history-focus-target, #f02-identity-history-proof-outer",
+      { opacity: 0, duration: 0.22, ease: "power1.out" },
+      8.58,
+    );
+    timeline.fromTo(
+      "#f02-identity-history-verdict",
+      { y: 22, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.56, ease: "power2.out" },
+      8.72,
+    );
+    timeline.fromTo(
+      "#f02-identity-history-verdict-line",
+      { scaleX: 0 },
+      { scaleX: 1, duration: 0.58, ease: "power2.out" },
+      8.82,
+    );
+
+    window.__timelines["02-identity-history"] = timeline;
+  </script>
+</template>

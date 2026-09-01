@@ -30,6 +30,12 @@ def registry_identity_block():
     return INDEX[start:end]
 
 
+def channel_loader_block():
+    start = INDEX.index("function absolutise(url, base)")
+    end = INDEX.index("async function loadLegacyPolicy()")
+    return INDEX[start:end]
+
+
 @unittest.skipUnless(NODE, "node not available; exact player validation test skipped")
 class TestPairedPlayer(unittest.TestCase):
     def run_node(self, body):
@@ -327,6 +333,41 @@ class TestPairedPlayer(unittest.TestCase):
         if (result.channels.length !== 1) throw new Error("duplicate channel loaded twice");
         if (result.failed.length !== 1 || result.failed[0] !== "second")
           throw new Error("duplicate channel was not rejected deterministically");
+        """
+        self.run_node(script)
+
+    def test_browser_rejects_registry_contract_schema_mismatch(self):
+        legacy = json.dumps(json.loads(
+            (ROOT / "channel.json").read_text(encoding="utf-8")
+        ))
+        policy = json.dumps(json.loads(
+            (ROOT / "policy/legacy-publications.json").read_text(encoding="utf-8")
+        ))
+        script = f"""
+        if (!globalThis.crypto) globalThis.crypto = require("crypto").webcrypto;
+        globalThis.location = {{href:"https://kody-w.github.io/rapp-vision/"}};
+        let LEGACY_POLICY = {policy};
+        {contract_block()}
+        {channel_loader_block()}
+        globalThis.fetch = async () => ({{
+          ok:true,
+          json:async () => ({legacy})
+        }});
+        (async () => {{
+          try {{
+            await fetchChannel({{
+              id:"rock-tumbler",
+              url:"channel.json",
+              contract:CURRENT_CHANNEL_SCHEMA,
+              _registry:true
+            }});
+            throw new Error("registry accepted v1 content declared as v2");
+          }} catch (error) {{
+            if (!String(error.message).includes(
+              "registry declaration requires channel schema rapp-vision-channel/2.0"
+            )) throw error;
+          }}
+        }})().catch(error => {{ console.error(error); process.exit(1); }});
         """
         self.run_node(script)
 

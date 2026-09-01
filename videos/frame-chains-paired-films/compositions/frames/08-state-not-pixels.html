@@ -1,0 +1,637 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-400.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-700.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #242424;
+      font-family: "Inter", sans-serif;
+    }
+
+    .f08-ground {
+      position: absolute;
+      inset: 0;
+      z-index: -10;
+      background: #ffffff;
+    }
+
+    .f08-proof-video {
+      position: absolute;
+      object-fit: fill;
+    }
+
+    .f08-edge-matte {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .f08-edge {
+      position: absolute;
+      background: #ffffff;
+    }
+
+    .f08-edge-top {
+      top: 0;
+      left: 0;
+      width: 1920px;
+      height: 24px;
+    }
+
+    .f08-edge-bottom {
+      top: 860px;
+      left: 0;
+      width: 1920px;
+      height: 220px;
+    }
+
+    .f08-edge-left {
+      top: 24px;
+      left: 0;
+      width: 24px;
+      height: 836px;
+    }
+
+    .f08-edge-right {
+      top: 24px;
+      right: 0;
+      width: 24px;
+      height: 836px;
+    }
+
+    .f08-stage-border {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      width: 1872px;
+      height: 836px;
+      z-index: 21;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 12px;
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+      pointer-events: none;
+    }
+
+    .f08-opening-mask {
+      position: absolute;
+      inset: 0;
+      z-index: 8;
+      pointer-events: none;
+    }
+
+    .f08-opening-shade {
+      position: absolute;
+      background: rgba(21, 23, 24, 0.88);
+      will-change: transform;
+    }
+
+    .f08-opening-left {
+      top: 24px;
+      left: 24px;
+      width: 250px;
+      height: 836px;
+    }
+
+    .f08-opening-right {
+      top: 24px;
+      left: 1015px;
+      width: 881px;
+      height: 836px;
+    }
+
+    .f08-opening-top {
+      top: 24px;
+      left: 274px;
+      width: 741px;
+      height: 44px;
+    }
+
+    .f08-opening-bottom {
+      top: 612px;
+      left: 274px;
+      width: 741px;
+      height: 248px;
+    }
+
+    .f08-opening-frame {
+      position: absolute;
+      top: 68px;
+      left: 274px;
+      width: 741px;
+      height: 544px;
+      border: 1px solid rgba(255, 255, 255, 0.44);
+      border-radius: 8px;
+      will-change: transform, opacity;
+    }
+
+    .f08-state-card {
+      position: absolute;
+      top: 62px;
+      left: 66px;
+      width: 520px;
+      z-index: 12;
+      pointer-events: none;
+    }
+
+    .f08-state-inner {
+      padding: 18px 24px 22px;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 12px;
+      background: #f8d5e0;
+      color: #242424;
+      isolation: isolate;
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+    }
+
+    .f08-index {
+      margin-bottom: 8px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #242424;
+    }
+
+    .f08-title {
+      font-size: 58px;
+      font-weight: 400;
+      line-height: 1.02;
+      letter-spacing: -0.022em;
+      color: #242424;
+    }
+
+    .f08-device-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .f08-device-focus {
+      position: absolute;
+      top: 694px;
+      left: 278px;
+      width: 452px;
+      height: 146px;
+      border: 3px solid #0067b8;
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.74);
+      will-change: transform, opacity;
+    }
+
+    .f08-route {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: visible;
+    }
+
+    .f08-route path {
+      fill: none;
+      stroke: #0067b8;
+      stroke-width: 7px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .f08-route circle {
+      fill: #ffffff;
+      stroke: #0067b8;
+      stroke-width: 5px;
+    }
+
+    .f08-receipt-group {
+      position: absolute;
+      inset: 0;
+      z-index: 13;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+
+    .f08-receipt-frame {
+      position: absolute;
+      top: 445px;
+      left: 298px;
+      width: 1328px;
+      height: 126px;
+      border: 2px solid rgba(255, 255, 255, 0.82);
+      border-radius: 8px;
+      box-shadow: 0 0 0 1px rgba(36, 36, 36, 0.24);
+    }
+
+    .f08-proof-tag {
+      position: absolute;
+      top: 80px;
+      right: 72px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 248px;
+      padding: 15px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 8px;
+      background: rgba(21, 23, 24, 0.94);
+      color: #ffffff;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .f08-proof-x {
+      color: #f8d5e0;
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .f08-preserved {
+      position: absolute;
+      top: 612px;
+      right: 72px;
+      width: 560px;
+      z-index: 14;
+      pointer-events: none;
+    }
+
+    .f08-preserved-inner {
+      padding: 20px 24px;
+      border: 1px solid rgba(36, 36, 36, 0.2);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.97);
+      color: #242424;
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 25px;
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .f08-preserved-rule {
+      display: block;
+      width: 100%;
+      height: 1px;
+      margin-bottom: 14px;
+      background: rgba(36, 36, 36, 0.2);
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="08-state-not-pixels"
+    data-width="1920"
+    data-height="1080"
+    data-duration="11.621"
+  >
+    <div
+      id="f08-ground"
+      class="clip f08-ground"
+      data-start="0"
+      data-duration="11.621"
+      data-track-index="0"
+    ></div>
+
+    <!-- approved frame video hoisted by assemble-index -->
+
+    <!-- approved frame video hoisted by assemble-index -->
+
+    <!-- approved frame video hoisted by assemble-index -->
+
+    <div
+      id="f08-opening-mask"
+      class="clip f08-opening-mask"
+      data-start="0"
+      data-duration="3.2"
+      data-track-index="4"
+    >
+      <div
+        id="f08-opening-left"
+        class="f08-opening-shade f08-opening-left"
+        data-layout-allow-overflow
+      ></div>
+      <div
+        id="f08-opening-right"
+        class="f08-opening-shade f08-opening-right"
+        data-layout-allow-overflow
+      ></div>
+      <div
+        id="f08-opening-top"
+        class="f08-opening-shade f08-opening-top"
+        data-layout-allow-overflow
+      ></div>
+      <div
+        id="f08-opening-bottom"
+        class="f08-opening-shade f08-opening-bottom"
+        data-layout-allow-overflow
+      ></div>
+      <div id="f08-opening-frame" class="f08-opening-frame"></div>
+    </div>
+
+    <div
+      id="f08-state-card"
+      class="clip f08-state-card"
+      data-start="0"
+      data-duration="6.5"
+      data-track-index="5"
+    >
+      <div id="f08-state-inner" class="f08-state-inner">
+        <div class="f08-index">Frame 08</div>
+        <div class="f08-title">State, not pixels</div>
+      </div>
+    </div>
+
+    <div
+      id="f08-device-overlay"
+      class="clip f08-device-overlay"
+      data-start="3.2"
+      data-duration="3.3"
+      data-track-index="6"
+    >
+      <div id="f08-device-focus" class="f08-device-focus"></div>
+      <svg class="f08-route" viewBox="0 0 1920 1080" aria-hidden="true">
+        <path id="f08-route-path" d="M 704 772 C 728 716, 752 716, 778 772"></path>
+        <circle cx="704" cy="772" r="10"></circle>
+        <circle cx="778" cy="772" r="10"></circle>
+      </svg>
+    </div>
+
+    <div
+      id="f08-item-clip"
+      class="clip f08-receipt-group"
+      data-start="6.5"
+      data-duration="2.4"
+      data-track-index="7"
+      data-layout-allow-overflow
+    >
+      <div class="f08-receipt-frame"></div>
+      <div id="f08-item-tag" class="f08-proof-tag">
+        <span>ITEM</span>
+        <span class="f08-proof-x">✕</span>
+      </div>
+    </div>
+
+    <div
+      id="f08-parent-clip"
+      class="clip f08-receipt-group"
+      data-start="8.9"
+      data-duration="2.721"
+      data-track-index="8"
+      data-layout-allow-overflow
+    >
+      <div class="f08-receipt-frame"></div>
+      <div id="f08-parent-tag" class="f08-proof-tag">
+        <span>PARENT</span>
+        <span class="f08-proof-x">✕</span>
+      </div>
+    </div>
+
+    <div
+      id="f08-preserved-clip"
+      class="clip f08-preserved"
+      data-start="8.9"
+      data-duration="2.721"
+      data-track-index="9"
+    >
+      <div id="f08-preserved-inner" class="f08-preserved-inner">
+        <span class="f08-preserved-rule"></span>
+        Last good head preserved
+      </div>
+    </div>
+
+    <div
+      id="f08-edge-matte"
+      class="clip f08-edge-matte"
+      data-start="0"
+      data-duration="11.621"
+      data-track-index="10"
+    >
+      <div class="f08-edge f08-edge-top"></div>
+      <div class="f08-edge f08-edge-bottom"></div>
+      <div class="f08-edge f08-edge-left"></div>
+      <div class="f08-edge f08-edge-right"></div>
+      <div class="f08-stage-border"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script>
+    (() => {
+      const stateInner = document.getElementById("f08-state-inner");
+      const openingLeft = document.getElementById("f08-opening-left");
+      const openingRight = document.getElementById("f08-opening-right");
+      const openingTop = document.getElementById("f08-opening-top");
+      const openingBottom = document.getElementById("f08-opening-bottom");
+      const openingFrame = document.getElementById("f08-opening-frame");
+      const deviceFocus = document.getElementById("f08-device-focus");
+      const routePath = document.getElementById("f08-route-path");
+      const itemClip = document.getElementById("f08-item-clip");
+      const itemTag = document.getElementById("f08-item-tag");
+      const parentClip = document.getElementById("f08-parent-clip");
+      const parentTag = document.getElementById("f08-parent-tag");
+      const preservedInner = document.getElementById("f08-preserved-inner");
+
+      const routeLength = routePath.getTotalLength();
+      routePath.style.strokeDasharray = `${routeLength}`;
+      routePath.style.strokeDashoffset = `${routeLength}`;
+
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo(
+        stateInner,
+        { y: -26, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.48,
+          ease: "power3.out",
+          immediateRender: false,
+        },
+        0.08,
+      );
+
+      tl.to(
+        openingLeft,
+        { x: -270, duration: 2.35, ease: "power2.inOut" },
+        0.55,
+      );
+      tl.to(
+        openingRight,
+        { x: 910, duration: 2.35, ease: "power2.inOut" },
+        0.55,
+      );
+      tl.to(
+        openingTop,
+        { y: -70, duration: 2.35, ease: "power2.inOut" },
+        0.55,
+      );
+      tl.to(
+        openingBottom,
+        { y: 280, duration: 2.35, ease: "power2.inOut" },
+        0.55,
+      );
+      tl.to(
+        openingFrame,
+        {
+          scale: 1.08,
+          opacity: 0,
+          duration: 1.4,
+          ease: "power2.inOut",
+        },
+        1.42,
+      );
+
+      tl.fromTo(
+        deviceFocus,
+        { x: 0, opacity: 0.3 },
+        {
+          x: 455,
+          opacity: 1,
+          duration: 1.6,
+          ease: "power4.out",
+          immediateRender: false,
+        },
+        3.2,
+      );
+      tl.to(
+        routePath,
+        {
+          strokeDashoffset: 0,
+          duration: 0.72,
+          ease: "power2.out",
+        },
+        3.35,
+      );
+      tl.to(
+        deviceFocus,
+        { x: 461, duration: 1.56, ease: "power1.inOut" },
+        4.82,
+      );
+
+      tl.fromTo(
+        itemTag,
+        { x: 72, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.5,
+          ease: "power4.out",
+          immediateRender: false,
+        },
+        6.82,
+      );
+      tl.fromTo(
+        itemClip.querySelector(".f08-receipt-frame"),
+        { y: 22, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.54,
+          ease: "power3.out",
+          immediateRender: false,
+        },
+        6.62,
+      );
+
+      tl.to(
+        itemClip,
+        {
+          x: -150,
+          opacity: 0,
+          duration: 0.22,
+          ease: "power4.in",
+        },
+        8.68,
+      );
+      tl.set(itemClip, { opacity: 0 }, 8.9);
+
+      tl.fromTo(
+        parentClip,
+        { x: 150, opacity: 0.35 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.34,
+          ease: "power4.out",
+          immediateRender: false,
+        },
+        8.9,
+      );
+      tl.fromTo(
+        parentTag,
+        { x: 72, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.42,
+          ease: "power4.out",
+          immediateRender: false,
+        },
+        9.08,
+      );
+      tl.fromTo(
+        preservedInner,
+        { y: 34, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.62,
+          ease: "power3.out",
+          immediateRender: false,
+        },
+        9.62,
+      );
+      tl.to(
+        preservedInner,
+        {
+          y: -4,
+          duration: 0.98,
+          ease: "none",
+        },
+        10.24,
+      );
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["08-state-not-pixels"] = tl;
+    })();
+  </script>
+</template>
