@@ -1,0 +1,31 @@
+name: Publication Policy
+
+on:
+  push:
+    branches: [main, "policy/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate paired template
+        run: python3 scripts/validate_publications.py template/channel.json
+
+      - name: Validate default registry
+        run: python3 scripts/validate_publications.py --registry channels.json
+
+      - name: Full offline test suite
+        run: python3 -m unittest discover -s tests -v

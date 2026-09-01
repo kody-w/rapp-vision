@@ -150,6 +150,9 @@
     border:1px solid var(--line);font-size:13px}
   .tbtn:hover{border-color:var(--accent)}
   .tbtn.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+  .mode-switch{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+  .mode-switch:focus-visible,.tbtn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  #mode-tools{display:flex;gap:8px;flex-wrap:wrap}
 
   /* ---------- misc ---------- */
   .note{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
@@ -246,8 +249,8 @@
  * RAPP Vision — a local-first video platform.
  *
  * No backend. The catalog is a JSON file; the media are ordinary files
- * in a public repo. Publishing a video means committing a file and
- * adding an entry. Everything personal (history, resume position,
+ * in a public repo. A new publication pairs MP4 + WebM orientation with
+ * a live replay under one entry. Everything personal (history, resume position,
  * watch-later, likes) stays in localStorage and is exportable as JSON.
  * ------------------------------------------------------------------ */
 
@@ -262,6 +265,258 @@ let CHANNELS = [];        // loaded channel objects, each with .videos
 let ALL_VIDEOS = [];      // full catalog; direct links must ignore subscriptions
 let VIDEOS  = [];         // flattened, each video carries ._ch
 let state = load();
+let LEGACY_POLICY = { channels: [] };
+
+/* publication contract:start
+   This block is deliberately dependency-free: tests execute the exact browser
+   validator under Node so the CLI and player cannot silently grow different
+   definitions of a valid paired publication. */
+const CURRENT_CHANNEL_SCHEMA = "rapp-vision-channel/2.0";
+const LEGACY_CHANNEL_SCHEMA = "rapp-vision-channel/1.0";
+const LIVE_REPLAY_KIND = "rapp-vision-live/1.0";
+const MAX_PUBLICATION_DURATION = 86400;
+const rvObject = v => !!v && typeof v === "object" && !Array.isArray(v);
+const rvString = v => typeof v === "string" && !!v.trim();
+const rvId = v => typeof v === "string" && /^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(v);
+const rvNumber = v => typeof v === "number" && Number.isFinite(v);
+const rvPoint = v => Array.isArray(v) && v.length === 2 && v.every(rvNumber);
+const rvTarget = v => rvObject(v) && (rvString(v.selector) !== rvString(v.text));
+const decodedUrlPath = parsed => {
+  if (/%(?:2[fF]|5[cC])/.test(parsed.pathname))
+    return { path: "", error: "encoded path separators or backslashes are not allowed" };
+  let path;
+  try { path = decodeURIComponent(parsed.pathname); }
+  catch { return { path: "", error: "pathname contains invalid percent encoding" }; }
+  if (path.includes(";")) return { path, error: "pathname parameters are not allowed" };
+  if (path.includes("\\")) return { path: "", error: "encoded path separators or backslashes are not allowed" };
+  if ([...path].some(char => char.charCodeAt(0) < 32 || /\s/.test(char)))
+    return { path: "", error: "pathname contains encoded whitespace or control characters" };
+  return { path, error: "" };
+};
+const safeAppUrl = value => {
+  if (!rvString(value) || value !== value.trim() || /\s|\\/.test(value) || value.startsWith("//"))
+    return false;
+  try {
+    const absolute = /^[A-Za-z][A-Za-z0-9+.-]*:/.test(value);
+    const parsed = new URL(value, "https://relative.invalid/channel.json");
+    const decoded = decodedUrlPath(parsed);
+    if (decoded.error) return false;
+    return absolute ? value.startsWith("https://") && parsed.protocol === "https:" && !!parsed.host
+                    : parsed.origin === "https://relative.invalid" && !!decoded.path;
+  } catch { return false; }
+};
+const safeResolvedAppUrl = (raw, resolved, base) => {
+  if (!safeAppUrl(raw)) return "";
+  try {
+    const target = new URL(resolved), channel = new URL(base);
+    if (decodedUrlPath(target).error) return "";
+    if (/^https:/i.test(raw)) return target.protocol === "https:" ? target.href : "";
+    return target.origin === channel.origin && /^(https?|http):$/.test(target.protocol)
+      ? target.href : "";
+  } catch { return ""; }
+};
+const renderableAppUrl = value => {
+  try {
+    const target = new URL(value, location.href);
+    if (decodedUrlPath(target).error) return "";
+    if (target.protocol === "https:") return target.href;
+    return target.protocol === "http:" && target.origin === location.origin ? target.href : "";
+  } catch { return ""; }
+};
+const replayDuration = live => rvNumber(live && live.duration) &&
+  live.duration > 0 && live.duration <= MAX_PUBLICATION_DURATION
+  ? live.duration
+  : ((live && live.scenes) || []).reduce((m, s) =>
+      Math.max(m, rvObject(s) && rvNumber(s.t) && rvNumber(s.dur) ? s.t + s.dur : 0), 0);
+
+function validateModeChapters(chapters, duration, path) {
+  const out = [];
+  if (chapters === undefined) return out;
+  if (!Array.isArray(chapters)) return [`${path}: must be an array`];
+  let previous = -1;
+  chapters.forEach((chapter, i) => {
+    const cp = `${path}[${i}]`;
+    if (!rvObject(chapter)) { out.push(`${cp}: must be an object`); return; }
+    if (!rvNumber(chapter.t) || chapter.t < 0 || chapter.t >= duration)
+      out.push(`${cp}.t: must be within the mode duration`);
+    else if (chapter.t <= previous) out.push(`${cp}.t: chapters must be strictly increasing`);
+    else previous = chapter.t;
+    if (!rvString(chapter.label)) out.push(`${cp}.label: must be a non-empty string`);
+  });
+  return out;
+}
+
+function validateReplayAction(a, dur, path) {
+  const out = [];
+  if (!rvObject(a)) return [`${path}: must be an object`];
+  if (!rvNumber(a.at) || a.at < 0 || a.at >= dur)
+    out.push(`${path}.at: must be at least 0 and less than the scene duration`);
+  const kinds = new Set(["click", "key", "keydown", "keyup", "type", "drag", "scroll"]);
+  if (!kinds.has(a.do)) return out.concat(`${path}.do: unsupported action ${JSON.stringify(a.do)}`);
+  const selector = rvString(a.selector), text = rvString(a.text);
+  if (a.do === "click" && selector === text)
+    out.push(`${path}: click requires exactly one non-empty selector or text`);
+  else if (["key", "keydown", "keyup"].includes(a.do) && !rvString(a.code))
+    out.push(`${path}.code: ${a.do} requires a non-empty code`);
+  else if (a.do === "type" && typeof a.text !== "string")
+    out.push(`${path}.text: type requires a string`);
+  else if (a.do === "drag" && (!rvPoint(a.from) || !rvPoint(a.to)))
+    out.push(`${path}: drag requires numeric two-item from and to points`);
+  else if (a.do === "scroll" && (+selector + +text + +rvPoint(a.to) !== 1))
+    out.push(`${path}: scroll requires exactly one selector, text, or numeric to point`);
+  return out;
+}
+
+function validateLiveReplay(live, path) {
+  const out = [];
+  if (!rvObject(live)) return [`${path}: must be an object`];
+  if (live.kind !== LIVE_REPLAY_KIND) out.push(`${path}.kind: must equal "${LIVE_REPLAY_KIND}"`);
+  if (!Array.isArray(live.scenes) || !live.scenes.length)
+    return out.concat(`${path}.scenes: must be a non-empty array`);
+  let cursor = 0;
+  live.scenes.forEach((scene, i) => {
+    const sp = `${path}.scenes[${i}]`;
+    if (!rvObject(scene)) { out.push(`${sp}: must be an object`); return; }
+    if (!rvNumber(scene.t) || scene.t < 0) out.push(`${sp}.t: must be a non-negative number`);
+    else if (Math.abs(scene.t - cursor) > 1e-6)
+      out.push(`${sp}.t: scenes must be contiguous; expected ${cursor}`);
+    if (!rvNumber(scene.dur) || scene.dur <= 0) { out.push(`${sp}.dur: must be greater than zero`); return; }
+    const card = rvObject(scene.card), appScene = rvString(scene.app);
+    if (card === appScene) out.push(`${sp}: must contain exactly one card object or non-empty app`);
+    if (appScene && !safeAppUrl(scene.app))
+      out.push(`${sp}.app: must be a safe relative URL or absolute HTTPS URL`);
+    if ("ready" in scene) {
+      if (!appScene) out.push(`${sp}.ready: is valid only on app scenes`);
+      if (!rvTarget(scene.ready)) out.push(`${sp}.ready: requires exactly one non-empty selector or text`);
+      else if ("enabled" in scene.ready && typeof scene.ready.enabled !== "boolean")
+        out.push(`${sp}.ready.enabled: must be boolean`);
+    }
+    const actions = "actions" in scene ? scene.actions : [];
+    if (!Array.isArray(actions)) out.push(`${sp}.actions: must be an array`);
+    else {
+      if (actions.length && !appScene) out.push(`${sp}.actions: card scenes cannot contain actions`);
+      actions.forEach((a, ai) => out.push(...validateReplayAction(a, scene.dur, `${sp}.actions[${ai}]`)));
+    }
+    if (rvNumber(scene.t)) cursor = scene.t + scene.dur;
+  });
+  const explicit = live.duration;
+  if (explicit !== undefined && (!rvNumber(explicit) || explicit <= 0 || explicit > MAX_PUBLICATION_DURATION))
+    out.push(`${path}.duration: must be greater than zero and at most ${MAX_PUBLICATION_DURATION}`);
+  const duration = explicit !== undefined && rvNumber(explicit) && explicit > 0 ? explicit : cursor;
+  if (duration <= 0 || duration > MAX_PUBLICATION_DURATION)
+    out.push(`${path}.scenes: derived replay duration must be greater than zero and at most ${MAX_PUBLICATION_DURATION}`);
+  else if (Math.abs(cursor - duration) > 1e-6)
+    out.push(`${path}.scenes: must fill replay duration ${duration}; ended at ${cursor}`);
+  out.push(...validateModeChapters(live.chapters, duration, `${path}.chapters`));
+  return out;
+}
+
+function validatePairedPublication(v, path, sourceUrl) {
+  const out = [];
+  if (!rvObject(v)) return [`${path}: must be an object`];
+  if (!rvString(v.title)) out.push(`${path}.title: must be a non-empty string`);
+  const duration = rvNumber(v.duration) && v.duration > 0 && v.duration <= MAX_PUBLICATION_DURATION
+    ? v.duration : 0;
+  if (!duration) out.push(`${path}.duration: must be greater than zero and at most ${MAX_PUBLICATION_DURATION}`);
+  if ("chapters" in v) out.push(...validateModeChapters(v.chapters, duration, `${path}.chapters`));
+  const types = new Set();
+  const resolvedSources = new Set();
+  if (!Array.isArray(v.sources) || !v.sources.length) out.push(`${path}.sources: must be a non-empty array`);
+  else v.sources.forEach((s, i) => {
+    const sp = `${path}.sources[${i}]`;
+    if (!rvObject(s)) { out.push(`${sp}: must be an object`); return; }
+    if (!rvString(s.src)) out.push(`${sp}.src: must be a non-empty string`);
+    let mediaUrl = null;
+    let mediaPath = "";
+    if (rvString(s.src)) {
+      try {
+        mediaUrl = new URL(s.src, sourceUrl);
+        mediaUrl.hash = "";
+        if (resolvedSources.has(mediaUrl.href))
+          out.push(`${sp}.src: media source URLs must be distinct`);
+        resolvedSources.add(mediaUrl.href);
+        const decoded = decodedUrlPath(mediaUrl);
+        if (decoded.error) out.push(`${sp}.src: ${decoded.error}`);
+        mediaPath = decoded.path;
+      } catch { out.push(`${sp}.src: must resolve to a valid URL`); }
+    }
+    if (!rvString(s.type)) out.push(`${sp}.type: must be a non-empty media type`);
+    else {
+      const match = /^\s*video\/(mp4|webm)\s*(?:;.*)?$/.exec(s.type);
+      if (!match)
+        out.push(`${sp}.type: only video/mp4 and video/webm are allowed`);
+      else {
+        const mediaType = `video/${match[1]}`;
+        types.add(mediaType);
+        if (!mediaUrl || !mediaPath || !mediaPath.endsWith(`.${match[1]}`))
+          out.push(`${sp}.src: ${mediaType} requires a .${match[1]} pathname`);
+      }
+    }
+  });
+  ["video/mp4", "video/webm"].forEach(type => {
+    if (!types.has(type)) out.push(`${path}.sources: missing required ${type} source`);
+  });
+  out.push(...validateLiveReplay(v.live, `${path}.live`));
+  return out;
+}
+
+function legacyPublicationRecord(policy, channelId, sourceUrl) {
+  return (policy.channels || []).find(r => rvObject(r) && r.id === channelId && r.source === sourceUrl) || null;
+}
+
+function canonicalPublicationJson(value) {
+  if (Array.isArray(value)) return `[${value.map(canonicalPublicationJson).join(",")}]`;
+  if (rvObject(value)) return `{${Object.keys(value).sort().map(key =>
+    `${JSON.stringify(key)}:${canonicalPublicationJson(value[key])}`).join(",")}}`;
+  return JSON.stringify(value);
+}
+
+async function publicationSha256(publication) {
+  const bytes = new TextEncoder().encode(canonicalPublicationJson(publication));
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function legacyPublicationDigest(record, publicationId) {
+  return (record.publications || []).find(publication =>
+    rvObject(publication) && publication.id === publicationId) || null;
+}
+
+async function validateChannelContract(channel, sourceUrl, policy = LEGACY_POLICY) {
+  const out = [];
+  if (!rvObject(channel)) return ["channel: must be an object"];
+  if (!rvId(channel.id))
+    out.push("channel.id: must start alphanumeric and contain only alphanumeric, dot, underscore, or hyphen");
+  if (!rvString(channel.name)) out.push("channel.name: must be a non-empty string");
+  const videos = Array.isArray(channel.videos) ? channel.videos : [];
+  if (!videos.length) out.push("channel.videos: must be a non-empty array");
+  const ids = videos.filter(rvObject).map(v => v.id);
+  if (new Set(ids).size !== ids.length) out.push("channel.videos: publication ids must be unique");
+  videos.forEach((v, i) => {
+    if (rvObject(v) && !rvId(v.id))
+      out.push(`channel.videos[${i}].id: must start alphanumeric and contain only alphanumeric, dot, underscore, or hyphen`);
+  });
+  if (channel.schema === CURRENT_CHANNEL_SCHEMA)
+    videos.forEach((v, i) => out.push(
+      ...validatePairedPublication(v, `channel.videos[${i}]`, sourceUrl)
+    ));
+  else if (channel.schema === LEGACY_CHANNEL_SCHEMA) {
+    const legacy = legacyPublicationRecord(policy, channel.id, sourceUrl);
+    if (!legacy) out.push("channel.schema: v1 is frozen legacy only; channel id and canonical source are not allowlisted");
+    else {
+      for (let i = 0; i < videos.length; i++) {
+        const v = videos[i];
+        const frozen = rvObject(v) ? legacyPublicationDigest(legacy, v.id) : null;
+        if (!frozen)
+          out.push(`channel.videos[${i}].id: ${JSON.stringify(v && v.id)} is not a frozen legacy publication`);
+        else if (await publicationSha256(v) !== frozen.sha256)
+          out.push(`channel.videos[${i}]: content does not match its frozen legacy digest`);
+      }
+    }
+  } else out.push(`channel.schema: must equal "${CURRENT_CHANNEL_SCHEMA}"`);
+  return out;
+}
+/* publication contract:end */
 
 function load() {
   try {
@@ -311,9 +566,42 @@ function ago(d) {
   return mo < 12 ? mo + (mo === 1 ? " month ago" : " months ago")
                  : Math.floor(mo / 12) + " year" + (mo >= 24 ? "s" : "") + " ago";
 }
-const byId = id => VIDEOS.find(v => v.id === id)
-  || ALL_VIDEOS.find(v => v.id === id);
-const prog = id => { const h = state.history[id]; return h && h.d ? Math.min(1, h.t / h.d) : 0; };
+/* publication identity:start */
+const vkey = v => (v && v._ch ? v._ch.id : "") + "/" + (v ? v.id : "");
+const frozenLegacyOwnerKey = publicationId => {
+  const owners = (LEGACY_POLICY.channels || []).filter(record =>
+    (record.publications || []).some(publication =>
+      rvObject(publication) && publication.id === publicationId));
+  return owners.length === 1 ? `${owners[0].id}/${publicationId}` : "";
+};
+const unscopedVideo = id => {
+  const catalog = ALL_VIDEOS.length ? ALL_VIDEOS : VIDEOS;
+  const frozen = frozenLegacyOwnerKey(id);
+  if (frozen) return catalog.find(v => vkey(v) === frozen);
+  const matches = catalog.filter(v => v.id === id);
+  return matches.length === 1 ? matches[0] : undefined;
+};
+const byId = ref => {
+  const value = String(ref || "");
+  const catalog = ALL_VIDEOS.length ? ALL_VIDEOS : VIDEOS;
+  if (value.includes("/")) return catalog.find(v => vkey(v) === value);
+  return unscopedVideo(value);
+};
+const isPaired = v => !!(v && v.live && Array.isArray(v.sources) && v.sources.length);
+const historyKey = (v, mode) => `${vkey(v)}${isPaired(v) ? `::${mode}` : ""}`;
+const historyRecord = (v, mode) => state.history[historyKey(v, mode)]
+  || (legacyStateOwner(v) && isPaired(v) ? state.history[`${v.id}::${mode}`] : null)
+  || (legacyStateOwner(v) && (mode === "video" || !isPaired(v)) ? state.history[v.id] : null);
+const historyVideo = key => byId(String(key).replace(/::(?:video|live)$/, ""));
+const legacyStateOwner = v => unscopedVideo(v.id) === v;
+const stateHasVideo = (items, v) => items.includes(vkey(v))
+  || (items.includes(v.id) && legacyStateOwner(v));
+const stateVideos = items => items.map(byId).filter((v, i, all) => v && all.indexOf(v) === i);
+/* publication identity:end */
+const prog = v => {
+  const h = historyRecord(v, "video");
+  return h && h.d ? Math.min(1, h.t / h.d) : 0;
+};
 
 /* ---------------- community snapshot (optional) ----------------
  *
@@ -340,8 +628,6 @@ const normKey = s => String(s ?? "").trim().toLowerCase().replace(/[-\s]+/g, "_"
 /* A video id is only unique inside its own channel.json — template/channel.json
    ships "my-first-video" and every new publisher copies it — so the subject id
    is scoped by the channel id declared INSIDE that file. */
-const vkey = v => (v && v._ch ? v._ch.id : "") + "/" + (v ? v.id : "");
-
 const numOr = x => (typeof x === "number" && isFinite(x) && x >= 0) ? x : null;
 const strOr = x => (typeof x === "string" ? x.trim() : "");
 
@@ -565,8 +851,8 @@ function communityHTML(m) {
 /* ---------------------------- views ---------------------------- */
 
 function cardHTML(v) {
-  const p = prog(v.id), portrait = v.orientation === "portrait";
-  return `<a class="card" href="#/watch/${encodeURIComponent(v.id)}" data-vk="${esc(vkey(v))}">
+  const p = prog(v), portrait = v.orientation === "portrait";
+  return `<a class="card" href="#/watch/${encodeURIComponent(vkey(v))}" data-vk="${esc(vkey(v))}">
     <div class="thumbwrap${portrait ? " portrait" : ""}">
       <img src="${esc(v.thumb)}" alt="" loading="lazy" decoding="async">
       ${portrait ? '<span class="badge">SHORT</span>' : ""}
@@ -584,14 +870,15 @@ function cardHTML(v) {
 function matches(v, q) {
   if (!q) return true;
   const hay = [v.title, v.description, (v.tags || []).join(" "),
-               (v.chapters || []).map(c => c.label).join(" ")].join(" ").toLowerCase();
+               (v.chapters || []).map(c => c.label).join(" "),
+               ((v.live && v.live.chapters) || []).map(c => c.label).join(" ")].join(" ").toLowerCase();
   return q.toLowerCase().split(/\s+/).filter(Boolean).every(w => hay.includes(w));
 }
 
 function viewHome(q = "", tag = "") {
   const list = VIDEOS.filter(v => matches(v, q) && (!tag || (v.tags || []).includes(tag)));
   const tags = [...new Set(VIDEOS.flatMap(v => v.tags || []))].sort();
-  const cont = VIDEOS.filter(v => { const p = prog(v.id); return p > 0.02 && p < 0.97; });
+  const cont = VIDEOS.filter(v => { const p = prog(v); return p > 0.02 && p < 0.97; });
 
   app.innerHTML = `
     ${q || tag ? "" : `<section class="hero">
@@ -757,8 +1044,9 @@ const Shred = (() => {
       <h3>Your shred — ${esc(fmtBytes(blob.size))}</h3>
       <div class="fine">It exists only on this device until you send it somewhere.
         Sharing goes through your own share sheet — person to person, no platform in
-        the middle. If you’d rather put it on the network, publish it to a channel
-        with <code>remix_of: "${esc(vkey(v))}"</code> and it joins this post’s remix tree.</div>
+        the middle. To publish it on the network, encode an MP4 companion and pair
+        both files with a live replay in a v2 entry carrying
+        <code>remix_of: "${esc(vkey(v))}"</code>.</div>
       <div class="row">
         ${canShare ? `<button class="tbtn" id="sh-share">Share…</button>` : ""}
         <a class="tbtn" id="sh-dl" href="${url}" download="${esc(name)}">↓ Save the file</a>
@@ -776,9 +1064,9 @@ function fmtBytes(n) {
   return n > 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.round(n / 1024) + " KB";
 }
 
-function mountLive(v, host) {
+function mountLive(v, host, progressKey) {
   const scenes = (v.live.scenes || []).slice().sort((a, b) => a.t - b.t);
-  const total = v.duration || scenes.reduce((m, s) => Math.max(m, s.t + (s.dur || 0)), 0);
+  const total = replayDuration(v.live);
 
   host.innerHTML = `
     <div class="stage" id="stage"><div class="shade" id="shade"></div></div>
@@ -794,6 +1082,8 @@ function mountLive(v, host) {
   const stage = $("#stage", host), shade = $("#shade", host);
   let clock = 0, playing = false, raf = 0, cur = -1, frame = null, fired = new Set(), last = 0;
   let anchor = null, anchorPoll = 0;
+  let destroyed = false;
+  const retryTimers = new Set();
 
   const sceneAt = t => { let s = null; scenes.forEach((x, i) => { if (t >= x.t) { s = x; s._i = i; } }); return s; };
 
@@ -810,6 +1100,7 @@ function mountLive(v, host) {
     if (!s || !s.app) { anchor = clock; return; }
     const want = s.ready, t0 = performance.now();
     anchorPoll = setInterval(() => {
+      if (destroyed) return;
       if (!frame) return;
       let doc; try { doc = frame.contentDocument; } catch (e) { return; }
       if (!doc || doc.readyState !== "complete") return;
@@ -837,8 +1128,16 @@ function mountLive(v, host) {
       return;
     }
     if (s.app) {
+      const appSrc = renderableAppUrl(s.app);
+      if (!appSrc) {
+        const error = document.createElement("div");
+        error.className = "card3";
+        error.innerHTML = `<h2>Replay blocked</h2><p>Unsafe application URL.</p>`;
+        stage.appendChild(error);
+        return;
+      }
       frame = document.createElement("iframe");
-      frame.src = s.app;
+      frame.src = appSrc;
       frame.setAttribute("title", (s.lower && s.lower.title) || "application");
       /* allow-pointer-lock is not decoration. Without it a first-person app in
          the frame can never capture the mouse, so "pause and take the wheel"
@@ -927,16 +1226,20 @@ function mountLive(v, host) {
   function retryClick(find, budgetMs) {
     const t0 = performance.now();
     const attempt = () => {
+      if (destroyed) return;
       let el = null;
       try { el = find(); } catch (e) { el = null; }
       if (clickable(el)) { realClick(el); return; }
-      if (performance.now() - t0 < budgetMs) setTimeout(attempt, 250);
+      if (performance.now() - t0 < budgetMs) {
+        const timer = setTimeout(() => { retryTimers.delete(timer); attempt(); }, 250);
+        retryTimers.add(timer);
+      }
     };
     attempt();
   }
 
   function act(a) {
-    if (!frame) return;
+    if (destroyed || !frame) return;
     let doc;
     try { doc = frame.contentDocument; } catch (e) { return; }
     if (!doc) return;
@@ -1078,9 +1381,17 @@ function mountLive(v, host) {
     $("#ls i", host).style.width = (clock / total * 100).toFixed(2) + "%";
     const s = sceneAt(clock);
     if (s) shade.style.opacity = clock > s.t + (s.dur || 0) - 0.5 ? 0.55 : 0;
+    const chapters = v.live.chapters || [];
+    const btns = app.querySelectorAll(".chapters button");
+    if (chapters.length && btns.length) {
+      let active = 0;
+      chapters.forEach((chapter, i) => { if (clock >= chapter.t - 0.25) active = i; });
+      btns.forEach((button, i) => button.classList.toggle("on", i === active));
+    }
   }
 
   function seek(t) {
+    if (destroyed) return;
     clock = Math.max(0, Math.min(total, t));
     const s = sceneAt(clock);
     if (s && s._i !== cur) { cur = s._i; fired.clear(); renderScene(s); }
@@ -1090,7 +1401,7 @@ function mountLive(v, host) {
       if (clock >= due && !fired.has(key)) { fired.add(key); act(a); }
     });
     paint();
-    state.history[v.id] = { t: clock, d: total, at: Date.now() };
+    state.history[progressKey] = { t: clock, d: total, at: Date.now() };
     save();
   }
 
@@ -1111,29 +1422,56 @@ function mountLive(v, host) {
     cur = -1; seek((e.clientX - r.left) / r.width * total);
   };
 
-  const h = state.history[v.id];
+  const h = historyRecord(v, "live");
   seek(h && h.t > 2 && h.t < total - 4 ? h.t : 0);
 
-  return { keys: e => {
+  const keys = e => {
     const k = e.key.toLowerCase();
     if (k === " " || k === "k") { e.preventDefault(); playing ? pause() : play(); }
     else if (k === "arrowright" || k === "l") { cur = -1; seek(clock + 10); }
     else if (k === "arrowleft"  || k === "j") { cur = -1; seek(clock - 10); }
-  } };
+  };
+  return {
+    keys,
+    seek,
+    play,
+    destroy() {
+      if (destroyed) return;
+      destroyed = true;
+      pause();
+      clearInterval(anchorPoll);
+      retryTimers.forEach(clearTimeout);
+      retryTimers.clear();
+      if (frame) {
+        try { frame.src = "about:blank"; } catch {}
+        frame.remove();
+      }
+      host.innerHTML = "";
+    }
+  };
 }
 
-function bindCommon(id) {
+function bindCommon(v) {
+  const key = vkey(v);
+  const toggle = items => {
+    const active = stateHasVideo(items, v);
+    if (active) {
+      const oldId = legacyStateOwner(v) ? v.id : null;
+      items.splice(0, items.length, ...items.filter(item => item !== key && item !== oldId));
+    } else items.push(key);
+    return !active;
+  };
   $("#b-like").onclick = e => {
-    const i = state.liked.indexOf(id);
-    if (i < 0) { state.liked.push(id); e.target.classList.add("on"); e.target.textContent = "♥ Liked"; }
-    else { state.liked.splice(i, 1); e.target.classList.remove("on"); e.target.textContent = "♥ Like"; }
-    save(); toast(i < 0 ? "Liked" : "Removed like");
+    const on = toggle(state.liked);
+    e.target.classList.toggle("on", on);
+    e.target.textContent = on ? "♥ Liked" : "♥ Like";
+    save(); toast(on ? "Liked" : "Removed like");
   };
   $("#b-later").onclick = e => {
-    const i = state.later.indexOf(id);
-    if (i < 0) { state.later.push(id); e.target.classList.add("on"); e.target.textContent = "✓ Saved"; }
-    else { state.later.splice(i, 1); e.target.classList.remove("on"); e.target.textContent = "+ Watch later"; }
-    save(); toast(i < 0 ? "Saved to Watch later" : "Removed");
+    const on = toggle(state.later);
+    e.target.classList.toggle("on", on);
+    e.target.textContent = on ? "✓ Saved" : "+ Watch later";
+    save(); toast(on ? "Saved to Watch later" : "Removed");
   };
   $("#b-link").onclick = () => {
     const url = location.href;
@@ -1142,25 +1480,97 @@ function bindCommon(id) {
   };
 }
 
+function mountEncoded(v, host, progressKey) {
+  const portrait = v.orientation === "portrait";
+  host.innerHTML = `<div class="player${portrait ? " portrait" : ""}">
+    <video id="v" controls playsinline preload="metadata"
+           poster="${esc(v.thumb)}" class="${portrait ? "portrait" : ""}">
+      ${(v.sources || []).map(s => `<source src="${esc(s.src)}" type='${esc(s.type)}'>`).join("")}
+      Your browser can’t play this video.
+      <a href="${esc(v.sources[0].src)}">Download it instead.</a>
+    </video>
+  </div>`;
+  const vid = $("#v", host);
+  vid.playbackRate = state.rate;
+
+  const h = historyRecord(v, "video");
+  const resume = () => {
+    if (h && h.t > 3 && h.d && h.t < h.d - 8) {
+      vid.currentTime = h.t;
+      toast(`Resuming guided video at ${fmt(h.t)}`);
+    }
+  };
+  vid.addEventListener("loadedmetadata", resume, { once: true });
+
+  let last = 0;
+  const update = () => {
+    const now = Date.now();
+    if (now - last < 1000) return;
+    last = now;
+    if (vid.duration) {
+      state.history[progressKey] = { t: vid.currentTime, d: vid.duration, at: now };
+      save();
+    }
+    const btns = app.querySelectorAll(".chapters button");
+    if (btns.length) {
+      let active = 0;
+      (v.chapters || []).forEach((c, i) => { if (vid.currentTime >= c.t - 0.25) active = i; });
+      btns.forEach((b, i) => b.classList.toggle("on", i === active));
+    }
+  };
+  vid.addEventListener("timeupdate", update);
+  app.querySelectorAll(".chapters button").forEach(b => b.onclick = () => {
+    vid.currentTime = +b.dataset.t;
+    vid.play().catch(() => {});
+  });
+  const speed = $("#b-speed");
+  if (speed) speed.onclick = e => {
+    const steps = [0.75, 1, 1.25, 1.5, 1.75, 2];
+    state.rate = steps[(steps.indexOf(state.rate) + 1) % steps.length];
+    vid.playbackRate = state.rate;
+    e.target.textContent = `Speed ${state.rate}×`;
+    save();
+  };
+
+  const keys = e => {
+    if (/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
+    const k = e.key.toLowerCase();
+    if (k === " " || k === "k") { e.preventDefault(); vid.paused ? vid.play() : vid.pause(); }
+    else if (k === "arrowright" || k === "l") vid.currentTime += 10;
+    else if (k === "arrowleft" || k === "j") vid.currentTime -= 10;
+    else if (k === "m") vid.muted = !vid.muted;
+    else if (k === "f") (document.fullscreenElement ? document.exitFullscreen() : vid.requestFullscreen?.());
+    else if (k >= "0" && k <= "9" && vid.duration) vid.currentTime = vid.duration * (+k / 10);
+  };
+  document.addEventListener("keydown", keys);
+  return {
+    destroy() {
+      document.removeEventListener("keydown", keys);
+      vid.removeEventListener("timeupdate", update);
+      vid.removeEventListener("loadedmetadata", resume);
+      try { vid.pause(); } catch {}
+      vid.removeAttribute("src");
+      [...vid.querySelectorAll("source")].forEach(source => source.removeAttribute("src"));
+      try { vid.load(); } catch {}
+      host.innerHTML = "";
+    }
+  };
+}
+
 function viewWatch(id) {
   const v = byId(id);
   if (!v) { app.innerHTML = `<p class="empty">That video isn’t in this catalog.</p>`; return; }
-  const portrait = v.orientation === "portrait";
-  const isLive = !!(v.live && !(v.sources && v.sources.length));
-  const up = VIDEOS.filter(x => x.id !== id);
-  const liked = state.liked.includes(id), later = state.later.includes(id);
+  const hasVideo = !!(v.sources && v.sources.length);
+  const hasLive = !!v.live;
+  const paired = hasVideo && hasLive;
+  const up = VIDEOS.filter(x => x !== v);
+  const liked = stateHasVideo(state.liked, v), later = stateHasVideo(state.later, v);
 
   app.innerHTML = `
   <div class="watch">
     <div>
-      <div id="host">${isLive ? "" : `<div class="player${portrait ? " portrait" : ""}">
-        <video id="v" controls playsinline preload="metadata"
-               poster="${esc(v.thumb)}" class="${portrait ? "portrait" : ""}">
-          ${v.sources.map(s => `<source src="${esc(s.src)}" type='${esc(s.type)}'>`).join("")}
-          Your browser can’t play this video.
-          <a href="${esc(v.sources[0].src)}">Download it instead.</a>
-        </video>
-      </div>`}</div>
+      <div id="host"></div>
+      <span class="sr" id="mode-status" role="status" aria-live="polite"></span>
       <h1 class="vtitle">${esc(v.title)}</h1>
       <div class="vrow">
         <div class="chan">
@@ -1170,28 +1580,20 @@ function viewWatch(id) {
         <div class="toolbar">
           <button class="tbtn${liked ? " on" : ""}" id="b-like">♥ ${liked ? "Liked" : "Like"}</button>
           <button class="tbtn${later ? " on" : ""}" id="b-later">${later ? "✓ Saved" : "+ Watch later"}</button>
-          ${isLive ? "" : `<button class="tbtn" id="b-speed">Speed ${state.rate}×</button>`}
-          ${isLive
-            ? `<button class="tbtn" id="b-shred" title="Record your own run of this scene — camera off by default, file stays on your device">⏺ Shred</button>
-               <a class="tbtn" href="${esc((v.live.scenes || []).map(s => s.app).filter(Boolean)[0] || "#")}" target="_blank" rel="noopener">Open the app ↗</a>`
-            : `<a class="tbtn" href="${esc(v.sources[0].src)}" download>↓ Download</a>`}
+          <span id="mode-tools"></span>
           <button class="tbtn" id="b-link">Copy link</button>
         </div>
       </div>
       <div class="desc">
-        <div class="stat">${[esc(ago(v.published)), fmt(v.duration), (v.width && v.height ? v.width + "×" + v.height : ""), (v.tags || []).map(t => "#" + t).join(" ")].filter(Boolean).join(" · ")}</div>
+        <div class="stat">${[esc(ago(v.published)), `<span id="mode-duration">${fmt(v.duration)}</span>`, (v.width && v.height ? v.width + "×" + v.height : ""), (v.tags || []).map(t => "#" + t).join(" ")].filter(Boolean).join(" · ")}</div>
         ${esc(v.description)}
       </div>
-      ${(v.chapters || []).length ? `<div class="chapters">
-        <h2 class="sec" style="margin-bottom:8px">Chapters</h2>
-        <ol>${v.chapters.map((c, i) => `<li><button data-t="${c.t}" data-i="${i}">
-          <time>${fmt(c.t)}</time><span>${esc(c.label)}</span></button></li>`).join("")}</ol>
-      </div>` : ""}
+      <div id="chapters-slot"></div>
       <div id="community" data-vk="${esc(vkey(v))}">${communityHTML(mget(v))}</div>
     </div>
     <aside>
       <h3>Up next</h3>
-      ${up.map(x => `<a class="up" href="#/watch/${encodeURIComponent(x.id)}">
+      ${up.map(x => `<a class="up" href="#/watch/${encodeURIComponent(vkey(x))}">
         <span class="t"><img src="${esc(x.thumb)}" alt="" loading="lazy"></span>
         <span class="i"><h4>${esc(x.title)}</h4><span>${esc(x._ch.name)} · ${fmt(x.duration)}</span></span>
       </a>`).join("")}
@@ -1202,72 +1604,89 @@ function viewWatch(id) {
     </aside>
   </div>`;
 
-  bindCommon(id);
+  bindCommon(v);
+  const host = $("#host"), tools = $("#mode-tools"), status = $("#mode-status");
+  const chaptersSlot = $("#chapters-slot");
+  const modeDuration = $("#mode-duration");
+  let mounted = null;
+  let mode = "";
+  let liveAuthorized = !!v._ch._trustedLive;
 
-  if (isLive) {                       // a script, not a file
-    const live = mountLive(v, $("#host"));
-    $("#b-shred") && ($("#b-shred").onclick = () => Shred.open(v));
-    app._keys = live.keys;
-    document.addEventListener("keydown", app._keys);
-    return;
+  function renderModeChapters(next) {
+    const chapters = next === "live" ? ((v.live && v.live.chapters) || []) : (v.chapters || []);
+    chaptersSlot.innerHTML = chapters.length ? `<div class="chapters">
+      <h2 class="sec" style="margin-bottom:8px">${next === "live" ? "Replay chapters" : "Film chapters"}</h2>
+      <ol>${chapters.map((c, i) => `<li><button data-t="${c.t}" data-i="${i}">
+        <time>${fmt(c.t)}</time><span>${esc(c.label)}</span></button></li>`).join("")}</ol>
+    </div>` : "";
   }
 
-  const vid = $("#v");
-  vid.playbackRate = state.rate;
-
-  // resume where you left off
-  const h = state.history[id];
-  if (h && h.t > 3 && h.d && h.t < h.d - 8) {
-    const goto = h.t;
-    vid.addEventListener("loadedmetadata", () => { vid.currentTime = goto; }, { once: true });
-    toast(`Resuming at ${fmt(goto)}`);
+  function cleanupMode() {
+    if (mounted) mounted.destroy();
+    mounted = null;
+    app.querySelectorAll(".chapters button").forEach(b => { b.onclick = null; b.classList.remove("on"); });
   }
 
-  let last = 0;
-  vid.addEventListener("timeupdate", () => {
-    const now = Date.now();
-    if (now - last < 1000) return;              // throttle writes
-    last = now;
-    if (vid.duration) {
-      state.history[id] = { t: vid.currentTime, d: vid.duration, at: now };
-      save();
+  function mountMode(next, announce = true, userInitiated = false) {
+    cleanupMode();
+    mode = next;
+    if (mode === "live" && userInitiated) liveAuthorized = true;
+    host.dataset.watchMode = mode;
+    modeDuration.textContent = fmt(mode === "live" ? replayDuration(v.live) : v.duration);
+    renderModeChapters(mode);
+    if (mode === "live") {
+      if (!liveAuthorized) {
+        host.innerHTML = `<div class="note"><b>Live replay is ready when you are.</b>
+          This channel was added outside the default registry, so its app will not load
+          until you explicitly start it.</div>`;
+        tools.innerHTML = `<button class="tbtn mode-switch" id="b-start-live">Start live replay</button>`;
+        mounted = { destroy() { host.innerHTML = ""; } };
+        $("#b-start-live").onclick = () => mountMode("live", true, true);
+        if (announce) status.textContent = "Live replay waiting for explicit permission.";
+        return;
+      }
+      tools.innerHTML = `
+        ${paired ? `<button class="tbtn mode-switch" id="b-switch" aria-label="Watch guided video">Watch guided video</button>` : ""}
+        <button class="tbtn" id="b-shred" title="Record your own run of this scene — camera off by default, file stays on your device">⏺ Shred</button>
+        <a class="tbtn" href="${esc((v.live.scenes || []).map(s => s.app).filter(Boolean)[0] || "#")}" target="_blank" rel="noopener">Open the app ↗</a>`;
+      const live = mountLive(v, host, historyKey(v, "live"));
+      document.addEventListener("keydown", live.keys);
+      mounted = {
+        destroy() {
+          document.removeEventListener("keydown", live.keys);
+          live.destroy();
+        }
+      };
+      app.querySelectorAll(".chapters button").forEach(b => b.onclick = () => {
+        live.seek(+b.dataset.t);
+        live.play();
+      });
+      $("#b-shred") && ($("#b-shred").onclick = () => Shred.open(v));
+    } else {
+      tools.innerHTML = `
+        ${paired ? `<button class="tbtn mode-switch" id="b-switch" aria-label="Try live replay">Try live replay</button>` : ""}
+        <button class="tbtn" id="b-speed">Speed ${state.rate}×</button>
+        <a class="tbtn" href="${esc(v.sources[0].src)}" download>↓ Download</a>`;
+      mounted = mountEncoded(v, host, historyKey(v, "video"));
     }
-    const btns = app.querySelectorAll(".chapters button");
-    if (btns.length) {
-      let active = 0;
-      (v.chapters || []).forEach((c, i) => { if (vid.currentTime >= c.t - 0.25) active = i; });
-      btns.forEach((b, i) => b.classList.toggle("on", i === active));
-    }
-  });
+    const switcher = $("#b-switch");
+    if (switcher) switcher.onclick = () => {
+      const next = mode === "video" ? "live" : "video";
+      mountMode(next, true, next === "live");
+    };
+    if (announce) status.textContent = mode === "video"
+      ? "Guided video mode. Encoded video is the default."
+      : "Live replay mode. Pause to take the wheel.";
+  }
 
-  app.querySelectorAll(".chapters button").forEach(b => b.onclick = () => {
-    vid.currentTime = +b.dataset.t;
-    vid.play().catch(() => {});
-  });
-
-  $("#b-speed").onclick = e => {
-    const steps = [0.75, 1, 1.25, 1.5, 1.75, 2];
-    state.rate = steps[(steps.indexOf(state.rate) + 1) % steps.length];
-    vid.playbackRate = state.rate; e.target.textContent = `Speed ${state.rate}×`; save();
-  };
-  // YouTube-style keyboard shortcuts
-  app._keys = e => {
-    if (/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
-    const k = e.key.toLowerCase();
-    if (k === " " || k === "k") { e.preventDefault(); vid.paused ? vid.play() : vid.pause(); }
-    else if (k === "arrowright" || k === "l") vid.currentTime += 10;
-    else if (k === "arrowleft" || k === "j") vid.currentTime -= 10;
-    else if (k === "m") vid.muted = !vid.muted;
-    else if (k === "f") (document.fullscreenElement ? document.exitFullscreen() : vid.requestFullscreen?.());
-    else if (k >= "0" && k <= "9" && vid.duration) vid.currentTime = vid.duration * (+k / 10);
-  };
-  document.addEventListener("keydown", app._keys);
+  app._cleanup = cleanupMode;
+  mountMode(hasVideo ? "video" : "live", false);
 }
 
 function viewLibrary() {
   const watched = Object.entries(state.history)
     .sort((a, b) => (b[1].at || 0) - (a[1].at || 0))
-    .map(([id]) => byId(id)).filter(Boolean);
+    .map(([id]) => historyVideo(id)).filter((v, i, all) => v && all.indexOf(v) === i);
   const sec = (title, list, empty) => `<h2 class="sec">${title} · ${list.length}</h2>
     ${list.length ? `<div class="grid">${list.map(cardHTML).join("")}</div>`
                   : `<p class="empty">${empty}</p>`}`;
@@ -1282,8 +1701,8 @@ function viewLibrary() {
         <button class="tbtn" id="cl">Clear history</button>
       </div>
     </section>
-    ${sec("Watch later", state.later.map(byId).filter(Boolean), "Nothing saved yet.")}
-    ${sec("Liked", state.liked.map(byId).filter(Boolean), "Nothing liked yet.")}
+    ${sec("Watch later", stateVideos(state.later), "Nothing saved yet.")}
+    ${sec("Liked", stateVideos(state.liked), "Nothing liked yet.")}
     ${sec("Recently watched", watched, "You haven’t watched anything yet.")}`;
 
   $("#ex").onclick = () => {
@@ -1360,7 +1779,7 @@ function viewChannels() {
     <section class="hero"><h1>RAPP Hive</h1>
       <p><b>The RAPP Hive is the most universal layer for any AI to contribute by federating into
          this parking lot.</b> A contribution is just a <code>channel.json</code> in a public repo,
-         with its media or live replays sitting next to it. Add any channel by URL without asking
+         with its MP4, WebM, and live replay sitting next to it. Add any valid v2 channel by URL without asking
          permission, moving the source, or surrendering ownership.</p>
       <p style="margin-top:10px">Subscribe to what you want \u2014 that choice lives in this browser,
          not on a central server. The Hive aggregates independent channels; it does not absorb them.</p>
@@ -1430,7 +1849,7 @@ function viewChannels() {
       state.subs.push(c.id); save();
       CHANNELS.push(c); rebuild(); viewChannels();
       toast("Added " + c.name);
-    } catch (e) { toast("Couldn't load that channel.json"); }
+    } catch (e) { toast(e && e.message ? e.message : "Couldn't load that channel.json"); }
   };
 }
 
@@ -1455,10 +1874,11 @@ function viewAbout() {
     repositories, served with byte-range support, which is all a <code>&lt;video&gt;</code> element
     needs in order to stream and seek.</div>
 
-  <h2 class="sec">Publishing a video</h2>
-  <div class="desc">1. Commit the file to a public repo.
-2. Add it to that repo's <code>channel.json</code> — title, thumbnail, duration, sources, chapters.
-3. Paste the channel URL into RAPP Hive, or open a PR to the default registry.
+  <h2 class="sec">Publishing a paired work</h2>
+  <div class="desc">1. Commit both the MP4 and WebM guided encodes plus the live replay target to a public repo.
+2. Add one <code>rapp-vision-channel/2.0</code> entry containing both <code>sources</code> and <code>live</code>.
+3. Run the publication validator; a single-format entry is rejected.
+4. Paste the channel URL into RAPP Hive, or open a PR to the default registry.
 
 That's it. Sources may be relative paths or absolute <code>raw.githubusercontent.com</code> URLs, so a
 channel can point at media living in a completely different repo.</div>
@@ -1466,7 +1886,8 @@ channel can point at media living in a completely different repo.</div>
   <h2 class="sec">What it does</h2>
   <div class="desc">• Home grid, search across titles, descriptions, tags and chapter labels
 • Watch view with clickable chapters that highlight as the video plays
-• Resume where you left off, per video
+• Encoded video by default, with an obvious same-entry live replay switch
+• Separate resume points for the guided video and live replay
 • Watch later, likes, recently watched
 • Playback speed, and YouTube-style keys — space/k, j/l, ←/→, m, f, 0–9
 • Both landscape and vertical (Shorts-style) videos
@@ -1477,16 +1898,16 @@ channel can point at media living in a completely different repo.</div>
 see next. Nothing about what you watch leaves this browser — the entire "profile" is a
 <code>localStorage</code> key you can read, export, or delete.</div>
 
-  <div class="note" style="margin-top:26px"><b>Encoding tip.</b> Ship H.264/AAC in MP4 <em>and</em>
-    VP9/Opus in WebM. Plenty of Chromium builds ship without proprietary codecs, and an MP4-only
-    source is silently unplayable there — a bug found the hard way, by measuring rather than
-    assuming.</div>`;
+  <div class="note" style="margin-top:26px"><b>Encoding requirement.</b> Every new publication ships
+    H.264/AAC in MP4 <em>and</em> VP9/Opus in WebM. Plenty of Chromium builds ship without proprietary
+    codecs, while other devices lack WebM; the validator requires both.</div>`;
 }
 
 /* ---------------------------- router ---------------------------- */
 
 function route() {
-  document.removeEventListener("keydown", app._keys || (() => {}));
+  if (app._cleanup) app._cleanup();
+  app._cleanup = null;
   const h = location.hash.replace(/^#\/?/, "");
   const [view, arg] = h.split("/");
   $("#nav-ch").classList.toggle("on", view === "channels" || view === "channel");
@@ -1530,8 +1951,18 @@ async function fetchChannel(entry) {
   const r = await fetch(url, { cache: "no-cache" });
   if (!r.ok) throw new Error(entry.id + " HTTP " + r.status);
   const c = await r.json();
+  if (entry._registry && entry.id !== c.id)
+    throw new Error(`registry id ${entry.id} does not match fetched channel id ${c.id}`);
+  const sourceIdentity = entry.legacy === LEGACY_POLICY.id && LEGACY_POLICY.registry_base
+    ? absolutise(entry.url, LEGACY_POLICY.registry_base)
+    : url;
+  const contractErrors = await validateChannelContract(c, sourceIdentity);
+  if (contractErrors.length)
+    throw new Error(`${entry.id || c.id || "channel"} rejected: ${contractErrors[0]}`);
   c._url = url;
+  c._sourceIdentity = sourceIdentity;
   c._repo = entry.repo || c.repo || "";
+  c._trustedLive = !!entry._registry;
   /* Be forgiving about shape. Anyone can publish a channel, so one typo in
      someone else's JSON must not blank the network: `poster` is the obvious
      name for a thumbnail and people reach for it, and `links` is just as
@@ -1544,10 +1975,30 @@ async function fetchChannel(entry) {
     v.thumb = absolutise(v.thumb || v.poster, url);
     (v.sources || []).forEach(s => { s.src = absolutise(s.src, url); });
     if (v.live) (v.live.scenes || []).forEach(sc => {
-      if (sc.app) sc.app = absolutise(sc.app, url);
+      if (sc.app) {
+        const rawApp = sc.app;
+        const resolvedApp = absolutise(rawApp, url);
+        sc.app = safeResolvedAppUrl(rawApp, resolvedApp, url);
+        if (!sc.app) throw new Error(`${c.id}/${v.id} rejected: unsafe resolved live app URL`);
+      }
     });
   });
   return c;
+}
+
+async function loadLegacyPolicy() {
+  try {
+    const r = await fetch("policy/legacy-publications.json", { cache: "no-cache" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const policy = await r.json();
+    if (policy.schema !== "rapp-vision-legacy-publications/1.0" ||
+        !rvString(policy.id) || !rvString(policy.registry_base) || !Array.isArray(policy.channels))
+      throw new Error("malformed policy");
+    LEGACY_POLICY = policy;
+  } catch (e) {
+    LEGACY_POLICY = { channels: [] };
+    console.warn("Legacy publication policy unavailable:", e);
+  }
 }
 
 /* ---- Follow a GitHub account (the rappvision-* owner convention) ---------
@@ -1660,20 +2111,40 @@ function applyMetrics() {
   });
 }
 
+/* registry identity:start */
+function collectUniqueChannels(settled, entries) {
+  const channels = [], failed = [], resolved = new Set();
+  settled.forEach((result, index) => {
+    const entryId = entries[index] && entries[index].id;
+    if (result.status !== "fulfilled") { failed.push(entryId); return; }
+    const channel = result.value;
+    if (resolved.has(channel.id)) { failed.push(entryId); return; }
+    resolved.add(channel.id);
+    channels.push(channel);
+  });
+  return { channels, failed: failed.filter(Boolean) };
+}
+/* registry identity:end */
+
 async function boot() {
+  await loadLegacyPolicy();
   let registry = { channels: [] };
   try {
     const r = await fetch("channels.json", { cache: "no-cache" });
     if (r.ok) registry = await r.json();
   } catch {}
 
-  const entries = [...(registry.channels || []), ...state.custom];
+  const entries = [
+    ...(registry.channels || []).map(entry => ({ ...entry, _registry: true })),
+    ...state.custom
+  ];
   const seen = new Set();
   const wanted = entries.filter(e => !seen.has(e.id) && seen.add(e.id));
 
   const settled = await Promise.allSettled(wanted.map(fetchChannel));
-  CHANNELS = settled.filter(s => s.status === "fulfilled").map(s => s.value);
-  const failed = settled.map((s, i) => s.status === "rejected" ? wanted[i].id : null).filter(Boolean);
+  const loaded = collectUniqueChannels(settled, wanted);
+  CHANNELS = loaded.channels;
+  const failed = loaded.failed;
 
   await loadFollows();   // followed owners' rappvision-* fleets; never throws, cached hourly
 
