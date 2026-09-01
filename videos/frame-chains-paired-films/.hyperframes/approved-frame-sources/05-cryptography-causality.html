@@ -1,0 +1,598 @@
+<template id="05-cryptography-causality-template">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-400.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-700.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+      font-display: block;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+      font-display: block;
+    }
+
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #242424;
+      font-family: "Inter", sans-serif;
+    }
+
+    #root * {
+      box-sizing: border-box;
+    }
+
+    [class~="05-cryptography-causality-ground"] {
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+    }
+
+    [class~="05-cryptography-causality-rail"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 580px;
+      height: 896px;
+      background: #ffffff;
+      border-right: 1px solid rgba(36, 36, 36, 0.12);
+    }
+
+    [class~="05-cryptography-causality-index"] {
+      position: absolute;
+      left: 80px;
+      top: 78px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #242424;
+    }
+
+    [class~="05-cryptography-causality-spike"] {
+      color: #0067b8;
+      font-size: 28px;
+    }
+
+    [class~="05-cryptography-causality-proof-copy"] {
+      position: absolute;
+      left: 78px;
+      top: 166px;
+      width: 440px;
+      min-height: 328px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 2px;
+    }
+
+    [class~="05-cryptography-causality-word"] {
+      display: block;
+      width: max-content;
+      max-width: 440px;
+      font-family: "Inter", sans-serif;
+      font-size: 86px;
+      font-weight: 400;
+      line-height: 0.98;
+      letter-spacing: -0.028em;
+      color: #242424;
+    }
+
+    [class~="05-cryptography-causality-rule"] {
+      position: absolute;
+      left: 80px;
+      top: 524px;
+      width: 420px;
+      height: 1px;
+      background: rgba(36, 36, 36, 0.2);
+      transform-origin: left center;
+    }
+
+    [class~="05-cryptography-causality-note"] {
+      position: absolute;
+      left: 80px;
+      top: 550px;
+      width: 410px;
+      font-family: "Inter", sans-serif;
+      font-size: 29px;
+      font-weight: 400;
+      line-height: 1.35;
+      letter-spacing: -0.012em;
+      color: rgba(36, 36, 36, 0.76);
+    }
+
+    [class~="05-cryptography-causality-video-frame"] {
+      position: absolute;
+      left: 558px;
+      top: 56px;
+      width: 1304px;
+      height: 757px;
+      border: 1px solid rgba(36, 36, 36, 0.16);
+      border-radius: 12px;
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+      pointer-events: none;
+    }
+
+    [class~="05-cryptography-causality-video-frame"]::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border: 1px solid rgba(36, 36, 36, 0.08);
+      border-radius: 8px;
+    }
+
+    [class~="05-cryptography-causality-f01-stack"] {
+      position: absolute;
+      left: 763px;
+      top: 473px;
+      width: 572px;
+      height: 92px;
+      display: grid;
+      pointer-events: none;
+    }
+
+    [class~="05-cryptography-causality-f01-outline"] {
+      grid-area: 1 / 1;
+      border: 2px solid #C64545;
+      border-radius: 10px;
+    }
+
+    [class~="05-cryptography-causality-f01-outline-warm"] {
+      border-color: #b11f4b;
+      opacity: 0;
+    }
+
+    [class~="05-cryptography-causality-f01-outline-cool"] {
+      border-color: #0067b8;
+      opacity: 0;
+    }
+
+    [class~="05-cryptography-causality-f01-base"] {
+      position: relative;
+      z-index: 2;
+    }
+
+    [class~="05-cryptography-causality-f01-tag"] {
+      position: absolute;
+      left: 80px;
+      top: 566px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border: 1px solid rgba(36, 36, 36, 0.12);
+      border-radius: 6px;
+      background: #F8D5E0;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #242424;
+    }
+
+    [class~="05-cryptography-causality-f01-dot"] {
+      width: 11px;
+      height: 11px;
+      border-radius: 9999px;
+      background: #C64545;
+    }
+
+    [class~="05-cryptography-causality-split-stage"] {
+      position: absolute;
+      left: 62px;
+      top: 654px;
+      width: 474px;
+      height: 154px;
+      display: flex;
+      gap: 16px;
+      perspective: 1400px;
+      transform-style: preserve-3d;
+    }
+
+    [class~="05-cryptography-causality-proof-card"] {
+      position: relative;
+      width: 229px;
+      height: 146px;
+      padding: 20px 18px;
+      overflow: hidden;
+      border: 1px solid rgba(36, 36, 36, 0.14);
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow:
+        0 1px 3px rgba(36, 36, 36, 0.08),
+        0 4px 16px rgba(36, 36, 36, 0.04);
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    [class~="05-cryptography-causality-card-label"] {
+      display: block;
+      margin-bottom: 19px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: rgba(36, 36, 36, 0.62);
+    }
+
+    [class~="05-cryptography-causality-card-verdict"] {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      font-family: "Inter", sans-serif;
+      font-size: 42px;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: -0.025em;
+      color: #242424;
+    }
+
+    [class~="05-cryptography-causality-card-symbol"] {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 34px;
+      font-weight: 700;
+    }
+
+    [class~="05-cryptography-causality-card-hash"] {
+      border-bottom: 5px solid #5DB872;
+    }
+
+    [class~="05-cryptography-causality-card-cause"] {
+      border-bottom: 5px solid #C64545;
+    }
+
+    [class~="05-cryptography-causality-card-hash"] [class~="05-cryptography-causality-card-symbol"] {
+      color: #397c4a;
+    }
+
+    [class~="05-cryptography-causality-card-cause"] [class~="05-cryptography-causality-card-symbol"] {
+      color: #C64545;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="05-cryptography-causality"
+    data-start="0"
+    data-duration="10.752"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div
+      id="fc05-ground"
+      class="clip 05-cryptography-causality-ground"
+      data-start="0"
+      data-duration="10.752"
+      data-track-index="0"
+    ></div>
+
+    <video
+      id="fc05-accepted-video"
+      class="clip"
+      data-frame-video="approved"
+      data-start="0"
+      data-duration="3.1"
+      data-track-index="1"
+      data-media-start="11.8"
+      data-frame-video-x="580"
+      data-frame-video-y="78"
+      data-frame-video-width="1260"
+      data-frame-video-height="709"
+      data-frame-video-fit="cover"
+      src="assets/proof-clips/05-causal-detective/source.webm"
+      muted
+      playsinline
+    ></video>
+
+    <video
+      id="fc05-forged-video"
+      class="clip"
+      data-frame-video="approved"
+      data-start="3.1"
+      data-duration="7.652"
+      data-track-index="1"
+      data-media-start="15.7"
+      data-playback-rate="0.55"
+      data-frame-video-x="580"
+      data-frame-video-y="78"
+      data-frame-video-width="1260"
+      data-frame-video-height="709"
+      data-frame-video-fit="cover"
+      src="assets/proof-clips/05-causal-detective/source.webm"
+      muted
+      playsinline
+    ></video>
+
+    <div
+      id="fc05-video-frame"
+      class="clip 05-cryptography-causality-video-frame"
+      data-start="0"
+      data-duration="10.752"
+      data-track-index="2"
+      aria-hidden="true"
+    ></div>
+
+    <div
+      id="fc05-rail"
+      class="clip 05-cryptography-causality-rail"
+      data-start="0"
+      data-duration="10.752"
+      data-track-index="3"
+    >
+      <div class="05-cryptography-causality-index">
+        <span class="05-cryptography-causality-spike">✱</span>
+        <span>Exact proof</span>
+      </div>
+
+      <div
+        id="fc05-proof-copy"
+        class="05-cryptography-causality-proof-copy"
+        aria-label="Exact earlier causes"
+      >
+        <span class="05-cryptography-causality-word">Exact</span>
+        <span class="05-cryptography-causality-word">earlier</span>
+        <span class="05-cryptography-causality-word">causes</span>
+      </div>
+
+      <div
+        id="fc05-rule"
+        class="05-cryptography-causality-rule"
+        aria-hidden="true"
+      ></div>
+
+      <div id="fc05-note" class="05-cryptography-causality-note">
+        One accepted receipt. One impossible event.
+      </div>
+    </div>
+
+    <div
+      id="fc05-failure-layer"
+      class="clip"
+      data-start="3.1"
+      data-duration="7.652"
+      data-track-index="4"
+    >
+      <div
+        id="fc05-f01-stack"
+        class="05-cryptography-causality-f01-stack"
+        aria-label="Forged frame F01 isolated"
+      >
+        <div
+          class="05-cryptography-causality-f01-outline 05-cryptography-causality-f01-outline-warm"
+          aria-hidden="true"
+        ></div>
+        <div
+          class="05-cryptography-causality-f01-outline 05-cryptography-causality-f01-outline-cool"
+          aria-hidden="true"
+        ></div>
+        <div
+          class="05-cryptography-causality-f01-outline 05-cryptography-causality-f01-base"
+          aria-hidden="true"
+        ></div>
+      </div>
+
+      <div id="fc05-f01-tag" class="05-cryptography-causality-f01-tag">
+        <span class="05-cryptography-causality-f01-dot" aria-hidden="true"></span>
+        <span>F01 · forged clue</span>
+      </div>
+    </div>
+
+    <div
+      id="fc05-comparison-layer"
+      class="clip"
+      data-start="6.6"
+      data-duration="4.152"
+      data-track-index="5"
+    >
+      <div
+        id="fc05-split-stage"
+        class="05-cryptography-causality-split-stage"
+        aria-label="Cryptographic and causal proof comparison"
+      >
+        <div
+          id="fc05-hash-card"
+          class="05-cryptography-causality-proof-card 05-cryptography-causality-card-hash"
+        >
+          <span class="05-cryptography-causality-card-label">Cryptographic shape</span>
+          <div class="05-cryptography-causality-card-verdict">
+            <span>Hash</span>
+            <span class="05-cryptography-causality-card-symbol">✓</span>
+          </div>
+        </div>
+
+        <div
+          id="fc05-cause-card"
+          class="05-cryptography-causality-proof-card 05-cryptography-causality-card-cause"
+        >
+          <span class="05-cryptography-causality-card-label">World validity</span>
+          <div class="05-cryptography-causality-card-verdict">
+            <span>Cause</span>
+            <span class="05-cryptography-causality-card-symbol">✕</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const tl = gsap.timeline({ paused: true });
+
+      const words = gsap.utils.toArray(
+        "#fc05-proof-copy [class~=\"05-cryptography-causality-word\"]"
+      );
+      const wordSchedule = words.reduce((schedule, word, index) => {
+        const previousEnd = index === 0 ? 0.18 : schedule[index - 1].end;
+        const duration = 0.26 + word.textContent.length * 0.045;
+        schedule.push({ word, start: previousEnd, end: previousEnd + duration });
+        return schedule;
+      }, []);
+
+      wordSchedule.forEach(({ word, start }) => {
+        tl.fromTo(
+          word,
+          { x: -34, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.52, ease: "power3.out" },
+          start
+        );
+      });
+
+      tl.fromTo(
+        "#fc05-rule",
+        { scaleX: 0, opacity: 0 },
+        { scaleX: 1, opacity: 1, duration: 0.72, ease: "power3.out" },
+        2.12
+      );
+      tl.fromTo(
+        "#fc05-note",
+        { y: 18, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+        2.4
+      );
+
+      tl.set(
+        [
+          "#fc05-proof-copy",
+          "#fc05-rule",
+          "#fc05-note"
+        ],
+        { autoAlpha: 0 },
+        3.1
+      );
+
+      tl.fromTo(
+        "#fc05-f01-tag",
+        { x: -26, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.42, ease: "power3.out" },
+        3.18
+      );
+      tl.fromTo(
+        "#fc05-f01-stack",
+        { scaleX: 1.035, opacity: 0 },
+        { scaleX: 1, opacity: 1, duration: 0.36, ease: "power4.out" },
+        3.22
+      );
+
+      const glitchCopies = gsap.utils.toArray(
+        "#fc05-f01-stack " +
+        "[class~=\"05-cryptography-causality-f01-outline-warm\"], " +
+        "#fc05-f01-stack " +
+        "[class~=\"05-cryptography-causality-f01-outline-cool\"]"
+      );
+      const glitchAmplitude = { value: 0 };
+      const glitchHash = n => {
+        const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+        return x - Math.floor(x);
+      };
+
+      tl.set(glitchAmplitude, { value: 1 }, 3.22);
+      tl.set(glitchCopies, { opacity: 0.68 }, 3.22);
+      tl.to(
+        glitchAmplitude,
+        {
+          value: 0,
+          duration: 0.38,
+          ease: "power3.in",
+          onUpdate: () => {
+            const step = Math.floor(tl.time() / (1 / 20));
+            glitchCopies.forEach((copy, index) => {
+              const x =
+                (glitchHash(step * 13 + index * 7) * 2 - 1) *
+                11 *
+                glitchAmplitude.value;
+              const y =
+                (glitchHash(step * 29 + index * 11) * 2 - 1) *
+                4 *
+                glitchAmplitude.value;
+              gsap.set(copy, { x, y });
+            });
+          }
+        },
+        3.22
+      );
+      tl.set(glitchCopies, { x: 0, y: 0, opacity: 0 }, 3.6);
+
+      tl.fromTo(
+        "#fc05-hash-card",
+        { x: -210, rotateY: 18, opacity: 0 },
+        { x: 0, rotateY: 0, opacity: 1, duration: 0.88, ease: "power3.out" },
+        6.6
+      );
+      tl.fromTo(
+        "#fc05-cause-card",
+        { x: 210, rotateY: -18, opacity: 0 },
+        { x: 0, rotateY: 0, opacity: 1, duration: 0.88, ease: "power3.out" },
+        6.78
+      );
+      tl.fromTo(
+        "#fc05-split-stage [class~=\"05-cryptography-causality-card-label\"]",
+        { y: 12, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.46,
+          stagger: 0.12,
+          ease: "power2.out"
+        },
+        7.08
+      );
+      tl.fromTo(
+        "#fc05-split-stage [class~=\"05-cryptography-causality-card-verdict\"]",
+        { y: 16, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.52,
+          stagger: 0.14,
+          ease: "power2.out"
+        },
+        7.28
+      );
+      tl.to(
+        "#fc05-hash-card",
+        { y: -5, duration: 0.75, ease: "sine.inOut", yoyo: true, repeat: 1 },
+        8.0
+      );
+      tl.to(
+        "#fc05-cause-card",
+        { y: 5, duration: 0.75, ease: "sine.inOut", yoyo: true, repeat: 1 },
+        8.0
+      );
+
+      window.__timelines["05-cryptography-causality"] = tl;
+    })();
+  </script>
+</template>

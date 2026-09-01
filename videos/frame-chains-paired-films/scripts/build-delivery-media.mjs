@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { basename, dirname, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -171,6 +171,32 @@ for (const delivery of deliveries) {
       mp4,
     ]);
   }
+
+  const normalizedMp4 = `${mp4}.normalized.mp4`;
+  run("ffmpeg", [
+    "-y",
+    "-hide_banner",
+    "-loglevel",
+    "error",
+    "-i",
+    mp4,
+    "-map",
+    "0:v:0",
+    "-map",
+    "0:a:0",
+    "-c:v",
+    "copy",
+    "-af",
+    "loudnorm=I=-16:TP=-1.5:LRA=11",
+    "-c:a",
+    "aac",
+    "-b:a",
+    "192k",
+    "-movflags",
+    "+faststart",
+    normalizedMp4,
+  ]);
+  await rename(normalizedMp4, mp4);
 
   run("ffmpeg", [
     "-y",

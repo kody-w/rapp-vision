@@ -1,0 +1,129 @@
+{
+  "schema": "rapp-vision.frame-build-loop-ledger/1",
+  "loop": 1,
+  "base_commit": "4ca9de7dccc96f53a071e6ae7de1f054475bfd51",
+  "integration_head_before_ledger": "fcd4218d5e5a21da320f8c3ed88f11e5e2d7a5f7",
+  "merge_strategy": "git merge --no-ff",
+  "squash": false,
+  "frame_count": 10,
+  "frames": [
+    {
+      "frame": 1,
+      "slug": "01-understand-operate",
+      "branch": "frame-film/01-many-worlds-capture",
+      "path": "compositions/frames/01-understand-operate.html",
+      "asset": "assets/proof-clips/01-many-worlds/source.webm",
+      "commit": "98e6d9d60623edf6d107b440f77abfc1b738cc56",
+      "commits": [
+        "98e6d9d60623edf6d107b440f77abfc1b738cc56"
+      ]
+    },
+    {
+      "frame": 2,
+      "slug": "02-identity-history",
+      "branch": "frame-film/02-soul-passport-capture",
+      "path": "compositions/frames/02-identity-history.html",
+      "asset": "assets/proof-clips/02-soul-passport/source.webm",
+      "commit": "d00c0db648a22be7df9497aca934f596fbc4a0fb",
+      "commits": [
+        "d00c0db648a22be7df9497aca934f596fbc4a0fb"
+      ]
+    },
+    {
+      "frame": 3,
+      "slug": "03-correct-hash-wrong-repair",
+      "branch": "frame-film/03-mars-colony-capture",
+      "path": "compositions/frames/03-correct-hash-wrong-repair.html",
+      "asset": "assets/proof-clips/03-mars-colony/source.webm",
+      "commit": "68c2007bd09dbad19f20748153b461b59c3b5be4",
+      "commits": [
+        "751a852be04f549c7d81a568968eb97f697f73a5",
+        "68c2007bd09dbad19f20748153b461b59c3b5be4"
+      ]
+    },
+    {
+      "frame": 4,
+      "slug": "04-five-realities",
+      "branch": "frame-film/04-five-realities-capture",
+      "path": "compositions/frames/04-five-realities.html",
+      "asset": "assets/proof-clips/04-five-realities/source.webm",
+      "commit": "3b220a46f3626642dd2103fbe49c291a9acd0106",
+      "commits": [
+        "5c05721a66045507dff3b209233ea80c0efd7d2d",
+        "5fd0fcb461099a4a5223ac211c2a3ab7f5a19567",
+        "3b220a46f3626642dd2103fbe49c291a9acd0106"
+      ]
+    },
+    {
+      "frame": 5,
+      "slug": "05-cryptography-causality",
+      "branch": "frame-film/05-causal-detective-capture",
+      "path": "compositions/frames/05-cryptography-causality.html",
+      "asset": "assets/proof-clips/05-causal-detective/source.webm",
+      "commit": "add6fb36b1948cc07c571870294d129d587c19cb",
+      "commits": [
+        "add6fb36b1948cc07c571870294d129d587c19cb"
+      ]
+    },
+    {
+      "frame": 6,
+      "slug": "06-preserve-disagreement",
+      "branch": "frame-film/06-space-station-capture",
+      "path": "compositions/frames/06-preserve-disagreement.html",
+      "asset": "assets/proof-clips/06-space-station/source.webm",
+      "commit": "173f37cfaf39aae77bc06987ee5fd6ac3a959f50",
+      "commits": [
+        "173f37cfaf39aae77bc06987ee5fd6ac3a959f50"
+      ]
+    },
+    {
+      "frame": 7,
+      "slug": "07-law-executes",
+      "branch": "frame-film/07-constitution-capture",
+      "path": "compositions/frames/07-law-executes.html",
+      "asset": "assets/proof-clips/07-constitution/source.webm",
+      "commit": "1830e3466afd0d85093984ace29d7f7ecee774af",
+      "commits": [
+        "b2b565545ad4dc3d150d0b59c087232dcd3d7004",
+        "1830e3466afd0d85093984ace29d7f7ecee774af"
+      ]
+    },
+    {
+      "frame": 8,
+      "slug": "08-state-not-pixels",
+      "branch": "frame-film/08-teleporting-roguelike-capture",
+      "path": "compositions/frames/08-state-not-pixels.html",
+      "asset": "assets/proof-clips/08-teleporting-roguelike/source.webm",
+      "commit": "2e9823e2cae62f24a80a11ac543a24dc48a36405",
+      "commits": [
+        "43c5a8a0c6a10908f159e2fc6b522e6a95205c62",
+        "41922f6aa5181d9df3527e8518aaedb90e494e23",
+        "2e9823e2cae62f24a80a11ac543a24dc48a36405"
+      ]
+    },
+    {
+      "frame": 9,
+      "slug": "09-attack-boundaries",
+      "branch": "frame-film/09-attack-timeline-capture",
+      "path": "compositions/frames/09-attack-boundaries.html",
+      "asset": "assets/proof-clips/09-attack-timeline/source.webm",
+      "commit": "85ab7dc957b365421ba23a2f829756b4bd125834",
+      "commits": [
+        "85ab7dc957b365421ba23a2f829756b4bd125834"
+      ]
+    },
+    {
+      "frame": 10,
+      "slug": "10-film-plus-proof",
+      "branch": "frame-film/10-futures-museum-capture",
+      "path": "compositions/frames/10-film-plus-proof.html",
+      "asset": "assets/proof-clips/10-futures-museum/source.webm",
+      "commit": "e0149743ba5ccbfc3983e12119a763bd18b2519b",
+      "commits": [
+        "fd133fea912ae888d02f68b505ce786442b63938",
+        "268b73c7c8c994dc2f8c35c4b3ee69fd0cf1b1e2",
+        "e0149743ba5ccbfc3983e12119a763bd18b2519b"
+      ]
+    }
+  ]
+}
