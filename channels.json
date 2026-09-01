@@ -5,8 +5,8 @@
   "name": "RAPP Hive",
   "visibility": "public",
   "revision": {
-    "sequence": 2,
-    "updated": "2026-08-21T02:25:21Z"
+    "sequence": 3,
+    "updated": "2026-09-01T03:37:21Z"
   },
   "peers": [],
   "_note": "RAPP Hive is the most universal contribution layer: a parking lot of federated channel.json URLs. Channels stay in their own repos; anyone can run a registry or add a channel locally without asking permission. Open a PR only if you want default listing.",
@@ -121,6 +121,86 @@
       "repo": "https://github.com/kody-w/frame-chains",
       "contract": "rapp-vision-channel/2.0",
       "_why": "Five paired publications: newcomer-first encoded films plus live executable proofs covering ten synthetic Frame Chains worlds."
+    },
+    {
+      "id": "signal-garden",
+      "name": "Signal Garden",
+      "url": "../rappvision-signal-garden/channel.json",
+      "repo": "https://github.com/kody-w/rappvision-signal-garden",
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "A botanical systems documentary paired with an anomaly, healing, and exact-reset garden replay."
+    },
+    {
+      "id": "null-arcade",
+      "name": "Null Arcade",
+      "url": "../rappvision-null-arcade/channel.json",
+      "repo": "https://github.com/kody-w/rappvision-null-arcade",
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "A portrait integrity speedrun whose verified record survives a visibly rejected cheat."
+    },
+    {
+      "id": "tiny-bureau",
+      "name": "Tiny Bureau",
+      "url": "../rappvision-tiny-bureau/channel.json",
+      "repo": "https://github.com/kody-w/rappvision-tiny-bureau",
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "An investigative case file that proves a discrepancy while refusing an unsupported accusation."
+    },
+    {
+      "id": "kitchen-table-physics",
+      "name": "Kitchen Table Physics",
+      "url": "../rappvision-kitchen-table-physics/channel.json",
+      "repo": "https://github.com/kody-w/rappvision-kitchen-table-physics",
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "A paper-tabletop force experiment paired with a bounded simulator and explicit invalid-input rejection."
+    },
+    {
+      "id": "after-midnight-maps",
+      "name": "After Midnight Maps",
+      "url": "../rappvision-after-midnight-maps/channel.json",
+      "repo": "https://github.com/kody-w/rappvision-after-midnight-maps",
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "An ambient route essay paired with a movable waypoint, preserved alternative, invalid move, and exact reset."
+    },
+    {
+      "id": "patch-notes-tomorrow",
+      "name": "Patch Notes from Tomorrow",
+      "url": "../rappvision-patch-notes-tomorrow/channel.json",
+      "repo": "https://github.com/kody-w/rappvision-patch-notes-tomorrow",
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "A fictional future bulletin paired with two deterministic branches, comparison, and baseline restoration."
+    },
+    {
+      "id": "repair-manual",
+      "name": "The Repair Manual",
+      "url": "../rappvision-repair-manual/channel.json",
+      "repo": "https://github.com/kody-w/rappvision-repair-manual",
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "An exact-fit teardown film paired with inspect, near-match rejection, exact-part acceptance, restoration, and reset."
+    },
+    {
+      "id": "one-minute-orchestra",
+      "name": "One Minute Orchestra",
+      "url": "../rappvision-one-minute-orchestra/channel.json",
+      "repo": "https://github.com/kody-w/rappvision-one-minute-orchestra",
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "A square music performance paired with a noncanonical remix, locked source, rejected source edit, and exact reset."
+    },
+    {
+      "id": "creature-office-hours",
+      "name": "Creature Office Hours",
+      "url": "../rappvision-creature-office-hours/channel.json",
+      "repo": "https://github.com/kody-w/rappvision-creature-office-hours",
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "A synthetic nature film paired with feeding, reproduction, lineage inspection, impossible-trait rejection, and reset."
+    },
+    {
+      "id": "receipt-culture",
+      "name": "Receipt Culture",
+      "url": "../rappvision-receipt-culture/channel.json",
+      "repo": "https://github.com/kody-w/rappvision-receipt-culture",
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "An editorial provenance film paired with reveal, comparison, exact field identification, rejection, and reset."
     }
   ]
 }
