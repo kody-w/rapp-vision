@@ -107,14 +107,6 @@
       "_why": "Evidence-backed RappterBox experiments: exact prompts become visible worlds, institutions, languages, crises, and receipts. Static HyperFrames films and live title-card or app replays share one channel."
     },
     {
-      "id": "rappterbox",
-      "name": "RappterBox Experiments",
-      "url": "../rappvision-rappterbox/channel.json",
-      "repo": "https://github.com/kody-w/rappvision-rappterbox",
-      "legacy": "legacy-publications-2026-08-31",
-      "_why": "QC-approved films from bounded RappterBox experiments. Every static entry ships both MP4 and WebM sources, labels synthetic constructs, and preserves an evidence-first production trail."
-    },
-    {
       "id": "dada-collective",
       "name": "Dada Collective",
       "url": "dada/channel.json",
@@ -127,8 +119,8 @@
       "name": "Frame Chains",
       "url": "frame-chains/channel.json",
       "repo": "https://github.com/kody-w/frame-chains",
-      "legacy": "legacy-publications-2026-08-31",
-      "_why": "Ten public synthetic showcase apps replayed live from GitHub Pages, including focused adversarial proofs for branching, identity, provenance, and timeline integrity."
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "Five paired publications: newcomer-first encoded films plus live executable proofs covering ten synthetic Frame Chains worlds."
     }
   ]
 }

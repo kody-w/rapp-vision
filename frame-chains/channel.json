@@ -1,5 +1,5 @@
 {
-  "schema": "rapp-vision-channel/1.0",
+  "schema": "rapp-vision-channel/2.0",
   "id": "frame-chains",
   "name": "Frame Chains",
   "handle": "@kody-w",
@@ -18,23 +18,85 @@
   "videos": [
     {
       "id": "frame-chains-ten-frame-loop",
-      "title": "Frame Chains — The Ten-Frame Live Loop",
-      "description": "A public synthetic tour of all ten Frame Chains showcase apps. This entry contains no captured footage: RAPP Vision loads each live program from GitHub Pages and clicks its visible controls at replay time. The sequence moves from branching worlds and portable identity through colonies, constitutions, provenance, timeline attacks, and a futures museum.",
-      "published": "2026-08-30",
-      "duration": 576,
-      "width": 1280,
-      "height": 800,
+      "title": "Ten Impossible Worlds, One Verifiable History",
+      "description": "Start with the narrated film: it explains what each proof means and which visible outcome matters. Then switch to Try live replay to operate all ten current public programs yourself. Both modes use synthetic public state; no desktop capture or private source material is included.",
+      "published": "2026-08-31",
+      "duration": 105.4,
+      "width": 1920,
+      "height": 1080,
       "orientation": "landscape",
       "tags": [
         "frame-chains",
+        "paired-publication",
+        "encoded-video",
         "live-replay",
         "public-showcase",
         "synthetic"
       ],
       "thumb": "thumbs/frame-chains-ten-frame-loop.svg",
-      "sources": [],
+      "sources": [
+        {
+          "src": "media/frame-chains-ten-frame-loop.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "media/frame-chains-ten-frame-loop.webm",
+          "type": "video/webm"
+        }
+      ],
       "live": {
         "kind": "rapp-vision-live/1.0",
+        "duration": 576,
+        "chapters": [
+          {
+            "t": 0,
+            "label": "Live replay, not captured footage"
+          },
+          {
+            "t": 8,
+            "label": "01 · Many Worlds Mission Control"
+          },
+          {
+            "t": 64,
+            "label": "02 · AI Soul Passport"
+          },
+          {
+            "t": 120,
+            "label": "03 · Mars Colony"
+          },
+          {
+            "t": 176,
+            "label": "04 · Five Realities"
+          },
+          {
+            "t": 232,
+            "label": "05 · Causal Detective"
+          },
+          {
+            "t": 288,
+            "label": "06 · Space Station"
+          },
+          {
+            "t": 344,
+            "label": "07 · Constitution"
+          },
+          {
+            "t": 400,
+            "label": "08 · Teleporting Roguelike"
+          },
+          {
+            "t": 456,
+            "label": "09 · Attack the Timeline"
+          },
+          {
+            "t": 512,
+            "label": "10 · Futures Museum"
+          },
+          {
+            "t": 568,
+            "label": "Take the wheel"
+          }
+        ],
         "scenes": [
           {
             "t": 0,
@@ -369,73 +431,95 @@
       "chapters": [
         {
           "t": 0,
-          "label": "Live replay, not captured footage"
+          "label": "Why film and replay travel together"
         },
         {
-          "t": 8,
-          "label": "01 · Many Worlds Mission Control"
+          "t": 10.731,
+          "label": "Identity carries its history"
         },
         {
-          "t": 64,
-          "label": "02 · AI Soul Passport"
+          "t": 21.974,
+          "label": "Correct hash, wrong repair"
         },
         {
-          "t": 120,
-          "label": "03 · Mars Colony"
+          "t": 32.619,
+          "label": "Five realities, one source"
         },
         {
-          "t": 176,
-          "label": "04 · Five Realities"
+          "t": 42.219,
+          "label": "Cryptography is not causality"
         },
         {
-          "t": 232,
-          "label": "05 · Causal Detective"
+          "t": 52.971,
+          "label": "Preserve the disagreement"
         },
         {
-          "t": 288,
-          "label": "06 · Space Station"
+          "t": 63.083,
+          "label": "Law that executes"
         },
         {
-          "t": 344,
-          "label": "07 · Constitution"
+          "t": 72.576,
+          "label": "State, not pixels"
         },
         {
-          "t": 400,
-          "label": "08 · Teleporting Roguelike"
+          "t": 83.797,
+          "label": "Attack every boundary"
         },
         {
-          "t": 456,
-          "label": "09 · Attack the Timeline"
-        },
-        {
-          "t": 512,
-          "label": "10 · Futures Museum"
-        },
-        {
-          "t": 568,
-          "label": "Take the wheel"
+          "t": 94.976,
+          "label": "Film plus proof"
         }
       ]
     },
     {
       "id": "many-worlds-mission-control",
       "title": "Many Worlds Mission Control — Parent-Hash Challenge",
-      "description": "A focused live run of the public synthetic Many Worlds app. The guided sequence builds and verifies a branch; the second selector-based action mutates its parent hash so the app can demonstrate rejection. This is an executable replay over the current GitHub Pages program, not captured desktop footage.",
-      "published": "2026-08-30",
-      "duration": 88,
-      "width": 1280,
-      "height": 800,
+      "description": "The default film explains why parent provenance matters, shows the valid branch construction, and lands on the isolated Rescue SABLE-2 rejection. Try live replay then runs the current public app so the viewer can inspect and interrupt the same proof.",
+      "published": "2026-08-31",
+      "duration": 14.3,
+      "width": 1920,
+      "height": 1080,
       "orientation": "landscape",
       "tags": [
         "frame-chains",
+        "paired-publication",
+        "encoded-video",
         "live-replay",
         "many-worlds",
         "integrity"
       ],
       "thumb": "thumbs/many-worlds-mission-control.svg",
-      "sources": [],
+      "sources": [
+        {
+          "src": "media/many-worlds-mission-control.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "media/many-worlds-mission-control.webm",
+          "type": "video/webm"
+        }
+      ],
       "live": {
         "kind": "rapp-vision-live/1.0",
+        "duration": 88,
+        "chapters": [
+          {
+            "t": 0,
+            "label": "What a live proof replay is"
+          },
+          {
+            "t": 8,
+            "label": "Guided branch construction"
+          },
+          {
+            "t": 52,
+            "label": "Parent-hash mutation"
+          },
+          {
+            "t": 80,
+            "label": "Inspect the result"
+          }
+        ],
         "scenes": [
           {
             "t": 0,
@@ -485,41 +569,63 @@
       "chapters": [
         {
           "t": 0,
-          "label": "What a live proof replay is"
+          "label": "Understand the parent-hash proof"
         },
         {
-          "t": 8,
-          "label": "Guided branch construction"
-        },
-        {
-          "t": 52,
-          "label": "Parent-hash mutation"
-        },
-        {
-          "t": 80,
-          "label": "Inspect the result"
+          "t": 10.731,
+          "label": "Take the controls"
         }
       ]
     },
     {
       "id": "ai-soul-passport",
       "title": "AI Soul Passport — Identity Migration and Counterfeit Rejection",
-      "description": "A public synthetic identity crosses a boundary while retaining its verifiable history. After the guided migration settles, RAPP Vision creates a counterfeit and invokes the independent clone verifier so the live app shows why the forged passport fails. The entry is a programmatic replay with no captured footage or private identity data.",
-      "published": "2026-08-30",
-      "duration": 88,
-      "width": 1280,
-      "height": 800,
+      "description": "The default film introduces history-backed identity, follows one synthetic migration, and shows the counterfeit reaching REJECTED while the accepted head remains intact. Try live replay exposes the complete current migration and verifier controls.",
+      "published": "2026-08-31",
+      "duration": 18.3,
+      "width": 1920,
+      "height": 1080,
       "orientation": "landscape",
       "tags": [
         "frame-chains",
+        "paired-publication",
+        "encoded-video",
         "live-replay",
         "identity",
         "counterfeit-rejection"
       ],
       "thumb": "thumbs/ai-soul-passport.svg",
-      "sources": [],
+      "sources": [
+        {
+          "src": "media/ai-soul-passport.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "media/ai-soul-passport.webm",
+          "type": "video/webm"
+        }
+      ],
       "live": {
         "kind": "rapp-vision-live/1.0",
+        "duration": 88,
+        "chapters": [
+          {
+            "t": 0,
+            "label": "A live synthetic identity"
+          },
+          {
+            "t": 8,
+            "label": "Guided identity migration"
+          },
+          {
+            "t": 52,
+            "label": "Counterfeit rejection"
+          },
+          {
+            "t": 80,
+            "label": "Continuity over appearance"
+          }
+        ],
         "scenes": [
           {
             "t": 0,
@@ -574,41 +680,71 @@
       "chapters": [
         {
           "t": 0,
-          "label": "A live synthetic identity"
+          "label": "Why film and replay are paired"
         },
         {
-          "t": 8,
-          "label": "Guided identity migration"
+          "t": 3.5,
+          "label": "Identity migration and counterfeit rejection"
         },
         {
-          "t": 52,
-          "label": "Counterfeit rejection"
-        },
-        {
-          "t": 80,
-          "label": "Continuity over appearance"
+          "t": 14.743,
+          "label": "Try the live proof"
         }
       ]
     },
     {
       "id": "teleporting-roguelike",
       "title": "Teleporting Roguelike — Inventory and Provenance Proof",
-      "description": "The complete public synthetic roguelike proof runs in the live app before two adversarial checks. One action forges an inventory item; the next forges its parent provenance. Both use visible selector-addressed controls, giving the running program time to reject state that cannot prove where it came from. No gameplay footage is stored in this channel.",
-      "published": "2026-08-30",
-      "duration": 112,
-      "width": 1280,
-      "height": 800,
+      "description": "The default film explains portable game state, shows the dungeon arriving on Device B, and lands on inventory and parent-provenance refusal. Try live replay runs the full current proof and lets the viewer take the controls.",
+      "published": "2026-08-31",
+      "duration": 18.3,
+      "width": 1920,
+      "height": 1080,
       "orientation": "landscape",
       "tags": [
         "frame-chains",
+        "paired-publication",
+        "encoded-video",
         "live-replay",
         "roguelike",
         "provenance"
       ],
       "thumb": "thumbs/teleporting-roguelike.svg",
-      "sources": [],
+      "sources": [
+        {
+          "src": "media/teleporting-roguelike.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "media/teleporting-roguelike.webm",
+          "type": "video/webm"
+        }
+      ],
       "live": {
         "kind": "rapp-vision-live/1.0",
+        "duration": 112,
+        "chapters": [
+          {
+            "t": 0,
+            "label": "Why this is a live program"
+          },
+          {
+            "t": 8,
+            "label": "Full guided teleport proof"
+          },
+          {
+            "t": 64,
+            "label": "Forged inventory rejection"
+          },
+          {
+            "t": 80,
+            "label": "Forged parent provenance rejection"
+          },
+          {
+            "t": 104,
+            "label": "The provenance result"
+          }
+        ],
         "scenes": [
           {
             "t": 0,
@@ -663,45 +799,71 @@
       "chapters": [
         {
           "t": 0,
-          "label": "Why this is a live program"
+          "label": "Why film and replay are paired"
         },
         {
-          "t": 8,
-          "label": "Full guided teleport proof"
+          "t": 3.5,
+          "label": "State transfer and provenance rejection"
         },
         {
-          "t": 64,
-          "label": "Forged inventory rejection"
-        },
-        {
-          "t": 80,
-          "label": "Forged parent provenance rejection"
-        },
-        {
-          "t": 104,
-          "label": "The provenance result"
+          "t": 14.721,
+          "label": "Try the live proof"
         }
       ]
     },
     {
       "id": "attack-the-timeline",
       "title": "Attack the Timeline — Control, Attack All, Replay",
-      "description": "A live adversarial sequence over the public synthetic timeline app. The control run establishes the baseline, Attack All challenges every branch, and Replay reconstructs the evidence. RAPP Vision performs only selector-based clicks against the current GitHub Pages program; this channel stores no desktop recording.",
-      "published": "2026-08-30",
-      "duration": 112,
-      "width": 1280,
-      "height": 800,
+      "description": "The default film establishes the accepted control, walks through nine exact red boundaries, and ends on the reconstructed rejection receipt. Try live replay operates the current public attack lab and exposes every detector.",
+      "published": "2026-08-31",
+      "duration": 18.3,
+      "width": 1920,
+      "height": 1080,
       "orientation": "landscape",
       "tags": [
         "frame-chains",
+        "paired-publication",
+        "encoded-video",
         "live-replay",
         "timeline",
         "adversarial-proof"
       ],
       "thumb": "thumbs/attack-the-timeline.svg",
-      "sources": [],
+      "sources": [
+        {
+          "src": "media/attack-the-timeline.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "media/attack-the-timeline.webm",
+          "type": "video/webm"
+        }
+      ],
       "live": {
         "kind": "rapp-vision-live/1.0",
+        "duration": 112,
+        "chapters": [
+          {
+            "t": 0,
+            "label": "The live adversarial plan"
+          },
+          {
+            "t": 8,
+            "label": "Control run"
+          },
+          {
+            "t": 46,
+            "label": "Attack every branch"
+          },
+          {
+            "t": 78,
+            "label": "Replay the evidence"
+          },
+          {
+            "t": 104,
+            "label": "The replay receipt"
+          }
+        ],
         "scenes": [
           {
             "t": 0,
@@ -756,23 +918,15 @@
       "chapters": [
         {
           "t": 0,
-          "label": "The live adversarial plan"
+          "label": "Why film and replay are paired"
         },
         {
-          "t": 8,
-          "label": "Control run"
+          "t": 3.5,
+          "label": "Nine attacks and their red boundaries"
         },
         {
-          "t": 46,
-          "label": "Attack every branch"
-        },
-        {
-          "t": 78,
-          "label": "Replay the evidence"
-        },
-        {
-          "t": 104,
-          "label": "The replay receipt"
+          "t": 14.679,
+          "label": "Try the live proof"
         }
       ]
     }

@@ -53,12 +53,18 @@ automation branches and open review-ready pull requests. See
 
 | Channel | | What it is |
 |---|---|---|
+| **Frame Chains** | ⛓️ | The first current-contract channel: five paired publications combining newcomer-first encoded films with live executable proofs across ten synthetic worlds. |
 | **Rooms** | 🕯️ | Nine ambient places that do not exist — a canoe at dawn, a cabin under the aurora, a cave lit by larvae. Slow TV where the rain is simulated, so it never falls the same way twice. |
 | **Arcade** | 🕹️ | Games and emulators, booted cold and played live. Including one entry that stops scripting halfway through and hands you the keyboard. |
 | **The Workbench** | 🛠️ | A DAW, a vector editor, a spreadsheet, an 808 — driven live. A product demo you can interrupt is a different object from one you watch. |
 | **OpenRappter Training** | 🦖 | Eight grandfathered card-replay modules on a sibling project, built only from commands that were actually run. |
 | **Rock Tumbler** | 🪨 | Three grandfathered encoded videos about ten apps built by AI sub-agents. |
 | **Local First Tools** · **Learn with Kody** · **Catch-up** · **Field Notes** | | The rest of the network. |
+
+`rappterbox` is temporarily absent from the default registry because its
+`genesis-251-founding-four-draft` publication changed after the legacy digest
+was frozen. Its repository remains public; migration to a paired v2 publication
+is tracked in [rappvision-rappterbox#3](https://github.com/kody-w/rappvision-rappterbox/issues/3).
 
 The three app-driving channels come to 57 KB of JSON, and drive 31 scenes across 26
 of the apps in the neighbouring repo. (Plus 0.9 MB of poster images — which any

@@ -6,7 +6,9 @@ import json
 import re
 import subprocess
 import sys
+import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 from urllib.parse import urljoin
 
@@ -375,8 +377,8 @@ class TestPublicationPolicy(unittest.TestCase):
         self.assertEqual(scene["actions"]["type"], "array")
 
     def test_frozen_legacy_identity_source_and_content_are_all_required(self):
-        legacy = load(ROOT / "frame-chains" / "channel.json")
-        canonical = "https://kody-w.github.io/rapp-vision/frame-chains/channel.json"
+        legacy = load(ROOT / "channel.json")
+        canonical = "https://kody-w.github.io/rapp-vision/channel.json"
         self.assertEqual(self.validate(legacy, canonical), [])
         replaced = copy.deepcopy(legacy)
         replaced["videos"][0]["title"] = "Arbitrary replacement"
@@ -420,29 +422,67 @@ class TestPublicationPolicy(unittest.TestCase):
                     del channel["videos"][0]["live"]
                 self.assertTrue(self.validate(channel))
 
-    def test_default_registry_is_fully_and_explicitly_frozen(self):
+    def test_default_registry_declares_legacy_or_current_contract(self):
         registry = load(ROOT / "channels.json")
         base = self.policy["registry_base"]
         for entry in registry["channels"]:
             with self.subTest(channel=entry["id"]):
-                self.assertEqual(entry.get("legacy"), self.policy["id"])
-                self.assertIsNotNone(
-                    VALIDATOR.legacy_record(
-                        self.policy,
-                        entry["id"],
-                        urljoin(base, entry["url"]),
-                    )
-                )
                 record = VALIDATOR.legacy_record(
                     self.policy,
                     entry["id"],
                     urljoin(base, entry["url"]),
                 )
-                self.assertTrue(all(
-                    isinstance(publication, dict)
-                    and re.fullmatch(r"[0-9a-f]{64}", publication.get("sha256", ""))
-                    for publication in record["publications"]
-                ))
+                if entry.get("legacy") is not None:
+                    self.assertEqual(entry["legacy"], self.policy["id"])
+                    self.assertIsNotNone(record)
+                    self.assertTrue(all(
+                        isinstance(publication, dict)
+                        and re.fullmatch(r"[0-9a-f]{64}", publication.get("sha256", ""))
+                        for publication in record["publications"]
+                    ))
+                else:
+                    self.assertEqual(entry.get("contract"), VALIDATOR.CURRENT_SCHEMA)
+                    local = ROOT / entry["url"]
+                    if local.is_file():
+                        self.assertEqual(
+                            load(local).get("schema"),
+                            VALIDATOR.CURRENT_SCHEMA,
+                        )
+
+    def test_frozen_channel_can_upgrade_to_current_contract(self):
+        registry = {
+            "channels": [{
+                "id": "frame-chains",
+                "url": "frame-chains/channel.json",
+                "contract": VALIDATOR.CURRENT_SCHEMA,
+            }]
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            registry_path = root / "channels.json"
+            registry_path.write_text(json.dumps(registry), encoding="utf-8")
+            policy = copy.deepcopy(self.policy)
+            policy["registry_base"] = registry_path.resolve().as_uri()
+            policy["channels"] = [{
+                "id": "frame-chains",
+                "source": urljoin(
+                    policy["registry_base"],
+                    "frame-chains/channel.json",
+                ),
+                "publications": [{
+                    "id": "legacy-video",
+                    "sha256": "0" * 64,
+                }],
+            }]
+            with mock.patch.object(
+                VALIDATOR,
+                "fetch_json",
+                return_value={**self.valid, "id": "frame-chains"},
+            ):
+                self.assertEqual(
+                    VALIDATOR.validate_registry(registry_path, policy),
+                    [],
+                )
 
     def test_git_baseline_rejects_legacy_expansion_and_digest_self_authorization(self):
         video = {"id": "old-video", "title": "Original"}

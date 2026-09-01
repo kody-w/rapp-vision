@@ -796,14 +796,13 @@ def validate_registry(
             continue
         canonical = urljoin(base, raw_url)
         record = legacy_record(policy, entry.get("id"), canonical)
-        if entry.get("legacy") is not None:
+        is_legacy_entry = entry.get("legacy") is not None
+        if is_legacy_entry:
             if entry.get("legacy") != policy_id:
                 errors.append(f"{path}.legacy: must equal the frozen policy id {policy_id!r}")
             if not record:
                 errors.append(f"{path}: legacy marker does not match a frozen id and canonical source")
         else:
-            if record:
-                errors.append(f"{path}: frozen legacy entry must declare its legacy policy id")
             if entry.get("contract") != CURRENT_SCHEMA:
                 errors.append(f"{path}.contract: new registry entries must declare {CURRENT_SCHEMA!r}")
 
@@ -818,6 +817,11 @@ def validate_registry(
             except Exception as exc:  # deterministic message, no traceback
                 errors.append(f"{path}: could not load {canonical}: {exc}")
                 continue
+        expected_schema = LEGACY_SCHEMA if is_legacy_entry else CURRENT_SCHEMA
+        if channel.get("schema") != expected_schema:
+            errors.append(
+                f"{path}: registry declaration requires channel schema {expected_schema!r}"
+            )
         errors.extend(validate_registry_channel_identity(entry, channel, resolved_ids, path))
         channel_errors = validate_channel(channel, canonical, policy)
         errors.extend(f"{path} -> {error}" for error in channel_errors)
