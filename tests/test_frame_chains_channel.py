@@ -152,8 +152,6 @@ class TestFrameChainsChannel(unittest.TestCase):
                 ),
             }],
         )
-        self.assertEqual(registry["channels"][-1]["id"], "frame-chains")
-
     def test_every_entry_is_a_landscape_paired_publication(self):
         for video in self.videos.values():
             with self.subTest(video=video["id"]):

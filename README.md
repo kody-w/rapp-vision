@@ -53,6 +53,7 @@ automation branches and open review-ready pull requests. See
 
 | Channel | | What it is |
 |---|---|---|
+| **Oil Field season** | 🛢️ | Ten independent current-contract channels spanning botanical documentary, portrait gameplay, investigation, physics, cartography, future news, repair, music, synthetic nature, and criticism. Every film teaches first; every replay exposes a positive path, visible failure, and reset. |
 | **Frame Chains** | ⛓️ | The first current-contract channel: five paired publications combining newcomer-first encoded films with live executable proofs across ten synthetic worlds. |
 | **Rooms** | 🕯️ | Nine ambient places that do not exist — a canoe at dawn, a cabin under the aurora, a cave lit by larvae. Slow TV where the rain is simulated, so it never falls the same way twice. |
 | **Arcade** | 🕹️ | Games and emulators, booted cold and played live. Including one entry that stops scripting halfway through and hands you the keyboard. |
@@ -60,6 +61,12 @@ automation branches and open review-ready pull requests. See
 | **OpenRappter Training** | 🦖 | Eight grandfathered card-replay modules on a sibling project, built only from commands that were actually run. |
 | **Rock Tumbler** | 🪨 | Three grandfathered encoded videos about ten apps built by AI sub-agents. |
 | **Local First Tools** · **Learn with Kody** · **Catch-up** · **Field Notes** | | The rest of the network. |
+
+The Oil Field channels are separate `rappvision-*` repositories, so following
+the `kody-w` GitHub account discovers them automatically even without the
+default registry. Their complete worker and repair histories are preserved in
+a private no-squash integration archive; only privacy-checked channel
+artifacts are public.
 
 `rappterbox` is temporarily absent from the default registry because its
 `genesis-251-founding-four-draft` publication changed after the legacy digest
