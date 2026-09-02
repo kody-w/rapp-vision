@@ -99,11 +99,11 @@
     }
 
     .sample p {
-      max-width: 24ch;
+      max-width: 58ch;
       margin: 0;
-      font-size: clamp(1.25rem, 4vw, 2.1rem);
-      font-weight: 700;
-      line-height: 1.28;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
     }
 
     .sample small {
@@ -267,14 +267,14 @@
     </header>
 
     <section id="accepted-sample" class="sample" aria-labelledby="sample-heading">
-      <p id="sample-heading">Readable text survives exactly at the acceptance boundary.</p>
+      <p id="sample-heading">This normal-size text uses an integer sRGB pair computed on the passing side of the threshold.</p>
       <small id="palette-name">Opening pair</small>
     </section>
 
     <div class="meter" aria-label="Contrast ratio threshold meter">
-      <span class="meter-label">4.49 reject</span>
+      <span class="meter-label">4.48 reject</span>
       <span class="meter-track" aria-hidden="true"></span>
-      <span class="meter-label">4.50 pass</span>
+      <span class="meter-label">4.54 pass</span>
     </div>
 
     <div class="readout-grid">
@@ -285,18 +285,18 @@
       </section>
       <section id="rejection-panel" class="readout" aria-labelledby="rejected-heading" hidden>
         <h2 id="rejected-heading">Rejected candidate</h2>
-        <strong id="rejected-ratio">4.49:1</strong>
+        <strong id="rejected-ratio">4.48:1</strong>
         <span>The active accepted pair did not change.</span>
       </section>
     </div>
 
     <div class="controls" aria-label="Contrast tests">
-      <button id="apply-boundary-btn" type="button" data-action="APPLY_BOUNDARY">Apply 4.50 boundary</button>
-      <button id="apply-near-miss-btn" type="button" data-action="APPLY_NEAR_MISS">Try 4.49 near miss</button>
+      <button id="apply-boundary-btn" type="button" data-action="APPLY_BOUNDARY">Apply #767676 pass</button>
+      <button id="apply-near-miss-btn" type="button" data-action="APPLY_NEAR_MISS">Try #777777 fail</button>
       <button id="reset-btn" type="button" data-action="RESET" data-reset="exact">Reset exactly</button>
     </div>
 
-    <p class="formula">WCAG ratio = (lighter relative luminance + 0.05) ÷ (darker relative luminance + 0.05). Decimal sRGB channels locate both sides of the boundary without rounding the input color.</p>
+    <p class="formula">WCAG ratio = (lighter relative luminance + 0.05) ÷ (darker relative luminance + 0.05). Neighboring 8-bit gray values #767676 and #777777 compute on opposite sides of 4.50:1.</p>
   </main>
 
   <script type="application/json" id="contract-states">
@@ -304,26 +304,26 @@
   "positive": {
     "accepted": {
       "key": "boundary",
-      "foreground": "rgb(118.656357 118.656357 118.656357)",
+      "foreground": "rgb(118 118 118)",
       "background": "rgb(255 255 255)",
-      "ratio": 4.5
+      "ratio": 4.54
     },
     "status": "accepted",
-    "message": "Boundary pair accepted at 4.50:1.",
+    "message": "#767676 accepted at 4.54:1.",
     "rejected": null
   },
   "rejected": {
     "accepted": {
       "key": "boundary",
-      "foreground": "rgb(118.656357 118.656357 118.656357)",
+      "foreground": "rgb(118 118 118)",
       "background": "rgb(255 255 255)",
-      "ratio": 4.5
+      "ratio": 4.54
     },
     "status": "rejected",
-    "message": "Near miss rejected at 4.49:1; accepted pair remains 4.50:1.",
+    "message": "#777777 rejected at 4.48:1; accepted pair remains 4.54:1.",
     "rejected": {
       "key": "near-miss",
-      "ratio": 4.49
+      "ratio": 4.48
     }
   },
   "reset": {
@@ -389,8 +389,8 @@
         background: "rgb(255 255 255)",
         ratio: Number(contrastRatio([0, 0, 0], [255, 255, 255]).toFixed(2))
       }),
-      boundary: grayPair("boundary", 118.656357),
-      nearMiss: grayPair("near-miss", 118.812934)
+      boundary: grayPair("boundary", 118),
+      nearMiss: grayPair("near-miss", 119)
     });
 
     function freezeState(value) {
@@ -421,7 +421,7 @@
           return freezeState({
             accepted: candidate,
             status: "accepted",
-            message: "Boundary pair accepted at 4.50:1.",
+            message: "#767676 accepted at 4.54:1.",
             rejected: null
           });
         }
@@ -433,7 +433,7 @@
           return freezeState({
             accepted: state.accepted,
             status: "rejected",
-            message: `Near miss rejected at 4.49:1; accepted pair remains ${state.accepted.ratio.toFixed(2)}:1.`,
+            message: `#777777 rejected at 4.48:1; accepted pair remains ${state.accepted.ratio.toFixed(2)}:1.`,
             rejected: {
               key: candidate.key,
               ratio: candidate.ratio

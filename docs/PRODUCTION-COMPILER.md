@@ -56,6 +56,18 @@ python scripts/compile_publications.py build . --ffmpeg ffmpeg.exe --ffprobe ffp
 
 Generated JSON is UTF-8, sorted, indented with two spaces, and LF-terminated.
 It contains no timestamps, tool versions, or generated identifiers.
+Both encoders run single-threaded with bit-exact muxer and codec flags, and
+VP9 row-level threading is disabled. Repeated builds are byte-stable with the
+same FFmpeg build and inputs; codec bytes are not promised across FFmpeg
+versions. Both outputs explicitly declare BT.709 primaries, transfer, matrix,
+and limited range; at most the first optional audio stream is carried.
+
+Before encoding, the build probes each master. Untagged RGB masters are treated
+as display-referred RGB and converted through FFmpeg's BT.709 matrix and
+limited-range transform. YUV masters must already declare BT.709 primaries,
+transfer, and matrix (full or limited range); other or unknown YUV color
+descriptions are rejected rather than relabelled. Output probes verify every
+BT.709 field after encoding.
 
 ## Path and failure safety
 
@@ -64,9 +76,18 @@ backslash-containing, control-character, encoded-separator (`%2F`/`%5C`), and
 escaping paths are rejected. Resolving a symlink outside the source directory
 is also rejected.
 
+Generated paths are checked with conservative case-insensitive filesystem
+semantics. Publication ids that collide by case, map to reserved Windows
+device names, or would make an output replace the production source or any
+master are rejected before encoding.
+
 Encoding and probing happen under `.rapp-vision-production-stage`. Nothing is
 published until both formats for every publication pass their codec probes.
 On an encoding, probe, or publish failure, staging files are removed, newly
 installed media is rolled back, and the previous `channel.json` remains
-untouched. A successful build atomically installs `channel.json` only after all
-media pairs are in place.
+untouched. If a rollback itself fails, the staging directory and its recovery
+copies are deliberately preserved and their path is printed. A successful
+build atomically installs `channel.json` only after all media pairs are in
+place. Every destination, including `channel.json`, is backed up and registered
+as potentially replaced before the OS rename starts, so an interrupt delivered
+immediately after a completed rename is still recoverable.

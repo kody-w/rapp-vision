@@ -349,13 +349,13 @@ def _render_contrast(spec: RenderSpec, frame_index: int) -> bytes:
     canvas.text(48, 84, "TO ONE", (22, 22, 22), 5)
 
     if progress < 0.34:
-        ratio = "4.50:1"
-        label = "BOUNDARY / PASS"
-        foreground = (119, 119, 119)
+        ratio = "#767676 / 4.54:1"
+        label = "SOURCE PAIR / PASS"
+        foreground = (118, 118, 118)
         decision = (31, 122, 77)
     elif progress < 0.78:
-        ratio = "4.49:1"
-        label = "NEAR MISS / REJECT"
+        ratio = "#777777 / 4.48:1"
+        label = "SOURCE PAIR / REJECT"
         foreground = (119, 119, 119)
         decision = (156, 32, 39)
     else:
@@ -366,9 +366,9 @@ def _render_contrast(spec: RenderSpec, frame_index: int) -> bytes:
 
     canvas.rect(48, 150, 624, 292, (22, 22, 22))
     canvas.rect(54, 156, 612, 280, (255, 255, 255))
-    canvas.text(84, 206, "READABLE TEXT", foreground, 5)
-    canvas.text(84, 266, "AT THE EXACT", foreground, 4)
-    canvas.text(84, 316, "BOUNDARY", foreground, 5)
+    canvas.text(84, 206, "NORMAL TEXT", foreground, 5)
+    canvas.text(84, 266, "CROSSES THE", foreground, 4)
+    canvas.text(84, 316, "4.50 THRESHOLD", foreground, 4)
     canvas.rect(84, 382, 430, 4, foreground)
 
     canvas.rect(48, 474, 624, 92, decision)
@@ -530,10 +530,10 @@ def thumbnail_svg(spec: RenderSpec) -> str:
   <text x="48" y="132" fill="#161616" font-family="sans-serif" font-size="58" font-weight="900">TO ONE</text>
   <rect x="48" y="168" width="624" height="294" fill="#161616"/>
   <rect x="55" y="175" width="610" height="280" fill="#fff"/>
-  <text x="86" y="263" fill="rgb(118.656357 118.656357 118.656357)" font-family="sans-serif" font-size="46" font-weight="800">READABLE TEXT</text>
-  <text x="86" y="326" fill="rgb(118.656357 118.656357 118.656357)" font-family="sans-serif" font-size="46" font-weight="800">AT 4.50:1</text>
+  <text x="86" y="263" fill="#767676" font-family="sans-serif" font-size="38">NORMAL TEXT</text>
+  <text x="86" y="326" fill="#767676" font-family="sans-serif" font-size="38">#767676 = 4.54:1</text>
   <rect x="48" y="492" width="624" height="94" fill="#1f7a4d"/>
-  <text x="76" y="550" fill="#fff" font-family="sans-serif" font-size="29" font-weight="800">BOUNDARY / PASS</text>
+  <text x="76" y="550" fill="#fff" font-family="sans-serif" font-size="29" font-weight="800">4.54 PASS / 4.48 REJECT</text>
   <path d="M48 633H672" stroke="#161616" stroke-width="5"/>
   <rect x="48" y="620" width="312" height="28" fill="#d64045"/>
   <rect x="360" y="620" width="312" height="28" fill="#1f7a4d"/>

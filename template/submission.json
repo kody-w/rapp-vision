@@ -1,18 +1,18 @@
 {
-  "$schema": "../submission.schema.json",
+  "$schema": "submission.schema.json",
   "schema": "rapp-vision-submission/1.0",
-  "id": "offline-field-log-submission",
+  "id": "REPLACE_SUBMISSION_ID",
   "phase": "submitted",
-  "commission_id": "use-offline-field-log",
+  "commission_id": "REPLACE_COMMISSION_ID",
   "creator": {
-    "id": "github-your-handle",
-    "display_name": "Your public display name",
-    "profile": "https://github.com/your-handle"
+    "id": "REPLACE_CREATOR_ID",
+    "display_name": "REPLACE creator display name",
+    "github_user_id": 0,
+    "profile": "https://github.com/REPLACE"
   },
   "pull_request": {
     "repository": "https://github.com/kody-w/rapp-vision",
-    "number": 1,
-    "head_ref": "creator/offline-field-log"
+    "head_ref": "REPLACE_HEAD_REF"
   },
   "claim": {
     "effect": "coordination-only",
@@ -20,61 +20,61 @@
     "note": "This claim coordinates work on the commission and does not reserve publication or default-registry placement."
   },
   "artifact": {
-    "repository": "https://github.com/your-handle/rappvision-offline-field-log",
+    "repository": "https://github.com/REPLACE/REPLACE_REPOSITORY",
     "path": "channel.json",
-    "publication_id": "offline-field-log",
-    "commit": "1111111111111111111111111111111111111111",
-    "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+    "publication_id": "REPLACE_PUBLICATION_ID",
+    "commit": "REPLACE_COMMIT",
+    "sha256": "REPLACE_CHANNEL_SHA256",
     "digest_scope": "raw-file-bytes"
   },
   "deliverables": {
     "mp4": {
-      "path": "media/offline-field-log.mp4",
-      "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+      "path": "media/REPLACE_PUBLICATION_ID.mp4",
+      "sha256": "REPLACE_MP4_SHA256"
     },
     "webm": {
-      "path": "media/offline-field-log.webm",
-      "sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+      "path": "media/REPLACE_PUBLICATION_ID.webm",
+      "sha256": "REPLACE_WEBM_SHA256"
     },
     "live": {
       "channel_path": "channel.json",
-      "publication_id": "offline-field-log",
+      "publication_id": "REPLACE_PUBLICATION_ID",
       "kind": "rapp-vision-live/1.0"
     }
   },
   "evidence": {
     "objective_evidence": {
-      "criterion": "State the commission's measurable pass condition verbatim.",
-      "observed": "Record the measured result, units, tolerance, and whether it passed.",
-      "evidence_path": "evidence/objective-result.json"
+      "criterion": "REPLACE with the commission's measurable pass condition.",
+      "observed": "REPLACE with the measured result, units, tolerance, and verdict.",
+      "evidence_path": "REPLACE_EVIDENCE_PATH"
     },
     "positive_path": {
-      "description": "Describe the successful path that the replay visibly completes.",
+      "description": "REPLACE with the successful path visibly completed by the replay.",
       "live_scene_t": 6
     },
     "visible_failure": {
-      "description": "Describe the intentional failure and the visible state proving it occurred.",
+      "description": "REPLACE with the intentional failure and its visible state.",
       "live_scene_t": 18
     },
     "exact_reset": {
       "steps": [
-        "Name the exact reset control or command.",
-        "List every follow-up input needed to restore the opening fixture."
+        "REPLACE with the exact reset control or command.",
+        "REPLACE with every input needed to restore the opening fixture."
       ],
-      "restored_state": "Name the values, selection, seed, clock, and persisted state that match the opening state.",
+      "restored_state": "REPLACE with the values, selection, seed, clock, and persistence that match the opening state.",
       "live_scene_t": 28
     }
   },
   "attestations": {
     "rights": {
-      "attested": true,
-      "statement": "I have the right to publish and redistribute every submitted code, media, font, sound, image, and data asset."
+      "attested": false,
+      "statement": "REPLACE after verifying rights to every submitted asset."
     },
     "privacy": {
-      "attested": true,
-      "statement": "I checked the artifact and recordings for personal data, private locations, credentials, tokens, and unconsented likenesses."
+      "attested": false,
+      "statement": "REPLACE after completing the privacy review."
     },
-    "no_secrets": true
+    "no_secrets": false
   },
   "review_request": {
     "minimum_approvals": 2,
@@ -85,18 +85,16 @@
     "independent_reviewers": true,
     "reviews": [
       {
-        "role": "technical",
-        "reviewer": "github-technical-reviewer"
+        "role": "technical"
       },
       {
-        "role": "curation",
-        "reviewer": "github-curation-reviewer"
+        "role": "curation"
       }
     ]
   },
   "_replace": [
-    "Replace every example identity, repository, pull request, path, commit, digest, measurement, replay time, statement, and reviewer before marking the pull request ready.",
+    "Replace every REPLACE sentinel and zero GitHub user id, add the assigned pull request number after GitHub creates it, and explicitly attest rights, privacy, and secret review before marking the pull request ready.",
     "The artifact commit is the immutable commit containing the reviewed channel and deliverables; the manifest may be added in a later pull-request commit.",
-    "Do not add a creator-authored approval, quality pass, or default-registry listing field."
+    "Run the submission validator; do not add a creator-authored approval, quality pass, or default-registry listing field."
   ]
 }

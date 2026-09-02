@@ -754,6 +754,24 @@ class EditorialReviewTests(unittest.TestCase):
             rm.record_fingerprint(annotated),
         )
 
+    def test_fingerprint_normalizes_javascript_number_semantics(self):
+        self.assertEqual(
+            rm.record_fingerprint({"duration": 10}),
+            rm.record_fingerprint({"duration": 10.0}),
+        )
+        self.assertEqual(
+            rm.record_fingerprint({"value": 0}),
+            rm.record_fingerprint({"value": -0.0}),
+        )
+        self.assertNotEqual(
+            rm.record_fingerprint({"value": 1e-7}),
+            rm.record_fingerprint({"value": 1e-8}),
+        )
+        self.assertEqual(
+            rm.record_fingerprint({"value": "\ud800", "\udfff": "key"}),
+            rm.record_fingerprint({"value": "\ufffd", "\ufffd": "key"}),
+        )
+
     def test_rendered_note_is_marked_attributed_and_stable(self):
         review = rm.editorial_review(self.GOOD)
         body = rm.render_editorial("alpha/showcase", review)

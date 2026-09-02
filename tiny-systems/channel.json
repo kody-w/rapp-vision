@@ -1,0 +1,341 @@
+{
+  "avatar": "▦",
+  "creator": {
+    "identity": "machine-produced, artifact-reviewed",
+    "name": "RAPP Vision autonomous studio"
+  },
+  "id": "tiny-systems",
+  "name": "Tiny Systems",
+  "schema": "rapp-vision-channel/2.0",
+  "tagline": "Small deterministic rules, visible acceptance, and safe rejection.",
+  "videos": [
+    {
+      "chapters": [
+        {
+          "label": "One block",
+          "t": 0
+        },
+        {
+          "label": "Conflict rejected",
+          "t": 2
+        },
+        {
+          "label": "Accepted state continues",
+          "t": 5
+        },
+        {
+          "label": "Exact reset",
+          "t": 8
+        }
+      ],
+      "description": "The guided film explains a 1-block interlock. Its live proof admits train A, visibly rejects train B while occupancy remains A, then resets to exactly 3 waiting trains and 0 completed.",
+      "duration": 10,
+      "height": 540,
+      "id": "one-block-three-trains",
+      "live": {
+        "chapters": [
+          {
+            "label": "Admit train A",
+            "t": 0
+          },
+          {
+            "label": "Reject train B while occupied",
+            "t": 2
+          },
+          {
+            "label": "Release and admit the next train",
+            "t": 5
+          },
+          {
+            "label": "Reset the interlock",
+            "t": 8
+          }
+        ],
+        "duration": 10,
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "actions": [
+              {
+                "at": 0.8,
+                "do": "click",
+                "selector": "#dispatch-btn"
+              },
+              {
+                "at": 2.8,
+                "do": "click",
+                "selector": "#dispatch-btn"
+              },
+              {
+                "at": 5,
+                "do": "click",
+                "selector": "#depart-btn"
+              },
+              {
+                "at": 6.4,
+                "do": "click",
+                "selector": "#dispatch-btn"
+              },
+              {
+                "at": 8.7,
+                "do": "click",
+                "selector": "#reset-btn"
+              }
+            ],
+            "app": "apps/one-block-three-trains.html",
+            "dur": 10,
+            "lower": {
+              "bench": "At most one train may occupy the block.",
+              "fix": "Pause and test any request.",
+              "title": "One Block, Three Trains"
+            },
+            "ready": {
+              "selector": "#dispatch-btn"
+            },
+            "t": 0
+          }
+        ]
+      },
+      "orientation": "landscape",
+      "published": "2026-09-02",
+      "sources": [
+        {
+          "src": "media/one-block-three-trains.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "media/one-block-three-trains.webm",
+          "type": "video/webm"
+        }
+      ],
+      "tags": [
+        "deterministic",
+        "interlock",
+        "state-machine",
+        "live-replay"
+      ],
+      "thumb": "thumbs/one-block-three-trains.svg",
+      "title": "One Block, Three Trains",
+      "width": 960
+    },
+    {
+      "chapters": [
+        {
+          "label": "The 4.5:1 boundary",
+          "t": 0
+        },
+        {
+          "label": "The 4.48:1 failing neighbor",
+          "t": 3
+        },
+        {
+          "label": "Exact reset",
+          "t": 7
+        }
+      ],
+      "description": "The guided film explains the WCAG 4.50:1 normal-text threshold with integer sRGB neighbors. Its live proof accepts #767676 at 4.54:1, rejects #777777 at 4.48:1 without replacing the accepted palette, and resets to 21.00:1.",
+      "duration": 9,
+      "height": 720,
+      "id": "four-and-a-half-to-one",
+      "live": {
+        "chapters": [
+          {
+            "label": "Apply the boundary pair",
+            "t": 0
+          },
+          {
+            "label": "Reject the near miss",
+            "t": 3
+          },
+          {
+            "label": "Reset to maximum contrast",
+            "t": 7
+          }
+        ],
+        "duration": 9,
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "actions": [
+              {
+                "at": 0.8,
+                "do": "click",
+                "selector": "#apply-boundary-btn"
+              },
+              {
+                "at": 3.2,
+                "do": "click",
+                "selector": "#apply-near-miss-btn"
+              },
+              {
+                "at": 7,
+                "do": "click",
+                "selector": "#reset-btn"
+              }
+            ],
+            "app": "apps/four-and-a-half-to-one.html",
+            "dur": 9,
+            "lower": {
+              "bench": "#767676 computes to 4.54:1; #777777 computes to 4.48:1.",
+              "fix": "Pause and verify both 8-bit source pairs.",
+              "title": "Four-and-a-Half to One"
+            },
+            "ready": {
+              "selector": "#apply-boundary-btn"
+            },
+            "t": 0
+          }
+        ]
+      },
+      "orientation": "square",
+      "published": "2026-09-02",
+      "sources": [
+        {
+          "src": "media/four-and-a-half-to-one.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "media/four-and-a-half-to-one.webm",
+          "type": "video/webm"
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "contrast",
+        "wcag",
+        "live-replay"
+      ],
+      "thumb": "thumbs/four-and-a-half-to-one.svg",
+      "title": "Four-and-a-Half to One",
+      "width": 720
+    },
+    {
+      "chapters": [
+        {
+          "label": "Choose three tokens",
+          "t": 0
+        },
+        {
+          "label": "Nine accepted",
+          "t": 2
+        },
+        {
+          "label": "Eight rejected",
+          "t": 5
+        },
+        {
+          "label": "Exact reset",
+          "t": 9
+        }
+      ],
+      "description": "The guided film explains a 3-token arithmetic gate. Its live proof accepts 2 + 3 + 4 = 9, rejects 1 + 3 + 4 = 8 without replacing the accepted trio, and resets both trays.",
+      "duration": 12,
+      "height": 960,
+      "id": "three-tokens-make-nine",
+      "live": {
+        "chapters": [
+          {
+            "label": "Build 2 + 3 + 4",
+            "t": 0
+          },
+          {
+            "label": "Submit nine",
+            "t": 2
+          },
+          {
+            "label": "Try 1 + 3 + 4",
+            "t": 4
+          },
+          {
+            "label": "Preserve the accepted trio",
+            "t": 5
+          },
+          {
+            "label": "Reset both trays",
+            "t": 9
+          }
+        ],
+        "duration": 12,
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "actions": [
+              {
+                "at": 0.7,
+                "do": "click",
+                "selector": "#token-2"
+              },
+              {
+                "at": 1.3,
+                "do": "click",
+                "selector": "#token-3"
+              },
+              {
+                "at": 1.9,
+                "do": "click",
+                "selector": "#token-4"
+              },
+              {
+                "at": 2.6,
+                "do": "click",
+                "selector": "#submit-btn"
+              },
+              {
+                "at": 4.5,
+                "do": "click",
+                "selector": "#token-2"
+              },
+              {
+                "at": 5.1,
+                "do": "click",
+                "selector": "#token-1"
+              },
+              {
+                "at": 5.8,
+                "do": "click",
+                "selector": "#submit-btn"
+              },
+              {
+                "at": 9.5,
+                "do": "click",
+                "selector": "#reset-btn"
+              }
+            ],
+            "app": "apps/three-tokens-make-nine.html",
+            "dur": 12,
+            "lower": {
+              "bench": "Exactly three selected values must total nine.",
+              "fix": "Pause and build another candidate.",
+              "title": "Three Tokens Make Nine"
+            },
+            "ready": {
+              "selector": "#token-2"
+            },
+            "t": 0
+          }
+        ]
+      },
+      "orientation": "portrait",
+      "published": "2026-09-02",
+      "sources": [
+        {
+          "src": "media/three-tokens-make-nine.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "media/three-tokens-make-nine.webm",
+          "type": "video/webm"
+        }
+      ],
+      "tags": [
+        "arithmetic",
+        "tokens",
+        "deterministic",
+        "live-replay"
+      ],
+      "thumb": "thumbs/three-tokens-make-nine.svg",
+      "title": "Three Tokens Make Nine",
+      "width": 540
+    }
+  ]
+}

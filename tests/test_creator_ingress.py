@@ -99,6 +99,10 @@ class TestCreatorIngress(unittest.TestCase):
             "submission_schema": self.agent["submission_schema"],
             "quality_schema": self.agent["quality_schema"],
             "submission_template": self.agent["submission_template"],
+            "production_schema": self.agent["production"]["schema"],
+            "production_template": self.agent["production"]["template"],
+            "production_compiler": self.agent["production"]["compiler"],
+            "submission_validator": self.agent["submission_validator"]["script"],
             "default_registry": self.agent["default_registry"],
         }
         for relation, link in links.items():
@@ -122,6 +126,42 @@ class TestCreatorIngress(unittest.TestCase):
         self.assertEqual(
             self.agent["repository"],
             "https://github.com/kody-w/rapp-vision",
+        )
+        self.assertEqual(
+            self.agent["production"],
+            {
+                "contract": "rapp-vision-production/1.0",
+                "schema": "channel.production.schema.json",
+                "template": "template/channel.production.json",
+                "compiler": "scripts/compile_publications.py",
+                "check": (
+                    "python3 scripts/compile_publications.py check "
+                    "{production_json}"
+                ),
+                "build": (
+                    "python3 scripts/compile_publications.py build "
+                    "{production_json}"
+                ),
+            },
+        )
+        self.assertEqual(
+            self.agent["submission_validator"],
+            {
+                "script": "scripts/validate_creator_submission.py",
+                "submission_command": (
+                    "python3 scripts/validate_creator_submission.py submission "
+                    "{submission_json} --artifact-root {artifact_checkout} "
+                    "--pr-number {pull_request_number}"
+                ),
+                "quality_command": (
+                    "python3 scripts/validate_creator_submission.py quality "
+                    "{submission_json} {quality_json} "
+                    "--repository {repository_url} --run-url {workflow_run_url} "
+                    "--pull-request-number {pull_request_number} "
+                    "--pull-request-head-sha {pull_request_head_sha} "
+                    "--review-state-sha256 {review_state_sha256}"
+                ),
+            },
         )
 
     def test_documents_expose_required_core_and_allow_extensions(self):
@@ -175,7 +215,7 @@ class TestCreatorIngress(unittest.TestCase):
         sha_pattern = self.submission_schema["$defs"]["sha256"]["pattern"]
         commit_pattern = self.submission_schema["$defs"]["gitCommit"]["pattern"]
         self.assertEqual(sha_pattern, "^[0-9a-f]{64}$")
-        self.assertIsNotNone(
+        self.assertIsNone(
             re.fullmatch(commit_pattern, self.template["artifact"]["commit"])
         )
         digests = [
@@ -184,7 +224,7 @@ class TestCreatorIngress(unittest.TestCase):
             self.template["deliverables"]["webm"]["sha256"],
         ]
         for digest in digests:
-            self.assertIsNotNone(re.fullmatch(sha_pattern, digest))
+            self.assertIsNone(re.fullmatch(sha_pattern, digest))
         self.assertEqual(
             self.quality_schema["$defs"]["sha256"]["pattern"],
             sha_pattern,
@@ -273,7 +313,8 @@ class TestCreatorIngress(unittest.TestCase):
             },
         )
 
-    def test_submitted_template_binds_artifact_and_all_gates(self):
+    def test_submitted_template_exposes_all_bindings_and_fails_closed(self):
+        self.assertEqual(self.template["$schema"], "submission.schema.json")
         artifact = self.template["artifact"]
         self.assertEqual(artifact["digest_scope"], "raw-file-bytes")
         self.assertEqual(artifact["path"], "channel.json")
@@ -310,9 +351,9 @@ class TestCreatorIngress(unittest.TestCase):
         self.assertTrue(evidence["exact_reset"]["restored_state"])
 
         attestations = self.template["attestations"]
-        self.assertIs(attestations["rights"]["attested"], True)
-        self.assertIs(attestations["privacy"]["attested"], True)
-        self.assertIs(attestations["no_secrets"], True)
+        self.assertIs(attestations["rights"]["attested"], False)
+        self.assertIs(attestations["privacy"]["attested"], False)
+        self.assertIs(attestations["no_secrets"], False)
         review = self.template["review_request"]
         self.assertGreaterEqual(review["minimum_approvals"], 2)
         self.assertIs(review["independent_reviewers"], True)
@@ -320,13 +361,19 @@ class TestCreatorIngress(unittest.TestCase):
             {item["role"] for item in review["reviews"]},
             {"technical", "curation"},
         )
-        self.assertTrue(all("decision" not in item for item in review["reviews"]))
+        self.assertTrue(
+            all(
+                "decision" not in item and "reviewer" not in item
+                for item in review["reviews"]
+            )
+        )
 
     def test_quality_separates_pass_listing_and_staleness(self):
         properties = self.quality_schema["properties"]
         self.assertIn("technical", properties)
         self.assertIn("default_registry", properties)
         self.assertIn("freshness", properties)
+        self.assertIn("authority", properties)
         self.assertNotEqual(properties["technical"], properties["default_registry"])
 
         technical_statuses = set(
@@ -359,6 +406,10 @@ class TestCreatorIngress(unittest.TestCase):
 
         stale_when = (
             self.quality_schema["$defs"]["freshness"]["properties"]["stale_when"]
+        )
+        self.assertIs(
+            stale_when["properties"]["submission_sha256_changes"]["const"],
+            True,
         )
         self.assertIs(
             stale_when["properties"]["artifact_commit_changes"]["const"],
@@ -449,6 +500,8 @@ class TestCreatorIngress(unittest.TestCase):
             "artifact.commit",
             "artifact.sha256",
             "raw-byte SHA-256",
+            "canonical submitted-manifest digest",
+            "protected workflow",
             "default-registry bytes",
             "stale",
         ):

@@ -2,12 +2,15 @@
 
 import ast
 import copy
+import hashlib
 import importlib.util
 import json
 import math
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 import unittest
 import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
@@ -17,9 +20,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TINY_ROOT = ROOT / "tiny-systems"
 MANIFEST_PATH = TINY_ROOT / "channel.production.json"
+CHANNEL_PATH = TINY_ROOT / "channel.json"
 EVIDENCE_PATH = TINY_ROOT / "evidence.json"
+DELIVERY_PATH = TINY_ROOT / "delivery.json"
 RENDERER_PATH = ROOT / "scripts" / "render_tiny_systems.py"
 VALIDATOR_PATH = ROOT / "scripts" / "validate_publications.py"
+COMPILER_PATH = ROOT / "scripts" / "compile_publications.py"
 
 PUBLICATIONS = [
     ("one-block-three-trains", "One Block, Three Trains"),
@@ -55,9 +61,9 @@ FRAME_SAMPLES = {
         119: "53fece679f38501e5883104beb5596d9262c6e3293ddeab504c3f271db311d3a",
     },
     "four-and-a-half-to-one": {
-        0: "6d5ba4a7f3c616361accca34faf7dc1190ea011e615b136c128649b97c7b5703",
-        54: "5c9c355fe702ba33b6e012be74cb8c5c508cc80de8eea151df366b7b24366f44",
-        107: "59ca772358022e4c989c1e755bf0278b15b835ed683776bac54e7c0f37b29bc8",
+        0: "838fea5b32678a682af74ef20075b48ae48a2220cf1685fddc58de30745ce55e",
+        54: "69f1d8fe3912f060c6189d8319c13ea04285b3b518dd468cf6b0db91f2d2e21b",
+        107: "3869f7291839bdbbdb89441eaae8cc9392e8e5cfed34ac9336246e2f35ecae4f",
     },
     "three-tokens-make-nine": {
         0: "3abd60340d0e0b8759bfb94abee6ec0b8639728e9e27a7c6decaa2fd05958995",
@@ -74,12 +80,14 @@ def load_json(path):
 def load_module(name, path):
     spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
     spec.loader.exec_module(module)
     return module
 
 
 VALIDATOR = load_module("validate_tiny_system_publications", VALIDATOR_PATH)
 RENDERER = load_module("render_tiny_systems", RENDERER_PATH)
+COMPILER = load_module("compile_tiny_system_publications", COMPILER_PATH)
 
 
 class AppIndex(HTMLParser):
@@ -318,10 +326,10 @@ class TestTinySystemsEvidenceAndApps(unittest.TestCase):
             )
             return 1.05 / (linear + 0.05)
 
-        boundary = contrast(118.656357)
-        near_miss = contrast(118.812934)
-        self.assertTrue(math.isclose(boundary, 4.5, abs_tol=1e-7))
-        self.assertEqual(round(near_miss, 2), 4.49)
+        boundary = contrast(118)
+        near_miss = contrast(119)
+        self.assertEqual(round(boundary, 2), 4.54)
+        self.assertEqual(round(near_miss, 2), 4.48)
         self.assertGreaterEqual(claims["positive"]["expectedState"]["accepted"]["ratio"], 4.5)
         self.assertLess(claims["rejected"]["expectedState"]["rejected"]["ratio"], 4.5)
 
@@ -494,14 +502,112 @@ class TestTinySystemsRenderer(unittest.TestCase):
         self.assertIn("unknown publication id", completed.stderr)
         self.assertFalse(output_root.exists())
 
-    def test_source_branch_contains_no_binary_media(self):
-        files = [path for path in TINY_ROOT.rglob("*") if path.is_file()]
-        self.assertTrue(files)
-        self.assertTrue(
-            all(path.suffix in {".json", ".html", ".svg"} for path in files),
-            [str(path.relative_to(ROOT)) for path in files],
-        )
-        self.assertFalse((TINY_ROOT / "masters").exists())
+    def test_compiled_delivery_is_complete_and_digest_bound(self):
+        channel = load_json(CHANNEL_PATH)
+        delivery = load_json(DELIVERY_PATH)
+        self.assertEqual(channel["schema"], "rapp-vision-channel/2.0")
+        self.assertEqual(delivery["schema"], "tiny-systems-delivery/1.0")
+        by_id = {record["id"]: record for record in delivery["videos"]}
+        self.assertEqual(set(by_id), {publication_id for publication_id, _ in PUBLICATIONS})
+
+        for video in channel["videos"]:
+            with self.subTest(publication=video["id"]):
+                record = by_id[video["id"]]
+                self.assertEqual(
+                    video["sources"],
+                    [
+                        {
+                            "src": f"media/{video['id']}.mp4",
+                            "type": "video/mp4",
+                        },
+                        {
+                            "src": f"media/{video['id']}.webm",
+                            "type": "video/webm",
+                        },
+                    ],
+                )
+                for kind in ("master", "mp4", "webm"):
+                    artifact = record[kind]
+                    path = TINY_ROOT / artifact["path"]
+                    self.assertTrue(path.is_file(), path)
+                    self.assertEqual(path.stat().st_size, artifact["bytes"])
+                    self.assertEqual(
+                        hashlib.sha256(path.read_bytes()).hexdigest(),
+                        artifact["sha256"],
+                    )
+                for kind in ("mp4", "webm"):
+                    self.assertEqual(record[kind]["color_space"], "bt709")
+                    self.assertEqual(record[kind]["color_transfer"], "bt709")
+                    self.assertEqual(record[kind]["color_primaries"], "bt709")
+                    self.assertEqual(record[kind]["color_range"], "tv")
+
+        registry = load_json(ROOT / "channels.json")
+        matches = [
+            entry for entry in registry["channels"]
+            if entry["id"] == "tiny-systems"
+        ]
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0]["url"], "tiny-systems/channel.json")
+        self.assertEqual(matches[0]["contract"], "rapp-vision-channel/2.0")
+
+    @unittest.skipUnless(
+        shutil.which("ffmpeg") and shutil.which("ffprobe"),
+        "ffmpeg and ffprobe are required for byte-stability integration",
+    )
+    def test_real_compiler_rebuild_is_byte_stable_and_bt709(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source_root = root / "source"
+            (source_root / "masters").mkdir(parents=True)
+            manifest = load_json(MANIFEST_PATH)
+            manifest["videos"] = manifest["videos"][:1]
+            source = source_root / "channel.production.json"
+            source.write_text(
+                json.dumps(manifest, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            master_name = manifest["videos"][0]["production"]["master"]
+            shutil.copy2(TINY_ROOT / master_name, source_root / master_name)
+
+            outputs = []
+            for name in ("first", "second"):
+                output = root / name
+                compilation = COMPILER.prepare_compilation(source, output)
+                COMPILER.build_compilation(compilation)
+                outputs.append(output)
+
+            for extension in ("mp4", "webm"):
+                relative = Path("media") / f"one-block-three-trains.{extension}"
+                first = outputs[0] / relative
+                second = outputs[1] / relative
+                self.assertEqual(
+                    hashlib.sha256(first.read_bytes()).hexdigest(),
+                    hashlib.sha256(second.read_bytes()).hexdigest(),
+                )
+                probe = json.loads(
+                    subprocess.check_output(
+                        [
+                            "ffprobe",
+                            "-v",
+                            "error",
+                            "-select_streams",
+                            "v:0",
+                            "-show_entries",
+                            (
+                                "stream=codec_name,color_space,color_transfer,"
+                                "color_primaries,color_range"
+                            ),
+                            "-of",
+                            "json",
+                            str(first),
+                        ],
+                        text=True,
+                    )
+                )["streams"][0]
+                self.assertEqual(probe["color_space"], "bt709")
+                self.assertEqual(probe["color_transfer"], "bt709")
+                self.assertEqual(probe["color_primaries"], "bt709")
+                self.assertEqual(probe["color_range"], "tv")
 
 
 if __name__ == "__main__":

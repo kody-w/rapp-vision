@@ -27,10 +27,21 @@ DEFAULT_SOURCE = "channel.production.json"
 STAGE_DIRECTORY = ".rapp-vision-production-stage"
 ENCODED_SEPARATOR = re.compile(r"%(?:2[fF]|5[cC])")
 URL_SCHEME = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
+WINDOWS_RESERVED_NAMES = frozenset(
+    {"CON", "PRN", "AUX", "NUL"}
+    | {f"COM{number}" for number in range(1, 10)}
+    | {f"LPT{number}" for number in range(1, 10)}
+)
 
 MP4_TYPE = "video/mp4"
 WEBM_TYPE = "video/webm"
 EXPECTED_CODECS = {"mp4": "h264", "webm": "vp9"}
+EXPECTED_COLOR = {
+    "color_space": "bt709",
+    "color_transfer": "bt709",
+    "color_primaries": "bt709",
+    "color_range": "tv",
+}
 
 Runner = Callable[..., subprocess.CompletedProcess[str]]
 
@@ -52,10 +63,16 @@ VALIDATOR = _load_validator()
 class CompilerFailure(Exception):
     """A deterministic, user-facing compilation failure."""
 
-    def __init__(self, errors: str | Sequence[str]):
+    def __init__(
+        self,
+        errors: str | Sequence[str],
+        *,
+        preserve_stage: bool = False,
+    ):
         if isinstance(errors, str):
             errors = [errors]
         self.errors = tuple(str(error) for error in errors)
+        self.preserve_stage = preserve_stage
         super().__init__("\n".join(self.errors))
 
 
@@ -119,6 +136,27 @@ def deterministic_json(value: Any) -> str:
 
 def _contains_control(value: str) -> bool:
     return any(unicodedata.category(character) == "Cc" for character in value)
+
+
+def _path_key(path: Path) -> str:
+    """A conservative key that stays collision-safe on case-insensitive hosts."""
+    return os.path.normcase(str(path.resolve(strict=False))).casefold()
+
+
+def _is_link_or_junction(path: Path) -> bool:
+    return path.is_symlink() or (
+        hasattr(path, "is_junction") and path.is_junction()
+    )
+
+
+def _portable_id_error(publication_id: str) -> str | None:
+    device_name = publication_id.split(".", 1)[0].upper()
+    if device_name in WINDOWS_RESERVED_NAMES:
+        return (
+            f"publication id {publication_id!r} maps to reserved Windows "
+            f"device name {device_name!r}"
+        )
+    return None
 
 
 def resolve_source_path(source: str | os.PathLike[str]) -> Path:
@@ -228,6 +266,8 @@ def prepare_compilation(
                 path = f"source.videos[{index}]"
                 if not isinstance(video, dict):
                     continue
+                if not isinstance(video.get("id"), str):
+                    errors.append(f"{path}.id: must be a string")
                 if "sources" in video:
                     errors.append(
                         f"{path}.sources: production publications must not define sources"
@@ -246,8 +286,19 @@ def prepare_compilation(
                     errors.extend(exc.errors)
 
     transformed = transform_production_channel(document)
-    source_url = (output_root / "channel.json").as_uri()
-    errors.extend(VALIDATOR.validate_channel(transformed, source_url, {}))
+    try:
+        errors.extend(
+            VALIDATOR.validate_channel(
+                transformed,
+                "https://rapp-vision.invalid/channel.json",
+                {},
+            )
+        )
+    except (AttributeError, KeyError, OverflowError, TypeError, ValueError) as exc:
+        errors.append(
+            "source: malformed structural value prevented publication "
+            f"validation: {exc}"
+        )
 
     publications: list[PublicationBuild] = []
     if isinstance(document, dict) and isinstance(document.get("videos"), list):
@@ -255,6 +306,7 @@ def prepare_compilation(
             if (
                 not isinstance(video, dict)
                 or index not in masters
+                or not isinstance(video.get("id"), str)
                 or not VALIDATOR.valid_id(video.get("id"))
             ):
                 continue
@@ -274,13 +326,62 @@ def prepare_compilation(
 
     if errors:
         raise CompilerFailure(errors)
-    return Compilation(
+    compilation = Compilation(
         source_path=source_path,
         source_root=source_root,
         output_root=output_root,
         channel=transformed,
         publications=tuple(publications),
     )
+    _validate_compilation_paths(compilation)
+    return compilation
+
+
+def _validate_compilation_paths(compilation: Compilation) -> None:
+    destination_by_key: dict[str, Path] = {}
+    errors: list[str] = []
+    for publication in compilation.publications:
+        portable_error = _portable_id_error(publication.publication_id)
+        if portable_error:
+            errors.append(portable_error)
+        for destination in (
+            publication.mp4,
+            publication.webm,
+            publication.staged_mp4,
+            publication.staged_webm,
+        ):
+            key = _path_key(destination)
+            previous = destination_by_key.get(key)
+            if previous is not None and str(previous) != str(destination):
+                errors.append(
+                    f"generated paths collide on a portable filesystem: "
+                    f"{previous} and {destination}"
+                )
+            destination_by_key[key] = destination
+
+    final_destinations = {
+        _path_key(compilation.channel_path): compilation.channel_path,
+        **{
+            _path_key(path): path
+            for publication in compilation.publications
+            for path in (publication.mp4, publication.webm)
+        },
+    }
+    source_key = _path_key(compilation.source_path)
+    if source_key in final_destinations:
+        errors.append(
+            f"generated output {final_destinations[source_key]} aliases "
+            f"production source {compilation.source_path}"
+        )
+    for publication in compilation.publications:
+        master_key = _path_key(publication.master)
+        if master_key in final_destinations:
+            errors.append(
+                f"generated output {final_destinations[master_key]} aliases "
+                f"master input {publication.master}"
+            )
+    if errors:
+        raise CompilerFailure(errors)
 
 
 def _mp4_command(executable: str, publication: PublicationBuild) -> list[str]:
@@ -296,11 +397,18 @@ def _mp4_command(executable: str, publication: PublicationBuild) -> list[str]:
         "-map",
         "0:v:0",
         "-map",
-        "0:a?",
+        "0:a:0?",
         "-map_metadata",
         "-1",
         "-map_chapters",
         "-1",
+        "-vf",
+        (
+            "scale=in_range=auto:out_range=tv:out_color_matrix=bt709,"
+            "format=yuv420p,"
+            "setparams=range=limited:color_primaries=bt709:"
+            "color_trc=bt709:colorspace=bt709"
+        ),
         "-c:v",
         "libx264",
         "-preset",
@@ -309,6 +417,22 @@ def _mp4_command(executable: str, publication: PublicationBuild) -> list[str]:
         "20",
         "-pix_fmt",
         "yuv420p",
+        "-color_primaries",
+        "bt709",
+        "-color_trc",
+        "bt709",
+        "-colorspace",
+        "bt709",
+        "-color_range",
+        "tv",
+        "-threads",
+        "1",
+        "-fflags",
+        "+bitexact",
+        "-flags:v",
+        "+bitexact",
+        "-flags:a",
+        "+bitexact",
         "-movflags",
         "+faststart",
         "-c:a",
@@ -332,11 +456,18 @@ def _webm_command(executable: str, publication: PublicationBuild) -> list[str]:
         "-map",
         "0:v:0",
         "-map",
-        "0:a?",
+        "0:a:0?",
         "-map_metadata",
         "-1",
         "-map_chapters",
         "-1",
+        "-vf",
+        (
+            "scale=in_range=auto:out_range=tv:out_color_matrix=bt709,"
+            "format=yuv420p,"
+            "setparams=range=limited:color_primaries=bt709:"
+            "color_trc=bt709:colorspace=bt709"
+        ),
         "-c:v",
         "libvpx-vp9",
         "-crf",
@@ -344,14 +475,48 @@ def _webm_command(executable: str, publication: PublicationBuild) -> list[str]:
         "-b:v",
         "0",
         "-row-mt",
+        "0",
+        "-threads",
         "1",
         "-pix_fmt",
         "yuv420p",
+        "-color_primaries",
+        "bt709",
+        "-color_trc",
+        "bt709",
+        "-colorspace",
+        "bt709",
+        "-color_range",
+        "tv",
         "-c:a",
         "libopus",
         "-b:a",
         "128k",
+        "-fflags",
+        "+bitexact",
+        "-flags:v",
+        "+bitexact",
+        "-flags:a",
+        "+bitexact",
         str(publication.staged_webm),
+    ]
+
+
+def _master_probe_command(executable: str, path: Path) -> list[str]:
+    return [
+        executable,
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        (
+            "stream=pix_fmt,color_space,color_transfer,"
+            "color_primaries,color_range"
+        ),
+        "-of",
+        "json",
+        str(path),
     ]
 
 
@@ -363,7 +528,10 @@ def _probe_command(executable: str, path: Path) -> list[str]:
         "-select_streams",
         "v:0",
         "-show_entries",
-        "stream=codec_name",
+        (
+            "stream=codec_name,color_space,color_transfer,"
+            "color_primaries,color_range"
+        ),
         "-of",
         "json",
         str(path),
@@ -389,6 +557,14 @@ def make_plan(
         operations.extend(
             [
                 {
+                    "command": _master_probe_command(
+                        ffprobe,
+                        publication.master,
+                    ),
+                    "kind": "master_probe",
+                    "publication": publication.publication_id,
+                },
+                {
                     "command": _mp4_command(ffmpeg, publication),
                     "format": "mp4",
                     "kind": "encode",
@@ -405,6 +581,7 @@ def make_plan(
                 {
                     "command": _probe_command(ffprobe, publication.staged_mp4),
                     "expected_codec": EXPECTED_CODECS["mp4"],
+                    "expected_color": EXPECTED_COLOR,
                     "format": "mp4",
                     "kind": "probe",
                     "publication": publication.publication_id,
@@ -412,6 +589,7 @@ def make_plan(
                 {
                     "command": _probe_command(ffprobe, publication.staged_webm),
                     "expected_codec": EXPECTED_CODECS["webm"],
+                    "expected_color": EXPECTED_COLOR,
                     "format": "webm",
                     "kind": "probe",
                     "publication": publication.publication_id,
@@ -447,6 +625,35 @@ def _execute_plan(plan: dict[str, Any], runner: Runner) -> None:
     for operation in plan["operations"]:
         command = operation["command"]
         completed = _run_process(command, runner)
+        if operation["kind"] == "master_probe":
+            try:
+                payload = json.loads(completed.stdout or "")
+                streams = payload.get("streams", [])
+                stream = streams[0] if len(streams) == 1 else {}
+            except (AttributeError, IndexError, json.JSONDecodeError):
+                stream = {}
+            pixel_format = str(stream.get("pix_fmt") or "")
+            rgb = pixel_format.startswith(("rgb", "bgr", "gbr"))
+            rgb_tags_compatible = (
+                stream.get("color_space") in (None, "unknown", "gbr", "bt709")
+                and stream.get("color_transfer") in (None, "unknown", "bt709")
+                and stream.get("color_primaries") in (None, "unknown", "bt709")
+                and stream.get("color_range") in (None, "unknown", "pc", "tv")
+            )
+            bt709_yuv = (
+                pixel_format.startswith(("yuv", "yuva"))
+                and stream.get("color_space") == "bt709"
+                and stream.get("color_transfer") == "bt709"
+                and stream.get("color_primaries") == "bt709"
+                and stream.get("color_range") in ("pc", "tv")
+            )
+            if not ((rgb and rgb_tags_compatible) or bt709_yuv):
+                raise CompilerFailure(
+                    f"{operation['publication']} master: unsupported color "
+                    f"description for {pixel_format or 'unknown pixel format'}; "
+                    "use RGB or tagged BT.709 YUV"
+                )
+            continue
         if operation["kind"] == "encode":
             output = Path(operation["output"])
             if output.is_symlink() or not output.is_file():
@@ -468,6 +675,14 @@ def _execute_plan(plan: dict[str, Any], runner: Runner) -> None:
                 f"{operation['publication']} {operation['format']} output: "
                 f"expected {expected!r} video codec, found {codec!r}"
             )
+        expected_color = operation.get("expected_color") or {}
+        for field, expected_value in expected_color.items():
+            if streams[0].get(field) != expected_value:
+                raise CompilerFailure(
+                    f"{operation['publication']} {operation['format']} output: "
+                    f"expected {field}={expected_value!r}, found "
+                    f"{streams[0].get(field)!r}"
+                )
 
 
 def _path_exists(path: Path) -> bool:
@@ -477,7 +692,7 @@ def _path_exists(path: Path) -> bool:
 def _validate_output_layout(compilation: Compilation) -> None:
     media_root = compilation.output_root / "media"
     if media_root.exists():
-        if not media_root.is_dir() or media_root.is_symlink():
+        if not media_root.is_dir() or _is_link_or_junction(media_root):
             raise CompilerFailure(f"{media_root}: media output must be a real directory")
         try:
             media_root.resolve().relative_to(compilation.output_root)
@@ -486,7 +701,7 @@ def _validate_output_layout(compilation: Compilation) -> None:
     for publication in compilation.publications:
         for artifact in (publication.mp4, publication.webm):
             if _path_exists(artifact) and (
-                artifact.is_symlink() or not artifact.is_file()
+                _is_link_or_junction(artifact) or not artifact.is_file()
             ):
                 raise CompilerFailure(f"{artifact}: existing output must be a regular file")
 
@@ -500,43 +715,58 @@ def _backup_file(source: Path, backup: Path) -> None:
 
 
 def _publish(compilation: Compilation, staged_channel: Path) -> None:
-    backups: list[tuple[Path, Path]] = []
-    installed: list[Path] = []
+    backups: dict[Path, Path] = {}
+    attempted: list[Path] = []
     backup_root = compilation.stage_root / "backups"
-    pairs = [
+    replacements = [
         (staged, final)
         for publication in compilation.publications
         for staged, final in (
             (publication.staged_mp4, publication.mp4),
             (publication.staged_webm, publication.webm),
         )
-    ]
+    ] + [(staged_channel, compilation.channel_path)]
 
     try:
-        for _staged, final in pairs:
+        _validate_output_layout(compilation)
+        for _staged, final in replacements:
             if final.exists():
-                backup = backup_root / final.name
+                backup = backup_root / final.relative_to(
+                    compilation.output_root
+                )
                 _backup_file(final, backup)
-                backups.append((final, backup))
-        for staged, final in pairs:
+                backups[final] = backup
+        for staged, final in replacements:
+            # Record before replacement: an interrupt may be delivered after
+            # the kernel rename succeeds but before os.replace returns.
+            attempted.append(final)
             os.replace(staged, final)
-            installed.append(final)
-        os.replace(staged_channel, compilation.channel_path)
-    except OSError as exc:
+    except BaseException as exc:
         rollback_errors: list[str] = []
-        for final in reversed(installed):
+        for final in reversed(attempted):
+            backup = backups.get(final)
             try:
-                final.unlink(missing_ok=True)
-            except OSError as rollback_exc:
-                rollback_errors.append(f"cannot remove {final}: {rollback_exc}")
-        for final, backup in reversed(backups):
-            try:
-                os.replace(backup, final)
-            except OSError as rollback_exc:
-                rollback_errors.append(f"cannot restore {final}: {rollback_exc}")
+                if backup is None:
+                    final.unlink(missing_ok=True)
+                else:
+                    os.replace(backup, final)
+            except BaseException as rollback_exc:
+                action = "remove" if backup is None else "restore"
+                rollback_errors.append(
+                    f"cannot {action} {final}: {rollback_exc}"
+                )
         errors = [f"cannot publish compiled channel: {exc}"]
         errors.extend(f"rollback failed: {error}" for error in rollback_errors)
-        raise CompilerFailure(errors) from exc
+        if rollback_errors:
+            errors.append(
+                f"recovery files preserved under {compilation.stage_root}"
+            )
+        if rollback_errors or isinstance(exc, OSError):
+            raise CompilerFailure(
+                errors,
+                preserve_stage=bool(rollback_errors),
+            ) from exc
+        raise
 
 
 def build_compilation(
@@ -550,26 +780,38 @@ def build_compilation(
     deterministic_channel = deterministic_json(compilation.channel).encode("utf-8")
     plan = make_plan(compilation, ffmpeg=ffmpeg, ffprobe=ffprobe)
 
-    compilation.output_root.mkdir(parents=True, exist_ok=True)
-    _validate_output_layout(compilation)
-    if compilation.stage_root.exists() or compilation.stage_root.is_symlink():
-        raise CompilerFailure(
-            f"{compilation.stage_root}: staging path already exists; remove it and retry"
-        )
-
     staged_channel = compilation.stage_root / "channel.json"
+    created_stage = False
+    preserve_stage = False
     try:
-        (compilation.stage_root / "media").mkdir(parents=True)
+        compilation.output_root.mkdir(parents=True, exist_ok=True)
+        _validate_output_layout(compilation)
+        try:
+            compilation.stage_root.mkdir()
+            created_stage = True
+        except FileExistsError as exc:
+            raise CompilerFailure(
+                f"{compilation.stage_root}: staging path already exists; "
+                "remove it and retry"
+            ) from exc
+        (compilation.stage_root / "media").mkdir()
         staged_channel.write_bytes(deterministic_channel)
         _execute_plan(plan, runner)
         (compilation.output_root / "media").mkdir(parents=True, exist_ok=True)
+        _validate_output_layout(compilation)
         _publish(compilation, staged_channel)
-    except CompilerFailure:
+    except CompilerFailure as exc:
+        preserve_stage = exc.preserve_stage
         raise
     except OSError as exc:
         raise CompilerFailure(f"build failed: {exc}") from exc
     finally:
-        if compilation.stage_root.exists() and not compilation.stage_root.is_symlink():
+        if (
+            created_stage
+            and not preserve_stage
+            and compilation.stage_root.exists()
+            and not _is_link_or_junction(compilation.stage_root)
+        ):
             shutil.rmtree(compilation.stage_root, ignore_errors=True)
     return compilation.channel_path
 

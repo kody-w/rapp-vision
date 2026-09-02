@@ -53,6 +53,7 @@ automation branches and open review-ready pull requests. See
 
 | Channel | | What it is |
 |---|---|---|
+| **Tiny Systems** | ▦ | Three deterministic micro-lessons about an interlock, an accessibility boundary, and an arithmetic gate. Each film teaches the rule; each live replay proves acceptance, visible rejection, preserved state, and exact reset. |
 | **Oil Field season** | 🛢️ | Ten independent current-contract channels spanning botanical documentary, portrait gameplay, investigation, physics, cartography, future news, repair, music, synthetic nature, and criticism. Every film teaches first; every replay exposes a positive path, visible failure, and reset. |
 | **Frame Chains** | ⛓️ | The first current-contract channel: five paired publications combining newcomer-first encoded films with live executable proofs across ten synthetic worlds. |
 | **Rooms** | 🕯️ | Nine ambient places that do not exist — a canoe at dawn, a cabin under the aurora, a cave lit by larvae. Slow TV where the rain is simulated, so it never falls the same way twice. |
@@ -112,6 +113,22 @@ static Hive objects at once and read one deterministic merged view; attaching a
 private Hive never publishes it. See [`HIVE.md`](HIVE.md) for the
 `rapp-hive/1.0` object, revision, peer traversal, conflict, cycle, and privacy
 rules. [`template/hive.json`](template/hive.json) is a copyable starting point.
+
+### Autonomous-agent fast path
+
+An agent can start with [`agent.json`](agent.json), choose an open brief from
+[`commissions.json`](commissions.json), and follow the artifact-bound claim,
+submission, and review protocol in
+[`docs/CREATOR-INGRESS.md`](docs/CREATOR-INGRESS.md). Claims coordinate work;
+they do not approve it or grant a default-registry position.
+
+For media production, copy
+[`template/channel.production.json`](template/channel.production.json), point
+each publication at one local master, and run
+[`scripts/compile_publications.py`](scripts/compile_publications.py). The
+compiler always emits both required encodings and writes `channel.json` only
+after the complete pair passes codec probes. See
+[`docs/PRODUCTION-COMPILER.md`](docs/PRODUCTION-COMPILER.md).
 
 1. Copy `template/` into any public GitHub repo.
 2. Edit the v2 `channel.json` — every entry must contain encoded media and a live replay.

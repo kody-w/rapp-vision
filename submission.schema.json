@@ -153,7 +153,8 @@
       "type": "object",
       "required": [
         "id",
-        "display_name"
+        "display_name",
+        "github_user_id"
       ],
       "properties": {
         "id": {
@@ -162,6 +163,10 @@
         "display_name": {
           "type": "string",
           "minLength": 1
+        },
+        "github_user_id": {
+          "type": "integer",
+          "minimum": 1
         },
         "profile": {
           "type": "string",
@@ -175,7 +180,6 @@
       "type": "object",
       "required": [
         "repository",
-        "number",
         "head_ref"
       ],
       "properties": {
@@ -500,8 +504,7 @@
           "items": {
             "type": "object",
             "required": [
-              "role",
-              "reviewer"
+              "role"
             ],
             "properties": {
               "role": {

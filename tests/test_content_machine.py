@@ -225,13 +225,16 @@ class TestWorkflowReliability(unittest.TestCase):
             self.assertNotIn("GH_TOKEN", step)
             self.assertNotIn("secrets.", step)
 
-    def test_existing_branch_is_verified_and_rebased_before_use(self):
+    def test_existing_branch_is_rebuilt_from_main_with_only_verified_state(self):
         resume = workflow_step("Resume automation branch on current main")
         commit = workflow_step("Commit state if changed")
         self.assertIn('refs/heads/$AUTOMATION_BRANCH', resume)
         self.assertIn("git diff --name-only --no-renames origin/main", resume)
-        self.assertIn('git checkout -B "$AUTOMATION_BRANCH" "$remote_ref"', resume)
-        self.assertIn("git rebase origin/main", resume)
+        self.assertIn('git checkout -B "$AUTOMATION_BRANCH" origin/main', resume)
+        self.assertIn('git show "$remote_ref:$path" > "$path"', resume)
+        self.assertIn("Refusing to execute content machinery", resume)
+        self.assertNotIn("git rebase", resume)
+        self.assertNotIn('git checkout -B "$AUTOMATION_BRANCH" "$remote_ref"', resume)
         self.assertIn("--force-with-lease=", commit)
 
     def test_workflow_pushes_only_the_fixed_pr_branch(self):

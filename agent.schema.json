@@ -18,11 +18,13 @@
     "submission_schema",
     "quality_schema",
     "submission_template",
+    "production",
     "submission_transport",
     "submission_manifest_location",
     "validator",
     "repository",
     "default_registry",
+    "submission_validator",
     "authority"
   ],
   "properties": {
@@ -72,6 +74,40 @@
     "submission_template": {
       "$ref": "#/$defs/relativeReference"
     },
+    "production": {
+      "type": "object",
+      "required": [
+        "contract",
+        "schema",
+        "template",
+        "compiler",
+        "check",
+        "build"
+      ],
+      "properties": {
+        "contract": {
+          "const": "rapp-vision-production/1.0"
+        },
+        "schema": {
+          "$ref": "#/$defs/relativeReference"
+        },
+        "template": {
+          "$ref": "#/$defs/relativeReference"
+        },
+        "compiler": {
+          "$ref": "#/$defs/relativeReference"
+        },
+        "check": {
+          "type": "string",
+          "minLength": 1
+        },
+        "build": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
     "submission_transport": {
       "const": "pull-request"
     },
@@ -102,6 +138,28 @@
     },
     "default_registry": {
       "$ref": "#/$defs/relativeReference"
+    },
+    "submission_validator": {
+      "type": "object",
+      "required": [
+        "script",
+        "submission_command",
+        "quality_command"
+      ],
+      "properties": {
+        "script": {
+          "$ref": "#/$defs/relativeReference"
+        },
+        "submission_command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quality_command": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
     },
     "authority": {
       "type": "object",

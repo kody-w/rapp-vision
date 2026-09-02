@@ -2,13 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "quality.schema.json",
   "title": "RAPP Vision artifact-bound quality record",
-  "$comment": "Consumers must derive staleness by comparing binding.artifact_commit and binding.artifact_sha256 with the current submitted artifact. A quality record never grants default-registry listing; only an observed entry in the registry bytes can establish listing.",
+  "$comment": "Consumers must derive staleness from the canonical submitted-manifest digest, artifact binding, PR head, and complete current review-state digest, and must require the latest stable workflow check. Only a trusted aggregator may issue an authoritative quality record. A quality record never grants default-registry listing; only an observed entry in the registry bytes can establish listing.",
   "type": "object",
   "required": [
     "$schema",
     "schema",
     "id",
     "submission_id",
+    "authority",
     "binding",
     "freshness",
     "technical",
@@ -26,6 +27,9 @@
     },
     "submission_id": {
       "$ref": "#/$defs/id"
+    },
+    "authority": {
+      "$ref": "#/$defs/authority"
     },
     "binding": {
       "$ref": "#/$defs/binding"
@@ -265,6 +269,7 @@
     "binding": {
       "type": "object",
       "required": [
+        "submission_sha256",
         "artifact_repository",
         "artifact_path",
         "publication_id",
@@ -272,6 +277,9 @@
         "artifact_sha256"
       ],
       "properties": {
+        "submission_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
         "artifact_repository": {
           "type": "string",
           "format": "uri",
@@ -296,6 +304,7 @@
       "type": "object",
       "required": [
         "status",
+        "compared_submission_sha256",
         "compared_commit",
         "compared_sha256",
         "stale_when"
@@ -307,6 +316,9 @@
             "stale"
           ]
         },
+        "compared_submission_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
         "compared_commit": {
           "$ref": "#/$defs/gitCommit"
         },
@@ -316,10 +328,14 @@
         "stale_when": {
           "type": "object",
           "required": [
+            "submission_sha256_changes",
             "artifact_commit_changes",
             "artifact_sha256_changes"
           ],
           "properties": {
+            "submission_sha256_changes": {
+              "const": true
+            },
             "artifact_commit_changes": {
               "const": true
             },
@@ -360,14 +376,20 @@
       "type": "object",
       "required": [
         "reviewer",
+        "reviewer_github_user_id",
         "role",
         "decision",
+        "submission_sha256",
         "artifact_commit",
         "artifact_sha256"
       ],
       "properties": {
         "reviewer": {
           "$ref": "#/$defs/id"
+        },
+        "reviewer_github_user_id": {
+          "type": "integer",
+          "minimum": 1
         },
         "role": {
           "enum": [
@@ -380,6 +402,9 @@
             "pass",
             "fail"
           ]
+        },
+        "submission_sha256": {
+          "$ref": "#/$defs/sha256"
         },
         "artifact_commit": {
           "$ref": "#/$defs/gitCommit"
@@ -432,6 +457,47 @@
         },
         "met": {
           "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    },
+    "authority": {
+      "type": "object",
+      "required": [
+        "kind",
+        "repository",
+        "run_url",
+        "pull_request_number",
+        "pull_request_head_sha",
+        "review_state_sha256",
+        "check_name"
+      ],
+      "properties": {
+        "kind": {
+          "const": "protected-workflow"
+        },
+        "repository": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "run_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "pull_request_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "pull_request_head_sha": {
+          "$ref": "#/$defs/gitCommit"
+        },
+        "review_state_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "check_name": {
+          "const": "Creator Submission Review / review"
         }
       },
       "additionalProperties": true

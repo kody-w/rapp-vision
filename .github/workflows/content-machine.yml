@@ -70,9 +70,6 @@ jobs:
             "refs/heads/$AUTOMATION_BRANCH" | awk '{print $1}')"
           echo "AUTOMATION_REMOTE_SHA=$remote_sha" >> "$GITHUB_ENV"
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
           if [ -n "$remote_sha" ]; then
             remote_ref="refs/remotes/origin/$AUTOMATION_BRANCH"
             git fetch --no-tags origin \
@@ -88,14 +85,31 @@ jobs:
               exit 1
             fi
 
-            git checkout -B "$AUTOMATION_BRANCH" "$remote_ref"
-            if ! git rebase origin/main; then
-              git rebase --abort
-              echo "Could not safely rebase $AUTOMATION_BRANCH onto current origin/main." >&2
-              exit 1
-            fi
+            # Never replay automation-branch history. Rebuild from trusted
+            # current main and carry forward only the two verified snapshots.
+            git checkout -B "$AUTOMATION_BRANCH" origin/main
+            for path in $ALLOWED_STATE_FILES; do
+              if git cat-file -e "$remote_ref:$path" 2>/dev/null; then
+                mkdir -p "$(dirname "$path")"
+                git show "$remote_ref:$path" > "$path"
+              else
+                rm -f -- "$path"
+              fi
+            done
           else
             git checkout -B "$AUTOMATION_BRANCH" origin/main
+          fi
+
+          unexpected_paths="$(
+            {
+              git diff --name-only --no-renames
+              git ls-files --others --exclude-standard
+            } | sort -u | reject_unallowed_paths
+          )"
+          if [ -n "$unexpected_paths" ]; then
+            echo "Refusing to execute content machinery after restoring unexpected paths:" >&2
+            printf '%s\n' "$unexpected_paths" >&2
+            exit 1
           fi
 
       # Same mirror step as metrics.yml, for the same reason: channel

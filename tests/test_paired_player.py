@@ -3,6 +3,7 @@
 import json
 import shutil
 import subprocess
+import sys
 import unittest
 from pathlib import Path
 
@@ -91,12 +92,14 @@ class TestConsumerDiscovery(unittest.TestCase):
         )
         card = source_block("function cardHTML(", "function matches(")
         watch = source_block("function viewWatch(", "function viewLibrary(")
-        self.assertIn('if (!m || !m.review) return "";', indicator)
+        self.assertIn("!m.review.on", indicator)
+        self.assertIn("m.review.on !== v._recordSha8", indicator)
         self.assertIn(">Machine reviewed</span>", indicator)
         self.assertIn("not human approval or registry curation", indicator)
         self.assertIn("m = mget(v)", card)
-        self.assertIn("${reviewIndicatorHTML(m)}", card)
-        self.assertIn("${reviewIndicatorHTML(mget(v))}", watch)
+        self.assertIn("${reviewIndicatorHTML(v, m)}", card)
+        self.assertIn("reviewIndicatorHTML(v, mget(v))", watch)
+        self.assertIn('${reviewIndicator ? ` ${reviewIndicator}` : ""}', watch)
 
         gate = indicator[: indicator.index("return `<span")]
         self.assertNotIn("_trustedLive", gate)
@@ -110,23 +113,22 @@ class TestConsumerDiscovery(unittest.TestCase):
         apply_metrics = source_block(
             "function applyMetrics()", "/* registry identity:start */",
         )
-        self.assertIn("!m || !m.review", patch)
         self.assertIn('$(".machine-reviewed", target)', patch)
         self.assertIn(
-            'target.insertAdjacentHTML("beforeend", reviewIndicatorHTML(m));',
+            "const indicator = reviewIndicatorHTML(v, m);",
             patch,
         )
         self.assertEqual(apply_metrics.count("patchReviewIndicator("), 2)
         self.assertIn('const watchReview = $("#watch-review[data-vk]");', apply_metrics)
         self.assertIn(
-            "patchReviewIndicator(watchReview, mfind(watchReview.dataset.vk));",
+            "videoForKey(watchReview.dataset.vk)",
             apply_metrics,
         )
         self.assertIn(
             'document.querySelectorAll(".card[data-vk]").forEach',
             apply_metrics,
         )
-        self.assertIn("patchReviewIndicator(wrap, m);", apply_metrics)
+        self.assertIn("patchReviewIndicator(wrap, video, m);", apply_metrics)
 
 
 @unittest.skipUnless(NODE, "node not available; exact player validation test skipped")
@@ -178,6 +180,40 @@ class TestPairedPlayer(unittest.TestCase):
           );
           if (legacyErrors.length) throw new Error(legacyErrors.join("\\n"));
         }})().catch(error => {{ console.error(error); process.exit(1); }});
+        """
+        self.run_node(script)
+
+    def test_browser_review_fingerprint_matches_metrics_writer(self):
+        record = json.loads(
+            (ROOT / "tiny-systems" / "channel.json").read_text(
+                encoding="utf-8"
+            )
+        )["videos"][0]
+        record["integral_float"] = 10.0
+        record["exponent"] = 1e-7
+        record["negative_zero"] = -0.0
+        record["rounding_tie"] = 707693033.1894531
+        record["unpaired_surrogate"] = "\ud800"
+        record["\udfff"] = "surrogate key"
+        clean = {
+            key: value
+            for key, value in record.items()
+            if not str(key).startswith("_")
+        }
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import rapp_metrics
+
+        expected = rapp_metrics.record_fingerprint(clean)
+        helpers = source_block(
+            "function canonicalRecordJSON(", "function parseRecord(",
+        )
+        script = f"""
+        if (!globalThis.crypto) globalThis.crypto = require("crypto").webcrypto;
+        {helpers}
+        recordSha8({json.dumps(record, ensure_ascii=True)}).then(actual => {{
+          if (actual !== {json.dumps(expected)})
+            throw new Error(`fingerprint mismatch: ${{actual}}`);
+        }}).catch(error => {{ console.error(error); process.exit(1); }});
         """
         self.run_node(script)
 

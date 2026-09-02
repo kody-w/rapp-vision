@@ -1,0 +1,107 @@
+{
+  "schema": "tiny-systems-delivery/1.0",
+  "videos": [
+    {
+      "id": "one-block-three-trains",
+      "master": {
+        "path": "masters/one-block-three-trains.mkv",
+        "sha256": "dcccbc665dfd09a6e532cf9def31971b358a81f6b47c718cf1ba3bb8a6a8db70",
+        "bytes": 2459943
+      },
+      "mp4": {
+        "path": "media/one-block-three-trains.mp4",
+        "sha256": "3ffe0ac64c5abc57a469d29f2f540262f6d36bf4179bbeb6a7e778dcce7a6897",
+        "bytes": 71593,
+        "codec": "h264",
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "color_primaries": "bt709",
+        "color_range": "tv",
+        "width": 960,
+        "height": 540,
+        "duration": 10
+      },
+      "webm": {
+        "path": "media/one-block-three-trains.webm",
+        "sha256": "d19069705ffbdc02b53767fa1f5b2962a3a3861bdc98f6e5b8aab934c535e6d8",
+        "bytes": 46271,
+        "codec": "vp9",
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "color_primaries": "bt709",
+        "color_range": "tv",
+        "width": 960,
+        "height": 540,
+        "duration": 10
+      }
+    },
+    {
+      "id": "four-and-a-half-to-one",
+      "master": {
+        "path": "masters/four-and-a-half-to-one.mkv",
+        "sha256": "e2691a693ddd0cd55679e4a821074096560ee66809914baffa27046284b83a57",
+        "bytes": 1901246
+      },
+      "mp4": {
+        "path": "media/four-and-a-half-to-one.mp4",
+        "sha256": "b1dff7db6434fe4afc90e1b304d35e9fce97f48eb1a16e93471e06e042cd316b",
+        "bytes": 39000,
+        "codec": "h264",
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "color_primaries": "bt709",
+        "color_range": "tv",
+        "width": 720,
+        "height": 720,
+        "duration": 9
+      },
+      "webm": {
+        "path": "media/four-and-a-half-to-one.webm",
+        "sha256": "33e9157aae28f8d93b063f67745edfe5c0dc30b5eb8bb8d56f8c7dcae74db2d2",
+        "bytes": 27890,
+        "codec": "vp9",
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "color_primaries": "bt709",
+        "color_range": "tv",
+        "width": 720,
+        "height": 720,
+        "duration": 9
+      }
+    },
+    {
+      "id": "three-tokens-make-nine",
+      "master": {
+        "path": "masters/three-tokens-make-nine.mkv",
+        "sha256": "5babc7346181322cc9824c857ec670b557f82c0ac235225d5cf6ec031c27ce9a",
+        "bytes": 3264227
+      },
+      "mp4": {
+        "path": "media/three-tokens-make-nine.mp4",
+        "sha256": "9e80ab990b752e87b01cde4d1b917d85b48fc5a8bd814dad848f5a0e0608a890",
+        "bytes": 42255,
+        "codec": "h264",
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "color_primaries": "bt709",
+        "color_range": "tv",
+        "width": 540,
+        "height": 960,
+        "duration": 12
+      },
+      "webm": {
+        "path": "media/three-tokens-make-nine.webm",
+        "sha256": "bcb8fa53e245253ffc88bcf1505517902837781a56f87b0a21e24712548fc59c",
+        "bytes": 41966,
+        "codec": "vp9",
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "color_primaries": "bt709",
+        "color_range": "tv",
+        "width": 540,
+        "height": 960,
+        "duration": 12
+      }
+    }
+  ]
+}

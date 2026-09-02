@@ -1,0 +1,56 @@
+name: Creator Submission Review
+
+on:
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize, ready_for_review]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: creator-submission-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: github.event.pull_request.base.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout trusted base
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify media probe
+        run: ffprobe -version
+
+      - name: Validate immutable submission and derive review quorum
+        run: |
+          python3 scripts/review_creator_submission.py \
+            --event "$GITHUB_EVENT_PATH" \
+            --output "$RUNNER_TEMP/rapp-vision-quality.json" \
+            --repository "$GITHUB_REPOSITORY" \
+            --server-url "$GITHUB_SERVER_URL" \
+            --api-url "$GITHUB_API_URL" \
+            --run-id "$GITHUB_RUN_ID"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload protected quality record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapp-vision-quality-${{ github.event.pull_request.number }}
+          path: ${{ runner.temp }}/rapp-vision-quality.json
+          if-no-files-found: ignore
+          retention-days: 30

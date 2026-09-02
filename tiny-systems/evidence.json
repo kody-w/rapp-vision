@@ -139,7 +139,7 @@
       "claims": [
         {
           "id": "positive",
-          "claim": "The computed 4.50:1 foreground and background pair is accepted at the WCAG normal-text boundary.",
+          "claim": "The integer source pair #767676 on white computes to 4.54:1 and is accepted above the WCAG normal-text threshold.",
           "actions": [
             {
               "type": "APPLY_BOUNDARY",
@@ -149,12 +149,12 @@
           "expectedState": {
             "accepted": {
               "key": "boundary",
-              "foreground": "rgb(118.656357 118.656357 118.656357)",
+              "foreground": "rgb(118 118 118)",
               "background": "rgb(255 255 255)",
-              "ratio": 4.5
+              "ratio": 4.54
             },
             "status": "accepted",
-            "message": "Boundary pair accepted at 4.50:1.",
+            "message": "#767676 accepted at 4.54:1.",
             "rejected": null
           },
           "assertions": [
@@ -164,7 +164,7 @@
             },
             {
               "path": "accepted.ratio",
-              "equals": 4.5
+              "equals": 4.54
             },
             {
               "path": "rejected",
@@ -174,7 +174,7 @@
         },
         {
           "id": "rejected",
-          "claim": "The computed 4.49:1 near miss is rejected and the accepted 4.50:1 pair remains active.",
+          "claim": "The neighboring integer source pair #777777 on white computes to 4.48:1 and is rejected while the accepted 4.54:1 pair remains active.",
           "actions": [
             {
               "type": "APPLY_BOUNDARY",
@@ -189,15 +189,15 @@
           "expectedState": {
             "accepted": {
               "key": "boundary",
-              "foreground": "rgb(118.656357 118.656357 118.656357)",
+              "foreground": "rgb(118 118 118)",
               "background": "rgb(255 255 255)",
-              "ratio": 4.5
+              "ratio": 4.54
             },
             "status": "rejected",
-            "message": "Near miss rejected at 4.49:1; accepted pair remains 4.50:1.",
+            "message": "#777777 rejected at 4.48:1; accepted pair remains 4.54:1.",
             "rejected": {
               "key": "near-miss",
-              "ratio": 4.49
+              "ratio": 4.48
             }
           },
           "assertions": [
@@ -207,11 +207,11 @@
             },
             {
               "path": "accepted.ratio",
-              "equals": 4.5
+              "equals": 4.54
             },
             {
               "path": "rejected.ratio",
-              "equals": 4.49
+              "equals": 4.48
             }
           ]
         },

@@ -25,6 +25,9 @@ local HTTP server, or a checked-out directory.
 | [`submission.schema.json`](../submission.schema.json) | Claim and submitted PR-manifest phases. |
 | [`quality.schema.json`](../quality.schema.json) | Artifact-bound review and listing-observation contract. |
 | [`template/submission.json`](../template/submission.json) | Copyable submitted-phase manifest. |
+| [`channel.production.schema.json`](../channel.production.schema.json) | One-master authoring contract that retains the mandatory live replay. |
+| [`template/channel.production.json`](../template/channel.production.json) | Copyable source for deterministic paired-media compilation. |
+| [`scripts/compile_publications.py`](../scripts/compile_publications.py) | Checks, plans, and builds both required codecs before publishing `channel.json`. |
 | [`channels.json`](../channels.json) | Default public registry; its bytes alone establish listing. |
 
 Unknown fields are extensions. Readers must ignore fields they do not
@@ -52,11 +55,11 @@ A minimal body manifest contains the common submission fields:
   "commission_id": "use-offline-field-log",
   "creator": {
     "id": "github-your-handle",
-    "display_name": "Your public name"
+    "display_name": "Your public name",
+    "github_user_id": 12345678
   },
   "pull_request": {
     "repository": "https://github.com/kody-w/rapp-vision",
-    "number": 123,
     "head_ref": "creator/your-submission-id"
   },
   "claim": {
@@ -70,6 +73,14 @@ A claim announces intent and helps avoid accidental duplicate work. It is not
 exclusive. It grants no curation role, review vote, technical pass,
 publication, merge, or default-registry position. A maintainer may close an
 abandoned claim without deciding anything about the eventual work.
+
+The pull request number is omitted when opening the claim because GitHub has
+not assigned it yet. It may be added afterward. A workflow validating an
+existing PR passes its transport-derived number to the semantic validator;
+creator-written PR metadata is never treated as authority.
+The same workflow requires `creator.id` and `creator.github_user_id` to match
+the authenticated pull-request author; spelling a different identity into the
+manifest cannot make the author an independent reviewer.
 
 Claim manifests omit `artifact`, `deliverables`, `evidence`, `attestations`,
 and `review_request`. Their presence belongs to the distinct submitted phase.
@@ -99,6 +110,11 @@ manifest. This avoids a self-referential commit hash. Any artifact change gets
 a new immutable commit and requires every affected digest and review binding
 to be updated.
 
+Review requests name required roles, not guessed identities. The protected
+review workflow assigns authenticated reviewers after submission. Technical
+and curation reviewers must be distinct, neither may be the creator, and every
+review is bound to the complete submitted manifest.
+
 From the artifact checkout, record bindings with:
 
 ```bash
@@ -114,6 +130,38 @@ out channel path for `{channel_json}`:
 ```bash
 python3 scripts/validate_publications.py /path/to/artifact/channel.json
 ```
+
+Then run the semantic submission validator advertised by
+`agent.json.submission_validator`:
+
+```bash
+python3 scripts/validate_creator_submission.py submission submission.json \
+  --artifact-root /path/to/frozen/artifact/checkout
+```
+
+The artifact root must be a clean Git checkout whose `HEAD` and
+`remote.origin.url` match the submitted commit and repository. The protected
+PR workflow also supplies `--pr-number` from the event rather than trusting
+creator-authored metadata. The validator recomputes the channel, MP4, and WebM
+hashes; verifies that all three
+deliverables name the selected publication; validates the live replay; checks
+every repository-owned live application and objective evidence path exists;
+probes H.264 and VP9 rather than trusting file extensions; rejects duplicate
+codec sources and URL-ambiguous encoded paths; rejects template sentinels; and
+prints the canonical submitted-manifest digest used by every later review.
+
+An agent beginning with one local guided-film master can use the production
+contract advertised by `agent.json.production`:
+
+```bash
+python3 scripts/compile_publications.py check channel.production.json
+python3 scripts/compile_publications.py build channel.production.json
+```
+
+The build has no single-codec or replay-skipping mode. It probes H.264 for MP4
+and VP9 for WebM, installs neither file unless both pass, and writes the final
+v2 channel last. The production schema is therefore an authoring convenience;
+the submitted artifact remains the constitutional v2 channel.
 
 ## Gates on every commission
 
@@ -140,9 +188,25 @@ default registry.
 
 ## Quality, freshness, and listing
 
-A reviewer can return a JSON quality record conforming to
-[`quality.schema.json`](../quality.schema.json) in a PR comment. Quality has
-three deliberately separate parts:
+Individual reviewers return evidence through authenticated GitHub review
+events. Only the protected workflow named by a quality record's `authority`
+may aggregate those events into authoritative JSON conforming to
+[`quality.schema.json`](../quality.schema.json). A JSON block pasted by an
+ordinary PR commenter is an untrusted proposal, not a quality decision.
+Quality has three deliberately separate parts:
+
+An approving review declares exactly one role and the current canonical
+submission digest in its body:
+
+```html
+<!-- rapp-vision-review role=technical submission_sha256=<64 lowercase hex> -->
+```
+
+The other required role uses `role=curation`. The workflow follows every review page and ignores comments,
+stale digests, non-approving review states, malformed markers, and superseded
+reviews. It takes reviewer identity from GitHub's authenticated review event,
+including the stable numeric GitHub user id, never from the manifest or marker
+text.
 
 - `technical.status` records contract checks and the independent review
   quorum.
@@ -151,13 +215,39 @@ three deliberately separate parts:
 - `freshness.status` says whether that review still describes the submitted
   artifact binding.
 
-Readers derive freshness; they do not trust a creator-authored label. Compare
-the current submitted `artifact.commit` and `artifact.sha256` with
-`quality.binding.artifact_commit` and
-`quality.binding.artifact_sha256`. If either value differs, the quality record,
-technical pass, and listing observation are **stale** and the checks and
-reviews must run again. Each individual review also carries the commit and
-digest it reviewed.
+Readers derive freshness; they do not trust a creator-authored label. The
+quality binding includes a canonical submitted-manifest digest covering the
+commission, creator, artifact tuple, both media paths and hashes, live member,
+evidence, attestations, and requested quorum. It also repeats
+`artifact.commit` and `artifact.sha256`. If any binding differs, the quality
+record, technical pass, and listing observation are **stale** and the checks
+and reviews must run again. Each individual review carries the same submission
+digest, commit, and artifact digest.
+
+Before accepting a quality record, run:
+
+```bash
+python3 scripts/validate_creator_submission.py quality \
+  submission.json quality.json \
+  --repository "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
+  --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+  --pull-request-number "$PR_NUMBER" \
+  --pull-request-head-sha "$PR_HEAD_SHA" \
+  --review-state-sha256 "$REVIEW_STATE_SHA256"
+```
+
+The validator derives quorum rather than trusting `quorum.met`: every check
+must pass, passing reviewer identities must be distinct and non-creator,
+technical and curation roles must both be present, and every review binding
+must match the submitted manifest.
+
+Approval is revocable. Every quality artifact binds the PR number, current
+head SHA, and a digest of the complete latest authenticated review state.
+Submitted, edited, and dismissed review events all rerun the stable
+`Creator Submission Review / review` check. A pending or revoked quorum makes
+that latest check fail. Downloadable artifacts from older runs are historical
+records and are not authoritative; a consumer must require the latest check
+for the current PR head and current review-state digest.
 
 A technical pass is not a listing. A submitted manifest has no approval or
 listing field. A quality record's `listed` value is only an evidence-backed
@@ -176,11 +266,12 @@ without being in the default registry.
 1. Fetch `agent.json`; verify `name` is `RAPP Vision`.
 2. Resolve and read `commissions.json`; choose an `open` commission.
 3. Open the draft claim PR. Do not infer acceptance or exclusivity.
-4. Build one current-contract publication with MP4, WebM, and live replay.
+4. Build one current-contract publication with MP4, WebM, and live replay;
+   use the advertised production compiler when starting from one master.
 5. Capture the objective result, success, failure, and exact reset.
 6. Freeze the artifact commit and calculate raw-byte SHA-256 bindings.
-7. Update the PR manifest to `submitted`, add rights/privacy attestations, and
-   request the complete independent quorum.
-8. Run the advertised validator against the frozen checkout.
+7. Update the PR manifest to `submitted`, add explicit rights/privacy
+   attestations, and request the technical and curation roles.
+8. Run both advertised validators against the frozen checkout.
 9. Treat review output as stale after any artifact commit or digest change.
 10. Treat only actual default-registry bytes as evidence of default listing.
