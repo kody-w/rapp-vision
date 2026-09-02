@@ -1,0 +1,83 @@
+{
+  "artifacts": {
+    "app": {
+      "bytes": 32131,
+      "path": "apps/create-vector-icon-system.html",
+      "sha256": "3c274cc89e86720d81a4164cfef28f26319f8d5338b77051e08986284f1fa639"
+    },
+    "channel": {
+      "bytes": 3540,
+      "path": "channel.json",
+      "sha256": "987a7dfa237cca7c546c7c990cb37dfb7c27c229dbf0f34db8d4a2917c4826e4"
+    },
+    "evidence": {
+      "bytes": 13515,
+      "path": "evidence.json",
+      "sha256": "c1a279261ffa81a7349f30790f76d32a30a588a82e38e20ef35b2d7d48bb3470"
+    },
+    "master": {
+      "bytes": 4847771,
+      "codec": "ffv1",
+      "color_primaries": null,
+      "color_range": "pc",
+      "color_space": "gbr",
+      "color_transfer": null,
+      "duration": 15.0,
+      "height": 540,
+      "path": "masters/create-vector-icon-system.mkv",
+      "pixel_format": "bgr0",
+      "sha256": "1f8472f7f649e9f7f3d020c3d4382cc61e227ef640b28e9440c9eda32496c101",
+      "width": 960
+    },
+    "mp4": {
+      "bytes": 70804,
+      "codec": "h264",
+      "color_primaries": "bt709",
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": "bt709",
+      "duration": 15.0,
+      "height": 540,
+      "path": "media/create-vector-icon-system.mp4",
+      "pixel_format": "yuv420p",
+      "sha256": "6de1eff552823231aefa537e63f5a947e0b2a71c5a7e4a4b2b17fbc3f2619125",
+      "width": 960
+    },
+    "production": {
+      "bytes": 3389,
+      "path": "channel.production.json",
+      "sha256": "9ad523f1ef9a38ac2f5fbc0a0487e108132b715989ed89395b7bfddd6e1f43ff"
+    },
+    "snapshot": {
+      "bytes": 3227,
+      "path": "snapshots/create-vector-icon-system.svg",
+      "sha256": "e71776adbd910bd819744814514940ee96d39aab51c3175a61e823da752ad45e"
+    },
+    "sprite": {
+      "bytes": 2234,
+      "path": "exports/six-shapes.svg",
+      "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2"
+    },
+    "thumbnail": {
+      "bytes": 4399,
+      "path": "thumbs/create-vector-icon-system.svg",
+      "sha256": "728f35b2dd6f8d48bfc8497eadba4359e121c01daf47865d7b6d403efff045c3"
+    },
+    "webm": {
+      "bytes": 75246,
+      "codec": "vp9",
+      "color_primaries": "bt709",
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": "bt709",
+      "duration": 15.0,
+      "height": 540,
+      "path": "media/create-vector-icon-system.webm",
+      "pixel_format": "yuv420p",
+      "sha256": "06e98a673f2fbf62924230230e8b0e3061bbe12c3725e9d13ad02268783c320b",
+      "width": 960
+    }
+  },
+  "publication": "create-vector-icon-system",
+  "schema": "candidate-frame-0002-delivery/1.0"
+}

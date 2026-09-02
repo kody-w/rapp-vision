@@ -1,0 +1,565 @@
+{
+  "claims": [
+    {
+      "actions": [
+        {
+          "selector": "#stroke-2-btn",
+          "type": "SET_STROKE"
+        },
+        {
+          "selector": "#regenerate-btn",
+          "type": "REGENERATE"
+        },
+        {
+          "selector": "#export-btn",
+          "type": "EXPORT"
+        }
+      ],
+      "assertions": [
+        {
+          "equals": 2,
+          "path": "accepted.rules.stroke"
+        },
+        {
+          "equals": [
+            "bloom",
+            "cairn",
+            "hinge",
+            "orbit",
+            "pulse",
+            "weave"
+          ],
+          "path": "accepted.symbols"
+        },
+        {
+          "equals": "pass",
+          "path": "comparison.status"
+        },
+        {
+          "equals": 0,
+          "path": "comparison.differingPercent"
+        },
+        {
+          "equals": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+          "path": "lastExport.sha256"
+        }
+      ],
+      "claim": "Editing the shared stroke token to 2 px regenerates all six symbols and exports the exact passing sprite.",
+      "expectedState": {
+        "accepted": {
+          "fixture": "shared-stroke-2",
+          "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+          "rules": {
+            "grid": 2,
+            "linecap": "round",
+            "linejoin": "round",
+            "stroke": 2,
+            "viewBox": "0 0 24 24"
+          },
+          "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+          "symbols": [
+            "bloom",
+            "cairn",
+            "hinge",
+            "orbit",
+            "pulse",
+            "weave"
+          ]
+        },
+        "comparison": {
+          "differingPercent": 0,
+          "differingPixels": 0,
+          "overlay": [],
+          "status": "pass",
+          "totalPixels": 3456
+        },
+        "draftStroke": 2,
+        "invalidEdit": null,
+        "lastExport": {
+          "bytes": 2234,
+          "path": "exports/six-shapes.svg",
+          "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+          "symbolCount": 6
+        },
+        "message": "Exported 6 named 24 × 24 symbols; raster difference 0.0000% passes the 0.50% gate.",
+        "selection": "bloom",
+        "status": "accepted",
+        "zoom": 800
+      },
+      "id": "positive"
+    },
+    {
+      "actions": [
+        {
+          "selector": "#stroke-2-btn",
+          "type": "SET_STROKE"
+        },
+        {
+          "selector": "#regenerate-btn",
+          "type": "REGENERATE"
+        },
+        {
+          "selector": "#export-btn",
+          "type": "EXPORT"
+        },
+        {
+          "selector": "#off-grid-btn",
+          "type": "OFF_GRID"
+        }
+      ],
+      "assertions": [
+        {
+          "equals": {
+            "fixture": "shared-stroke-2",
+            "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+            "rules": {
+              "grid": 2,
+              "linecap": "round",
+              "linejoin": "round",
+              "stroke": 2,
+              "viewBox": "0 0 24 24"
+            },
+            "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+            "symbols": [
+              "bloom",
+              "cairn",
+              "hinge",
+              "orbit",
+              "pulse",
+              "weave"
+            ]
+          },
+          "path": "accepted"
+        },
+        {
+          "equals": {
+            "bytes": 2234,
+            "path": "exports/six-shapes.svg",
+            "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+            "symbolCount": 6
+          },
+          "path": "lastExport"
+        },
+        {
+          "equals": "fail",
+          "path": "comparison.status"
+        },
+        {
+          "equals": 51,
+          "path": "comparison.differingPixels"
+        },
+        {
+          "equals": [
+            13,
+            17
+          ],
+          "path": "invalidEdit.to"
+        }
+      ],
+      "claim": "Moving the Pulse anchor from 12,18 to off-grid 13,17 fails the comparison and highlights changed pixels without changing the accepted icon system or export.",
+      "expectedState": {
+        "accepted": {
+          "fixture": "shared-stroke-2",
+          "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+          "rules": {
+            "grid": 2,
+            "linecap": "round",
+            "linejoin": "round",
+            "stroke": 2,
+            "viewBox": "0 0 24 24"
+          },
+          "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+          "symbols": [
+            "bloom",
+            "cairn",
+            "hinge",
+            "orbit",
+            "pulse",
+            "weave"
+          ]
+        },
+        "comparison": {
+          "differingPercent": 1.4757,
+          "differingPixels": 51,
+          "overlay": [
+            [
+              9,
+              6
+            ],
+            [
+              9,
+              7
+            ],
+            [
+              14,
+              7
+            ],
+            [
+              8,
+              8
+            ],
+            [
+              9,
+              8
+            ],
+            [
+              10,
+              8
+            ],
+            [
+              14,
+              8
+            ],
+            [
+              8,
+              9
+            ],
+            [
+              10,
+              9
+            ],
+            [
+              13,
+              9
+            ],
+            [
+              15,
+              9
+            ],
+            [
+              8,
+              10
+            ],
+            [
+              10,
+              10
+            ],
+            [
+              11,
+              10
+            ],
+            [
+              13,
+              10
+            ],
+            [
+              15,
+              10
+            ],
+            [
+              8,
+              11
+            ],
+            [
+              9,
+              11
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              11
+            ],
+            [
+              13,
+              11
+            ],
+            [
+              15,
+              11
+            ],
+            [
+              9,
+              12
+            ],
+            [
+              11,
+              12
+            ],
+            [
+              12,
+              12
+            ],
+            [
+              13,
+              12
+            ],
+            [
+              14,
+              12
+            ],
+            [
+              15,
+              12
+            ],
+            [
+              9,
+              13
+            ],
+            [
+              10,
+              13
+            ],
+            [
+              11,
+              13
+            ],
+            [
+              14,
+              13
+            ],
+            [
+              9,
+              14
+            ],
+            [
+              10,
+              14
+            ],
+            [
+              11,
+              14
+            ],
+            [
+              12,
+              14
+            ],
+            [
+              14,
+              14
+            ],
+            [
+              10,
+              15
+            ],
+            [
+              11,
+              15
+            ],
+            [
+              13,
+              15
+            ],
+            [
+              14,
+              15
+            ],
+            [
+              10,
+              16
+            ],
+            [
+              11,
+              16
+            ],
+            [
+              13,
+              16
+            ],
+            [
+              14,
+              16
+            ],
+            [
+              10,
+              17
+            ],
+            [
+              11,
+              17
+            ],
+            [
+              12,
+              17
+            ],
+            [
+              13,
+              17
+            ],
+            [
+              11,
+              18
+            ],
+            [
+              12,
+              18
+            ]
+          ],
+          "status": "fail",
+          "totalPixels": 3456
+        },
+        "draftStroke": 2,
+        "invalidEdit": {
+          "anchorIndex": 3,
+          "from": [
+            12,
+            18
+          ],
+          "icon": "pulse",
+          "reason": "13,17 is off the shared 2 px grid.",
+          "to": [
+            13,
+            17
+          ]
+        },
+        "lastExport": {
+          "bytes": 2234,
+          "path": "exports/six-shapes.svg",
+          "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+          "symbolCount": 6
+        },
+        "message": "Rejected Pulse anchor 13,17: 51 pixels differ (1.4757%). The accepted 6-symbol export is unchanged.",
+        "selection": "pulse",
+        "status": "rejected",
+        "zoom": 800
+      },
+      "id": "rejected",
+      "preserves": "positive"
+    },
+    {
+      "actions": [
+        {
+          "selector": "#restore-btn",
+          "type": "RESTORE"
+        }
+      ],
+      "assertions": [
+        {
+          "equals": "original",
+          "path": "accepted.fixture"
+        },
+        {
+          "equals": 1.5,
+          "path": "accepted.rules.stroke"
+        },
+        {
+          "equals": [
+            "bloom",
+            "cairn",
+            "hinge",
+            "orbit",
+            "pulse",
+            "weave"
+          ],
+          "path": "accepted.symbols"
+        },
+        {
+          "equals": "bloom",
+          "path": "selection"
+        },
+        {
+          "equals": 800,
+          "path": "zoom"
+        },
+        {
+          "equals": [],
+          "path": "comparison.overlay"
+        },
+        {
+          "equals": "pass",
+          "path": "comparison.status"
+        }
+      ],
+      "claim": "Restore icon fixture returns all original paths and rules, selects Bloom, sets 800% zoom, and clears every overlay.",
+      "expectedState": {
+        "accepted": {
+          "fixture": "original",
+          "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+          "rules": {
+            "grid": 2,
+            "linecap": "round",
+            "linejoin": "round",
+            "stroke": 1.5,
+            "viewBox": "0 0 24 24"
+          },
+          "spriteSha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+          "symbols": [
+            "bloom",
+            "cairn",
+            "hinge",
+            "orbit",
+            "pulse",
+            "weave"
+          ]
+        },
+        "comparison": {
+          "differingPercent": 0,
+          "differingPixels": 0,
+          "overlay": [],
+          "status": "pass",
+          "totalPixels": 3456
+        },
+        "draftStroke": 1.5,
+        "invalidEdit": null,
+        "lastExport": null,
+        "message": "Original fixture restored: six paths are on the 2 px grid at 800% zoom.",
+        "selection": "bloom",
+        "status": "reset",
+        "zoom": 800
+      },
+      "id": "reset"
+    }
+  ],
+  "commission": {
+    "criterion": "The export contains exactly six named 24 by 24 SVG symbols and the reference raster comparison remains below 0.50 percent differing pixels.",
+    "id": "create-vector-icon-system"
+  },
+  "objective": {
+    "rasterComparison": {
+      "acceptedDifferingPercent": 0.0,
+      "acceptedDifferingPixels": 0,
+      "acceptedStatus": "pass",
+      "highlightCount": 51,
+      "invalidDifferingPercent": 1.4757,
+      "invalidDifferingPixels": 51,
+      "invalidStatus": "fail",
+      "method": "Round polyline coverage at 4x4 fixed subpixel centers; a pixel differs when its 8-bit coverage value differs.",
+      "reference": "reference/reference-raster.json",
+      "thresholdPercent": 0.5,
+      "totalPixels": 3456
+    },
+    "sprite": {
+      "bytes": 2234,
+      "names": [
+        "bloom",
+        "cairn",
+        "hinge",
+        "orbit",
+        "pulse",
+        "weave"
+      ],
+      "path": "exports/six-shapes.svg",
+      "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+      "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+      "sharedStroke": 2.0,
+      "symbolCount": 6,
+      "viewBox": "0 0 24 24"
+    }
+  },
+  "publication": "create-vector-icon-system",
+  "renderer": {
+    "duration": 15.0,
+    "fps": 12,
+    "frameSamples": {
+      "0": "bcb59b23114b600e6f4ac20d5afa24fb49cb9228033fb55985f417f4209b2fa1",
+      "132": "ec28c82642a04eac5e8910619b3c1e6c51357efc4f2abafa29970eeb0ca44d21",
+      "179": "85201a48fbedbc440f8dd965cf6a419b701d40dd25604f949df423664abe8d80",
+      "42": "0dcc2fde27029b5d84aca5cdcda9be139280f187a04238bfd9acc9019a9e0ae8",
+      "84": "17cfb18dc5db6ddfa3bfa5cd2490ebcd9543b413bac27f88bc0d6bce9af75c3b"
+    },
+    "frames": 180,
+    "height": 540,
+    "masterCodec": "ffv1",
+    "path": "render.py",
+    "width": 960
+  },
+  "rightsPrivacy": {
+    "noSecrets": true,
+    "privacyAttestation": true,
+    "rightsAttestation": true,
+    "statement": "All icon geometry, interface code, raster references, thumbnail, snapshot, and renderer graphics are original to this candidate; no logos, copied icons, external fonts, or network assets are used."
+  },
+  "schema": "candidate-frame-0002-create-vector-icon-system-evidence/1.0"
+}

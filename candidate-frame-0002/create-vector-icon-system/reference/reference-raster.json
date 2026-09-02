@@ -1,0 +1,416 @@
+{
+  "comparison": {
+    "acceptedDifferingPercent": 0.0,
+    "acceptedDifferingPixels": 0,
+    "acceptedStatus": "pass",
+    "changedPixelHighlights": [
+      {
+        "candidate": 96,
+        "icon": "pulse",
+        "reference": 48,
+        "x": 9,
+        "y": 6
+      },
+      {
+        "candidate": 191,
+        "icon": "pulse",
+        "reference": 143,
+        "x": 9,
+        "y": 7
+      },
+      {
+        "candidate": 112,
+        "icon": "pulse",
+        "reference": 143,
+        "x": 14,
+        "y": 7
+      },
+      {
+        "candidate": 239,
+        "icon": "pulse",
+        "reference": 255,
+        "x": 8,
+        "y": 8
+      },
+      {
+        "candidate": 255,
+        "icon": "pulse",
+        "reference": 223,
+        "x": 9,
+        "y": 8
+      },
+      {
+        "candidate": 64,
+        "icon": "pulse",
+        "reference": 0,
+        "x": 10,
+        "y": 8
+      },
+      {
+        "candidate": 175,
+        "icon": "pulse",
+        "reference": 223,
+        "x": 14,
+        "y": 8
+      },
+      {
+        "candidate": 128,
+        "icon": "pulse",
+        "reference": 223,
+        "x": 8,
+        "y": 9
+      },
+      {
+        "candidate": 175,
+        "icon": "pulse",
+        "reference": 48,
+        "x": 10,
+        "y": 9
+      },
+      {
+        "candidate": 0,
+        "icon": "pulse",
+        "reference": 48,
+        "x": 13,
+        "y": 9
+      },
+      {
+        "candidate": 255,
+        "icon": "pulse",
+        "reference": 223,
+        "x": 15,
+        "y": 9
+      },
+      {
+        "candidate": 16,
+        "icon": "pulse",
+        "reference": 143,
+        "x": 8,
+        "y": 10
+      },
+      {
+        "candidate": 255,
+        "icon": "pulse",
+        "reference": 143,
+        "x": 10,
+        "y": 10
+      },
+      {
+        "candidate": 32,
+        "icon": "pulse",
+        "reference": 0,
+        "x": 11,
+        "y": 10
+      },
+      {
+        "candidate": 64,
+        "icon": "pulse",
+        "reference": 143,
+        "x": 13,
+        "y": 10
+      },
+      {
+        "candidate": 207,
+        "icon": "pulse",
+        "reference": 143,
+        "x": 15,
+        "y": 10
+      },
+      {
+        "candidate": 0,
+        "icon": "pulse",
+        "reference": 48,
+        "x": 8,
+        "y": 11
+      },
+      {
+        "candidate": 159,
+        "icon": "pulse",
+        "reference": 255,
+        "x": 9,
+        "y": 11
+      },
+      {
+        "candidate": 255,
+        "icon": "pulse",
+        "reference": 223,
+        "x": 10,
+        "y": 11
+      },
+      {
+        "candidate": 159,
+        "icon": "pulse",
+        "reference": 0,
+        "x": 11,
+        "y": 11
+      },
+      {
+        "candidate": 143,
+        "icon": "pulse",
+        "reference": 223,
+        "x": 13,
+        "y": 11
+      },
+      {
+        "candidate": 143,
+        "icon": "pulse",
+        "reference": 48,
+        "x": 15,
+        "y": 11
+      },
+      {
+        "candidate": 32,
+        "icon": "pulse",
+        "reference": 223,
+        "x": 9,
+        "y": 12
+      },
+      {
+        "candidate": 255,
+        "icon": "pulse",
+        "reference": 48,
+        "x": 11,
+        "y": 12
+      },
+      {
+        "candidate": 16,
+        "icon": "pulse",
+        "reference": 48,
+        "x": 12,
+        "y": 12
+      },
+      {
+        "candidate": 207,
+        "icon": "pulse",
+        "reference": 255,
+        "x": 13,
+        "y": 12
+      },
+      {
+        "candidate": 255,
+        "icon": "pulse",
+        "reference": 223,
+        "x": 14,
+        "y": 12
+      },
+      {
+        "candidate": 64,
+        "icon": "pulse",
+        "reference": 0,
+        "x": 15,
+        "y": 12
+      },
+      {
+        "candidate": 0,
+        "icon": "pulse",
+        "reference": 143,
+        "x": 9,
+        "y": 13
+      },
+      {
+        "candidate": 175,
+        "icon": "pulse",
+        "reference": 255,
+        "x": 10,
+        "y": 13
+      },
+      {
+        "candidate": 255,
+        "icon": "pulse",
+        "reference": 143,
+        "x": 11,
+        "y": 13
+      },
+      {
+        "candidate": 255,
+        "icon": "pulse",
+        "reference": 143,
+        "x": 14,
+        "y": 13
+      },
+      {
+        "candidate": 0,
+        "icon": "pulse",
+        "reference": 48,
+        "x": 9,
+        "y": 14
+      },
+      {
+        "candidate": 64,
+        "icon": "pulse",
+        "reference": 255,
+        "x": 10,
+        "y": 14
+      },
+      {
+        "candidate": 255,
+        "icon": "pulse",
+        "reference": 223,
+        "x": 11,
+        "y": 14
+      },
+      {
+        "candidate": 255,
+        "icon": "pulse",
+        "reference": 223,
+        "x": 12,
+        "y": 14
+      },
+      {
+        "candidate": 175,
+        "icon": "pulse",
+        "reference": 48,
+        "x": 14,
+        "y": 14
+      },
+      {
+        "candidate": 0,
+        "icon": "pulse",
+        "reference": 223,
+        "x": 10,
+        "y": 15
+      },
+      {
+        "candidate": 191,
+        "icon": "pulse",
+        "reference": 255,
+        "x": 11,
+        "y": 15
+      },
+      {
+        "candidate": 255,
+        "icon": "pulse",
+        "reference": 223,
+        "x": 13,
+        "y": 15
+      },
+      {
+        "candidate": 112,
+        "icon": "pulse",
+        "reference": 0,
+        "x": 14,
+        "y": 15
+      },
+      {
+        "candidate": 0,
+        "icon": "pulse",
+        "reference": 143,
+        "x": 10,
+        "y": 16
+      },
+      {
+        "candidate": 96,
+        "icon": "pulse",
+        "reference": 255,
+        "x": 11,
+        "y": 16
+      },
+      {
+        "candidate": 255,
+        "icon": "pulse",
+        "reference": 143,
+        "x": 13,
+        "y": 16
+      },
+      {
+        "candidate": 48,
+        "icon": "pulse",
+        "reference": 0,
+        "x": 14,
+        "y": 16
+      },
+      {
+        "candidate": 0,
+        "icon": "pulse",
+        "reference": 48,
+        "x": 10,
+        "y": 17
+      },
+      {
+        "candidate": 0,
+        "icon": "pulse",
+        "reference": 255,
+        "x": 11,
+        "y": 17
+      },
+      {
+        "candidate": 207,
+        "icon": "pulse",
+        "reference": 255,
+        "x": 12,
+        "y": 17
+      },
+      {
+        "candidate": 207,
+        "icon": "pulse",
+        "reference": 48,
+        "x": 13,
+        "y": 17
+      },
+      {
+        "candidate": 0,
+        "icon": "pulse",
+        "reference": 207,
+        "x": 11,
+        "y": 18
+      },
+      {
+        "candidate": 0,
+        "icon": "pulse",
+        "reference": 207,
+        "x": 12,
+        "y": 18
+      }
+    ],
+    "invalidDifferingPercent": 1.4757,
+    "invalidDifferingPixels": 51,
+    "invalidEdit": {
+      "anchorIndex": 3,
+      "from": [
+        12,
+        18
+      ],
+      "icon": "pulse",
+      "reason": "Both coordinates must be divisible by the 2 px grid token.",
+      "to": [
+        13,
+        17
+      ]
+    },
+    "invalidStatus": "fail",
+    "method": "Round polyline coverage at 4x4 fixed subpixel centers; a pixel differs when its 8-bit coverage value differs.",
+    "thresholdPercent": 0.5,
+    "totalPixels": 3456
+  },
+  "grid": 2,
+  "icons": [
+    {
+      "coverageSha256": "03b58d76be9f7d87f3a5315df883b35feb051fa5767893a9ee782d010e2f11ec",
+      "name": "bloom"
+    },
+    {
+      "coverageSha256": "265c876a84208a824ba137a656606749e5855c302d0a35e76a9e5549b421ff4f",
+      "name": "cairn"
+    },
+    {
+      "coverageSha256": "bc1495924fdf71f7e4e2ee15c4277609b7113017c46ac1858a02d5fa57294f67",
+      "name": "hinge"
+    },
+    {
+      "coverageSha256": "5263166d60679fa9548c04fe4c4decf0ff8ea1b6c60814f25840db38db432c01",
+      "name": "orbit"
+    },
+    {
+      "coverageSha256": "6f15669487ffa3f1b9e9b348e59a1ca8488942e5e304a74f747b259afd393cb4",
+      "name": "pulse"
+    },
+    {
+      "coverageSha256": "1cb235fbd5f83f968a07f19b3a197038f09725e34271f0004a0aa407717a325e",
+      "name": "weave"
+    }
+  ],
+  "schema": "six-shapes-reference-raster/1.0",
+  "stroke": 2.0,
+  "supersample": "4x4",
+  "viewBox": "0 0 24 24"
+}
