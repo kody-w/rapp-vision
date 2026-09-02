@@ -66,10 +66,29 @@ class TestOilFieldChannels(unittest.TestCase):
 
     def test_registry_revision_advanced_for_the_season(self):
         registry = json.loads((ROOT / "channels.json").read_text(encoding="utf-8"))
-        self.assertGreaterEqual(registry["revision"]["sequence"], 4)
+        self.assertGreaterEqual(registry["revision"]["sequence"], 5)
         self.assertGreaterEqual(
             registry["revision"]["updated"],
-            "2026-09-02T16:08:06Z",
+            "2026-09-02T16:09:47Z",
+        )
+
+    def test_new_way_of_work_draft_channel_is_listed(self):
+        registry = json.loads((ROOT / "channels.json").read_text(encoding="utf-8"))
+        entries = {entry["id"]: entry for entry in registry["channels"]}
+
+        self.assertEqual(
+            entries["new-way-of-work"],
+            {
+                "id": "new-way-of-work",
+                "name": "The New Way of Work",
+                "url": "../rappvision-new-way-of-work/channel.json",
+                "repo": "https://github.com/kody-w/rappvision-new-way-of-work",
+                "contract": "rapp-vision-channel/2.0",
+                "_why": (
+                    "Narration-neutral production drafts paired with live, "
+                    "creator-driven storyboards for an open AI-worker build series."
+                ),
+            },
         )
 
 
