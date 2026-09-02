@@ -1,0 +1,432 @@
+{
+  "schema": "tiny-systems-evidence/1.0",
+  "channel": "tiny-systems",
+  "publications": [
+    {
+      "id": "one-block-three-trains",
+      "app": "apps/one-block-three-trains.html",
+      "claims": [
+        {
+          "id": "positive",
+          "claim": "With a clear block, dispatch accepts train A as the sole occupant.",
+          "actions": [
+            {
+              "type": "DISPATCH",
+              "selector": "#dispatch-btn"
+            }
+          ],
+          "expectedState": {
+            "waiting": [
+              "B",
+              "C"
+            ],
+            "block": "A",
+            "completed": [],
+            "status": "accepted",
+            "message": "Train A entered the block.",
+            "lastRejected": null
+          },
+          "assertions": [
+            {
+              "path": "block",
+              "equals": "A"
+            },
+            {
+              "path": "waiting",
+              "equals": [
+                "B",
+                "C"
+              ]
+            },
+            {
+              "path": "completed",
+              "equals": []
+            }
+          ]
+        },
+        {
+          "id": "rejected",
+          "claim": "A second dispatch is rejected while train A occupies the block, preserving every accepted occupancy field.",
+          "actions": [
+            {
+              "type": "DISPATCH",
+              "selector": "#dispatch-btn"
+            },
+            {
+              "type": "DISPATCH",
+              "selector": "#dispatch-btn"
+            }
+          ],
+          "preserves": "positive",
+          "expectedState": {
+            "waiting": [
+              "B",
+              "C"
+            ],
+            "block": "A",
+            "completed": [],
+            "status": "rejected",
+            "message": "Train B rejected: block occupied by train A.",
+            "lastRejected": "B"
+          },
+          "assertions": [
+            {
+              "path": "block",
+              "equals": "A"
+            },
+            {
+              "path": "waiting",
+              "equals": [
+                "B",
+                "C"
+              ]
+            },
+            {
+              "path": "completed",
+              "equals": []
+            },
+            {
+              "path": "lastRejected",
+              "equals": "B"
+            }
+          ]
+        },
+        {
+          "id": "reset",
+          "claim": "Reset returns the complete reducer state to the exact opening snapshot.",
+          "actions": [
+            {
+              "type": "RESET",
+              "selector": "#reset-btn"
+            }
+          ],
+          "expectedState": {
+            "waiting": [
+              "A",
+              "B",
+              "C"
+            ],
+            "block": null,
+            "completed": [],
+            "status": "ready",
+            "message": "Block clear. Train A is first in line.",
+            "lastRejected": null
+          },
+          "assertions": [
+            {
+              "path": "waiting",
+              "equals": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "path": "block",
+              "equals": null
+            },
+            {
+              "path": "status",
+              "equals": "ready"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "four-and-a-half-to-one",
+      "app": "apps/four-and-a-half-to-one.html",
+      "claims": [
+        {
+          "id": "positive",
+          "claim": "The computed 4.50:1 foreground and background pair is accepted at the WCAG normal-text boundary.",
+          "actions": [
+            {
+              "type": "APPLY_BOUNDARY",
+              "selector": "#apply-boundary-btn"
+            }
+          ],
+          "expectedState": {
+            "accepted": {
+              "key": "boundary",
+              "foreground": "rgb(118.656357 118.656357 118.656357)",
+              "background": "rgb(255 255 255)",
+              "ratio": 4.5
+            },
+            "status": "accepted",
+            "message": "Boundary pair accepted at 4.50:1.",
+            "rejected": null
+          },
+          "assertions": [
+            {
+              "path": "accepted.key",
+              "equals": "boundary"
+            },
+            {
+              "path": "accepted.ratio",
+              "equals": 4.5
+            },
+            {
+              "path": "rejected",
+              "equals": null
+            }
+          ]
+        },
+        {
+          "id": "rejected",
+          "claim": "The computed 4.49:1 near miss is rejected and the accepted 4.50:1 pair remains active.",
+          "actions": [
+            {
+              "type": "APPLY_BOUNDARY",
+              "selector": "#apply-boundary-btn"
+            },
+            {
+              "type": "APPLY_NEAR_MISS",
+              "selector": "#apply-near-miss-btn"
+            }
+          ],
+          "preserves": "positive",
+          "expectedState": {
+            "accepted": {
+              "key": "boundary",
+              "foreground": "rgb(118.656357 118.656357 118.656357)",
+              "background": "rgb(255 255 255)",
+              "ratio": 4.5
+            },
+            "status": "rejected",
+            "message": "Near miss rejected at 4.49:1; accepted pair remains 4.50:1.",
+            "rejected": {
+              "key": "near-miss",
+              "ratio": 4.49
+            }
+          },
+          "assertions": [
+            {
+              "path": "accepted.key",
+              "equals": "boundary"
+            },
+            {
+              "path": "accepted.ratio",
+              "equals": 4.5
+            },
+            {
+              "path": "rejected.ratio",
+              "equals": 4.49
+            }
+          ]
+        },
+        {
+          "id": "reset",
+          "claim": "Reset restores the exact black-on-white 21.00:1 opening state.",
+          "actions": [
+            {
+              "type": "RESET",
+              "selector": "#reset-btn"
+            }
+          ],
+          "expectedState": {
+            "accepted": {
+              "key": "baseline",
+              "foreground": "rgb(0 0 0)",
+              "background": "rgb(255 255 255)",
+              "ratio": 21
+            },
+            "status": "ready",
+            "message": "Opening pair is 21.00:1.",
+            "rejected": null
+          },
+          "assertions": [
+            {
+              "path": "accepted.key",
+              "equals": "baseline"
+            },
+            {
+              "path": "accepted.ratio",
+              "equals": 21
+            },
+            {
+              "path": "status",
+              "equals": "ready"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "three-tokens-make-nine",
+      "app": "apps/three-tokens-make-nine.html",
+      "claims": [
+        {
+          "id": "positive",
+          "claim": "Selecting tokens 2, 3, and 4 and submitting accepts exactly three tokens totaling nine.",
+          "actions": [
+            {
+              "type": "TOGGLE",
+              "value": 2,
+              "selector": "#token-2"
+            },
+            {
+              "type": "TOGGLE",
+              "value": 3,
+              "selector": "#token-3"
+            },
+            {
+              "type": "TOGGLE",
+              "value": 4,
+              "selector": "#token-4"
+            },
+            {
+              "type": "SUBMIT",
+              "selector": "#submit-btn"
+            }
+          ],
+          "expectedState": {
+            "draft": [
+              2,
+              3,
+              4
+            ],
+            "accepted": [
+              2,
+              3,
+              4
+            ],
+            "status": "accepted",
+            "message": "Accepted: 2 + 3 + 4 = 9.",
+            "rejectedTotal": null
+          },
+          "assertions": [
+            {
+              "path": "draft",
+              "equals": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "path": "accepted",
+              "equals": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "path": "rejectedTotal",
+              "equals": null
+            }
+          ]
+        },
+        {
+          "id": "rejected",
+          "claim": "Submitting 1 + 3 + 4 rejects total eight while the accepted 2 + 3 + 4 tray remains unchanged.",
+          "actions": [
+            {
+              "type": "TOGGLE",
+              "value": 2,
+              "selector": "#token-2"
+            },
+            {
+              "type": "TOGGLE",
+              "value": 3,
+              "selector": "#token-3"
+            },
+            {
+              "type": "TOGGLE",
+              "value": 4,
+              "selector": "#token-4"
+            },
+            {
+              "type": "SUBMIT",
+              "selector": "#submit-btn"
+            },
+            {
+              "type": "TOGGLE",
+              "value": 2,
+              "selector": "#token-2"
+            },
+            {
+              "type": "TOGGLE",
+              "value": 1,
+              "selector": "#token-1"
+            },
+            {
+              "type": "SUBMIT",
+              "selector": "#submit-btn"
+            }
+          ],
+          "preserves": "positive",
+          "expectedState": {
+            "draft": [
+              1,
+              3,
+              4
+            ],
+            "accepted": [
+              2,
+              3,
+              4
+            ],
+            "status": "rejected",
+            "message": "Rejected: 1 + 3 + 4 = 8. Accepted tokens stay 2 + 3 + 4.",
+            "rejectedTotal": 8
+          },
+          "assertions": [
+            {
+              "path": "draft",
+              "equals": [
+                1,
+                3,
+                4
+              ]
+            },
+            {
+              "path": "accepted",
+              "equals": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "path": "rejectedTotal",
+              "equals": 8
+            }
+          ]
+        },
+        {
+          "id": "reset",
+          "claim": "Reset empties both trays and returns every reducer field to its exact opening value.",
+          "actions": [
+            {
+              "type": "RESET",
+              "selector": "#reset-btn"
+            }
+          ],
+          "expectedState": {
+            "draft": [],
+            "accepted": [],
+            "status": "ready",
+            "message": "Choose exactly three tokens.",
+            "rejectedTotal": null
+          },
+          "assertions": [
+            {
+              "path": "draft",
+              "equals": []
+            },
+            {
+              "path": "accepted",
+              "equals": []
+            },
+            {
+              "path": "status",
+              "equals": "ready"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

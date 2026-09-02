@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 960" role="img" aria-labelledby="title desc">
+  <title id="title">Three Tokens Make Nine</title>
+  <desc id="desc">Deterministic synthetic thumbnail for Three Tokens Make Nine.</desc>
+  <rect width="540" height="960" fill="#f8edcf"/>
+  <path d="M0 760H540V960H0z" fill="#f2d999"/>
+  <text x="270" y="75" text-anchor="middle" fill="#27221b" font-family="sans-serif" font-size="37" font-weight="800" letter-spacing="2">THREE TOKENS</text>
+  <text x="270" y="132" text-anchor="middle" fill="#27221b" font-family="sans-serif" font-size="54" font-weight="900">MAKE NINE</text>
+  <path d="M55 166H485" stroke="#6d4822" stroke-width="4"/>
+  <g stroke="#27221b" stroke-width="5" font-family="sans-serif" font-size="43" font-weight="900" text-anchor="middle" fill="#27221b"><circle cx="90" cy="258" r="48" fill="#ff8f70"/><circle cx="210" cy="258" r="48" fill="#ffd166"/><circle cx="330" cy="258" r="48" fill="#7bdff2"/><circle cx="450" cy="258" r="48" fill="#b2f7a8"/><text x="90" y="273" stroke="none">1</text><text x="210" y="273" stroke="none">2</text><text x="330" y="273" stroke="none">3</text><text x="450" y="273" stroke="none">4</text></g>
+  <rect x="55" y="354" width="430" height="176" rx="22" fill="#fffaf0" stroke="#27221b" stroke-width="5"/>
+  <text x="270" y="433" text-anchor="middle" fill="#27221b" font-family="monospace" font-size="38" font-weight="900">2 + 3 + 4</text>
+  <text x="270" y="489" text-anchor="middle" fill="#1f7a4d" font-family="sans-serif" font-size="31" font-weight="900">ACCEPT = 9</text>
+  <rect x="55" y="585" width="430" height="112" rx="18" fill="#a52832"/>
+  <text x="270" y="653" text-anchor="middle" fill="#fff" font-family="sans-serif" font-size="27" font-weight="800">REJECT 8 / KEEP 9</text>
+</svg>

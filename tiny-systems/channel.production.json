@@ -1,0 +1,313 @@
+{
+  "schema": "rapp-vision-production/1.0",
+  "id": "tiny-systems",
+  "name": "Tiny Systems",
+  "tagline": "Small deterministic rules, visible acceptance, and safe rejection.",
+  "avatar": "▦",
+  "videos": [
+    {
+      "id": "one-block-three-trains",
+      "title": "One Block, Three Trains",
+      "description": "A single-track interlock admits one train, visibly rejects a conflicting request without changing the accepted occupancy, and resets to the exact opening state.",
+      "duration": 10,
+      "width": 960,
+      "height": 540,
+      "orientation": "landscape",
+      "tags": [
+        "deterministic",
+        "interlock",
+        "state-machine",
+        "live-replay"
+      ],
+      "thumb": "thumbs/one-block-three-trains.svg",
+      "production": {
+        "master": "masters/one-block-three-trains.mkv"
+      },
+      "chapters": [
+        {
+          "t": 0,
+          "label": "One block"
+        },
+        {
+          "t": 2,
+          "label": "Conflict rejected"
+        },
+        {
+          "t": 5,
+          "label": "Accepted state continues"
+        },
+        {
+          "t": 8,
+          "label": "Exact reset"
+        }
+      ],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "duration": 10,
+        "chapters": [
+          {
+            "t": 0,
+            "label": "Admit train A"
+          },
+          {
+            "t": 2,
+            "label": "Reject train B while occupied"
+          },
+          {
+            "t": 5,
+            "label": "Release and admit the next train"
+          },
+          {
+            "t": 8,
+            "label": "Reset the interlock"
+          }
+        ],
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 10,
+            "app": "apps/one-block-three-trains.html",
+            "ready": {
+              "selector": "#dispatch-btn"
+            },
+            "lower": {
+              "title": "One Block, Three Trains",
+              "bench": "At most one train may occupy the block.",
+              "fix": "Pause and test any request."
+            },
+            "actions": [
+              {
+                "at": 0.8,
+                "do": "click",
+                "selector": "#dispatch-btn"
+              },
+              {
+                "at": 2.8,
+                "do": "click",
+                "selector": "#dispatch-btn"
+              },
+              {
+                "at": 5,
+                "do": "click",
+                "selector": "#depart-btn"
+              },
+              {
+                "at": 6.4,
+                "do": "click",
+                "selector": "#dispatch-btn"
+              },
+              {
+                "at": 8.7,
+                "do": "click",
+                "selector": "#reset-btn"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "four-and-a-half-to-one",
+      "title": "Four-and-a-Half to One",
+      "description": "A contrast gate accepts the WCAG 4.5:1 boundary, rejects a 4.49:1 near miss while preserving the accepted palette, and restores a 21:1 opening pair on reset.",
+      "duration": 9,
+      "width": 720,
+      "height": 720,
+      "orientation": "square",
+      "tags": [
+        "accessibility",
+        "contrast",
+        "wcag",
+        "live-replay"
+      ],
+      "thumb": "thumbs/four-and-a-half-to-one.svg",
+      "production": {
+        "master": "masters/four-and-a-half-to-one.mkv"
+      },
+      "chapters": [
+        {
+          "t": 0,
+          "label": "The 4.5:1 boundary"
+        },
+        {
+          "t": 3,
+          "label": "The 4.49:1 near miss"
+        },
+        {
+          "t": 7,
+          "label": "Exact reset"
+        }
+      ],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "duration": 9,
+        "chapters": [
+          {
+            "t": 0,
+            "label": "Apply the boundary pair"
+          },
+          {
+            "t": 3,
+            "label": "Reject the near miss"
+          },
+          {
+            "t": 7,
+            "label": "Reset to maximum contrast"
+          }
+        ],
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 9,
+            "app": "apps/four-and-a-half-to-one.html",
+            "ready": {
+              "selector": "#apply-boundary-btn"
+            },
+            "lower": {
+              "title": "Four-and-a-Half to One",
+              "bench": "Normal text passes at 4.50:1 and fails below it.",
+              "fix": "Pause and compare the exact boundary."
+            },
+            "actions": [
+              {
+                "at": 0.8,
+                "do": "click",
+                "selector": "#apply-boundary-btn"
+              },
+              {
+                "at": 3.2,
+                "do": "click",
+                "selector": "#apply-near-miss-btn"
+              },
+              {
+                "at": 7,
+                "do": "click",
+                "selector": "#reset-btn"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "three-tokens-make-nine",
+      "title": "Three Tokens Make Nine",
+      "description": "A three-token arithmetic gate accepts 2 + 3 + 4, rejects a total of eight without replacing the accepted trio, and resets both the draft and accepted trays.",
+      "duration": 12,
+      "width": 540,
+      "height": 960,
+      "orientation": "portrait",
+      "tags": [
+        "arithmetic",
+        "tokens",
+        "deterministic",
+        "live-replay"
+      ],
+      "thumb": "thumbs/three-tokens-make-nine.svg",
+      "production": {
+        "master": "masters/three-tokens-make-nine.mkv"
+      },
+      "chapters": [
+        {
+          "t": 0,
+          "label": "Choose three tokens"
+        },
+        {
+          "t": 2,
+          "label": "Nine accepted"
+        },
+        {
+          "t": 5,
+          "label": "Eight rejected"
+        },
+        {
+          "t": 9,
+          "label": "Exact reset"
+        }
+      ],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "duration": 12,
+        "chapters": [
+          {
+            "t": 0,
+            "label": "Build 2 + 3 + 4"
+          },
+          {
+            "t": 2,
+            "label": "Submit nine"
+          },
+          {
+            "t": 4,
+            "label": "Try 1 + 3 + 4"
+          },
+          {
+            "t": 5,
+            "label": "Preserve the accepted trio"
+          },
+          {
+            "t": 9,
+            "label": "Reset both trays"
+          }
+        ],
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 12,
+            "app": "apps/three-tokens-make-nine.html",
+            "ready": {
+              "selector": "#token-2"
+            },
+            "lower": {
+              "title": "Three Tokens Make Nine",
+              "bench": "Exactly three selected values must total nine.",
+              "fix": "Pause and build another candidate."
+            },
+            "actions": [
+              {
+                "at": 0.7,
+                "do": "click",
+                "selector": "#token-2"
+              },
+              {
+                "at": 1.3,
+                "do": "click",
+                "selector": "#token-3"
+              },
+              {
+                "at": 1.9,
+                "do": "click",
+                "selector": "#token-4"
+              },
+              {
+                "at": 2.6,
+                "do": "click",
+                "selector": "#submit-btn"
+              },
+              {
+                "at": 4.5,
+                "do": "click",
+                "selector": "#token-2"
+              },
+              {
+                "at": 5.1,
+                "do": "click",
+                "selector": "#token-1"
+              },
+              {
+                "at": 5.8,
+                "do": "click",
+                "selector": "#submit-btn"
+              },
+              {
+                "at": 9.5,
+                "do": "click",
+                "selector": "#reset-btn"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
