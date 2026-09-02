@@ -5,8 +5,8 @@
   "name": "RAPP Hive",
   "visibility": "public",
   "revision": {
-    "sequence": 3,
-    "updated": "2026-09-01T03:37:21Z"
+    "sequence": 4,
+    "updated": "2026-09-02T16:09:46Z"
   },
   "peers": [],
   "_note": "RAPP Hive is the most universal contribution layer: a parking lot of federated channel.json URLs. Channels stay in their own repos; anyone can run a registry or add a channel locally without asking permission. Open a PR only if you want default listing.",
@@ -201,6 +201,14 @@
       "repo": "https://github.com/kody-w/rappvision-receipt-culture",
       "contract": "rapp-vision-channel/2.0",
       "_why": "An editorial provenance film paired with reveal, comparison, exact field identification, rejection, and reset."
+    },
+    {
+      "id": "new-way-of-work",
+      "name": "The New Way of Work",
+      "url": "../rappvision-new-way-of-work/channel.json",
+      "repo": "https://github.com/kody-w/rappvision-new-way-of-work",
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "Narration-neutral production drafts paired with live, creator-driven storyboards for an open AI-worker build series."
     }
   ]
 }
