@@ -12,7 +12,7 @@
     {
       "id": "use-keyboard-invoice-triage",
       "title": "Triage Invoices Without a Pointer",
-      "description": "A synthetic three-invoice queue totals exactly 196.25. The guided film and live replay accept two invoices, correct the third, export acceptedTotal 196.25, reject a negative amount with export disabled and focus on the invalid field, then restore the exact pending fixture.",
+      "description": "A synthetic three-invoice queue totals exactly 196.25. The guided film and live replay use only Tab, Shift-Tab, arrow keys, typing, and Enter to accept two invoices, correct the third, export acceptedTotal 196.25, reject a negative amount with export disabled and focus on the invalid field, then restore the exact pending fixture.",
       "published": "2026-09-02",
       "duration": 18,
       "width": 960,
@@ -68,12 +68,12 @@
             "label": "Export 196.25"
           },
           {
-            "t": 7,
-            "label": "Reject a negative amount"
+            "t": 6,
+            "label": "Shift-Tab back and type a negative amount"
           },
           {
-            "t": 12,
-            "label": "Restore the exact fixture"
+            "t": 10,
+            "label": "Tab to restore the exact fixture"
           }
         ],
         "scenes": [
@@ -136,54 +136,62 @@
                 "code": "Enter"
               },
               {
-                "at": 7.2,
-                "do": "click",
-                "selector": "#invoice-syn-003"
+                "at": 6.4,
+                "do": "keydown",
+                "code": "ShiftLeft"
               },
               {
-                "at": 7.8,
-                "do": "click",
-                "selector": "#amount-input"
-              },
-              {
-                "at": 8.4,
+                "at": 6.7,
                 "do": "key",
-                "code": "Minus",
-                "key": "-"
+                "code": "Tab"
               },
               {
-                "at": 8.75,
-                "do": "key",
-                "code": "Digit1"
+                "at": 7.0,
+                "do": "keyup",
+                "code": "ShiftLeft"
               },
               {
-                "at": 9.1,
-                "do": "key",
-                "code": "Period",
-                "key": "."
-              },
-              {
-                "at": 9.45,
-                "do": "key",
-                "code": "Digit0"
-              },
-              {
-                "at": 9.8,
-                "do": "key",
-                "code": "Digit0"
-              },
-              {
-                "at": 10.4,
+                "at": 7.4,
                 "do": "key",
                 "code": "Enter"
               },
               {
-                "at": 12.5,
-                "do": "click",
-                "selector": "#restore-button"
+                "at": 8.2,
+                "do": "type",
+                "text": "-1.00"
               },
               {
-                "at": 13.3,
+                "at": 9.2,
+                "do": "key",
+                "code": "Enter"
+              },
+              {
+                "at": 10.0,
+                "do": "key",
+                "code": "Tab"
+              },
+              {
+                "at": 10.5,
+                "do": "key",
+                "code": "Tab"
+              },
+              {
+                "at": 11.0,
+                "do": "key",
+                "code": "Tab"
+              },
+              {
+                "at": 11.5,
+                "do": "key",
+                "code": "Tab"
+              },
+              {
+                "at": 12.3,
+                "do": "key",
+                "code": "Enter"
+              },
+              {
+                "at": 14.3,
                 "do": "key",
                 "code": "Enter"
               }

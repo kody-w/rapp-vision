@@ -36,17 +36,17 @@
   "claims": [
     {
       "id": "positive",
-      "claim": "Enter accepts SYN-001 and SYN-002, arrow navigation corrects SYN-003 to Facilities, Tab reaches export, and Enter produces acceptedTotal 196.25.",
+      "claim": "Enter accepts SYN-001 and SYN-002, arrow navigation corrects SYN-003 to Facilities, Tab reaches export, and Enter produces acceptedTotal 196.25 without pointer input.",
       "actions": [
-        {"type": "KEY", "do": "key", "code": "Enter"},
-        {"type": "KEY", "do": "key", "code": "ArrowDown"},
-        {"type": "KEY", "do": "key", "code": "Enter"},
-        {"type": "KEY", "do": "key", "code": "ArrowDown"},
-        {"type": "KEY", "do": "key", "code": "Enter"},
-        {"type": "KEY", "do": "key", "code": "ArrowDown"},
-        {"type": "KEY", "do": "key", "code": "Enter"},
-        {"type": "KEY", "do": "key", "code": "Tab"},
-        {"type": "KEY", "do": "key", "code": "Enter"}
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "ArrowDown"},
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "ArrowDown"},
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "ArrowDown"},
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "Tab"},
+        {"do": "key", "code": "Enter"}
       ],
       "expectedState": {
         "invoices": [
@@ -79,26 +79,24 @@
     },
     {
       "id": "rejected",
-      "claim": "After a valid export, entering -1.00 rejects the edit, preserves the accepted and exported 196.25 values, disables export, and moves focus to the invalid amount field.",
+      "claim": "After a valid export, Shift-Tab returns to SYN-003, Enter opens its amount field, and typing -1.00 rejects the edit, preserves the accepted and exported 196.25 values, disables export, and keeps focus on the invalid field.",
       "preserves": "positive",
       "actions": [
-        {"type": "KEY", "do": "key", "code": "Enter"},
-        {"type": "KEY", "do": "key", "code": "ArrowDown"},
-        {"type": "KEY", "do": "key", "code": "Enter"},
-        {"type": "KEY", "do": "key", "code": "ArrowDown"},
-        {"type": "KEY", "do": "key", "code": "Enter"},
-        {"type": "KEY", "do": "key", "code": "ArrowDown"},
-        {"type": "KEY", "do": "key", "code": "Enter"},
-        {"type": "KEY", "do": "key", "code": "Tab"},
-        {"type": "KEY", "do": "key", "code": "Enter"},
-        {"type": "ACTIVATE_INVOICE", "do": "click", "selector": "#invoice-syn-003"},
-        {"type": "FOCUS_AMOUNT", "do": "click", "selector": "#amount-input"},
-        {"type": "KEY", "do": "key", "code": "Minus", "key": "-"},
-        {"type": "KEY", "do": "key", "code": "Digit1"},
-        {"type": "KEY", "do": "key", "code": "Period", "key": "."},
-        {"type": "KEY", "do": "key", "code": "Digit0"},
-        {"type": "KEY", "do": "key", "code": "Digit0"},
-        {"type": "KEY", "do": "key", "code": "Enter"}
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "ArrowDown"},
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "ArrowDown"},
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "ArrowDown"},
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "Tab"},
+        {"do": "key", "code": "Enter"},
+        {"do": "keydown", "code": "ShiftLeft"},
+        {"do": "key", "code": "Tab"},
+        {"do": "keyup", "code": "ShiftLeft"},
+        {"do": "key", "code": "Enter"},
+        {"do": "type", "text": "-1.00"},
+        {"do": "key", "code": "Enter"}
       ],
       "expectedState": {
         "invoices": [
@@ -135,11 +133,15 @@
     },
     {
       "id": "reset",
-      "claim": "Restore invoice fixture asks for confirmation and returns the exact opening snapshot with three pending invoices, total 196.25, no error, and focus on SYN-001.",
+      "claim": "Four forward Tabs reach Restore invoice fixture from the invalid amount field; two Enter presses confirm replacement and return the exact opening snapshot with three pending invoices, total 196.25, no error, and focus on SYN-001.",
       "after": "rejected",
       "actions": [
-        {"type": "REQUEST_RESTORE", "do": "click", "selector": "#restore-button"},
-        {"type": "KEY", "do": "key", "code": "Enter"}
+        {"do": "key", "code": "Tab"},
+        {"do": "key", "code": "Tab"},
+        {"do": "key", "code": "Tab"},
+        {"do": "key", "code": "Tab"},
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "Enter"}
       ],
       "expectedState": {
         "invoices": [
@@ -168,6 +170,53 @@
       ]
     }
   ],
+  "manifestReplay": {
+    "manifest": "channel.production.json",
+    "scene": 0,
+    "actionCount": 21,
+    "allowedActions": ["key", "keydown", "keyup", "type"],
+    "declaredFocusOrder": [
+      "invoice-syn-001",
+      "invoice-syn-002",
+      "invoice-syn-003",
+      "amount-input",
+      "code-select",
+      "save-editor-btn",
+      "cancel-editor-btn",
+      "export-button",
+      "restore-button",
+      "confirm-restore-btn",
+      "cancel-restore-btn"
+    ],
+    "focusAfterEachAction": [
+      "invoice-syn-001",
+      "invoice-syn-002",
+      "invoice-syn-002",
+      "invoice-syn-003",
+      "code-select",
+      "code-select",
+      "invoice-syn-003",
+      "export-button",
+      "export-button",
+      "export-button",
+      "invoice-syn-003",
+      "invoice-syn-003",
+      "amount-input",
+      "amount-input",
+      "amount-input",
+      "code-select",
+      "save-editor-btn",
+      "cancel-editor-btn",
+      "restore-button",
+      "confirm-restore-btn",
+      "invoice-syn-001"
+    ],
+    "checkpoints": [
+      {"afterAction": 8, "claim": "positive"},
+      {"afterAction": 14, "claim": "rejected"},
+      {"afterAction": 20, "claim": "reset"}
+    ]
+  },
   "attestations": {
     "rights": "All HTML, reducer code, vector art, and rendered frames are original for this candidate.",
     "privacy": "Vendors, invoice identifiers, categories, and amounts are synthetic and contain no personal or customer data.",

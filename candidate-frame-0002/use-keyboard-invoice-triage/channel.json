@@ -32,7 +32,7 @@
           "t": 14
         }
       ],
-      "description": "A synthetic three-invoice queue totals exactly 196.25. The guided film and live replay accept two invoices, correct the third, export acceptedTotal 196.25, reject a negative amount with export disabled and focus on the invalid field, then restore the exact pending fixture.",
+      "description": "A synthetic three-invoice queue totals exactly 196.25. The guided film and live replay use only Tab, Shift-Tab, arrow keys, typing, and Enter to accept two invoices, correct the third, export acceptedTotal 196.25, reject a negative amount with export disabled and focus on the invalid field, then restore the exact pending fixture.",
       "duration": 18,
       "height": 540,
       "id": "use-keyboard-invoice-triage",
@@ -51,12 +51,12 @@
             "t": 5
           },
           {
-            "label": "Reject a negative amount",
-            "t": 7
+            "label": "Shift-Tab back and type a negative amount",
+            "t": 6
           },
           {
-            "label": "Restore the exact fixture",
-            "t": 12
+            "label": "Tab to restore the exact fixture",
+            "t": 10
           }
         ],
         "duration": 18,
@@ -110,54 +110,62 @@
                 "do": "key"
               },
               {
-                "at": 7.2,
-                "do": "click",
-                "selector": "#invoice-syn-003"
+                "at": 6.4,
+                "code": "ShiftLeft",
+                "do": "keydown"
               },
               {
-                "at": 7.8,
-                "do": "click",
-                "selector": "#amount-input"
-              },
-              {
-                "at": 8.4,
-                "code": "Minus",
-                "do": "key",
-                "key": "-"
-              },
-              {
-                "at": 8.75,
-                "code": "Digit1",
+                "at": 6.7,
+                "code": "Tab",
                 "do": "key"
               },
               {
-                "at": 9.1,
-                "code": "Period",
-                "do": "key",
-                "key": "."
+                "at": 7.0,
+                "code": "ShiftLeft",
+                "do": "keyup"
               },
               {
-                "at": 9.45,
-                "code": "Digit0",
-                "do": "key"
-              },
-              {
-                "at": 9.8,
-                "code": "Digit0",
-                "do": "key"
-              },
-              {
-                "at": 10.4,
+                "at": 7.4,
                 "code": "Enter",
                 "do": "key"
               },
               {
-                "at": 12.5,
-                "do": "click",
-                "selector": "#restore-button"
+                "at": 8.2,
+                "do": "type",
+                "text": "-1.00"
               },
               {
-                "at": 13.3,
+                "at": 9.2,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 10.0,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 10.5,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 11.0,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 11.5,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 12.3,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 14.3,
                 "code": "Enter",
                 "do": "key"
               }

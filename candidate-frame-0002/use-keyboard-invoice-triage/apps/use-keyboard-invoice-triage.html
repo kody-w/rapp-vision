@@ -705,6 +705,19 @@
       document.querySelector("#contract-states").textContent
     );
     const CODE_OPTIONS = Object.freeze(["Uncoded", "Facilities", "Office", "Transit"]);
+    const FOCUS_ORDER = Object.freeze([
+      "invoice-syn-001",
+      "invoice-syn-002",
+      "invoice-syn-003",
+      "amount-input",
+      "code-select",
+      "save-editor-btn",
+      "cancel-editor-btn",
+      "export-button",
+      "restore-button",
+      "confirm-restore-btn",
+      "cancel-restore-btn"
+    ]);
 
     function money(cents) {
       return (cents / 100).toFixed(2);
@@ -1033,6 +1046,7 @@
     let state = initialState();
     let applyingFocus = false;
     let replaceAmountOnNextKey = false;
+    let shiftPressed = false;
 
     const elements = {
       rows: [...document.querySelectorAll(".invoice-row")],
@@ -1168,23 +1182,7 @@
     }
 
     function focusableOrder() {
-      const ids = state.invoices.map((invoice) => rowId(invoice.id));
-      if (state.editor) {
-        ids.push(
-          "amount-input",
-          "code-select",
-          "save-editor-btn",
-          "cancel-editor-btn"
-        );
-      }
-      if (state.canExport) {
-        ids.push("export-button");
-      }
-      ids.push("restore-button");
-      if (state.restorePending) {
-        ids.push("confirm-restore-btn", "cancel-restore-btn");
-      }
-      return ids.filter((id) => {
+      return FOCUS_ORDER.filter((id) => {
         const element = document.getElementById(id);
         return element && !element.disabled && !element.closest("[hidden]");
       });
@@ -1246,8 +1244,14 @@
       });
     }
 
-    elements.amount.addEventListener("input", () => {
-      dispatch({ type: "SET_AMOUNT_TEXT", value: elements.amount.value });
+    elements.amount.addEventListener("input", (event) => {
+      let value = elements.amount.value;
+      if (replaceAmountOnNextKey && typeof event.data === "string") {
+        value = event.data;
+        elements.amount.value = value;
+      }
+      replaceAmountOnNextKey = false;
+      dispatch({ type: "SET_AMOUNT_TEXT", value });
     });
     elements.amount.addEventListener("focus", () => {
       elements.amount.select();
@@ -1289,9 +1293,13 @@
 
     document.addEventListener("keydown", (event) => {
       const key = event.key;
+      if (key === "Shift") {
+        shiftPressed = true;
+        return;
+      }
       if (key === "Tab") {
         event.preventDefault();
-        moveTab(event.shiftKey);
+        moveTab(event.shiftKey || shiftPressed);
         return;
       }
 
@@ -1322,31 +1330,19 @@
         return;
       }
 
-      if (state.focus === "amount-input") {
-        const character =
-          key.length === 1 && /[0-9.-]/.test(key) ? key : null;
-        if (character || key === "Backspace" || key === "Delete") {
-          event.preventDefault();
-          let nextValue = state.editor.amountText;
-          if (key === "Backspace") {
-            nextValue = replaceAmountOnNextKey ? "" : nextValue.slice(0, -1);
-          } else if (key === "Delete") {
-            nextValue = "";
-          } else if (replaceAmountOnNextKey || character === "-") {
-            nextValue = character;
-          } else {
-            nextValue += character;
-          }
-          replaceAmountOnNextKey = false;
-          dispatch({ type: "SET_AMOUNT_TEXT", value: nextValue });
-          return;
-        }
-      }
-
       if (key === "Enter") {
         event.preventDefault();
         activateFocused();
       }
+    });
+
+    document.addEventListener("keyup", (event) => {
+      if (event.key === "Shift") {
+        shiftPressed = false;
+      }
+    });
+    window.addEventListener("blur", () => {
+      shiftPressed = false;
     });
 
     const contract = Object.freeze({
@@ -1356,6 +1352,8 @@
           FIXTURE.invoices.map((invoice) => Object.freeze({ ...invoice }))
         )
       }),
+      focusOrder: FOCUS_ORDER,
+      currentFocusOrder: () => Object.freeze([...focusableOrder()]),
       initialState,
       reduce,
       snapshot: () => snapshot(state)

@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -193,9 +194,9 @@ def _stage(seconds: float) -> str:
         return "correct"
     if seconds < 8.4:
         return "export"
-    if seconds < 13.2:
+    if seconds < 12.3:
         return "reject"
-    if seconds < 15.2:
+    if seconds < 14.3:
         return "confirm"
     return "reset"
 
@@ -270,11 +271,11 @@ def frame_rgb(frame_index: int, spec: RenderSpec = SPEC) -> bytes:
     focus_row = 0
     category = "UNCODED"
     if stage == "accept":
-        accepted[0] = seconds >= 0.8
+        accepted[0] = seconds >= 0.5
         accepted[1] = seconds >= 1.7
         focus_row = 0 if seconds < 1.0 else 1 if seconds < 2.0 else 2
     elif stage == "correct":
-        accepted = [True, True, seconds >= 4.3]
+        accepted = [True, True, seconds >= 4.1]
         focus_row = 2
         category = "FACILITIES" if seconds >= 3.5 else "UNCODED"
     elif stage in {"export", "reject", "confirm"}:
@@ -341,20 +342,21 @@ def frame_rgb(frame_index: int, spec: RenderSpec = SPEC) -> bytes:
         canvas.text(735, 302, "ACCEPTEDTOTAL", TEXT, 1)
         canvas.text(735, 326, "196.25", GREEN, 3)
         _draw_focus(canvas, 723, 260, 186, 111, 823, 248)
+        canvas.text(735, 352, "SHIFT TAB RETURNS", CYAN, 1)
     elif stage == "reject":
         canvas.rect(723, 258, 186, 56, (53, 25, 30))
         canvas.border(723, 258, 186, 56, RED, 3)
         canvas.text(735, 270, "AMOUNT", MUTED, 1)
         canvas.text(735, 289, "-1.00", RED, 2)
         _draw_focus(canvas, 723, 258, 186, 56, 823, 246)
-        canvas.text(728, 331, "NEGATIVE REJECTED", RED, 1)
+        canvas.text(728, 331, "TYPED / REJECTED", RED, 1)
         canvas.rect(727, 354, 178, 31, (53, 56, 59))
         canvas.text(743, 365, "EXPORT DISABLED", MUTED, 1)
     elif stage == "confirm":
         canvas.rect(723, 251, 186, 125, (48, 36, 23))
         canvas.border(723, 251, 186, 125, ORANGE, 3)
         canvas.text(735, 266, "RESTORE FIXTURE?", ORANGE, 1)
-        canvas.text(735, 295, "REPLACE EDITS", TEXT, 1)
+        canvas.text(735, 295, "TAB REACHED HERE", TEXT, 1)
         canvas.text(735, 326, "ENTER CONFIRMS", CYAN, 1)
         _draw_focus(canvas, 723, 251, 186, 125, 823, 239)
     else:
@@ -372,13 +374,13 @@ def frame_rgb(frame_index: int, spec: RenderSpec = SPEC) -> bytes:
         status = "CORRECT SYN-003: UNCODED TO FACILITIES"
         status_color = ORANGE
     elif stage == "export":
-        status = "EXPORTED ACCEPTEDTOTAL IS EXACTLY 196.25"
+        status = "EXPORTED 196.25 / SHIFT TAB RETURNS TO SYN-003"
         status_color = GREEN
     elif stage == "reject":
-        status = "AMOUNT MUST BE ZERO OR GREATER / EXPORT DISABLED"
+        status = "TYPE -1.00 / ERROR FOCUS / TAB TOWARD RESTORE"
         status_color = RED
     elif stage == "confirm":
-        status = "CONFIRM REPLACEMENT OF LOCAL EDITS"
+        status = "RESTORE REACHED WITHOUT POINTER / ENTER CONFIRMS"
         status_color = ORANGE
     else:
         status = "RESTORED: 3 PENDING / TOTAL 196.25 / FOCUS FIRST ROW"
@@ -439,7 +441,7 @@ def thumbnail_svg(spec: RenderSpec = SPEC) -> str:
   <text x="743" y="302" fill="#98b8c5" font-family="monospace" font-size="12">NEGATIVE REJECTED</text>
   <text x="743" y="324" fill="#ff6b6b" font-family="monospace" font-size="18" font-weight="800">-1.00</text>
   <rect x="38" y="426" width="884" height="72" rx="10" fill="#081a25" stroke="#284958" stroke-width="2"/>
-  <text x="480" y="469" text-anchor="middle" fill="#7df9ff" font-family="monospace" font-size="20" font-weight="800">VISIBLE FOCUS · SAFE REJECTION · EXACT RESET</text>
+  <text x="480" y="469" text-anchor="middle" fill="#7df9ff" font-family="monospace" font-size="20" font-weight="800">SHIFT-TAB · TYPE · SAFE REJECTION · EXACT RESET</text>
 </svg>
 """
 
@@ -520,16 +522,91 @@ def ffmpeg_command(executable: str, target: Path, spec: RenderSpec = SPEC) -> li
     ]
 
 
-def _resolve_executable(value: str, name: str) -> str:
-    candidate = Path(value)
-    if candidate.is_absolute() or candidate.parent != Path("."):
-        if not candidate.is_file():
+def _executable_name(name: str) -> str:
+    return f"{name}.exe" if os.name == "nt" else name
+
+
+def _configured_tool_values(name: str) -> Iterator[str]:
+    upper = name.upper()
+    for variable in (f"RAPP_VISION_{upper}", upper, f"{upper}_PATH"):
+        value = os.environ.get(variable)
+        if value:
+            yield value
+    bin_directory = os.environ.get("FFMPEG_BIN")
+    if bin_directory and name in {"ffmpeg", "ffprobe"}:
+        yield str(Path(bin_directory) / _executable_name(name))
+
+
+def _common_tool_candidates(name: str) -> Iterator[Path]:
+    executable = _executable_name(name)
+    if os.name == "nt":
+        local = os.environ.get("LOCALAPPDATA")
+        program_data = os.environ.get("ProgramData")
+        user_profile = os.environ.get("USERPROFILE")
+        program_roots = [
+            os.environ.get("ProgramFiles"),
+            os.environ.get("ProgramFiles(x86)"),
+        ]
+        if local:
+            local_root = Path(local)
+            yield local_root / "Microsoft" / "WinGet" / "Links" / executable
+            packages = local_root / "Microsoft" / "WinGet" / "Packages"
+            if packages.is_dir():
+                for package in sorted(packages.glob("Gyan.FFmpeg*")):
+                    yield from sorted(package.rglob(executable))
+        if program_data:
+            yield Path(program_data) / "chocolatey" / "bin" / executable
+        if user_profile:
+            yield (
+                Path(user_profile)
+                / "scoop"
+                / "apps"
+                / "ffmpeg"
+                / "current"
+                / "bin"
+                / executable
+            )
+        for root in filter(None, program_roots):
+            yield Path(root) / "ffmpeg" / "bin" / executable
+    else:
+        for directory in (
+            Path("/usr/bin"),
+            Path("/usr/local/bin"),
+            Path("/opt/homebrew/bin"),
+            Path("/opt/local/bin"),
+            Path("/snap/bin"),
+        ):
+            yield directory / executable
+
+
+def discover_executable(name: str, explicit: str | None = None) -> str:
+    values = [explicit] if explicit else list(_configured_tool_values(name))
+    for value in values:
+        if not value:
+            continue
+        candidate = Path(value).expanduser()
+        if candidate.is_dir():
+            candidate /= _executable_name(name)
+        if candidate.is_file():
+            return str(candidate.resolve())
+        resolved = shutil.which(value)
+        if resolved:
+            return str(Path(resolved).resolve())
+        if explicit and (candidate.is_absolute() or candidate.parent != Path(".")):
             raise RuntimeError(f"{name} executable does not exist: {candidate}")
-        return str(candidate.resolve())
-    resolved = shutil.which(value)
-    if not resolved:
-        raise RuntimeError(f"{name} executable not found: {value}")
-    return resolved
+
+    resolved = shutil.which(name)
+    if resolved:
+        return str(Path(resolved).resolve())
+    for candidate in _common_tool_candidates(name):
+        if candidate.is_file():
+            return str(candidate.resolve())
+    searched = "environment, PATH, and common install locations"
+    raise RuntimeError(f"{name} executable not found via {searched}")
+
+
+def _resolve_executable(value: str | None, name: str) -> str:
+    return discover_executable(name, value)
 
 
 def render(output_root: Path, ffmpeg: str, spec: RenderSpec = SPEC) -> tuple[Path, Path]:
@@ -729,9 +806,14 @@ def write_delivery(output_root: Path, ffprobe: str) -> Path:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--ffmpeg", default="ffmpeg")
-    parser.add_argument("--ffprobe", default="ffprobe")
+    parser.add_argument("--ffmpeg")
+    parser.add_argument("--ffprobe")
     parser.add_argument("--output-root", type=Path, default=ROOT)
+    parser.add_argument(
+        "--show-tools",
+        action="store_true",
+        help="print portable ffmpeg and ffprobe discovery results",
+    )
     parser.add_argument(
         "--delivery-only",
         action="store_true",
@@ -748,9 +830,21 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
+        if args.show_tools:
+            print(
+                json.dumps(
+                    {
+                        "ffmpeg": _resolve_executable(args.ffmpeg, "ffmpeg"),
+                        "ffprobe": _resolve_executable(args.ffprobe, "ffprobe"),
+                    },
+                    sort_keys=True,
+                )
+            )
+            return 0
         validate_manifest()
         output_root = args.output_root.resolve()
         if args.dry_run:
+            ffmpeg = _resolve_executable(args.ffmpeg, "ffmpeg")
             plan = {
                 "schema": "keyboard-invoice-triage-render-plan/1.0",
                 "publication": SPEC.publication_id,
@@ -762,7 +856,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "master": str(output_root / SPEC.master_relative),
                 "thumbnail": str(output_root / SPEC.thumbnail_relative),
                 "command": ffmpeg_command(
-                    args.ffmpeg,
+                    ffmpeg,
                     output_root / SPEC.master_relative,
                 ),
             }

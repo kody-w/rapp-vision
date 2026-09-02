@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "master": {
-      "bytes": 5586770,
+      "bytes": 5625823,
       "codec": "ffv1",
       "colorRange": "pc",
       "colorSpace": "gbr",
@@ -9,11 +9,11 @@
       "height": 540,
       "path": "masters/use-keyboard-invoice-triage.mkv",
       "pixelFormat": "bgr0",
-      "sha256": "fcb891bd87a89d552668d687e638914d15964bfa967092a365a5bf0bc2e910d6",
+      "sha256": "cc2109cc1007670c6cf4d3ce61e594bdfcfb0f2c1992130095d6a6adcdaac101",
       "width": 960
     },
     "mp4": {
-      "bytes": 97198,
+      "bytes": 100673,
       "codec": "h264",
       "colorPrimaries": "bt709",
       "colorRange": "tv",
@@ -23,11 +23,11 @@
       "height": 540,
       "path": "media/use-keyboard-invoice-triage.mp4",
       "pixelFormat": "yuv420p",
-      "sha256": "1105eaea2f00dde08eee27ac96d5c6c64a7fccaa017ffd4dcd7587b01fb4a766",
+      "sha256": "7db0bdc8f7681649f1250b4af026115989a1540d74346464ca964313d20a6847",
       "width": 960
     },
     "webm": {
-      "bytes": 98502,
+      "bytes": 98691,
       "codec": "vp9",
       "colorPrimaries": "bt709",
       "colorRange": "tv",
@@ -37,7 +37,7 @@
       "height": 540,
       "path": "media/use-keyboard-invoice-triage.webm",
       "pixelFormat": "yuv420p",
-      "sha256": "661125b0c01469de7778cdc846c036cd75d96a38a7ad5b02cb7e3be847e8b401",
+      "sha256": "1124a7fb8ace9e6bbd693c4873ec583275d39ace45d21b2ec92da46c25a9aa34",
       "width": 960
     }
   },
@@ -48,7 +48,7 @@
     "fps": 12,
     "frameSamples": {
       "0": "301b5c40a6eb8cbc724dacad5e27b579b3103c39224680cae5171bebb872ca7b",
-      "108": "8b25c20d748bfd45c37f3cd3de19c950d1f8b31448e7d4172d20256226895322",
+      "108": "1b3a33a1e3846f67ad7e75836aae35830ac23b16a0ec1a84f33d99da91927a09",
       "215": "a01cf6f06ea7d51211a883b7f47f6556010d33896119632e0d121e6ba8f6250f"
     },
     "frames": 216,
@@ -64,44 +64,44 @@
       "sha256": "cf302113fe57517bb72baa467c14d4f9bbdec8e8f0bab9f4b5dd1f2ffe4470d6"
     },
     {
-      "bytes": 2483,
+      "bytes": 2897,
       "path": "README.md",
-      "sha256": "c959e7fa23b166c3b5721ab0cd1a2fee178fc4c825d3bde2d87014e95a7a3a7c"
+      "sha256": "a0923ec7535932a18652484c2bbcc8e45c994bccc00c960784630f9e1a8aebc3"
     },
     {
-      "bytes": 40947,
+      "bytes": 40683,
       "path": "apps/use-keyboard-invoice-triage.html",
-      "sha256": "57cea00319c8a0956cf2ff749f54e43b63e4a07fa864a2867b13ce09a581070d"
+      "sha256": "cc9beaff0437fd2bc74a05099411abae6d68ef3926526688bd5103caeb6e8d8a"
     },
     {
-      "bytes": 5200,
+      "bytes": 5423,
       "path": "channel.production.json",
-      "sha256": "5b374ad5940b2ec0aed7e8cd85dd2959a37972a26f7f510ecb8544eacd0460e7"
+      "sha256": "b6898b609fb624975e13e53572363ad653d271b97a1fdc1fc22236d90dc81d92"
     },
     {
-      "bytes": 5353,
+      "bytes": 5576,
       "path": "channel.json",
-      "sha256": "2c32604bd33cd862fa48984a7ebf6fdc98fddc02bbe1090a8106b7090ec4ade9"
+      "sha256": "157b61c1f6c3a5e57769a961fef99100d81c1a489fc27cec1e9cf6f2718a353a"
     },
     {
-      "bytes": 7389,
+      "bytes": 8273,
       "path": "evidence.json",
-      "sha256": "c4b8056ed1da94d5305f8298dfb81a6609458b3d89077a58463972979fc39f79"
+      "sha256": "7d45c16b4f90c98d455c48c7f843d17824ec42bbf907adc8e4e3efad02bf46a6"
     },
     {
-      "bytes": 28976,
+      "bytes": 32324,
       "path": "render.py",
-      "sha256": "0aee71b815b34d27a7254fb4e5a28e225c16396e1c743f59769ed4a9efbda427"
+      "sha256": "3a39e76b151333dd417220f39dae6f8040e6557d158d40f18dfe83a8d8a56ec2"
     },
     {
-      "bytes": 3457,
+      "bytes": 3461,
       "path": "thumbs/use-keyboard-invoice-triage.svg",
-      "sha256": "abdb35854f8276d6e130cfaf96f046dff992b47bca3f9086b8e8ebb45ca2fa55"
+      "sha256": "8117ec27f3e42c688bd0b61cd9290f71104fe61fb5eb77e37bb27eb112282636"
     },
     {
-      "bytes": 10283,
+      "bytes": 16479,
       "path": "verify_dom.mjs",
-      "sha256": "8a2584d971fc71c8239429fc20eb5a3fba9ca09db218c767d53405ea7ff65fab"
+      "sha256": "f1010b7e0ba4469180307db82dd0792cb960c4fcfe31e044fba6f74e5c2c0a7d"
     }
   ]
 }

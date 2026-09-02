@@ -7,6 +7,7 @@ import copy
 import hashlib
 import importlib.util
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -30,23 +31,12 @@ APP_PATH = CANDIDATE / "apps" / f"{PUBLICATION_ID}.html"
 EVIDENCE_PATH = CANDIDATE / "evidence.json"
 DELIVERY_PATH = CANDIDATE / "delivery.json"
 RENDERER_PATH = CANDIDATE / "render.py"
+VERIFY_DOM_PATH = CANDIDATE / "verify_dom.mjs"
 VALIDATOR_PATH = ROOT / "scripts" / "validate_publications.py"
 COMPILER_PATH = ROOT / "scripts" / "compile_publications.py"
-FFMPEG_BIN = (
-    Path.home()
-    / "AppData"
-    / "Local"
-    / "Microsoft"
-    / "WinGet"
-    / "Packages"
-    / "Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe"
-    / "ffmpeg-8.1.1-essentials_build"
-    / "bin"
-)
-FFMPEG = FFMPEG_BIN / "ffmpeg.exe"
-FFPROBE = FFMPEG_BIN / "ffprobe.exe"
+NODE = shutil.which("node")
 
-EXPECTED_CONTROLS = {
+EXPECTED_FOCUS_ORDER = (
     "invoice-syn-001",
     "invoice-syn-002",
     "invoice-syn-003",
@@ -58,7 +48,32 @@ EXPECTED_CONTROLS = {
     "restore-button",
     "confirm-restore-btn",
     "cancel-restore-btn",
-}
+)
+EXPECTED_CONTROLS = set(EXPECTED_FOCUS_ORDER)
+
+EXPECTED_MANIFEST_ACTIONS = [
+    {"at": 0.5, "do": "key", "code": "Enter"},
+    {"at": 1.1, "do": "key", "code": "ArrowDown"},
+    {"at": 1.7, "do": "key", "code": "Enter"},
+    {"at": 2.3, "do": "key", "code": "ArrowDown"},
+    {"at": 2.9, "do": "key", "code": "Enter"},
+    {"at": 3.5, "do": "key", "code": "ArrowDown"},
+    {"at": 4.1, "do": "key", "code": "Enter"},
+    {"at": 4.8, "do": "key", "code": "Tab"},
+    {"at": 5.4, "do": "key", "code": "Enter"},
+    {"at": 6.4, "do": "keydown", "code": "ShiftLeft"},
+    {"at": 6.7, "do": "key", "code": "Tab"},
+    {"at": 7.0, "do": "keyup", "code": "ShiftLeft"},
+    {"at": 7.4, "do": "key", "code": "Enter"},
+    {"at": 8.2, "do": "type", "text": "-1.00"},
+    {"at": 9.2, "do": "key", "code": "Enter"},
+    {"at": 10.0, "do": "key", "code": "Tab"},
+    {"at": 10.5, "do": "key", "code": "Tab"},
+    {"at": 11.0, "do": "key", "code": "Tab"},
+    {"at": 11.5, "do": "key", "code": "Tab"},
+    {"at": 12.3, "do": "key", "code": "Enter"},
+    {"at": 14.3, "do": "key", "code": "Enter"},
+]
 
 
 def load_json(path: Path):
@@ -76,6 +91,121 @@ def load_module(name: str, path: Path):
 VALIDATOR = load_module("validate_frame_0002_02", VALIDATOR_PATH)
 COMPILER = load_module("compile_frame_0002_02", COMPILER_PATH)
 RENDERER = load_module("render_frame_0002_02", RENDERER_PATH)
+
+
+def optional_media_tool(name: str) -> Path | None:
+    try:
+        return Path(RENDERER.discover_executable(name))
+    except RuntimeError:
+        return None
+
+
+def browser_candidate(value: str | None) -> Path | None:
+    if not value:
+        return None
+    candidate = Path(value.strip().strip('"')).expanduser()
+    if candidate.is_file() and re.search(
+        r"(chrome|chromium|edge|brave)",
+        candidate.name,
+        flags=re.IGNORECASE,
+    ):
+        return candidate.resolve()
+    resolved = shutil.which(value)
+    if resolved and re.search(
+        r"(chrome|chromium|edge|brave)",
+        Path(resolved).name,
+        flags=re.IGNORECASE,
+    ):
+        return Path(resolved).resolve()
+    return None
+
+
+def discover_browser() -> Path | None:
+    for variable in (
+        "RAPP_VISION_BROWSER",
+        "PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH",
+        "EDGE_BIN",
+        "CHROME_BIN",
+        "CHROMIUM_BIN",
+        "BROWSER",
+    ):
+        found = browser_candidate(os.environ.get(variable))
+        if found:
+            return found
+    for command in (
+        "msedge",
+        "microsoft-edge",
+        "microsoft-edge-stable",
+        "google-chrome",
+        "google-chrome-stable",
+        "chromium",
+        "chromium-browser",
+        "brave-browser",
+    ):
+        found = browser_candidate(command)
+        if found:
+            return found
+
+    candidates: list[Path] = []
+    if sys.platform == "win32":
+        for root in filter(
+            None,
+            (
+                os.environ.get("ProgramFiles"),
+                os.environ.get("ProgramFiles(x86)"),
+                os.environ.get("LOCALAPPDATA"),
+            ),
+        ):
+            base = Path(root)
+            candidates.extend(
+                (
+                    base / "Microsoft" / "Edge" / "Application" / "msedge.exe",
+                    base / "Google" / "Chrome" / "Application" / "chrome.exe",
+                    base / "Chromium" / "Application" / "chrome.exe",
+                    base
+                    / "BraveSoftware"
+                    / "Brave-Browser"
+                    / "Application"
+                    / "brave.exe",
+                )
+            )
+    elif sys.platform == "darwin":
+        candidates.extend(
+            (
+                Path(
+                    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+                ),
+                Path(
+                    "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"
+                ),
+                Path("/Applications/Chromium.app/Contents/MacOS/Chromium"),
+                Path(
+                    "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
+                ),
+            )
+        )
+    else:
+        candidates.extend(
+            Path(path)
+            for path in (
+                "/usr/bin/google-chrome",
+                "/usr/bin/google-chrome-stable",
+                "/usr/bin/microsoft-edge",
+                "/usr/bin/microsoft-edge-stable",
+                "/usr/bin/chromium",
+                "/usr/bin/chromium-browser",
+                "/usr/bin/brave-browser",
+                "/usr/local/bin/google-chrome",
+                "/usr/local/bin/chromium",
+                "/snap/bin/chromium",
+            )
+        )
+    return next((candidate.resolve() for candidate in candidates if candidate.is_file()), None)
+
+
+FFMPEG = optional_media_tool("ffmpeg")
+FFPROBE = optional_media_tool("ffprobe")
+BROWSER = discover_browser()
 
 
 def embedded_json(source: str, element_id: str):
@@ -178,7 +308,7 @@ class TestCandidateManifest(unittest.TestCase):
             [],
         )
 
-    def test_live_replay_uses_browser_safe_key_and_click_actions(self):
+    def test_live_replay_is_exactly_keyboard_only(self):
         live = self.video["live"]
         self.assertEqual(live["kind"], "rapp-vision-live/1.0")
         self.assertEqual(live["duration"], 18)
@@ -189,28 +319,31 @@ class TestCandidateManifest(unittest.TestCase):
         self.assertEqual(scene["ready"], {"selector": "#invoice-syn-001"})
         self.assertEqual(scene["app"], f"apps/{PUBLICATION_ID}.html")
 
+        self.assertEqual(scene["actions"], EXPECTED_MANIFEST_ACTIONS)
         action_types = {action["do"] for action in scene["actions"]}
-        self.assertEqual(action_types, {"key", "click"})
+        self.assertEqual(action_types, {"key", "keydown", "keyup", "type"})
         codes = [action["code"] for action in scene["actions"] if action["do"] == "key"]
-        for required in ("Tab", "ArrowDown", "Enter", "Minus", "Digit1"):
+        for required in ("Tab", "ArrowDown", "Enter"):
             self.assertIn(required, codes)
+        self.assertEqual(
+            [action["text"] for action in scene["actions"] if action["do"] == "type"],
+            ["-1.00"],
+        )
         times = [action["at"] for action in scene["actions"]]
         self.assertEqual(times, sorted(times))
         self.assertTrue(all(0 <= value < scene["dur"] for value in times))
+        for action in scene["actions"]:
+            with self.subTest(action=action):
+                self.assertNotIn("selector", action)
+                self.assertNotIn("from", action)
+                self.assertNotIn("to", action)
 
         source = APP_PATH.read_text(encoding="utf-8")
         index = AppIndex()
         index.feed(source)
-        selectors = [scene["ready"]["selector"]]
-        selectors.extend(
-            action["selector"]
-            for action in scene["actions"]
-            if action["do"] == "click"
-        )
-        for selector in selectors:
-            with self.subTest(selector=selector):
-                self.assertRegex(selector, r"^#[A-Za-z][A-Za-z0-9_-]*$")
-                self.assertIn(selector[1:], index.ids)
+        selector = scene["ready"]["selector"]
+        self.assertRegex(selector, r"^#[A-Za-z][A-Za-z0-9_-]*$")
+        self.assertIn(selector[1:], index.ids)
 
 
 class TestFixtureEvidenceAndApp(unittest.TestCase):
@@ -255,6 +388,31 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
                     resolve_path(claim["expectedState"], assertion["path"]),
                     assertion["equals"],
                 )
+        manifest_actions = load_json(MANIFEST_PATH)["videos"][0]["live"]["scenes"][0][
+            "actions"
+        ]
+        normalized = [
+            {key: value for key, value in action.items() if key != "at"}
+            for action in manifest_actions
+        ]
+        self.assertEqual(self.claims["positive"]["actions"], normalized[:9])
+        self.assertEqual(self.claims["rejected"]["actions"], normalized[:15])
+        self.assertEqual(self.claims["reset"]["actions"], normalized[15:])
+        replay = self.evidence["manifestReplay"]
+        self.assertEqual(replay["actionCount"], len(manifest_actions))
+        self.assertEqual(replay["declaredFocusOrder"], list(EXPECTED_FOCUS_ORDER))
+        self.assertEqual(
+            len(replay["focusAfterEachAction"]),
+            len(manifest_actions),
+        )
+        self.assertEqual(
+            replay["checkpoints"],
+            [
+                {"afterAction": 8, "claim": "positive"},
+                {"afterAction": 14, "claim": "rejected"},
+                {"afterAction": 20, "claim": "reset"},
+            ],
+        )
 
     def test_positive_failure_and_reset_are_exact(self):
         positive = self.claims["positive"]["expectedState"]
@@ -286,6 +444,7 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
         self.assertEqual(index.resources, [])
         self.assertTrue(EXPECTED_CONTROLS <= index.ids)
         self.assertTrue(EXPECTED_CONTROLS <= set(index.focusable))
+        self.assertEqual(list(index.focusable), list(EXPECTED_FOCUS_ORDER))
         for element_id in EXPECTED_CONTROLS:
             with self.subTest(control=element_id):
                 self.assertNotEqual(index.focusable[element_id].get("tabindex"), "-1")
@@ -298,6 +457,8 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
             'data-reset="exact"',
             "window.invoiceTriage = contract;",
             "window.tinySystem = contract;",
+            "const FOCUS_ORDER = Object.freeze([",
+            "currentFocusOrder: () => Object.freeze([...focusableOrder()])",
             'key === "Tab"',
             'key === "ArrowDown"',
             'key === "Enter"',
@@ -329,6 +490,61 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
                 self.assertIsNone(re.search(pattern, self.source, flags=re.IGNORECASE))
 
 
+class TestRealBrowserReplay(unittest.TestCase):
+    @unittest.skipUnless(
+        NODE and BROWSER,
+        "Node and a Chromium-family browser are required for real-browser replay",
+    )
+    def test_exact_manifest_actions_in_real_browser(self):
+        profile = CANDIDATE / ".browser-profile-test"
+        if profile.exists():
+            shutil.rmtree(profile)
+        self.addCleanup(lambda: shutil.rmtree(profile, ignore_errors=True))
+
+        completed = subprocess.run(
+            [
+                str(NODE),
+                str(VERIFY_DOM_PATH),
+                "--browser",
+                str(BROWSER),
+                "--app",
+                str(APP_PATH),
+                "--evidence",
+                str(EVIDENCE_PATH),
+                "--manifest",
+                str(MANIFEST_PATH),
+                "--profile",
+                str(profile),
+            ],
+            cwd=CANDIDATE,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        if completed.returncode:
+            self.fail(
+                "real-browser manifest replay failed\n"
+                f"stdout:\n{completed.stdout}\n"
+                f"stderr:\n{completed.stderr}"
+            )
+        payload = json.loads(completed.stdout.strip().splitlines()[-1])
+        self.assertEqual(
+            payload,
+            {
+                "actionCount": 21,
+                "fixtureTotal": "196.25",
+                "acceptedTotal": "196.25",
+                "negativeAmount": "-1.00",
+                "errorFocus": "amount-input",
+                "exportDisabledOnError": True,
+                "resetFocus": "invoice-syn-001",
+                "checkpoints": ["positive", "rejected", "reset"],
+                "browserErrors": 0,
+            },
+        )
+
+
 class TestRendererAndDelivery(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -350,6 +566,7 @@ class TestRendererAndDelivery(unittest.TestCase):
                 "dataclasses",
                 "hashlib",
                 "json",
+                "os",
                 "pathlib",
                 "shutil",
                 "subprocess",
@@ -430,8 +647,8 @@ class TestRendererAndDelivery(unittest.TestCase):
             self.assertEqual(record["colorRange"], "tv")
 
     @unittest.skipUnless(
-        FFMPEG.is_file() and FFPROBE.is_file(),
-        "prescribed FFmpeg 8.1.1 tools are required",
+        FFMPEG and FFPROBE,
+        "ffmpeg and ffprobe were not found via environment, PATH, or common locations",
     )
     def test_repeated_compiler_build_is_byte_stable(self):
         scratch = CANDIDATE / ".test-rebuild"

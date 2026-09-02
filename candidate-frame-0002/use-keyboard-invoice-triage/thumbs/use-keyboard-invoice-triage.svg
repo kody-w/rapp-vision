@@ -34,5 +34,5 @@
   <text x="743" y="302" fill="#98b8c5" font-family="monospace" font-size="12">NEGATIVE REJECTED</text>
   <text x="743" y="324" fill="#ff6b6b" font-family="monospace" font-size="18" font-weight="800">-1.00</text>
   <rect x="38" y="426" width="884" height="72" rx="10" fill="#081a25" stroke="#284958" stroke-width="2"/>
-  <text x="480" y="469" text-anchor="middle" fill="#7df9ff" font-family="monospace" font-size="20" font-weight="800">VISIBLE FOCUS · SAFE REJECTION · EXACT RESET</text>
+  <text x="480" y="469" text-anchor="middle" fill="#7df9ff" font-family="monospace" font-size="20" font-weight="800">SHIFT-TAB · TYPE · SAFE REJECTION · EXACT RESET</text>
 </svg>

@@ -10,12 +10,12 @@ paired publication. Three wholly synthetic invoices total exactly **196.25**.
 - `Enter`, `ArrowDown`, and `Tab` accept the first two invoices, correct
   `SYN-003` from `Uncoded` to `Facilities`, and export
   `{"acceptedTotal":"196.25","invoiceCount":3}`.
-- Editing the accepted third invoice to `-1.00` shows an inline error, disables
-  export, preserves the accepted/exported 196.25 result, and focuses the amount
-  field.
-- **Restore invoice fixture** requires confirmation, then returns all three
-  invoices to pending, clears errors and exports, restores total 196.25, and
-  focuses `SYN-001`.
+- `Shift-Tab` returns from export to `SYN-003`; `Enter` opens the amount field,
+  and typing `-1.00` shows an inline error, disables export, preserves the
+  accepted/exported 196.25 result, and keeps focus on the invalid field.
+- Four forward `Tab` presses reach **Restore invoice fixture**. Two `Enter`
+  presses confirm replacement, return all three invoices to pending, clear
+  errors and exports, restore total 196.25, and focus `SYN-001`.
 
 `apps/use-keyboard-invoice-triage.html` is self-contained and exports the
 deterministic reducer contract as both `window.invoiceTriage` and
@@ -27,13 +27,20 @@ reset snapshots.
 From this directory in PowerShell:
 
 ```powershell
-$bin = 'C:\Users\kowildfe\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.1-essentials_build\bin'
-python .\render.py --ffmpeg "$bin\ffmpeg.exe"
-python ..\..\scripts\compile_publications.py build .\channel.production.json --ffmpeg "$bin\ffmpeg.exe" --ffprobe "$bin\ffprobe.exe"
-python .\render.py --delivery-only --ffprobe "$bin\ffprobe.exe"
-node .\verify_dom.mjs 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe' .\apps\use-keyboard-invoice-triage.html .\evidence.json .\.browser-profile
+$tools = python .\render.py --show-tools | ConvertFrom-Json
+python .\render.py --ffmpeg $tools.ffmpeg
+python ..\..\scripts\compile_publications.py build .\channel.production.json --ffmpeg $tools.ffmpeg --ffprobe $tools.ffprobe
+python .\render.py --delivery-only --ffprobe $tools.ffprobe
+node .\verify_dom.mjs
 python ..\..\tests\test_frame_0002_02.py -v
 ```
+
+Tool discovery checks explicit arguments, `RAPP_VISION_FFMPEG`,
+`RAPP_VISION_FFPROBE`, `FFMPEG`, `FFPROBE`, `FFMPEG_BIN`, `PATH`, and common
+cross-platform install locations. The DOM verifier similarly checks
+`RAPP_VISION_BROWSER`, common Chromium environment variables, `PATH`, and
+standard Edge, Chrome, Chromium, and Brave locations. Every path may still be
+overridden explicitly.
 
 The renderer uses only the Python standard library and streams deterministic
 RGB24 frames to a single-threaded FFV1 Matroska master. The existing compiler
@@ -44,7 +51,9 @@ digests, codec probes, and stable frame samples.
 ## Guided film timeline
 
 The 18-second, 960×540 film states the expected fixture total, visualizes the
-keyboard focus path, shows the correction and exported 196.25 field, displays
-the negative-amount error beside a disabled export control, and finishes on
-the exact restored fixture. It has no audio, external assets, or runtime
-network dependency.
+Tab, Shift-Tab, arrow, typing, and Enter focus path, shows the correction and
+exported 196.25 field, displays the negative-amount error beside a disabled
+export control, and finishes on the exact restored fixture. The executed
+real-browser verifier replays the production manifest itself and checks
+`document.activeElement` after every action. The pair has no audio, external
+assets, pointer action, or runtime network dependency.
