@@ -66,8 +66,11 @@ class TestOilFieldChannels(unittest.TestCase):
 
     def test_registry_revision_advanced_for_the_season(self):
         registry = json.loads((ROOT / "channels.json").read_text(encoding="utf-8"))
-        self.assertGreaterEqual(registry["revision"]["sequence"], 3)
-        self.assertEqual(registry["revision"]["updated"], "2026-09-02T16:09:46Z")
+        self.assertGreaterEqual(registry["revision"]["sequence"], 5)
+        self.assertGreaterEqual(
+            registry["revision"]["updated"],
+            "2026-09-02T16:09:47Z",
+        )
 
     def test_new_way_of_work_draft_channel_is_listed(self):
         registry = json.loads((ROOT / "channels.json").read_text(encoding="utf-8"))

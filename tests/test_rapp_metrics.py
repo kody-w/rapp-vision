@@ -170,8 +170,12 @@ class SilentWarnings(unittest.TestCase):
         self.addCleanup(patcher.stop)
 
     def assertWarned(self, needle: str):
+        normalized_needle = needle.replace("\\", "/")
         self.assertTrue(
-            any(needle in w for w in self.warnings),
+            any(
+                normalized_needle in warning.replace("\\", "/")
+                for warning in self.warnings
+            ),
             f"expected a warning containing {needle!r}; got {self.warnings}",
         )
 
@@ -752,6 +756,24 @@ class EditorialReviewTests(unittest.TestCase):
         self.assertEqual(
             rm.record_fingerprint(self.GOOD),
             rm.record_fingerprint(annotated),
+        )
+
+    def test_fingerprint_normalizes_javascript_number_semantics(self):
+        self.assertEqual(
+            rm.record_fingerprint({"duration": 10}),
+            rm.record_fingerprint({"duration": 10.0}),
+        )
+        self.assertEqual(
+            rm.record_fingerprint({"value": 0}),
+            rm.record_fingerprint({"value": -0.0}),
+        )
+        self.assertNotEqual(
+            rm.record_fingerprint({"value": 1e-7}),
+            rm.record_fingerprint({"value": 1e-8}),
+        )
+        self.assertEqual(
+            rm.record_fingerprint({"value": "\ud800", "\udfff": "key"}),
+            rm.record_fingerprint({"value": "\ufffd", "\ufffd": "key"}),
         )
 
     def test_rendered_note_is_marked_attributed_and_stable(self):

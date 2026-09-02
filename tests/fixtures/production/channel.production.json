@@ -1,0 +1,56 @@
+{
+  "customChannelMetadata": {
+    "audience": "builders"
+  },
+  "id": "fixture-channel",
+  "name": "Fixture Channel",
+  "schema": "rapp-vision-production/1.0",
+  "videos": [
+    {
+      "chapters": [
+        {
+          "label": "Start",
+          "t": 0
+        }
+      ],
+      "customPublicationMetadata": {
+        "proof": true
+      },
+      "description": "A compiler fixture with metadata that must survive transformation.",
+      "duration": 10,
+      "id": "paired",
+      "live": {
+        "duration": 12,
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "card": {
+              "title": "Intro"
+            },
+            "dur": 2,
+            "t": 0
+          },
+          {
+            "actions": [
+              {
+                "at": 1,
+                "do": "click",
+                "selector": "#go"
+              }
+            ],
+            "app": "app.html",
+            "dur": 10,
+            "ready": {
+              "selector": "#go"
+            },
+            "t": 2
+          }
+        ]
+      },
+      "production": {
+        "master": "masters/paired-master.mov"
+      },
+      "title": "Paired"
+    }
+  ]
+}

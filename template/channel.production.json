@@ -1,0 +1,112 @@
+{
+  "_howto": "Keep one local production.master per publication. The compiler creates the paired MP4/WebM sources; live remains the inline take-the-wheel replay.",
+  "avatar": "📺",
+  "handle": "@your-github-handle",
+  "id": "my-channel",
+  "links": [
+    {
+      "label": "GitHub",
+      "url": "https://github.com/your-github-handle"
+    }
+  ],
+  "name": "My Channel",
+  "schema": "rapp-vision-production/1.0",
+  "tagline": "One line about what this channel is.",
+  "videos": [
+    {
+      "chapters": [
+        {
+          "label": "Orientation",
+          "t": 0
+        },
+        {
+          "label": "Take the wheel",
+          "t": 6
+        }
+      ],
+      "description": "The guided video explains the work. The live replay lets the viewer interrupt it and take control.",
+      "duration": 30,
+      "height": 800,
+      "id": "my-first-publication",
+      "live": {
+        "chapters": [
+          {
+            "label": "Replay briefing",
+            "t": 0
+          },
+          {
+            "label": "Drive the real app",
+            "t": 6
+          }
+        ],
+        "duration": 36,
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "card": {
+              "note": "Switch back to the guided video at any time.",
+              "sub": "This replay drives the real application.",
+              "title": "The proof is live"
+            },
+            "dur": 6,
+            "t": 0
+          },
+          {
+            "actions": [
+              {
+                "at": 1,
+                "do": "click",
+                "selector": "#start-button"
+              },
+              {
+                "at": 4,
+                "code": "KeyW",
+                "do": "keydown"
+              },
+              {
+                "at": 9,
+                "code": "KeyW",
+                "do": "keyup"
+              },
+              {
+                "at": 12,
+                "do": "drag",
+                "from": [
+                  400,
+                  300
+                ],
+                "to": [
+                  700,
+                  420
+                ]
+              }
+            ],
+            "app": "../my-app.html",
+            "dur": 30,
+            "lower": {
+              "bench": "A visible benchmark",
+              "fix": "Pause and take control",
+              "title": "My App"
+            },
+            "ready": {
+              "selector": "#start-button"
+            },
+            "t": 6
+          }
+        ]
+      },
+      "orientation": "landscape",
+      "production": {
+        "master": "masters/my-first-publication.mov"
+      },
+      "published": "2026-01-01",
+      "tags": [
+        "demo",
+        "live-replay"
+      ],
+      "thumb": "thumbs/my-first-publication.jpg",
+      "title": "My first paired publication",
+      "width": 1280
+    }
+  ]
+}

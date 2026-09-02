@@ -1,0 +1,216 @@
+{
+  "$defs": {
+    "action": {
+      "properties": {
+        "at": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "do": {
+          "enum": [
+            "click",
+            "key",
+            "keydown",
+            "keyup",
+            "type",
+            "drag",
+            "scroll"
+          ]
+        }
+      },
+      "required": [
+        "at",
+        "do"
+      ],
+      "type": "object"
+    },
+    "chapter": {
+      "properties": {
+        "label": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "t": {
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "t",
+        "label"
+      ],
+      "type": "object"
+    },
+    "publication": {
+      "not": {
+        "required": [
+          "sources"
+        ]
+      },
+      "properties": {
+        "chapters": {
+          "items": {
+            "$ref": "#/$defs/chapter"
+          },
+          "type": "array"
+        },
+        "duration": {
+          "exclusiveMinimum": 0,
+          "maximum": 86400,
+          "type": "number"
+        },
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+          "type": "string"
+        },
+        "live": {
+          "properties": {
+            "chapters": {
+              "items": {
+                "$ref": "#/$defs/chapter"
+              },
+              "type": "array"
+            },
+            "duration": {
+              "exclusiveMinimum": 0,
+              "maximum": 86400,
+              "type": "number"
+            },
+            "kind": {
+              "const": "rapp-vision-live/1.0"
+            },
+            "scenes": {
+              "items": {
+                "oneOf": [
+                  {
+                    "not": {
+                      "required": [
+                        "app"
+                      ]
+                    },
+                    "required": [
+                      "card"
+                    ]
+                  },
+                  {
+                    "not": {
+                      "required": [
+                        "card"
+                      ]
+                    },
+                    "required": [
+                      "app"
+                    ]
+                  }
+                ],
+                "properties": {
+                  "actions": {
+                    "items": {
+                      "$ref": "#/$defs/action"
+                    },
+                    "type": "array"
+                  },
+                  "app": {
+                    "oneOf": [
+                      {
+                        "format": "uri",
+                        "pattern": "^https://(?:[A-Za-z0-9.-]+|\\[[0-9A-Fa-f:.]+\\])(?::(?:[0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))?(?![^?#]*(?:;|%3[bB]|%2[fF]|%5[cC]))(?:/[^\\s\\\\?#]*)?(?:[?#][^\\s\\\\]*)?$",
+                        "type": "string"
+                      },
+                      {
+                        "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:|//)(?!.*\\\\)(?![^?#]*(?:;|%3[bB]|%2[fF]|%5[cC]))[^\\s?#][^\\s]*$",
+                        "type": "string"
+                      }
+                    ],
+                    "type": "string"
+                  },
+                  "card": {
+                    "type": "object"
+                  },
+                  "dur": {
+                    "exclusiveMinimum": 0,
+                    "type": "number"
+                  },
+                  "ready": {
+                    "type": "object"
+                  },
+                  "t": {
+                    "minimum": 0,
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "t",
+                  "dur"
+                ],
+                "type": "object"
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          },
+          "required": [
+            "kind",
+            "scenes"
+          ],
+          "type": "object"
+        },
+        "production": {
+          "properties": {
+            "master": {
+              "minLength": 1,
+              "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:|//|/)(?!.*\\\\)(?!.*%(?:2[fF]|5[cC]))[^\\u0000-\\u001F\\u007F-\\u009F]+$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "master"
+          ],
+          "type": "object"
+        },
+        "title": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "duration",
+        "production",
+        "live"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://kody-w.github.io/rapp-vision/channel.production.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "rapp-vision-production/1.0"
+    },
+    "videos": {
+      "items": {
+        "$ref": "#/$defs/publication"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "name",
+    "videos"
+  ],
+  "title": "RAPP Vision production source channel",
+  "type": "object"
+}

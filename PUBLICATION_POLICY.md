@@ -20,6 +20,11 @@ The current contract is `rapp-vision-channel/2.0`, documented by
 [`scripts/validate_publications.py`](scripts/validate_publications.py). The
 validator, not descriptive prose, decides whether a publication is admissible.
 
+[`channel.production.schema.json`](channel.production.schema.json) is an
+authoring contract, not a second publication format. Its compiler accepts one
+local master plus the required live replay, emits both encoded media formats,
+and produces the same `rapp-vision-channel/2.0` object enforced above.
+
 ## Frozen legacy exception
 
 Material published before this constitution remains playable only when all

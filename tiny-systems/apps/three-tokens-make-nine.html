@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="tiny-system-reset" content="exact">
+  <title>Three Tokens Make Nine</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      background: #f8edcf;
+      color: #27221b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background:
+        linear-gradient(150deg, #f8edcf 0 62%, #f2d999 62% 100%);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    button:focus-visible {
+      outline: 4px solid #1d4e89;
+      outline-offset: 4px;
+    }
+
+    .shell {
+      width: min(100%, 590px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: clamp(22px, 6vw, 48px);
+      display: grid;
+      align-content: center;
+      gap: 20px;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    .kicker {
+      margin: 0 0 7px;
+      color: #6d4822;
+      font-size: 0.77rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 9ch;
+      margin: 0 auto;
+      font-size: clamp(2.6rem, 10vw, 5.25rem);
+      line-height: 0.92;
+      letter-spacing: -0.065em;
+    }
+
+    .rule {
+      max-width: 35ch;
+      margin: 13px auto 0;
+      color: #594834;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .workbench {
+      padding: clamp(18px, 5vw, 30px);
+      border: 3px solid #27221b;
+      border-radius: 30px;
+      background: #fffaf0;
+      box-shadow: 9px 11px 0 #27221b;
+    }
+
+    .workbench h2 {
+      margin: 0 0 16px;
+      color: #6d4822;
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .token-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .token {
+      aspect-ratio: 1;
+      padding: 0;
+      border: 3px solid #27221b;
+      border-radius: 50%;
+      color: #27221b;
+      cursor: pointer;
+      font-size: clamp(1.45rem, 7vw, 2.6rem);
+      font-weight: 950;
+      box-shadow: inset -5px -7px 0 #0002, 0 5px 0 #27221b;
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+
+    .token:nth-child(1) {
+      background: #ff8f70;
+    }
+
+    .token:nth-child(2) {
+      background: #ffd166;
+    }
+
+    .token:nth-child(3) {
+      background: #7bdff2;
+    }
+
+    .token:nth-child(4) {
+      background: #b2f7a8;
+    }
+
+    .token[aria-pressed="true"] {
+      transform: translateY(5px);
+      box-shadow: inset 0 0 0 7px #fff8, 0 0 0 #27221b;
+    }
+
+    .equation {
+      min-height: 92px;
+      margin: 24px 0 0;
+      display: grid;
+      place-items: center;
+      border: 3px dashed #b58b52;
+      border-radius: 18px;
+      background: #fff;
+      text-align: center;
+    }
+
+    #draft-equation {
+      margin: 0;
+      padding: 12px;
+      font-family: ui-monospace, "Cascadia Mono", monospace;
+      font-size: clamp(1.3rem, 6vw, 2.35rem);
+      font-weight: 900;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .controls button {
+      min-height: 52px;
+      padding: 11px 17px;
+      border: 3px solid #27221b;
+      border-radius: 13px;
+      background: #27221b;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    #reset-btn {
+      background: transparent;
+      color: #27221b;
+    }
+
+    .decision {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .panel {
+      min-height: 130px;
+      padding: 17px;
+      border: 3px solid #27221b;
+      border-radius: 19px;
+      background: #fffaf0;
+    }
+
+    .panel h2 {
+      margin: 0 0 9px;
+      color: #6d4822;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    #accepted-equation {
+      display: block;
+      margin-bottom: 8px;
+      font-family: ui-monospace, "Cascadia Mono", monospace;
+      font-size: 1.12rem;
+      font-weight: 900;
+    }
+
+    #status-message {
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    #rejection-panel {
+      border-color: #a52832;
+      background: #fff0ef;
+      color: #721c24;
+    }
+
+    #rejection-panel strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 1.1rem;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .path-key {
+      margin: 0;
+      color: #594834;
+      font-size: 0.8rem;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    @media (max-width: 440px) {
+      .decision,
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .token-row {
+        gap: 7px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="kicker">Deterministic sum gate 03</p>
+      <h1>Three Tokens Make Nine</h1>
+      <p class="rule">Choose exactly three token values. Only a total of nine may replace the accepted tray.</p>
+    </header>
+
+    <section class="workbench" aria-labelledby="draft-heading">
+      <h2 id="draft-heading">Candidate tray</h2>
+      <div class="token-row" aria-label="Available token values">
+        <button id="token-1" class="token" type="button" aria-pressed="false" data-action="TOGGLE" data-value="1" aria-label="Toggle token 1">1</button>
+        <button id="token-2" class="token" type="button" aria-pressed="false" data-action="TOGGLE" data-value="2" aria-label="Toggle token 2">2</button>
+        <button id="token-3" class="token" type="button" aria-pressed="false" data-action="TOGGLE" data-value="3" aria-label="Toggle token 3">3</button>
+        <button id="token-4" class="token" type="button" aria-pressed="false" data-action="TOGGLE" data-value="4" aria-label="Toggle token 4">4</button>
+      </div>
+      <div class="equation">
+        <p id="draft-equation">choose 3 tokens</p>
+      </div>
+      <div class="controls">
+        <button id="submit-btn" type="button" data-action="SUBMIT">Submit candidate</button>
+        <button id="reset-btn" type="button" data-action="RESET" data-reset="exact">Reset exactly</button>
+      </div>
+    </section>
+
+    <div class="decision">
+      <section class="panel" aria-labelledby="accepted-heading">
+        <h2 id="accepted-heading">Accepted tray</h2>
+        <output id="accepted-equation">none yet</output>
+        <p id="status-message" role="status" aria-live="polite">Choose exactly three tokens.</p>
+      </section>
+      <section id="rejection-panel" class="panel" aria-labelledby="rejection-heading" hidden>
+        <h2 id="rejection-heading">Rejected candidate</h2>
+        <strong id="rejected-equation"></strong>
+        <span>The accepted tray remains unchanged.</span>
+      </section>
+    </div>
+
+    <p class="path-key">Replay path: accept 2 + 3 + 4 → reject 1 + 3 + 4 while preserving the accepted tray → reset exactly.</p>
+  </main>
+
+  <script type="application/json" id="contract-states">
+{
+  "positive": {
+    "draft": [2, 3, 4],
+    "accepted": [2, 3, 4],
+    "status": "accepted",
+    "message": "Accepted: 2 + 3 + 4 = 9.",
+    "rejectedTotal": null
+  },
+  "rejected": {
+    "draft": [1, 3, 4],
+    "accepted": [2, 3, 4],
+    "status": "rejected",
+    "message": "Rejected: 1 + 3 + 4 = 8. Accepted tokens stay 2 + 3 + 4.",
+    "rejectedTotal": 8
+  },
+  "reset": {
+    "draft": [],
+    "accepted": [],
+    "status": "ready",
+    "message": "Choose exactly three tokens.",
+    "rejectedTotal": null
+  }
+}
+  </script>
+  <script>
+    "use strict";
+
+    const CONTRACT_STATES = JSON.parse(
+      document.querySelector("#contract-states").textContent
+    );
+
+    function freezeState(value) {
+      return Object.freeze({
+        draft: Object.freeze([...value.draft]),
+        accepted: Object.freeze([...value.accepted]),
+        status: value.status,
+        message: value.message,
+        rejectedTotal: value.rejectedTotal
+      });
+    }
+
+    function initialState() {
+      return freezeState({
+        draft: [],
+        accepted: [],
+        status: "ready",
+        message: "Choose exactly three tokens.",
+        rejectedTotal: null
+      });
+    }
+
+    function expression(values) {
+      return values.join(" + ");
+    }
+
+    function reduce(state, action) {
+      switch (action.type) {
+        case "TOGGLE": {
+          const value = Number(action.value);
+          if (![1, 2, 3, 4].includes(value)) {
+            return state;
+          }
+          const present = state.draft.includes(value);
+          if (!present && state.draft.length === 3) {
+            return freezeState({
+              draft: state.draft,
+              accepted: state.accepted,
+              status: "rejected",
+              message: "Rejected: the candidate tray already has three tokens.",
+              rejectedTotal: state.draft.reduce((sum, item) => sum + item, 0)
+            });
+          }
+          const draft = present
+            ? state.draft.filter((item) => item !== value)
+            : [...state.draft, value].sort((left, right) => left - right);
+          return freezeState({
+            draft,
+            accepted: state.accepted,
+            status: "editing",
+            message: draft.length === 3
+              ? `Candidate ${expression(draft)} is ready to submit.`
+              : `Choose ${3 - draft.length} more token${3 - draft.length === 1 ? "" : "s"}.`,
+            rejectedTotal: null
+          });
+        }
+        case "SUBMIT": {
+          const total = state.draft.reduce((sum, value) => sum + value, 0);
+          if (state.draft.length === 3 && total === 9) {
+            return freezeState({
+              draft: state.draft,
+              accepted: state.draft,
+              status: "accepted",
+              message: `Accepted: ${expression(state.draft)} = 9.`,
+              rejectedTotal: null
+            });
+          }
+          const candidate = state.draft.length
+            ? `${expression(state.draft)} = ${total}`
+            : "empty tray";
+          const accepted = state.accepted.length
+            ? expression(state.accepted)
+            : "empty";
+          return freezeState({
+            draft: state.draft,
+            accepted: state.accepted,
+            status: "rejected",
+            message: `Rejected: ${candidate}. Accepted tokens stay ${accepted}.`,
+            rejectedTotal: total
+          });
+        }
+        case "RESET":
+          return initialState();
+        default:
+          return state;
+      }
+    }
+
+    function snapshot(state) {
+      return {
+        draft: [...state.draft],
+        accepted: [...state.accepted],
+        status: state.status,
+        message: state.message,
+        rejectedTotal: state.rejectedTotal
+      };
+    }
+
+    function verifyClaim(claim, state) {
+      const actual = JSON.stringify(snapshot(state));
+      const expected = JSON.stringify(CONTRACT_STATES[claim]);
+      if (actual !== expected) {
+        throw new Error(`Reducer contract mismatch for ${claim}`);
+      }
+    }
+
+    let state = initialState();
+    const tokenButtons = [...document.querySelectorAll(".token")];
+    const draftEquation = document.querySelector("#draft-equation");
+    const acceptedEquation = document.querySelector("#accepted-equation");
+    const status = document.querySelector("#status-message");
+    const rejection = document.querySelector("#rejection-panel");
+    const rejectedEquation = document.querySelector("#rejected-equation");
+
+    function render() {
+      for (const button of tokenButtons) {
+        const selected = state.draft.includes(Number(button.dataset.value));
+        button.setAttribute(
+          "aria-pressed",
+          String(selected)
+        );
+        button.disabled = state.draft.length === 3 && !selected;
+      }
+      draftEquation.textContent = state.draft.length
+        ? `${expression(state.draft)} = ${state.draft.reduce((sum, value) => sum + value, 0)}`
+        : "choose 3 tokens";
+      acceptedEquation.textContent = state.accepted.length
+        ? `${expression(state.accepted)} = 9`
+        : "none yet";
+      status.textContent = state.message;
+      rejection.hidden = state.status !== "rejected";
+      rejectedEquation.textContent = state.status === "rejected"
+        ? `${expression(state.draft) || "empty"} = ${state.rejectedTotal}`
+        : "";
+    }
+
+    function dispatch(action, claim = null) {
+      state = reduce(state, action);
+      if (claim) {
+        verifyClaim(claim, state);
+      }
+      render();
+    }
+
+    for (const button of tokenButtons) {
+      button.addEventListener("click", () => {
+        dispatch({ type: "TOGGLE", value: Number(button.dataset.value) });
+      });
+    }
+    document.querySelector("#submit-btn").addEventListener("click", () => {
+      const claim =
+        JSON.stringify(state.draft) === JSON.stringify([2, 3, 4])
+          ? "positive"
+          : JSON.stringify(state.draft) === JSON.stringify([1, 3, 4]) &&
+              JSON.stringify(state.accepted) === JSON.stringify([2, 3, 4])
+            ? "rejected"
+            : null;
+      dispatch({ type: "SUBMIT" }, claim);
+    });
+    document.querySelector("#reset-btn").addEventListener("click", () => {
+      dispatch({ type: "RESET" }, "reset");
+    });
+
+    window.tinySystem = Object.freeze({
+      initialState,
+      reduce,
+      snapshot: () => snapshot(state)
+    });
+
+    render();
+  </script>
+</body>
+</html>

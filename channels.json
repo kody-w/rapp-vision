@@ -5,8 +5,8 @@
   "name": "RAPP Hive",
   "visibility": "public",
   "revision": {
-    "sequence": 4,
-    "updated": "2026-09-02T16:09:46Z"
+    "sequence": 5,
+    "updated": "2026-09-02T16:09:47Z"
   },
   "peers": [],
   "_note": "RAPP Hive is the most universal contribution layer: a parking lot of federated channel.json URLs. Channels stay in their own repos; anyone can run a registry or add a channel locally without asking permission. Open a PR only if you want default listing.",
@@ -209,6 +209,14 @@
       "repo": "https://github.com/kody-w/rappvision-new-way-of-work",
       "contract": "rapp-vision-channel/2.0",
       "_why": "Narration-neutral production drafts paired with live, creator-driven storyboards for an open AI-worker build series."
+    },
+    {
+      "id": "tiny-systems",
+      "name": "Tiny Systems",
+      "url": "tiny-systems/channel.json",
+      "repo": "https://github.com/kody-w/rapp-vision",
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "Three deterministic micro-lessons with encoded orientation films and live proofs of acceptance, visible rejection, preserved state, and exact reset."
     }
   ]
 }

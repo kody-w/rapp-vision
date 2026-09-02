@@ -1,0 +1,599 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "quality.schema.json",
+  "title": "RAPP Vision artifact-bound quality record",
+  "$comment": "Consumers must derive staleness from the canonical submitted-manifest digest, artifact binding, PR head, and complete current review-state digest, and must require the latest stable workflow check. Only a trusted aggregator may issue an authoritative quality record. A quality record never grants default-registry listing; only an observed entry in the registry bytes can establish listing.",
+  "type": "object",
+  "required": [
+    "$schema",
+    "schema",
+    "id",
+    "submission_id",
+    "authority",
+    "binding",
+    "freshness",
+    "technical",
+    "default_registry"
+  ],
+  "properties": {
+    "$schema": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "schema": {
+      "const": "rapp-vision-quality/1.0"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "submission_id": {
+      "$ref": "#/$defs/id"
+    },
+    "authority": {
+      "$ref": "#/$defs/authority"
+    },
+    "binding": {
+      "$ref": "#/$defs/binding"
+    },
+    "freshness": {
+      "$ref": "#/$defs/freshness"
+    },
+    "technical": {
+      "$ref": "#/$defs/technical"
+    },
+    "default_registry": {
+      "$ref": "#/$defs/defaultRegistry"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "freshness": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "stale"
+              }
+            },
+            "required": [
+              "status"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "freshness"
+        ]
+      },
+      "then": {
+        "properties": {
+          "technical": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "stale"
+              }
+            },
+            "required": [
+              "status"
+            ],
+            "additionalProperties": true
+          },
+          "default_registry": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "stale"
+              }
+            },
+            "required": [
+              "status"
+            ],
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "technical": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "pass"
+              }
+            },
+            "required": [
+              "status"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "technical"
+        ]
+      },
+      "then": {
+        "properties": {
+          "technical": {
+            "type": "object",
+            "properties": {
+              "quorum": {
+                "type": "object",
+                "properties": {
+                  "met": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "met"
+                ],
+                "additionalProperties": true
+              },
+              "reviews": {
+                "type": "array",
+                "minItems": 2,
+                "allOf": [
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {
+                        "role": {
+                          "const": "technical"
+                        },
+                        "decision": {
+                          "const": "pass"
+                        }
+                      },
+                      "required": [
+                        "role",
+                        "decision"
+                      ],
+                      "additionalProperties": true
+                    }
+                  },
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {
+                        "role": {
+                          "const": "curation"
+                        },
+                        "decision": {
+                          "const": "pass"
+                        }
+                      },
+                      "required": [
+                        "role",
+                        "decision"
+                      ],
+                      "additionalProperties": true
+                    }
+                  }
+                ]
+              }
+            },
+            "required": [
+              "quorum",
+              "reviews"
+            ],
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "default_registry": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "listed"
+              }
+            },
+            "required": [
+              "status"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "default_registry"
+        ]
+      },
+      "then": {
+        "properties": {
+          "freshness": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "current"
+              }
+            },
+            "required": [
+              "status"
+            ],
+            "additionalProperties": true
+          },
+          "technical": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "pass"
+              }
+            },
+            "required": [
+              "status"
+            ],
+            "additionalProperties": true
+          },
+          "default_registry": {
+            "type": "object",
+            "required": [
+              "evidence"
+            ],
+            "additionalProperties": true
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": true,
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "gitCommit": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "relativeReference": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:|//|/)(?!.*\\\\)[^\\s]+$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:|//|/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\s?#]+$"
+    },
+    "binding": {
+      "type": "object",
+      "required": [
+        "submission_sha256",
+        "artifact_repository",
+        "artifact_path",
+        "publication_id",
+        "artifact_commit",
+        "artifact_sha256"
+      ],
+      "properties": {
+        "submission_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "artifact_repository": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "artifact_path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "publication_id": {
+          "$ref": "#/$defs/id"
+        },
+        "artifact_commit": {
+          "$ref": "#/$defs/gitCommit"
+        },
+        "artifact_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "additionalProperties": true
+    },
+    "freshness": {
+      "type": "object",
+      "required": [
+        "status",
+        "compared_submission_sha256",
+        "compared_commit",
+        "compared_sha256",
+        "stale_when"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "current",
+            "stale"
+          ]
+        },
+        "compared_submission_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "compared_commit": {
+          "$ref": "#/$defs/gitCommit"
+        },
+        "compared_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "stale_when": {
+          "type": "object",
+          "required": [
+            "submission_sha256_changes",
+            "artifact_commit_changes",
+            "artifact_sha256_changes"
+          ],
+          "properties": {
+            "submission_sha256_changes": {
+              "const": true
+            },
+            "artifact_commit_changes": {
+              "const": true
+            },
+            "artifact_sha256_changes": {
+              "const": true
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "check": {
+      "type": "object",
+      "required": [
+        "id",
+        "status",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "enum": [
+            "pass",
+            "fail"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "review": {
+      "type": "object",
+      "required": [
+        "reviewer",
+        "reviewer_github_user_id",
+        "role",
+        "decision",
+        "submission_sha256",
+        "artifact_commit",
+        "artifact_sha256"
+      ],
+      "properties": {
+        "reviewer": {
+          "$ref": "#/$defs/id"
+        },
+        "reviewer_github_user_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "role": {
+          "enum": [
+            "technical",
+            "curation"
+          ]
+        },
+        "decision": {
+          "enum": [
+            "pass",
+            "fail"
+          ]
+        },
+        "submission_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "artifact_commit": {
+          "$ref": "#/$defs/gitCommit"
+        },
+        "artifact_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "quorum": {
+      "type": "object",
+      "required": [
+        "minimum_approvals",
+        "required_roles",
+        "independent_reviewers",
+        "met"
+      ],
+      "properties": {
+        "minimum_approvals": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "required_roles": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "allOf": [
+            {
+              "contains": {
+                "const": "technical"
+              }
+            },
+            {
+              "contains": {
+                "const": "curation"
+              }
+            }
+          ]
+        },
+        "independent_reviewers": {
+          "const": true
+        },
+        "met": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    },
+    "authority": {
+      "type": "object",
+      "required": [
+        "kind",
+        "repository",
+        "run_url",
+        "pull_request_number",
+        "pull_request_head_sha",
+        "review_state_sha256",
+        "trusted_base_ref",
+        "trusted_base_sha",
+        "check_name"
+      ],
+      "properties": {
+        "kind": {
+          "const": "protected-workflow"
+        },
+        "repository": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "run_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "pull_request_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "pull_request_head_sha": {
+          "$ref": "#/$defs/gitCommit"
+        },
+        "review_state_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "trusted_base_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trusted_base_sha": {
+          "$ref": "#/$defs/gitCommit"
+        },
+        "check_name": {
+          "const": "Creator Submission Review / review"
+        }
+      },
+      "additionalProperties": true
+    },
+    "technical": {
+      "type": "object",
+      "required": [
+        "status",
+        "checks",
+        "reviews",
+        "quorum"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "pending",
+            "pass",
+            "fail",
+            "stale"
+          ]
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/check"
+          }
+        },
+        "reviews": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/review"
+          }
+        },
+        "quorum": {
+          "$ref": "#/$defs/quorum"
+        }
+      },
+      "additionalProperties": true
+    },
+    "registryEvidence": {
+      "type": "object",
+      "required": [
+        "registry_commit",
+        "registry_sha256",
+        "channel_id"
+      ],
+      "properties": {
+        "registry_commit": {
+          "$ref": "#/$defs/gitCommit"
+        },
+        "registry_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "channel_id": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "additionalProperties": true
+    },
+    "defaultRegistry": {
+      "type": "object",
+      "required": [
+        "status",
+        "registry",
+        "authority"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not-requested",
+            "requested",
+            "not-listed",
+            "listed",
+            "stale"
+          ]
+        },
+        "registry": {
+          "const": "channels.json"
+        },
+        "authority": {
+          "const": "registry-entry-only"
+        },
+        "evidence": {
+          "$ref": "#/$defs/registryEvidence"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

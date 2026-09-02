@@ -1,0 +1,631 @@
+{
+  "$schema": "commissions.schema.json",
+  "schema": "rapp-vision-commissions/1.0",
+  "id": "rapp-vision-launch-slate",
+  "name": "RAPP Vision launch commissions",
+  "brand": "RAPP Vision",
+  "status": "open",
+  "claim_policy": {
+    "phase": "claim",
+    "effect": "coordination-only",
+    "curation": "none",
+    "note": "A claim helps creators avoid accidental duplication. It grants no review role, acceptance, publication, or default-registry position."
+  },
+  "submission_protocol": "docs/CREATOR-INGRESS.md",
+  "submission_schema": "submission.schema.json",
+  "quality_schema": "quality.schema.json",
+  "commissions": [
+    {
+      "id": "use-offline-field-log",
+      "title": "Recover an offline field log",
+      "category": "use",
+      "status": "open",
+      "brief": "Show a local-first field log surviving a cold reload without network access, exporting a verifiable record, and rejecting a damaged import without losing the good copy.",
+      "gates": {
+        "paired_delivery": {
+          "mp4": true,
+          "webm": true,
+          "live": true,
+          "same_publication": true
+        },
+        "objective_evidence": {
+          "required": true,
+          "criterion": "After the supplied twelve-observation fixture is loaded and the network is disabled, a cold reload still shows 12 observations and the exported file reports the fixture's expected SHA-256.",
+          "acceptance": "The film names the expected count and digest; the live replay exposes both values in the running app."
+        },
+        "positive_path": {
+          "required": true,
+          "demonstration": "Create one observation, reload offline, find it again, and export the complete log."
+        },
+        "visible_failure": {
+          "required": true,
+          "demonstration": "Attempt to import a deliberately truncated fixture and show a visible rejection while the twelve good observations remain."
+        },
+        "exact_reset": {
+          "required": true,
+          "steps": [
+            "Activate Reset demo data.",
+            "Confirm the reset dialog.",
+            "Reload the page with the network disabled."
+          ],
+          "restored_state": "The supplied twelve-observation fixture is present, no extra draft remains, and the export digest returns to the documented fixture value."
+        },
+        "rights_privacy": {
+          "rights_attestation": true,
+          "privacy_attestation": true,
+          "no_secrets": true,
+          "scope": "Use synthetic field notes and creator-owned interface assets only."
+        },
+        "review_quorum": {
+          "minimum_approvals": 2,
+          "required_roles": [
+            "technical",
+            "curation"
+          ],
+          "independent_reviewers": true
+        }
+      }
+    },
+    {
+      "id": "use-keyboard-invoice-triage",
+      "title": "Triage invoices without a pointer",
+      "category": "use",
+      "status": "open",
+      "brief": "Demonstrate a small invoice queue that can be reviewed, corrected, and exported using only a keyboard and a visible focus path.",
+      "gates": {
+        "paired_delivery": {
+          "mp4": true,
+          "webm": true,
+          "live": true,
+          "same_publication": true
+        },
+        "objective_evidence": {
+          "required": true,
+          "criterion": "The three-invoice fixture totals 196.25, every control is reachable by keyboard, and the exported accepted-total field is exactly 196.25.",
+          "acceptance": "The film states the expected total; the live replay shows keyboard focus, the computed total, and the exported value."
+        },
+        "positive_path": {
+          "required": true,
+          "demonstration": "Using Tab, arrow keys, and Enter only, accept two invoices, correct the third, and export the queue."
+        },
+        "visible_failure": {
+          "required": true,
+          "demonstration": "Enter a negative amount and show an inline error, disabled export, and focus moved to the invalid field."
+        },
+        "exact_reset": {
+          "required": true,
+          "steps": [
+            "Activate Restore invoice fixture.",
+            "Confirm replacement of local edits.",
+            "Move focus to the first invoice row."
+          ],
+          "restored_state": "All three invoices are pending, the displayed total is 196.25, no validation error is visible, and focus is on the first row."
+        },
+        "rights_privacy": {
+          "rights_attestation": true,
+          "privacy_attestation": true,
+          "no_secrets": true,
+          "scope": "All people, vendors, account numbers, and invoice values must be synthetic."
+        },
+        "review_quorum": {
+          "minimum_approvals": 2,
+          "required_roles": [
+            "technical",
+            "curation"
+          ],
+          "independent_reviewers": true
+        }
+      }
+    },
+    {
+      "id": "learn-orbit-transfer",
+      "title": "Teach one orbital transfer by prediction",
+      "category": "learn",
+      "status": "open",
+      "brief": "Teach a Hohmann-style transfer by asking the learner for a prediction before revealing the simulation and numerical result.",
+      "gates": {
+        "paired_delivery": {
+          "mp4": true,
+          "webm": true,
+          "live": true,
+          "same_publication": true
+        },
+        "objective_evidence": {
+          "required": true,
+          "criterion": "For the embedded training fixture, the computed total delta-v must equal the fixture's documented 3.58 km/s within 0.01 km/s and the trajectory must intersect the target-orbit tolerance band.",
+          "acceptance": "The formula inputs, computed value, tolerance, and final intersection are readable in both modes."
+        },
+        "positive_path": {
+          "required": true,
+          "demonstration": "Record a learner prediction, run the two burns, and compare the predicted and measured delta-v."
+        },
+        "visible_failure": {
+          "required": true,
+          "demonstration": "Apply the provided under-burn preset and show the craft miss the target band with the numerical shortfall visible."
+        },
+        "exact_reset": {
+          "required": true,
+          "steps": [
+            "Activate Reset lesson.",
+            "Select the training fixture.",
+            "Set simulation time to zero."
+          ],
+          "restored_state": "The original radii and mass are restored, no prediction is recorded, both burns are unapplied, and time reads 0.00."
+        },
+        "rights_privacy": {
+          "rights_attestation": true,
+          "privacy_attestation": true,
+          "no_secrets": true,
+          "scope": "Use original diagrams, public-domain references, or clearly attributed compatible sources."
+        },
+        "review_quorum": {
+          "minimum_approvals": 2,
+          "required_roles": [
+            "technical",
+            "curation"
+          ],
+          "independent_reviewers": true
+        }
+      }
+    },
+    {
+      "id": "learn-grid-overflow",
+      "title": "Explain why a grid overflows",
+      "category": "learn",
+      "status": "open",
+      "brief": "Turn one common CSS Grid overflow bug into an inspectable lesson with a before state, a measured diagnosis, and a fix the viewer can undo.",
+      "gates": {
+        "paired_delivery": {
+          "mp4": true,
+          "webm": true,
+          "live": true,
+          "same_publication": true
+        },
+        "objective_evidence": {
+          "required": true,
+          "criterion": "The failing fixture has scrollWidth greater than clientWidth at 320 px; after the fix those values are equal at both 320 px and 1280 px.",
+          "acceptance": "The exact viewport, scrollWidth, and clientWidth values are displayed before and after the change."
+        },
+        "positive_path": {
+          "required": true,
+          "demonstration": "Inspect the overflowing track, apply the minmax or min-width fix, and verify both target viewport widths."
+        },
+        "visible_failure": {
+          "required": true,
+          "demonstration": "Restore the unbreakable-token fixture and visibly reproduce horizontal scrolling at 320 px."
+        },
+        "exact_reset": {
+          "required": true,
+          "steps": [
+            "Activate Restore broken CSS.",
+            "Set the viewport control to 320 px.",
+            "Scroll the preview back to x = 0."
+          ],
+          "restored_state": "The original CSS text, long token, 320 px viewport, and measured overflow are identical to the opening state."
+        },
+        "rights_privacy": {
+          "rights_attestation": true,
+          "privacy_attestation": true,
+          "no_secrets": true,
+          "scope": "The lesson source, fixture text, fonts, and screenshots must be redistributable."
+        },
+        "review_quorum": {
+          "minimum_approvals": 2,
+          "required_roles": [
+            "technical",
+            "curation"
+          ],
+          "independent_reviewers": true
+        }
+      }
+    },
+    {
+      "id": "prove-deterministic-hive-merge",
+      "title": "Prove a deterministic Hive merge",
+      "category": "prove",
+      "status": "open",
+      "brief": "Build a small visual proof of RAPP Hive traversal, revision selection, and channel shadowing using fixed local fixtures and no network dependency.",
+      "gates": {
+        "paired_delivery": {
+          "mp4": true,
+          "webm": true,
+          "live": true,
+          "same_publication": true
+        },
+        "objective_evidence": {
+          "required": true,
+          "criterion": "For the supplied cyclic three-Hive fixture, traversal terminates after three unique Hives, revision sequence 9 wins for the duplicate Hive id, and the root-priority channel entry wins the shadow conflict.",
+          "acceptance": "The visited order, selected revision, winning channel source, and shadowed source are emitted as inspectable data."
+        },
+        "positive_path": {
+          "required": true,
+          "demonstration": "Run the fixed merge twice with the same root priority and show byte-identical result digests."
+        },
+        "visible_failure": {
+          "required": true,
+          "demonstration": "Load a fixture with a negative revision sequence and show it become unavailable rather than an empty successful Hive."
+        },
+        "exact_reset": {
+          "required": true,
+          "steps": [
+            "Activate Reset fixtures.",
+            "Restore root priority to alpha then beta.",
+            "Clear the traversal log and run counter."
+          ],
+          "restored_state": "The three original Hive objects, root priority, empty visited set, and documented expected digest are restored."
+        },
+        "rights_privacy": {
+          "rights_attestation": true,
+          "privacy_attestation": true,
+          "no_secrets": true,
+          "scope": "Fixtures must contain invented Hive names and local relative URLs only."
+        },
+        "review_quorum": {
+          "minimum_approvals": 2,
+          "required_roles": [
+            "technical",
+            "curation"
+          ],
+          "independent_reviewers": true
+        }
+      }
+    },
+    {
+      "id": "prove-white-furnace-energy",
+      "title": "Prove a white-furnace energy bound",
+      "category": "prove",
+      "status": "open",
+      "brief": "Make a compact renderer proof in which the viewer can run a white-furnace test, introduce a biased estimator, and restore the known-good integrator.",
+      "gates": {
+        "paired_delivery": {
+          "mp4": true,
+          "webm": true,
+          "live": true,
+          "same_publication": true
+        },
+        "objective_evidence": {
+          "required": true,
+          "criterion": "With albedo 1.0, seed 42, and 256 samples per pixel, mean luminance error must be at most 1.00 percent.",
+          "acceptance": "The input seed, sample count, measured mean, error percentage, and threshold are visible and exportable."
+        },
+        "positive_path": {
+          "required": true,
+          "demonstration": "Run the reference integrator from zero samples to 256 samples per pixel and show the error settle inside the bound."
+        },
+        "visible_failure": {
+          "required": true,
+          "demonstration": "Enable the supplied biased-weight toggle and show error exceed 5 percent with an unmistakable failing state."
+        },
+        "exact_reset": {
+          "required": true,
+          "steps": [
+            "Disable the biased-weight toggle.",
+            "Activate Reset accumulation.",
+            "Restore seed 42 and albedo 1.0."
+          ],
+          "restored_state": "The reference integrator is selected, the sample counter is zero, the image is cleared, and all fixture inputs match the opening state."
+        },
+        "rights_privacy": {
+          "rights_attestation": true,
+          "privacy_attestation": true,
+          "no_secrets": true,
+          "scope": "Shader, scene, textures, and explanatory graphics must be original or compatibly licensed."
+        },
+        "review_quorum": {
+          "minimum_approvals": 2,
+          "required_roles": [
+            "technical",
+            "curation"
+          ],
+          "independent_reviewers": true
+        }
+      }
+    },
+    {
+      "id": "play-one-button-rhythm",
+      "title": "Make one button carry a rhythm game",
+      "category": "play",
+      "status": "open",
+      "brief": "Create a readable one-button rhythm challenge whose deterministic chart can demonstrate a clean run, a real miss, and an exact retry.",
+      "gates": {
+        "paired_delivery": {
+          "mp4": true,
+          "webm": true,
+          "live": true,
+          "same_publication": true
+        },
+        "objective_evidence": {
+          "required": true,
+          "criterion": "The fixture chart contains exactly 16 cues; the reference input trace scores 16 hits within the 50 ms perfect window and produces the documented score.",
+          "acceptance": "Cue count, hit offsets, judgement windows, combo, and final score are visible or exportable."
+        },
+        "positive_path": {
+          "required": true,
+          "demonstration": "Play the deterministic reference trace through all 16 cues and reach the documented perfect result."
+        },
+        "visible_failure": {
+          "required": true,
+          "demonstration": "Skip the fourth cue and show the miss judgement, broken combo, changed audio or visual response, and lower score."
+        },
+        "exact_reset": {
+          "required": true,
+          "steps": [
+            "Activate Retry chart.",
+            "Wait for the three-count lead-in.",
+            "Leave the input untouched at beat zero."
+          ],
+          "restored_state": "The same 16-cue chart is at time zero with score 0, combo 0, no judgements, and the original deterministic seed."
+        },
+        "rights_privacy": {
+          "rights_attestation": true,
+          "privacy_attestation": true,
+          "no_secrets": true,
+          "scope": "Music, samples, chart, type, and visual assets must be creator-owned or clearly redistributable."
+        },
+        "review_quorum": {
+          "minimum_approvals": 2,
+          "required_roles": [
+            "technical",
+            "curation"
+          ],
+          "independent_reviewers": true
+        }
+      }
+    },
+    {
+      "id": "play-seeded-maze-return",
+      "title": "Escape and replay a seeded maze",
+      "category": "play",
+      "status": "open",
+      "brief": "Build a small maze whose seed, shortest route, failure room, and reset are legible enough for a viewer to verify and then take over.",
+      "gates": {
+        "paired_delivery": {
+          "mp4": true,
+          "webm": true,
+          "live": true,
+          "same_publication": true
+        },
+        "objective_evidence": {
+          "required": true,
+          "criterion": "Seed RAPP-42 always generates the same topology digest and an 18-step shortest route from the marked entrance to the exit.",
+          "acceptance": "The seed, topology digest, current step count, and reference shortest-path length are visible."
+        },
+        "positive_path": {
+          "required": true,
+          "demonstration": "Follow the 18-step reference route, open the exit, and display the matched optimal length."
+        },
+        "visible_failure": {
+          "required": true,
+          "demonstration": "Take the marked wrong turn into the trap room and show the route become longer than the reference without hiding the exit."
+        },
+        "exact_reset": {
+          "required": true,
+          "steps": [
+            "Activate Restart same seed.",
+            "Confirm seed RAPP-42.",
+            "Return camera orientation to north."
+          ],
+          "restored_state": "The original topology digest, entrance position, north-facing camera, zero step count, closed exit, and empty trail are restored."
+        },
+        "rights_privacy": {
+          "rights_attestation": true,
+          "privacy_attestation": true,
+          "no_secrets": true,
+          "scope": "All game code, sounds, textures, and level-generation assets must be original or compatible."
+        },
+        "review_quorum": {
+          "minimum_approvals": 2,
+          "required_roles": [
+            "technical",
+            "curation"
+          ],
+          "independent_reviewers": true
+        }
+      }
+    },
+    {
+      "id": "create-vector-icon-system",
+      "title": "Create a six-icon vector system",
+      "category": "create",
+      "status": "open",
+      "brief": "Show a tiny vector tool producing six related icons from shared geometric rules, then deliberately break and restore one rule.",
+      "gates": {
+        "paired_delivery": {
+          "mp4": true,
+          "webm": true,
+          "live": true,
+          "same_publication": true
+        },
+        "objective_evidence": {
+          "required": true,
+          "criterion": "The export contains exactly six named 24 by 24 SVG symbols and the reference raster comparison remains below 0.50 percent differing pixels.",
+          "acceptance": "Symbol count, viewBox, names, raster comparison method, measured difference, and exported SVG are inspectable."
+        },
+        "positive_path": {
+          "required": true,
+          "demonstration": "Edit the shared stroke rule, regenerate all six symbols, and export the passing SVG sprite."
+        },
+        "visible_failure": {
+          "required": true,
+          "demonstration": "Move one anchor off the shared grid and show the raster comparison fail with the changed pixels highlighted."
+        },
+        "exact_reset": {
+          "required": true,
+          "steps": [
+            "Activate Restore icon fixture.",
+            "Set zoom to 800 percent.",
+            "Select the first symbol and clear comparison overlays."
+          ],
+          "restored_state": "All six original paths, shared rules, names, selection, zoom, and passing reference comparison are restored."
+        },
+        "rights_privacy": {
+          "rights_attestation": true,
+          "privacy_attestation": true,
+          "no_secrets": true,
+          "scope": "Icons, fonts, reference rasters, and tool code must be original or compatibly licensed."
+        },
+        "review_quorum": {
+          "minimum_approvals": 2,
+          "required_roles": [
+            "technical",
+            "curation"
+          ],
+          "independent_reviewers": true
+        }
+      }
+    },
+    {
+      "id": "create-eight-bar-drum-loop",
+      "title": "Create an eight-bar drum loop",
+      "category": "create",
+      "status": "open",
+      "brief": "Compose a deterministic eight-bar rhythm, expose the event data behind it, show one timing defect, and export a verifiable audio render.",
+      "gates": {
+        "paired_delivery": {
+          "mp4": true,
+          "webm": true,
+          "live": true,
+          "same_publication": true
+        },
+        "objective_evidence": {
+          "required": true,
+          "criterion": "At 120 BPM in 4/4, the loop contains exactly 32 note events and the exported WAV duration is 16.000 seconds within 0.010 seconds.",
+          "acceptance": "Tempo, bar count, event count, event timestamps, render duration, and export digest are visible or exportable."
+        },
+        "positive_path": {
+          "required": true,
+          "demonstration": "Build the final pattern, play all eight bars, and export the 32-event passing render."
+        },
+        "visible_failure": {
+          "required": true,
+          "demonstration": "Move the supplied kick event off-grid and show the timing audit identify its exact bar, beat, and offset."
+        },
+        "exact_reset": {
+          "required": true,
+          "steps": [
+            "Activate Restore pattern fixture.",
+            "Return the playhead to bar 1 beat 1.",
+            "Clear the timing audit and export history."
+          ],
+          "restored_state": "Tempo is 120 BPM, all 32 original events and velocities are restored, the playhead is at zero, and no stale render remains."
+        },
+        "rights_privacy": {
+          "rights_attestation": true,
+          "privacy_attestation": true,
+          "no_secrets": true,
+          "scope": "All samples, synthesis, pattern data, cover art, and recorded audio must be creator-owned or redistributable."
+        },
+        "review_quorum": {
+          "minimum_approvals": 2,
+          "required_roles": [
+            "technical",
+            "curation"
+          ],
+          "independent_reviewers": true
+        }
+      }
+    },
+    {
+      "id": "explore-ecosystem-threshold",
+      "title": "Explore an ecosystem threshold",
+      "category": "explore",
+      "status": "open",
+      "brief": "Let the viewer sweep one model parameter, observe a stable band and a collapse, and reset to a reproducible starting population.",
+      "gates": {
+        "paired_delivery": {
+          "mp4": true,
+          "webm": true,
+          "live": true,
+          "same_publication": true
+        },
+        "objective_evidence": {
+          "required": true,
+          "criterion": "With seed 31415 and grazing rate 0.24, the fixture population remains between 80 and 120 at tick 600; with grazing rate 0.60 it falls below 10 before tick 300.",
+          "acceptance": "Seed, parameter values, tick number, population series, thresholds, and final measurements are visible and exportable."
+        },
+        "positive_path": {
+          "required": true,
+          "demonstration": "Run the 0.24 fixture through tick 600 and inspect the population staying inside the documented band."
+        },
+        "visible_failure": {
+          "required": true,
+          "demonstration": "Increase grazing to 0.60 and show the population cross the collapse threshold with the crossing tick marked."
+        },
+        "exact_reset": {
+          "required": true,
+          "steps": [
+            "Activate Reset ecosystem.",
+            "Restore seed 31415 and grazing rate 0.24.",
+            "Set simulation speed to 1x."
+          ],
+          "restored_state": "Tick is zero, the original population and resources are restored, the chart is empty, and all fixture parameters match the opening state."
+        },
+        "rights_privacy": {
+          "rights_attestation": true,
+          "privacy_attestation": true,
+          "no_secrets": true,
+          "scope": "Use synthetic model data and original or compatible species illustrations and sounds."
+        },
+        "review_quorum": {
+          "minimum_approvals": 2,
+          "required_roles": [
+            "technical",
+            "curation"
+          ],
+          "independent_reviewers": true
+        }
+      }
+    },
+    {
+      "id": "explore-archive-map-contrast",
+      "title": "Explore change across two archive maps",
+      "category": "explore",
+      "status": "open",
+      "brief": "Build a spatial comparison over a synthetic 24-record archive where the viewer can isolate changed records, trigger an empty query, and return to the same view.",
+      "gates": {
+        "paired_delivery": {
+          "mp4": true,
+          "webm": true,
+          "live": true,
+          "same_publication": true
+        },
+        "objective_evidence": {
+          "required": true,
+          "criterion": "Comparing the fixture's 1990 and 2020 snapshots yields exactly seven changed record ids, and the exported sorted id list matches the embedded expected list.",
+          "acceptance": "Snapshot labels, total record count, changed count, sorted ids, spatial extent, and export digest are inspectable."
+        },
+        "positive_path": {
+          "required": true,
+          "demonstration": "Compare the two snapshots, filter to the seven changed records, inspect one record, and export the sorted id list."
+        },
+        "visible_failure": {
+          "required": true,
+          "demonstration": "Select the supplied impossible date range and show a clear empty state that is not rendered as a successful zero-change comparison."
+        },
+        "exact_reset": {
+          "required": true,
+          "steps": [
+            "Activate Restore archive view.",
+            "Set snapshots to 1990 and 2020.",
+            "Reset filters, selection, pan, and zoom."
+          ],
+          "restored_state": "All 24 records are visible at the original extent, the seven-change comparison is selected, no record is focused, and the expected export digest is restored."
+        },
+        "rights_privacy": {
+          "rights_attestation": true,
+          "privacy_attestation": true,
+          "no_secrets": true,
+          "scope": "Records, coordinates, names, images, and dates must be synthetic or cleared for public redistribution."
+        },
+        "review_quorum": {
+          "minimum_approvals": 2,
+          "required_roles": [
+            "technical",
+            "curation"
+          ],
+          "independent_reviewers": true
+        }
+      }
+    }
+  ]
+}

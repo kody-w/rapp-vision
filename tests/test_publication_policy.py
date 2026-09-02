@@ -566,7 +566,10 @@ class TestPublicationPolicy(unittest.TestCase):
                 self.assertIn("contents: write", source)
                 self.assertIn("pull-requests: write", source)
                 self.assertIn(f"AUTOMATION_BRANCH: {branch}", source)
-                self.assertIn("git fetch origin main", source)
+                self.assertTrue(
+                    "git fetch origin main" in source
+                    or "+refs/heads/main:refs/remotes/origin/main" in source
+                )
                 self.assertIn('git checkout -B "$AUTOMATION_BRANCH" origin/main', source)
                 self.assertIn("--force-with-lease=", source)
                 self.assertIn('origin "HEAD:$AUTOMATION_BRANCH"', source)

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">One Block, Three Trains</title>
+  <desc id="desc">Deterministic synthetic thumbnail for One Block, Three Trains.</desc>
+  <rect width="960" height="540" fill="#07131f"/>
+  <g stroke="#102b3e" stroke-width="1"><path d="M0 48H960M0 96H960M0 144H960M0 192H960M0 240H960M0 288H960M0 336H960M0 384H960M0 432H960M0 480H960"/><path d="M48 0V540M96 0V540M144 0V540M192 0V540M240 0V540M288 0V540M336 0V540M384 0V540M432 0V540M480 0V540M528 0V540M576 0V540M624 0V540M672 0V540M720 0V540M768 0V540M816 0V540M864 0V540M912 0V540"/></g>
+  <rect x="330" y="174" width="360" height="224" rx="18" fill="#0b2638" stroke="#53c7e8" stroke-width="4" stroke-dasharray="12 10"/>
+  <path d="M0 309H960M0 345H960" stroke="#9eb1bd" stroke-width="7"/>
+  <circle cx="300" cy="244" r="15" fill="#ff6b6b"/>
+  <g fill="#ffd166" stroke="#07131f" stroke-width="5"><path d="M430 276h118v54H430z"/><path d="M516 258h32v18h-32z"/><circle cx="455" cy="338" r="12"/><circle cx="521" cy="338" r="12"/></g>
+  <text x="58" y="74" fill="#93c9e8" font-family="monospace" font-size="30" font-weight="700" letter-spacing="4">ONE BLOCK</text>
+  <text x="58" y="126" fill="#f4f8fb" font-family="monospace" font-size="42" font-weight="800">THREE TRAINS</text>
+  <text x="489" y="312" text-anchor="middle" fill="#07131f" font-family="monospace" font-size="30" font-weight="900">A</text>
+  <rect x="58" y="440" width="844" height="58" rx="8" fill="#0b1f2e"/>
+  <text x="82" y="478" fill="#ff6b6b" font-family="monospace" font-size="25" font-weight="800">REJECT B / A STAYS</text>
+</svg>

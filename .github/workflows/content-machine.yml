@@ -35,6 +35,8 @@ concurrency:
 
 env:
   AUTOMATION_BRANCH: automation/content-machine
+  ALLOWED_STATE_FILES: "state/proposals.json state/editorial_reviews.json"
+  PYTHONDONTWRITEBYTECODE: "1"
 
 jobs:
   propose-and-review:
@@ -46,12 +48,69 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+          persist-credentials: false
 
-      - name: Reset automation branch from current main
+      - name: Resume automation branch on current main
         run: |
-          git fetch origin main
-          echo "AUTOMATION_REMOTE_SHA=$(git ls-remote --heads origin "$AUTOMATION_BRANCH" | awk '{print $1}')" >> "$GITHUB_ENV"
-          git checkout -B "$AUTOMATION_BRANCH" origin/main
+          set -euo pipefail
+
+          reject_unallowed_paths() {
+            while IFS= read -r path; do
+              [ -z "$path" ] && continue
+              case "$path" in
+                state/proposals.json|state/editorial_reviews.json) ;;
+                *) printf '%s\n' "$path" ;;
+              esac
+            done
+          }
+
+          git fetch --no-tags origin \
+            "+refs/heads/main:refs/remotes/origin/main"
+          remote_sha="$(git ls-remote --heads origin \
+            "refs/heads/$AUTOMATION_BRANCH" | awk '{print $1}')"
+          echo "AUTOMATION_REMOTE_SHA=$remote_sha" >> "$GITHUB_ENV"
+
+          if [ -n "$remote_sha" ]; then
+            remote_ref="refs/remotes/origin/$AUTOMATION_BRANCH"
+            git fetch --no-tags origin \
+              "+refs/heads/$AUTOMATION_BRANCH:$remote_ref"
+
+            unexpected_paths="$(
+              git diff --name-only --no-renames origin/main..."$remote_ref" |
+                reject_unallowed_paths
+            )"
+            if [ -n "$unexpected_paths" ]; then
+              echo "Refusing to resume $AUTOMATION_BRANCH: its diff from origin/main contains unexpected paths:" >&2
+              printf '%s\n' "$unexpected_paths" >&2
+              exit 1
+            fi
+
+            # Never replay automation-branch history. Rebuild from trusted
+            # current main and carry forward only the two verified snapshots.
+            git checkout -B "$AUTOMATION_BRANCH" origin/main
+            for path in $ALLOWED_STATE_FILES; do
+              if git cat-file -e "$remote_ref:$path" 2>/dev/null; then
+                mkdir -p "$(dirname "$path")"
+                git show "$remote_ref:$path" > "$path"
+              else
+                rm -f -- "$path"
+              fi
+            done
+          else
+            git checkout -B "$AUTOMATION_BRANCH" origin/main
+          fi
+
+          unexpected_paths="$(
+            {
+              git diff --name-only --no-renames
+              git ls-files --others --exclude-standard
+            } | sort -u | reject_unallowed_paths
+          )"
+          if [ -n "$unexpected_paths" ]; then
+            echo "Refusing to execute content machinery after restoring unexpected paths:" >&2
+            printf '%s\n' "$unexpected_paths" >&2
+            exit 1
+          fi
 
       # Same mirror step as metrics.yml, for the same reason: channel
       # enumeration is filesystem-only by design, and the cross-repo channels
@@ -82,34 +141,78 @@ jobs:
       # proposal queue exactly as it was rather than emptying it. The queue is
       # durable state a human may have triaged; silence must never erase it.
       - name: Refresh proposal queue
-        run: python3 scripts/content_machine.py propose
+        run: python3 scripts/content_machine.py propose --metrics state/metrics.json
 
       # Editorial lane only. --review-limit caps the day's writes so a big
       # catalog drains over successive runs instead of hammering the API.
       - name: Review published videos (editorial lane)
         run: python3 scripts/content_machine.py review --review-limit 20
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit state if changed
         run: |
-          FILES=""
-          for f in state/proposals.json state/metrics.json state/editorial.json; do
-            [ -f "$f" ] && FILES="$FILES $f"
+          set -euo pipefail
+
+          reject_unallowed_paths() {
+            while IFS= read -r path; do
+              [ -z "$path" ] && continue
+              case "$path" in
+                state/proposals.json|state/editorial_reviews.json) ;;
+                *) printf '%s\n' "$path" ;;
+              esac
+            done
+          }
+
+          changed_paths="$(
+            {
+              git diff --name-only --no-renames origin/main...HEAD
+              git diff --name-only --no-renames
+              git diff --cached --name-only --no-renames
+              git ls-files --others --exclude-standard
+            } | sort -u
+          )"
+          unexpected_paths="$(printf '%s\n' "$changed_paths" | reject_unallowed_paths)"
+          if [ -n "$unexpected_paths" ]; then
+            echo "Unexpected changed paths; refusing to commit:" >&2
+            printf '%s\n' "$unexpected_paths" >&2
+            exit 1
+          fi
+
+          staged=false
+          for path in $ALLOWED_STATE_FILES; do
+            if [ -n "$(git status --porcelain -- "$path")" ]; then
+              git add -- "$path"
+              staged=true
+            fi
           done
-          if [ -z "$FILES" ] || [ -z "$(git status --porcelain $FILES)" ]; then
-            echo "No changes; nothing to commit."
+          if [ "$staged" = true ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore(machine): refresh proposals + editorial reviews"
+          else
+            echo "No new state changes to commit; preserving any resumed branch state."
+          fi
+
+          unexpected_paths="$(
+            git diff --name-only --no-renames origin/main...HEAD |
+              reject_unallowed_paths
+          )"
+          if [ -n "$unexpected_paths" ]; then
+            echo "Refusing to push a branch whose diff from origin/main contains unexpected paths:" >&2
+            printf '%s\n' "$unexpected_paths" >&2
+            exit 1
+          fi
+          if git diff --quiet origin/main...HEAD; then
+            echo "No automation state differs from main; nothing to push."
             exit 0
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add $FILES
-          git commit -m "chore(machine): refresh proposals + editorial reviews"
+
+          gh auth setup-git
           if [ -n "$AUTOMATION_REMOTE_SHA" ]; then
             git push --force-with-lease="refs/heads/$AUTOMATION_BRANCH:$AUTOMATION_REMOTE_SHA" \
               origin "HEAD:$AUTOMATION_BRANCH"
           else
-            git push origin "HEAD:$AUTOMATION_BRANCH"
+            git push --force-with-lease="refs/heads/$AUTOMATION_BRANCH:" \
+              origin "HEAD:$AUTOMATION_BRANCH"
           fi
 
           PR_URL=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$AUTOMATION_BRANCH" \

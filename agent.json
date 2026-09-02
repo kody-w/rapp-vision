@@ -1,0 +1,43 @@
+{
+  "$schema": "agent.schema.json",
+  "schema": "rapp-vision-agent/1.0",
+  "id": "rapp-vision",
+  "name": "RAPP Vision",
+  "description": "Static, agent-first discovery for creating paired RAPP Vision publications.",
+  "publication_contract": "rapp-vision-channel/2.0",
+  "publication_schema": "channel.schema.json#/$defs/publication",
+  "channel_contract": "rapp-vision-channel/2.0",
+  "channel_schema": "channel.schema.json",
+  "commissions": "commissions.json",
+  "commissions_schema": "commissions.schema.json",
+  "submission_protocol": "docs/CREATOR-INGRESS.md",
+  "submission_schema": "submission.schema.json",
+  "quality_schema": "quality.schema.json",
+  "submission_template": "template/submission.json",
+  "production": {
+    "contract": "rapp-vision-production/1.0",
+    "schema": "channel.production.schema.json",
+    "template": "template/channel.production.json",
+    "compiler": "scripts/compile_publications.py",
+    "check": "python3 scripts/compile_publications.py check {production_json}",
+    "build": "python3 scripts/compile_publications.py build {production_json}"
+  },
+  "submission_transport": "pull-request",
+  "submission_manifest_location": "pull-request-body",
+  "validator": {
+    "command": "python3 scripts/validate_publications.py {channel_json}",
+    "argument": "{channel_json}"
+  },
+  "submission_validator": {
+    "script": "scripts/validate_creator_submission.py",
+    "submission_command": "python3 scripts/validate_creator_submission.py submission {submission_json} --artifact-root {artifact_checkout} --pr-number {pull_request_number}",
+    "quality_command": "python3 scripts/validate_creator_submission.py quality {submission_json} {quality_json} --repository {repository_url} --run-url {workflow_run_url} --pull-request-number {pull_request_number} --pull-request-head-sha {pull_request_head_sha} --review-state-sha256 {review_state_sha256} --trusted-base-ref {default_branch} --trusted-base-sha {trusted_base_sha}"
+  },
+  "repository": "https://github.com/kody-w/rapp-vision",
+  "default_registry": "channels.json",
+  "authority": {
+    "claim": "coordination-only",
+    "technical_pass": "not-listing",
+    "default_registry": "registry-entry-only"
+  }
+}

@@ -1,0 +1,557 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "submission.schema.json",
+  "title": "RAPP Vision commission claim and submission manifest",
+  "type": "object",
+  "required": [
+    "$schema",
+    "schema",
+    "id",
+    "phase",
+    "commission_id",
+    "creator",
+    "pull_request",
+    "claim"
+  ],
+  "properties": {
+    "$schema": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "schema": {
+      "const": "rapp-vision-submission/1.0"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "phase": {
+      "enum": [
+        "claim",
+        "submitted"
+      ]
+    },
+    "commission_id": {
+      "$ref": "#/$defs/id"
+    },
+    "creator": {
+      "$ref": "#/$defs/creator"
+    },
+    "pull_request": {
+      "$ref": "#/$defs/pullRequest"
+    },
+    "claim": {
+      "$ref": "#/$defs/claim"
+    },
+    "artifact": {
+      "$ref": "#/$defs/artifact"
+    },
+    "deliverables": {
+      "$ref": "#/$defs/deliverables"
+    },
+    "evidence": {
+      "$ref": "#/$defs/evidence"
+    },
+    "attestations": {
+      "$ref": "#/$defs/attestations"
+    },
+    "review_request": {
+      "$ref": "#/$defs/reviewRequest"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "phase": {
+            "const": "claim"
+          }
+        },
+        "required": [
+          "phase"
+        ]
+      },
+      "then": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "artifact"
+              ]
+            },
+            {
+              "required": [
+                "deliverables"
+              ]
+            },
+            {
+              "required": [
+                "evidence"
+              ]
+            },
+            {
+              "required": [
+                "attestations"
+              ]
+            },
+            {
+              "required": [
+                "review_request"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "phase": {
+            "const": "submitted"
+          }
+        },
+        "required": [
+          "phase"
+        ]
+      },
+      "then": {
+        "required": [
+          "artifact",
+          "deliverables",
+          "evidence",
+          "attestations",
+          "review_request"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": true,
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "gitCommit": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "relativeReference": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:|//|/)(?!.*\\\\)[^\\s]+$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:|//|/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\s?#]+$"
+    },
+    "creator": {
+      "type": "object",
+      "required": [
+        "id",
+        "display_name",
+        "github_user_id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "github_user_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "profile": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        }
+      },
+      "additionalProperties": true
+    },
+    "pullRequest": {
+      "type": "object",
+      "required": [
+        "repository",
+        "head_ref"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "head_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "claim": {
+      "type": "object",
+      "required": [
+        "effect",
+        "curation"
+      ],
+      "properties": {
+        "effect": {
+          "const": "coordination-only"
+        },
+        "curation": {
+          "const": "none"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "artifact": {
+      "type": "object",
+      "required": [
+        "repository",
+        "path",
+        "publication_id",
+        "commit",
+        "sha256",
+        "digest_scope"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "publication_id": {
+          "$ref": "#/$defs/id"
+        },
+        "commit": {
+          "$ref": "#/$defs/gitCommit"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "digest_scope": {
+          "const": "raw-file-bytes"
+        }
+      },
+      "additionalProperties": true
+    },
+    "mediaFile": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "additionalProperties": true
+    },
+    "deliverables": {
+      "type": "object",
+      "required": [
+        "mp4",
+        "webm",
+        "live"
+      ],
+      "properties": {
+        "mp4": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/mediaFile"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "pattern": "\\.mp4$"
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "webm": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/mediaFile"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "pattern": "\\.webm$"
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "live": {
+          "type": "object",
+          "required": [
+            "channel_path",
+            "publication_id",
+            "kind"
+          ],
+          "properties": {
+            "channel_path": {
+              "$ref": "#/$defs/relativePath"
+            },
+            "publication_id": {
+              "$ref": "#/$defs/id"
+            },
+            "kind": {
+              "const": "rapp-vision-live/1.0"
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "objectiveEvidence": {
+      "type": "object",
+      "required": [
+        "criterion",
+        "observed",
+        "evidence_path"
+      ],
+      "properties": {
+        "criterion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observed": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_path": {
+          "$ref": "#/$defs/relativePath"
+        }
+      },
+      "additionalProperties": true
+    },
+    "pathEvidence": {
+      "type": "object",
+      "required": [
+        "description",
+        "live_scene_t"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "live_scene_t": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    },
+    "resetEvidence": {
+      "type": "object",
+      "required": [
+        "steps",
+        "restored_state",
+        "live_scene_t"
+      ],
+      "properties": {
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "restored_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "live_scene_t": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "objective_evidence",
+        "positive_path",
+        "visible_failure",
+        "exact_reset"
+      ],
+      "properties": {
+        "objective_evidence": {
+          "$ref": "#/$defs/objectiveEvidence"
+        },
+        "positive_path": {
+          "$ref": "#/$defs/pathEvidence"
+        },
+        "visible_failure": {
+          "$ref": "#/$defs/pathEvidence"
+        },
+        "exact_reset": {
+          "$ref": "#/$defs/resetEvidence"
+        }
+      },
+      "additionalProperties": true
+    },
+    "attestation": {
+      "type": "object",
+      "required": [
+        "attested",
+        "statement"
+      ],
+      "properties": {
+        "attested": {
+          "const": true
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "attestations": {
+      "type": "object",
+      "required": [
+        "rights",
+        "privacy",
+        "no_secrets"
+      ],
+      "properties": {
+        "rights": {
+          "$ref": "#/$defs/attestation"
+        },
+        "privacy": {
+          "$ref": "#/$defs/attestation"
+        },
+        "no_secrets": {
+          "const": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "reviewRequest": {
+      "type": "object",
+      "required": [
+        "minimum_approvals",
+        "required_roles",
+        "independent_reviewers",
+        "reviews"
+      ],
+      "properties": {
+        "minimum_approvals": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "required_roles": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "allOf": [
+            {
+              "contains": {
+                "const": "technical"
+              }
+            },
+            {
+              "contains": {
+                "const": "curation"
+              }
+            }
+          ]
+        },
+        "independent_reviewers": {
+          "const": true
+        },
+        "reviews": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": [
+              "role"
+            ],
+            "properties": {
+              "role": {
+                "enum": [
+                  "technical",
+                  "curation"
+                ]
+              },
+              "reviewer": {
+                "$ref": "#/$defs/id"
+              }
+            },
+            "additionalProperties": true
+          },
+          "allOf": [
+            {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "const": "technical"
+                  }
+                },
+                "required": [
+                  "role"
+                ],
+                "additionalProperties": true
+              }
+            },
+            {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "const": "curation"
+                  }
+                },
+                "required": [
+                  "role"
+                ],
+                "additionalProperties": true
+              }
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

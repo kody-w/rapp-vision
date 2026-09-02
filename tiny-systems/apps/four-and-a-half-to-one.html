@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="tiny-system-reset" content="exact">
+  <title>Four-and-a-Half to One</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f3efe4;
+      color: #161616;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background:
+        linear-gradient(90deg, #161616 0 10px, transparent 10px),
+        #f3efe4;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    button:focus-visible {
+      outline: 4px solid #005fcc;
+      outline-offset: 3px;
+    }
+
+    .shell {
+      width: min(100%, 760px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: clamp(22px, 6vw, 58px);
+      display: grid;
+      align-content: center;
+      gap: 22px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 18px;
+    }
+
+    .kicker {
+      margin: 0 0 8px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.17em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 11ch;
+      margin: 0;
+      font-size: clamp(2.25rem, 8vw, 5.6rem);
+      line-height: 0.9;
+      letter-spacing: -0.075em;
+    }
+
+    .threshold {
+      min-width: 140px;
+      padding: 13px 14px;
+      border: 2px solid #161616;
+      background: #fff;
+      text-align: center;
+    }
+
+    .threshold span {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .threshold strong {
+      font-size: 2rem;
+      line-height: 1.1;
+    }
+
+    .sample {
+      min-height: 230px;
+      padding: clamp(22px, 5vw, 42px);
+      display: grid;
+      align-content: center;
+      border: 2px solid #161616;
+      box-shadow: 12px 12px 0 #161616;
+      transition: color 160ms linear, background 160ms linear;
+    }
+
+    .sample p {
+      max-width: 58ch;
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .sample small {
+      display: block;
+      margin-top: 16px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .meter {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0 3px;
+    }
+
+    .meter-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .meter-track {
+      position: relative;
+      height: 16px;
+      border: 2px solid #161616;
+      background: linear-gradient(90deg, #d64045 0 45%, #f7c548 45% 50%, #1f7a4d 50% 100%);
+    }
+
+    .meter-track::after {
+      content: "";
+      position: absolute;
+      top: -7px;
+      bottom: -7px;
+      left: 50%;
+      width: 3px;
+      background: #161616;
+    }
+
+    .readout-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .readout {
+      min-height: 116px;
+      padding: 16px;
+      border: 2px solid #161616;
+      background: #fff;
+    }
+
+    .readout h2 {
+      margin: 0 0 10px;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    #accepted-ratio {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 2rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    #status-message {
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    #rejection-panel {
+      border-color: #9c2027;
+      background: #fff0f0;
+      color: #671419;
+    }
+
+    #rejection-panel strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 1.3rem;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+      gap: 10px;
+    }
+
+    .controls button {
+      min-height: 52px;
+      padding: 10px 14px;
+      border: 2px solid #161616;
+      background: #fff;
+      color: #161616;
+      cursor: pointer;
+      font-weight: 800;
+      box-shadow: 4px 4px 0 #161616;
+    }
+
+    .controls button:hover {
+      transform: translate(1px, 1px);
+      box-shadow: 3px 3px 0 #161616;
+    }
+
+    #apply-boundary-btn {
+      background: #161616;
+      color: #fff;
+    }
+
+    #apply-near-miss-btn {
+      background: #f7c548;
+    }
+
+    #reset-btn {
+      box-shadow: none;
+    }
+
+    .formula {
+      margin: 0;
+      color: #3c3c3c;
+      font-family: ui-monospace, "Cascadia Mono", monospace;
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 620px) {
+      header {
+        grid-template-columns: 1fr;
+      }
+
+      .threshold {
+        width: max-content;
+      }
+
+      .readout-grid,
+      .controls {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <p class="kicker">Deterministic contrast gate 02</p>
+        <h1>Four-and-a-Half to One</h1>
+      </div>
+      <p class="threshold">
+        <span>Normal text threshold</span>
+        <strong>4.50:1</strong>
+      </p>
+    </header>
+
+    <section id="accepted-sample" class="sample" aria-labelledby="sample-heading">
+      <p id="sample-heading">This normal-size text uses an integer sRGB pair computed on the passing side of the threshold.</p>
+      <small id="palette-name">Opening pair</small>
+    </section>
+
+    <div class="meter" aria-label="Contrast ratio threshold meter">
+      <span class="meter-label">4.48 reject</span>
+      <span class="meter-track" aria-hidden="true"></span>
+      <span class="meter-label">4.54 pass</span>
+    </div>
+
+    <div class="readout-grid">
+      <section class="readout" aria-labelledby="accepted-heading">
+        <h2 id="accepted-heading">Accepted pair</h2>
+        <output id="accepted-ratio">21.00:1</output>
+        <p id="status-message" role="status" aria-live="polite">Opening pair is 21.00:1.</p>
+      </section>
+      <section id="rejection-panel" class="readout" aria-labelledby="rejected-heading" hidden>
+        <h2 id="rejected-heading">Rejected candidate</h2>
+        <strong id="rejected-ratio">4.48:1</strong>
+        <span>The active accepted pair did not change.</span>
+      </section>
+    </div>
+
+    <div class="controls" aria-label="Contrast tests">
+      <button id="apply-boundary-btn" type="button" data-action="APPLY_BOUNDARY">Apply #767676 pass</button>
+      <button id="apply-near-miss-btn" type="button" data-action="APPLY_NEAR_MISS">Try #777777 fail</button>
+      <button id="reset-btn" type="button" data-action="RESET" data-reset="exact">Reset exactly</button>
+    </div>
+
+    <p class="formula">WCAG ratio = (lighter relative luminance + 0.05) ÷ (darker relative luminance + 0.05). Neighboring 8-bit gray values #767676 and #777777 compute on opposite sides of 4.50:1.</p>
+  </main>
+
+  <script type="application/json" id="contract-states">
+{
+  "positive": {
+    "accepted": {
+      "key": "boundary",
+      "foreground": "rgb(118 118 118)",
+      "background": "rgb(255 255 255)",
+      "ratio": 4.54
+    },
+    "status": "accepted",
+    "message": "#767676 accepted at 4.54:1.",
+    "rejected": null
+  },
+  "rejected": {
+    "accepted": {
+      "key": "boundary",
+      "foreground": "rgb(118 118 118)",
+      "background": "rgb(255 255 255)",
+      "ratio": 4.54
+    },
+    "status": "rejected",
+    "message": "#777777 rejected at 4.48:1; accepted pair remains 4.54:1.",
+    "rejected": {
+      "key": "near-miss",
+      "ratio": 4.48
+    }
+  },
+  "reset": {
+    "accepted": {
+      "key": "baseline",
+      "foreground": "rgb(0 0 0)",
+      "background": "rgb(255 255 255)",
+      "ratio": 21
+    },
+    "status": "ready",
+    "message": "Opening pair is 21.00:1.",
+    "rejected": null
+  }
+}
+  </script>
+  <script>
+    "use strict";
+
+    const MINIMUM_RATIO = 4.5;
+    const CONTRACT_STATES = JSON.parse(
+      document.querySelector("#contract-states").textContent
+    );
+
+    function linearChannel(channel) {
+      const normalized = channel / 255;
+      return normalized <= 0.04045
+        ? normalized / 12.92
+        : ((normalized + 0.055) / 1.055) ** 2.4;
+    }
+
+    function relativeLuminance(channels) {
+      return (
+        0.2126 * linearChannel(channels[0]) +
+        0.7152 * linearChannel(channels[1]) +
+        0.0722 * linearChannel(channels[2])
+      );
+    }
+
+    function contrastRatio(foreground, background) {
+      const first = relativeLuminance(foreground);
+      const second = relativeLuminance(background);
+      const lighter = Math.max(first, second);
+      const darker = Math.min(first, second);
+      return (lighter + 0.05) / (darker + 0.05);
+    }
+
+    function grayPair(key, channel) {
+      const ratio = Number(
+        contrastRatio([channel, channel, channel], [255, 255, 255]).toFixed(2)
+      );
+      return Object.freeze({
+        key,
+        foreground: `rgb(${channel} ${channel} ${channel})`,
+        background: "rgb(255 255 255)",
+        ratio
+      });
+    }
+
+    const PAIRS = Object.freeze({
+      baseline: Object.freeze({
+        key: "baseline",
+        foreground: "rgb(0 0 0)",
+        background: "rgb(255 255 255)",
+        ratio: Number(contrastRatio([0, 0, 0], [255, 255, 255]).toFixed(2))
+      }),
+      boundary: grayPair("boundary", 118),
+      nearMiss: grayPair("near-miss", 119)
+    });
+
+    function freezeState(value) {
+      return Object.freeze({
+        accepted: Object.freeze({ ...value.accepted }),
+        status: value.status,
+        message: value.message,
+        rejected: value.rejected ? Object.freeze({ ...value.rejected }) : null
+      });
+    }
+
+    function initialState() {
+      return freezeState({
+        accepted: PAIRS.baseline,
+        status: "ready",
+        message: "Opening pair is 21.00:1.",
+        rejected: null
+      });
+    }
+
+    function reduce(state, action) {
+      switch (action.type) {
+        case "APPLY_BOUNDARY": {
+          const candidate = PAIRS.boundary;
+          if (candidate.ratio < MINIMUM_RATIO) {
+            return state;
+          }
+          return freezeState({
+            accepted: candidate,
+            status: "accepted",
+            message: "#767676 accepted at 4.54:1.",
+            rejected: null
+          });
+        }
+        case "APPLY_NEAR_MISS": {
+          const candidate = PAIRS.nearMiss;
+          if (candidate.ratio >= MINIMUM_RATIO) {
+            return state;
+          }
+          return freezeState({
+            accepted: state.accepted,
+            status: "rejected",
+            message: `#777777 rejected at 4.48:1; accepted pair remains ${state.accepted.ratio.toFixed(2)}:1.`,
+            rejected: {
+              key: candidate.key,
+              ratio: candidate.ratio
+            }
+          });
+        }
+        case "RESET":
+          return initialState();
+        default:
+          return state;
+      }
+    }
+
+    function snapshot(state) {
+      return {
+        accepted: { ...state.accepted },
+        status: state.status,
+        message: state.message,
+        rejected: state.rejected ? { ...state.rejected } : null
+      };
+    }
+
+    function verifyClaim(claim, state) {
+      const actual = JSON.stringify(snapshot(state));
+      const expected = JSON.stringify(CONTRACT_STATES[claim]);
+      if (actual !== expected) {
+        throw new Error(`Reducer contract mismatch for ${claim}`);
+      }
+    }
+
+    let state = initialState();
+    const sample = document.querySelector("#accepted-sample");
+    const ratio = document.querySelector("#accepted-ratio");
+    const name = document.querySelector("#palette-name");
+    const status = document.querySelector("#status-message");
+    const rejection = document.querySelector("#rejection-panel");
+    const rejectedRatio = document.querySelector("#rejected-ratio");
+
+    function render() {
+      sample.style.color = state.accepted.foreground;
+      sample.style.background = state.accepted.background;
+      ratio.textContent = `${state.accepted.ratio.toFixed(2)}:1`;
+      name.textContent =
+        state.accepted.key === "baseline" ? "Opening pair" : "Accepted boundary pair";
+      status.textContent = state.message;
+      rejection.hidden = state.status !== "rejected";
+      rejectedRatio.textContent = state.rejected
+        ? `${state.rejected.ratio.toFixed(2)}:1`
+        : "";
+    }
+
+    function dispatch(action, claim = null) {
+      state = reduce(state, action);
+      if (claim) {
+        verifyClaim(claim, state);
+      }
+      render();
+    }
+
+    document.querySelector("#apply-boundary-btn").addEventListener("click", () => {
+      dispatch({ type: "APPLY_BOUNDARY" }, "positive");
+    });
+    document.querySelector("#apply-near-miss-btn").addEventListener("click", () => {
+      const claim = state.accepted.key === "boundary" ? "rejected" : null;
+      dispatch({ type: "APPLY_NEAR_MISS" }, claim);
+    });
+    document.querySelector("#reset-btn").addEventListener("click", () => {
+      dispatch({ type: "RESET" }, "reset");
+    });
+
+    window.tinySystem = Object.freeze({
+      initialState,
+      reduce,
+      contrastRatio,
+      snapshot: () => snapshot(state)
+    });
+
+    render();
+  </script>
+</body>
+</html>

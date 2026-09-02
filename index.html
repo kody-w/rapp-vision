@@ -9,6 +9,8 @@
 <meta property="og:title" content="RAPP Vision">
 <meta property="og:description" content="Local-first video. One HTML file, no server, no account. Streams straight from public GitHub repos.">
 <meta property="og:type" content="website">
+<link rel=alternate type=application/json href=agent.json title='RAPP Vision creator contract'>
+<link rel=alternate type=application/json href=channels.json title='RAPP Vision channel catalog'>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>">
 <style>
   :root{
@@ -71,6 +73,11 @@
      patched in without moving anything already on screen. */
   .score{position:absolute;right:8px;top:8px;background:rgba(0,0,0,.8);color:var(--accent);
     padding:2px 8px;border-radius:5px;font:600 11px/1.6 var(--mono)}
+  .machine-reviewed{display:inline-flex;align-items:center;background:rgba(0,0,0,.84);color:var(--dim);
+    border:1px dashed currentColor;padding:2px 8px;border-radius:5px;font:600 10.5px/1.6 var(--mono);
+    white-space:nowrap}
+  .thumbwrap>.machine-reviewed{position:absolute;left:8px;bottom:8px}
+  .vtitle .machine-reviewed{margin-left:9px;vertical-align:middle;transform:translateY(-2px)}
   .resume{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.25)}
   .resume i{display:block;height:100%;background:var(--bad)}
   .meta{padding:11px 3px 0}
@@ -205,9 +212,12 @@
     .watch{grid-template-columns:1fr}
     aside{margin-top:10px}
   }
-  @media (max-width:620px){
-    .bar{flex-wrap:wrap;padding:10px 14px}
+  @media (max-width:860px){
+    .bar{flex-wrap:wrap}
     .search{order:3;width:100%;max-width:none;flex-basis:100%}
+  }
+  @media (max-width:620px){
+    .bar{padding:10px 14px}
     main{padding:16px 14px 80px}
     .grid{grid-template-columns:1fr;gap:22px}
     .up .t{width:120px}
@@ -226,6 +236,7 @@
       <span aria-hidden="true">🔍</span>
       <input id="q" type="search" placeholder="Search videos, tags, chapters…" aria-label="Search">
     </div>
+    <a class="navbtn" href="agent.json" title="Machine-readable creator contract">Create with an agent</a>
     <button class="navbtn" id="nav-ch">RAPP Hive</button>
     <button class="navbtn" id="nav-lib">Library</button>
     <button class="navbtn" id="nav-about">About</button>
@@ -691,6 +702,56 @@ function parseReview(r) {
   };
 }
 
+function canonicalRecordJSON(value) {
+  const utf8 = item => new TextEncoder().encode(item);
+  const compareUtf8 = (left, right) => {
+    const a = utf8(left), b = utf8(right);
+    for (let i = 0; i < Math.min(a.length, b.length); i++) {
+      if (a[i] !== b[i]) return a[i] - b[i];
+    }
+    return a.length - b.length;
+  };
+  const number = item => {
+    if (!Number.isFinite(item)) throw new TypeError("record number must be finite");
+    const bytes = new Uint8Array(8);
+    new DataView(bytes.buffer).setFloat64(0, item === 0 ? 0 : item, false);
+    return Array.from(bytes, byte =>
+      byte.toString(16).padStart(2, "0")
+    ).join("");
+  };
+  const serialize = item => {
+    if (item === null) return "N";
+    if (item === true) return "T";
+    if (item === false) return "F";
+    if (typeof item === "number") return `D${number(item)}`;
+    if (typeof item === "string") return `S${utf8(item).length}:${item}`;
+    if (Array.isArray(item))
+      return `A${item.length}:${item.map(serialize).join("")}`;
+    if (!item || typeof item !== "object")
+      throw new TypeError(`record contains non-JSON value ${typeof item}`);
+    const keys = Object.keys(item).sort(compareUtf8);
+    return `O${keys.length}:${keys.map(key =>
+      `${serialize(key)}${serialize(item[key])}`
+    ).join("")}`;
+  };
+  const clean = Object.keys(value || {}).reduce((out, key) => {
+    if (!key.startsWith("_")) out[key] = value[key];
+    return out;
+  }, {});
+  return serialize(clean);
+}
+
+async function recordSha8(record) {
+  if (!globalThis.crypto || !crypto.subtle) return "";
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(canonicalRecordJSON(record)),
+  );
+  return Array.from(new Uint8Array(digest), byte =>
+    byte.toString(16).padStart(2, "0")
+  ).join("").slice(0, 8);
+}
+
 function parseRecord(raw) {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
   const sigs = raw.signals && typeof raw.signals === "object" ? raw.signals : {};
@@ -776,6 +837,7 @@ function mfind(key) {
   return METRICS.get(normKey(k)) || METRICS.get(normKey(k.slice(k.lastIndexOf("/") + 1))) || null;
 }
 const mget = v => mfind(vkey(v));
+const videoForKey = key => ALL_VIDEOS.find(v => vkey(v) === String(key || ""));
 
 /* The compact figure on a card is the snapshot's published `score` — a ranking
    convention, not a measurement, and not the endorsement count: calling it
@@ -793,6 +855,12 @@ function scorePillHTML(m) {
   if (m.watched !== null) parts.push(`${m.watched} marked watched`);
   const title = `Community score ${m.score}` + (parts.length ? ` · ${parts.join(", ")}` : "");
   return `<span class="score" title="${esc(title)}">★ ${esc(m.score)}</span>`;
+}
+
+function reviewIndicatorHTML(v, m) {
+  if (!v || !m || !m.review || !m.review.on ||
+      !v._recordSha8 || m.review.on !== v._recordSha8) return "";
+  return `<span class="machine-reviewed" title="A machine-generated review is available; this is not human approval or registry curation.">Machine reviewed</span>`;
 }
 
 function reviewHTML(r) {
@@ -851,13 +919,14 @@ function communityHTML(m) {
 /* ---------------------------- views ---------------------------- */
 
 function cardHTML(v) {
-  const p = prog(v), portrait = v.orientation === "portrait";
+  const p = prog(v), portrait = v.orientation === "portrait", m = mget(v);
   return `<a class="card" href="#/watch/${encodeURIComponent(vkey(v))}" data-vk="${esc(vkey(v))}">
     <div class="thumbwrap${portrait ? " portrait" : ""}">
       <img src="${esc(v.thumb)}" alt="" loading="lazy" decoding="async">
       ${portrait ? '<span class="badge">SHORT</span>' : ""}
       <span class="dur">${fmt(v.duration)}</span>
-      ${scorePillHTML(mget(v))}
+      ${scorePillHTML(m)}
+      ${reviewIndicatorHTML(v, m)}
       ${p > 0.02 && p < 0.97 ? `<span class="resume"><i style="width:${(p * 100).toFixed(1)}%"></i></span>` : ""}
     </div>
     <div class="meta">
@@ -883,9 +952,15 @@ function viewHome(q = "", tag = "") {
   app.innerHTML = `
     ${q || tag ? "" : `<section class="hero">
       <h1>${esc(CHANNELS[0] ? (CHANNELS[0].tagline || CHANNELS[0].about || "Local-first video.") : "Local-first video.")}</h1>
-      <p>Local-first video. This whole site is one HTML file with no backend and no account —
-         the catalog is a JSON file and the media are ordinary files in a public GitHub repo.
-         Your history, resume points and playlists stay in this browser.</p>
+      <p>Watch local-first video with no account or tracking. Your history, resume points and
+         playlists stay in this browser, and the creator contract gives an agent the portable
+         format and validation rules needed to publish.</p>
+      <div class="toolbar" style="margin-top:16px">
+        <a class="tbtn mode-switch" href="agent.json">Create with an agent</a>
+        <a class="tbtn" href="#/channels">Explore RAPP Hive</a>
+      </div>
+      <p style="margin-top:12px">Under the hood, this remains one static HTML player; its JSON
+         catalog points to media in creator-owned repositories.</p>
     </section>`}
     ${tags.length ? `<div class="chips" role="group" aria-label="Filter by tag">
       <button class="chip${tag ? "" : " on"}" data-tag="">All</button>
@@ -1565,13 +1640,14 @@ function viewWatch(id) {
   const paired = hasVideo && hasLive;
   const up = VIDEOS.filter(x => x !== v);
   const liked = stateHasVideo(state.liked, v), later = stateHasVideo(state.later, v);
+  const reviewIndicator = reviewIndicatorHTML(v, mget(v));
 
   app.innerHTML = `
   <div class="watch">
     <div>
       <div id="host"></div>
       <span class="sr" id="mode-status" role="status" aria-live="polite"></span>
-      <h1 class="vtitle">${esc(v.title)}</h1>
+      <h1 class="vtitle">${esc(v.title)}<span id="watch-review" data-vk="${esc(vkey(v))}">${reviewIndicator ? ` ${reviewIndicator}` : ""}</span></h1>
       <div class="vrow">
         <div class="chan">
           ${avatarHTML(v._ch.avatar, 38)}
@@ -1966,6 +2042,9 @@ async function fetchChannel(entry) {
   const contractErrors = await validateChannelContract(c, sourceIdentity);
   if (contractErrors.length)
     throw new Error(`${entry.id || c.id || "channel"} rejected: ${contractErrors[0]}`);
+  const recordHashes = await Promise.all(
+    (c.videos || []).map(video => recordSha8(video))
+  );
   c._url = url;
   c._sourceIdentity = sourceIdentity;
   c._repo = entry.repo || c.repo || "";
@@ -1977,7 +2056,8 @@ async function fetchChannel(entry) {
   if (c.links && !Array.isArray(c.links)) {
     c.links = Object.keys(c.links).map(k => ({ label: k, url: c.links[k] }));
   }
-  (c.videos || []).forEach(v => {
+  (c.videos || []).forEach((v, index) => {
+    v._recordSha8 = recordHashes[index];
     v._ch = c;
     v.thumb = absolutise(v.thumb || v.poster, url);
     (v.sources || []).forEach(s => { s.src = absolutise(s.src, url); });
@@ -2103,18 +2183,39 @@ async function loadMetrics() {
 }
 
 /* Patch what is already on screen rather than re-running route(): a re-render
-   would tear down a playing <video> and start it over. Both surfaces are
-   additive — the pill is absolutely positioned inside the thumbnail and the
-   community block is the last element in the watch column — so nothing that is
-   already laid out moves when a late snapshot lands. */
+   would tear down a playing <video> and start it over. Card additions stay
+   inside the thumbnail, and the active watch view has a dedicated title slot. */
+function patchReviewIndicator(target, v, m) {
+  if (!target || $(".machine-reviewed", target)) return;
+  const indicator = reviewIndicatorHTML(v, m);
+  if (!indicator) return;
+  target.insertAdjacentHTML(
+    "beforeend",
+    target.id === "watch-review" ? ` ${indicator}` : indicator,
+  );
+}
+
 function applyMetrics() {
   const slot = $("#community");
   if (slot && !slot.innerHTML) slot.innerHTML = communityHTML(mfind(slot.dataset.vk));
+  const watchReview = $("#watch-review[data-vk]");
+  if (watchReview) {
+    patchReviewIndicator(
+      watchReview,
+      videoForKey(watchReview.dataset.vk),
+      mfind(watchReview.dataset.vk),
+    );
+  }
   document.querySelectorAll(".card[data-vk]").forEach(a => {
     const wrap = $(".thumbwrap", a);
-    if (!wrap || $(".score", wrap)) return;
-    const pill = scorePillHTML(mfind(a.dataset.vk));
-    if (pill) wrap.insertAdjacentHTML("beforeend", pill);
+    if (!wrap) return;
+    const video = videoForKey(a.dataset.vk);
+    const m = mfind(a.dataset.vk);
+    if (!$(".score", wrap)) {
+      const pill = scorePillHTML(m);
+      if (pill) wrap.insertAdjacentHTML("beforeend", pill);
+    }
+    patchReviewIndicator(wrap, video, m);
   });
 }
 

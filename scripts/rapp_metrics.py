@@ -170,8 +170,10 @@ import argparse
 import hashlib
 import http.client
 import json
+import math
 import os
 import re
+import struct
 import sys
 import time
 import urllib.error
@@ -928,6 +930,78 @@ def build_snapshot(
 # ── the editorial lane ──────────────────────────────────────────────────
 
 
+def _canonical_record_number(value) -> str:
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError("record fingerprints require finite JSON numbers")
+    if number == 0:
+        number = 0.0
+    return struct.pack(">d", number).hex()
+
+
+def _javascript_well_formed_string(value: str) -> str:
+    """Match TextEncoder: combine valid UTF-16 pairs, replace lone surrogates."""
+    output = []
+    index = 0
+    while index < len(value):
+        code = ord(value[index])
+        if 0xD800 <= code <= 0xDBFF:
+            if index + 1 < len(value):
+                low = ord(value[index + 1])
+                if 0xDC00 <= low <= 0xDFFF:
+                    output.append(
+                        chr(
+                            0x10000
+                            + ((code - 0xD800) << 10)
+                            + (low - 0xDC00)
+                        )
+                    )
+                    index += 2
+                    continue
+            output.append("\uFFFD")
+        elif 0xDC00 <= code <= 0xDFFF:
+            output.append("\uFFFD")
+        else:
+            output.append(value[index])
+        index += 1
+    return "".join(output)
+
+
+def _canonical_record_json(value) -> str:
+    if value is None:
+        return "N"
+    if value is True:
+        return "T"
+    if value is False:
+        return "F"
+    if isinstance(value, (int, float)):
+        return "D" + _canonical_record_number(value)
+    if isinstance(value, str):
+        value = _javascript_well_formed_string(value)
+        return f"S{len(value.encode('utf-8'))}:{value}"
+    if isinstance(value, list):
+        return (
+            f"A{len(value)}:"
+            + "".join(_canonical_record_json(item) for item in value)
+        )
+    if isinstance(value, dict):
+        keys = sorted(
+            value,
+            key=lambda key: _javascript_well_formed_string(
+                str(key)
+            ).encode("utf-8"),
+        )
+        return (
+            f"O{len(keys)}:"
+            + "".join(
+                _canonical_record_json(str(key))
+                + _canonical_record_json(value[key])
+                for key in keys
+            )
+        )
+    raise TypeError(f"record contains non-JSON value {type(value).__name__}")
+
+
 def record_fingerprint(record: dict) -> str:
     """sha256 (first 8 hex) of the channel record, minus player-attached
     fields. An editorial verdict is always attributable to the exact
@@ -935,10 +1009,7 @@ def record_fingerprint(record: dict) -> str:
     clean = {
         k: v for k, v in (record or {}).items() if not str(k).startswith("_")
     }
-    blob = json.dumps(
-        clean, sort_keys=True, separators=(",", ":"),
-        ensure_ascii=False, default=str,
-    )
+    blob = _canonical_record_json(clean)
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:8]
 
 
