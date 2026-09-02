@@ -239,6 +239,8 @@ def build_quality(
     pull_request_number: int,
     pull_request_head_sha: str,
     review_state_sha256: str,
+    trusted_base_ref: str,
+    trusted_base_sha: str,
 ) -> dict:
     artifact = submission.get("artifact") or {}
     digest = validator.canonical_digest(submission)
@@ -279,6 +281,8 @@ def build_quality(
             "pull_request_number": pull_request_number,
             "pull_request_head_sha": pull_request_head_sha,
             "review_state_sha256": review_state_sha256,
+            "trusted_base_ref": trusted_base_ref,
+            "trusted_base_sha": trusted_base_sha,
             "check_name": "Creator Submission Review / review",
         },
         "binding": {
@@ -337,6 +341,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--server-url", default="https://github.com")
     parser.add_argument("--api-url", default="https://api.github.com")
     parser.add_argument("--run-id", required=True)
+    parser.add_argument("--trusted-base-ref", required=True)
+    parser.add_argument("--trusted-base-sha", required=True)
     return parser
 
 
@@ -353,6 +359,10 @@ def main(argv=None) -> int:
         )
         if validator.COMMIT_RE.fullmatch(pull_request_head_sha) is None:
             raise ValueError("event pull request head SHA is unavailable")
+        if validator.COMMIT_RE.fullmatch(args.trusted_base_sha) is None:
+            raise ValueError("trusted base SHA is invalid")
+        if not args.trusted_base_ref.strip():
+            raise ValueError("trusted base ref is unavailable")
         submission = extract_manifest(pull_request.get("body") or "")
         if submission.get("phase") == "claim":
             errors = validator.validate_submission(
@@ -363,8 +373,11 @@ def main(argv=None) -> int:
             errors.extend(creator_identity_errors(submission, pull_request))
             if errors:
                 raise ValueError("; ".join(errors))
-            print("claim manifest is valid; no quality artifact emitted")
-            return 0
+            print(
+                "claim manifest is valid; review check remains incomplete "
+                "until submission and quorum"
+            )
+            return 1
         if submission.get("phase") != "submitted":
             raise ValueError("submission phase must be claim or submitted")
 
@@ -409,6 +422,8 @@ def main(argv=None) -> int:
             pull_request_number=number,
             pull_request_head_sha=pull_request_head_sha,
             review_state_sha256=review_digest,
+            trusted_base_ref=args.trusted_base_ref,
+            trusted_base_sha=args.trusted_base_sha,
         )
         quality_errors = validator.validate_quality(
             submission,
@@ -418,6 +433,8 @@ def main(argv=None) -> int:
             authority_pull_request_number=number,
             authority_pull_request_head_sha=pull_request_head_sha,
             authority_review_state_sha256=review_digest,
+            authority_trusted_base_ref=args.trusted_base_ref,
+            authority_trusted_base_sha=args.trusted_base_sha,
         )
         if quality_errors:
             raise ValueError(

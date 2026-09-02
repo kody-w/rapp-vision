@@ -145,6 +145,12 @@ def _control_character(value: str) -> bool:
     return any(unicodedata.category(character) == "Cc" for character in value)
 
 
+def _link_or_junction(path: Path) -> bool:
+    return path.is_symlink() or (
+        hasattr(path, "is_junction") and path.is_junction()
+    )
+
+
 def resolve_artifact_path(
     root: Path,
     raw: Any,
@@ -165,11 +171,18 @@ def resolve_artifact_path(
         or any(part in ("", ".", "..") for part in posix.parts)
         or urlsplit(raw).scheme
         or raw.startswith("//")
+        or any(part.casefold() == ".git" for part in posix.parts)
     ):
         errors.append(f"{label}: must be a safe repository-relative path")
         return None
+    candidate = root
+    for part in posix.parts:
+        candidate = candidate / part
+        if _link_or_junction(candidate):
+            errors.append(f"{label}: symlink and junction paths are not allowed")
+            return None
     try:
-        resolved = root.joinpath(*posix.parts).resolve()
+        resolved = candidate.resolve()
         resolved.relative_to(root)
     except (OSError, ValueError):
         errors.append(f"{label}: escapes the artifact checkout")
@@ -197,16 +210,24 @@ def resolve_channel_reference(
         or "\\" in raw
         or _control_character(raw)
         or "%" in raw
+        or any(
+            part.casefold() == ".git"
+            for part in PurePosixPath(parsed.path).parts
+        )
     ):
         errors.append(
             f"{label}: immutable submissions require a repository-owned "
             "relative path"
         )
         return None, None
+    candidate = channel_path.parent
+    for part in PurePosixPath(parsed.path).parts:
+        candidate = candidate.parent if part == ".." else candidate / part
+        if _link_or_junction(candidate):
+            errors.append(f"{label}: symlink and junction paths are not allowed")
+            return None, None
     try:
-        relative_to_channel = channel_path.parent.joinpath(
-            *PurePosixPath(parsed.path).parts
-        ).resolve()
+        relative_to_channel = candidate.resolve()
         relative_to_channel.relative_to(root)
     except (OSError, ValueError):
         errors.append(f"{label}: escapes the artifact checkout")
@@ -217,6 +238,38 @@ def resolve_channel_reference(
         errors.append(f"{label}: escapes the artifact checkout")
         return None, None
     return relative_to_channel, repository_relative
+
+
+def require_tracked_blob(
+    root: Path,
+    path: Path | None,
+    label: str,
+    errors: list[str],
+) -> None:
+    if path is None:
+        return
+    try:
+        relative = path.resolve().relative_to(root.resolve()).as_posix()
+    except (OSError, ValueError):
+        errors.append(f"{label}: escapes the artifact checkout")
+        return
+    if any(part.casefold() == ".git" for part in PurePosixPath(relative).parts):
+        errors.append(f"{label}: Git administrative paths are not artifacts")
+        return
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(root), "ls-tree", "HEAD", "--", relative],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except OSError as exc:
+        errors.append(f"{label}: cannot verify tracked blob: {exc}")
+        return
+    line = (completed.stdout or "").strip()
+    mode = line.split(None, 1)[0] if line else ""
+    if completed.returncode or not mode.startswith("100"):
+        errors.append(f"{label}: must be a regular file tracked in pinned HEAD")
 
 
 def normalize_repository_url(value: str) -> str:
@@ -443,6 +496,12 @@ def validate_submission(
         "submission.artifact.path",
         errors,
     )
+    require_tracked_blob(
+        artifact_root,
+        channel_path,
+        "submission.artifact.path",
+        errors,
+    )
     _expected_hash(
         channel_path,
         artifact.get("sha256"),
@@ -537,6 +596,12 @@ def validate_submission(
                 f"{repository_relative!r}"
             )
         media_path = source_path
+        require_tracked_blob(
+            artifact_root,
+            media_path,
+            f"submission.deliverables.{key}.path",
+            errors,
+        )
         _expected_hash(
             media_path,
             media.get("sha256"),
@@ -598,6 +663,12 @@ def validate_submission(
                     f"submission artifact live scene {scene_index} application: "
                     f"file does not exist: {app_path}"
                 )
+            require_tracked_blob(
+                artifact_root,
+                app_path,
+                f"submission artifact live scene {scene_index} application",
+                errors,
+            )
 
     evidence = _mapping(document.get("evidence"), "submission.evidence", errors)
     objective = _mapping(
@@ -623,6 +694,12 @@ def validate_submission(
             "submission.evidence.objective_evidence.evidence_path: "
             f"file does not exist: {evidence_path}"
         )
+    require_tracked_blob(
+        artifact_root,
+        evidence_path,
+        "submission.evidence.objective_evidence.evidence_path",
+        errors,
+    )
     for key in ("positive_path", "visible_failure"):
         path_evidence = _mapping(
             evidence.get(key),
@@ -759,6 +836,8 @@ def validate_quality(
     authority_pull_request_number: int | None = None,
     authority_pull_request_head_sha: str | None = None,
     authority_review_state_sha256: str | None = None,
+    authority_trusted_base_ref: str | None = None,
+    authority_trusted_base_sha: str | None = None,
 ) -> list[str]:
     errors: list[str] = []
     if not isinstance(submission, dict):
@@ -794,6 +873,8 @@ def validate_quality(
         ("pull_request_number", authority_pull_request_number),
         ("pull_request_head_sha", authority_pull_request_head_sha),
         ("review_state_sha256", authority_review_state_sha256),
+        ("trusted_base_ref", authority_trusted_base_ref),
+        ("trusted_base_sha", authority_trusted_base_sha),
     ):
         if expected is None:
             errors.append(f"trusted workflow {field} context is required")
@@ -815,6 +896,14 @@ def validate_quality(
         authority_review_state_sha256, str
     ) or SHA256_RE.fullmatch(authority_review_state_sha256 or "") is None:
         errors.append("trusted workflow review-state SHA-256 is invalid")
+    if not isinstance(authority_trusted_base_ref, str) or not (
+        authority_trusted_base_ref.strip()
+    ):
+        errors.append("trusted workflow base ref is invalid")
+    if not isinstance(
+        authority_trusted_base_sha, str
+    ) or COMMIT_RE.fullmatch(authority_trusted_base_sha or "") is None:
+        errors.append("trusted workflow base SHA is invalid")
     if authority.get("check_name") != "Creator Submission Review / review":
         errors.append(
             "quality.authority.check_name: must identify the stable review check"
@@ -935,7 +1024,22 @@ def validate_quality(
         review.get("reviewer_github_user_id") for review in valid_reviews
     ]
     roles = {review.get("role") for review in valid_reviews}
-    minimum = quorum.get("minimum_approvals")
+    requested_quorum = submission.get("review_request") or {}
+    minimum = requested_quorum.get("minimum_approvals")
+    required_roles = requested_quorum.get("required_roles")
+    independent_reviewers = requested_quorum.get("independent_reviewers")
+    if quorum.get("minimum_approvals") != minimum:
+        errors.append(
+            "quality.technical.quorum.minimum_approvals: must match submission"
+        )
+    if quorum.get("required_roles") != required_roles:
+        errors.append(
+            "quality.technical.quorum.required_roles: must match submission"
+        )
+    if quorum.get("independent_reviewers") != independent_reviewers:
+        errors.append(
+            "quality.technical.quorum.independent_reviewers: must match submission"
+        )
     distinct = len(reviewer_ids) == len(set(reviewer_ids))
     non_creator = (
         submission.get("creator", {}).get("github_user_id")
@@ -945,12 +1049,13 @@ def validate_quality(
         isinstance(minimum, int)
         and not isinstance(minimum, bool)
         and len(valid_reviews) >= minimum
-        and REVIEW_ROLES <= roles
+        and isinstance(required_roles, list)
+        and set(required_roles) <= roles
         and distinct
         and non_creator
         and checks_pass
     )
-    if quorum.get("independent_reviewers") is not True:
+    if independent_reviewers is not True:
         errors.append("quality.technical.quorum.independent_reviewers: must be true")
     if quorum.get("met") is not derived_quorum:
         errors.append(
@@ -990,6 +1095,8 @@ def build_parser() -> argparse.ArgumentParser:
     quality.add_argument("--pull-request-number", type=int, required=True)
     quality.add_argument("--pull-request-head-sha", required=True)
     quality.add_argument("--review-state-sha256", required=True)
+    quality.add_argument("--trusted-base-ref", required=True)
+    quality.add_argument("--trusted-base-sha", required=True)
     return parser
 
 
@@ -1027,6 +1134,8 @@ def main(argv=None) -> int:
             authority_pull_request_number=args.pull_request_number,
             authority_pull_request_head_sha=args.pull_request_head_sha,
             authority_review_state_sha256=args.review_state_sha256,
+            authority_trusted_base_ref=args.trusted_base_ref,
+            authority_trusted_base_sha=args.trusted_base_sha,
         )
         if _print_errors(args.quality, errors):
             return 1

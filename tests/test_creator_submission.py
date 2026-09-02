@@ -20,6 +20,8 @@ SCRIPT = ROOT / "scripts" / "validate_creator_submission.py"
 PR_NUMBER = 42
 PR_HEAD_SHA = "d" * 40
 REVIEW_STATE_SHA256 = "e" * 64
+TRUSTED_BASE_REF = "main"
+TRUSTED_BASE_SHA = "f" * 40
 SPEC = importlib.util.spec_from_file_location("validate_creator_submission", SCRIPT)
 VALIDATOR = importlib.util.module_from_spec(SPEC)
 sys.modules["validate_creator_submission"] = VALIDATOR
@@ -138,6 +140,8 @@ def quality_for(document: dict) -> dict:
             "pull_request_number": PR_NUMBER,
             "pull_request_head_sha": PR_HEAD_SHA,
             "review_state_sha256": REVIEW_STATE_SHA256,
+            "trusted_base_ref": TRUSTED_BASE_REF,
+            "trusted_base_sha": TRUSTED_BASE_SHA,
             "check_name": "Creator Submission Review / review",
         },
         "binding": {
@@ -227,6 +231,27 @@ def validate(
 
 
 class TestCreatorSubmission(unittest.TestCase):
+    def test_symlink_components_cannot_alias_tracked_artifacts(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            real = root / "real"
+            real.mkdir()
+            (real / "channel.json").write_text("{}", encoding="utf-8")
+            alias = root / "alias"
+            try:
+                alias.symlink_to(real, target_is_directory=True)
+            except OSError as exc:
+                self.skipTest(f"symlink creation unavailable: {exc}")
+            errors = []
+            resolved = VALIDATOR.resolve_artifact_path(
+                root,
+                "alias/channel.json",
+                "artifact",
+                errors,
+            )
+            self.assertIsNone(resolved)
+            self.assertTrue(any("symlink" in error for error in errors))
+
     def test_valid_submission_binds_selected_paired_publication(self):
         document = submission()
         self.assertEqual(validate(document), [])
@@ -383,6 +408,8 @@ class TestCreatorQuality(unittest.TestCase):
             authority_pull_request_number=PR_NUMBER,
             authority_pull_request_head_sha=PR_HEAD_SHA,
             authority_review_state_sha256=REVIEW_STATE_SHA256,
+            authority_trusted_base_ref=TRUSTED_BASE_REF,
+            authority_trusted_base_sha=TRUSTED_BASE_SHA,
         )
 
     def test_valid_quality_is_bound_and_quorum_is_derived(self):
@@ -427,6 +454,17 @@ class TestCreatorQuality(unittest.TestCase):
         quality["technical"]["checks"][0]["status"] = "fail"
         errors = self.validate(document, quality)
         self.assertTrue(any("all checks to pass" in error for error in errors))
+        self.assertTrue(any("complete independent quorum" in error for error in errors))
+
+    def test_quality_cannot_lower_submission_quorum(self):
+        document = submission()
+        document["review_request"]["minimum_approvals"] = 3
+        quality = quality_for(document)
+        quality["technical"]["quorum"]["minimum_approvals"] = 2
+        errors = self.validate(document, quality)
+        self.assertTrue(
+            any("minimum_approvals: must match submission" in error for error in errors)
+        )
         self.assertTrue(any("complete independent quorum" in error for error in errors))
 
 

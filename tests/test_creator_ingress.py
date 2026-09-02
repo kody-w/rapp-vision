@@ -159,7 +159,9 @@ class TestCreatorIngress(unittest.TestCase):
                     "--repository {repository_url} --run-url {workflow_run_url} "
                     "--pull-request-number {pull_request_number} "
                     "--pull-request-head-sha {pull_request_head_sha} "
-                    "--review-state-sha256 {review_state_sha256}"
+                    "--review-state-sha256 {review_state_sha256} "
+                    "--trusted-base-ref {default_branch} "
+                    "--trusted-base-sha {trusted_base_sha}"
                 ),
             },
         )

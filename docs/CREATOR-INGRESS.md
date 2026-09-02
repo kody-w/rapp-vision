@@ -73,6 +73,10 @@ A claim announces intent and helps avoid accidental duplicate work. It is not
 exclusive. It grants no curation role, review vote, technical pass,
 publication, merge, or default-registry position. A maintainer may close an
 abandoned claim without deciding anything about the eventual work.
+The stable quality check intentionally remains incomplete on a claim: a green
+`Creator Submission Review / review` status exists only after a submitted
+artifact and full review quorum. Claim-shape validation is coordination
+feedback, never a reusable approval.
 
 The pull request number is omitted when opening the claim because GitHub has
 not assigned it yet. It may be added afterward. A workflow validating an
@@ -149,6 +153,9 @@ every repository-owned live application and objective evidence path exists;
 probes H.264 and VP9 rather than trusting file extensions; rejects duplicate
 codec sources and URL-ambiguous encoded paths; rejects template sentinels; and
 prints the canonical submitted-manifest digest used by every later review.
+Every referenced channel, media, application, and evidence path must be a
+regular tracked blob in that pinned `HEAD`; Git administrative paths and
+untracked/generated checkout files cannot satisfy a gate.
 
 An agent beginning with one local guided-film master can use the production
 contract advertised by `agent.json.production`:
@@ -233,7 +240,9 @@ python3 scripts/validate_creator_submission.py quality \
   --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
   --pull-request-number "$PR_NUMBER" \
   --pull-request-head-sha "$PR_HEAD_SHA" \
-  --review-state-sha256 "$REVIEW_STATE_SHA256"
+  --review-state-sha256 "$REVIEW_STATE_SHA256" \
+  --trusted-base-ref "$DEFAULT_BRANCH" \
+  --trusted-base-sha "$TRUSTED_BASE_SHA"
 ```
 
 The validator derives quorum rather than trusting `quorum.met`: every check
@@ -242,12 +251,15 @@ technical and curation roles must both be present, and every review binding
 must match the submitted manifest.
 
 Approval is revocable. Every quality artifact binds the PR number, current
-head SHA, and a digest of the complete latest authenticated review state.
+head SHA, the default protected base ref and SHA, and a digest of the complete
+latest authenticated review state.
 Submitted, edited, and dismissed review events all rerun the stable
 `Creator Submission Review / review` check. A pending or revoked quorum makes
 that latest check fail. Downloadable artifacts from older runs are historical
 records and are not authoritative; a consumer must require the latest check
 for the current PR head and current review-state digest.
+PRs targeting any other base branch do not run the review job and cannot mint
+an authoritative quality artifact.
 
 A technical pass is not a listing. A submitted manifest has no approval or
 listing field. A quality record's `listed` value is only an evidence-backed

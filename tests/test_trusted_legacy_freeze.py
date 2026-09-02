@@ -12,14 +12,18 @@ FREEZE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(FREEZE)
 
 
+def repository_bytes(path):
+    return path.read_bytes().replace(b"\r\n", b"\n")
+
+
 class TestTrustedLegacyFreeze(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.script = SCRIPT.read_bytes()
-        cls.workflow = (
+        cls.script = repository_bytes(SCRIPT)
+        cls.workflow = repository_bytes(
             ROOT / ".github" / "workflows" / "legacy-freeze.yml"
-        ).read_bytes()
-        cls.policy = (ROOT / FREEZE.POLICY_PATH).read_bytes()
+        )
+        cls.policy = repository_bytes(ROOT / FREEZE.POLICY_PATH)
         cls.root = {
             FREEZE.VERIFIER_PATH: cls.script,
             FREEZE.WORKFLOW_PATH: cls.workflow,

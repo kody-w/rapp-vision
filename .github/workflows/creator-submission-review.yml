@@ -16,7 +16,9 @@ concurrency:
 
 jobs:
   review:
-    if: github.event.pull_request.base.repo.full_name == github.repository
+    if: >-
+      github.event.pull_request.base.repo.full_name == github.repository &&
+      github.event.pull_request.base.ref == github.event.repository.default_branch
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -42,7 +44,9 @@ jobs:
             --repository "$GITHUB_REPOSITORY" \
             --server-url "$GITHUB_SERVER_URL" \
             --api-url "$GITHUB_API_URL" \
-            --run-id "$GITHUB_RUN_ID"
+            --run-id "$GITHUB_RUN_ID" \
+            --trusted-base-ref "${{ github.event.pull_request.base.ref }}" \
+            --trusted-base-sha "${{ github.event.pull_request.base.sha }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

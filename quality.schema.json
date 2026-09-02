@@ -470,6 +470,8 @@
         "pull_request_number",
         "pull_request_head_sha",
         "review_state_sha256",
+        "trusted_base_ref",
+        "trusted_base_sha",
         "check_name"
       ],
       "properties": {
@@ -495,6 +497,13 @@
         },
         "review_state_sha256": {
           "$ref": "#/$defs/sha256"
+        },
+        "trusted_base_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trusted_base_sha": {
+          "$ref": "#/$defs/gitCommit"
         },
         "check_name": {
           "const": "Creator Submission Review / review"

@@ -170,8 +170,12 @@ class SilentWarnings(unittest.TestCase):
         self.addCleanup(patcher.stop)
 
     def assertWarned(self, needle: str):
+        normalized_needle = needle.replace("\\", "/")
         self.assertTrue(
-            any(needle in w for w in self.warnings),
+            any(
+                normalized_needle in warning.replace("\\", "/")
+                for warning in self.warnings
+            ),
             f"expected a warning containing {needle!r}; got {self.warnings}",
         )
 

@@ -161,6 +161,8 @@ class TestCreatorReview(unittest.TestCase):
             "pull_request_number": 1,
             "pull_request_head_sha": "c" * 40,
             "review_state_sha256": "d" * 64,
+            "trusted_base_ref": "main",
+            "trusted_base_sha": "e" * 40,
         }
         passed = REVIEW.build_quality(submission, [], reviews, **context)
         pending = REVIEW.build_quality(submission, [], reviews[:1], **context)
@@ -178,10 +180,16 @@ class TestCreatorReview(unittest.TestCase):
         self.assertIn("contents: read", workflow)
         self.assertIn("pull-requests: read", workflow)
         self.assertIn("ref: ${{ github.event.pull_request.base.sha }}", workflow)
+        self.assertIn(
+            "base.ref == github.event.repository.default_branch",
+            workflow,
+        )
         self.assertIn("persist-credentials: false", workflow)
         self.assertIn("--event \"$GITHUB_EVENT_PATH\"", workflow)
         self.assertIn("--repository \"$GITHUB_REPOSITORY\"", workflow)
         self.assertIn("--run-id \"$GITHUB_RUN_ID\"", workflow)
+        self.assertIn("--trusted-base-ref", workflow)
+        self.assertIn("--trusted-base-sha", workflow)
         self.assertNotIn("github.event.pull_request.head", workflow)
         self.assertNotIn("contents: write", workflow)
 
