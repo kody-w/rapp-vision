@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="candidate-frame" content="0002-09">
-  <meta name="exact-reset" content="original-paths,shared-rules,names,selection,zoom,overlays">
+  <meta name="exact-reset" content="immutable-reference-2px,original-paths,shared-rules,names,selection,zoom,overlays">
   <title>Six Shapes, One Grid</title>
   <style>
     :root {
@@ -454,14 +454,14 @@
       </div>
       <p class="brief">
         Edit one shared stroke token, regenerate all six original symbols, and
-        export one deterministic sprite. An off-grid anchor is inspected but
-        never allowed to replace the accepted system.
+        compare it with the immutable 2 px raster reference. An off-grid anchor
+        is inspected but never allowed to replace the accepted system.
       </p>
     </header>
 
     <section class="workspace" aria-label="Vector icon creation tool">
       <section class="panel stage" aria-labelledby="stage-title">
-        <h2 class="panel-title" id="stage-title">Accepted icon system</h2>
+        <h2 class="panel-title" id="stage-title">Generated icon system</h2>
         <div class="token-rail" aria-label="Shared geometric tokens">
           <div class="token"><span>Canvas</span><strong>24 × 24</strong></div>
           <div class="token"><span>Grid</span><strong>2 px</strong></div>
@@ -502,7 +502,7 @@
           <div class="control-grid">
             <div class="field">
               <label for="stroke-rule">Shared stroke width in pixels</label>
-              <input id="stroke-rule" name="stroke-rule" type="number" min="1" max="3" step="0.5" value="1.5" inputmode="decimal">
+              <input id="stroke-rule" name="stroke-rule" type="number" min="1" max="3" step="0.5" value="2" inputmode="decimal">
             </div>
             <button id="stroke-2-btn" type="button" data-action="SET_STROKE">Set stroke 2</button>
             <button id="regenerate-btn" type="button" data-action="REGENERATE">Regenerate six</button>
@@ -519,8 +519,8 @@
             <div><dt>ViewBox</dt><dd>0 0 24 24</dd></div>
             <div><dt>Raster diff</dt><dd id="diff-value" class="pass">0.0000%</dd></div>
             <div><dt>Threshold</dt><dd>&lt; 0.50%</dd></div>
-            <div><dt>Accepted stroke</dt><dd id="accepted-stroke">1.5 px</dd></div>
-            <div><dt>Sprite SHA-256</dt><dd id="sprite-hash">0dd372e6f87d…</dd></div>
+            <div><dt>Current stroke</dt><dd id="accepted-stroke">2 px</dd></div>
+            <div><dt>Sprite SHA-256</dt><dd id="sprite-hash">6c32a2cef1a3…</dd></div>
           </dl>
         </section>
 
@@ -535,17 +535,17 @@
               <circle cx="13" cy="17" r="1" fill="#fb7185"></circle>
             </svg>
             <p id="comparison-copy">
-              Passing reference: 4 × 4 fixed subpixel coverage. No comparison
-              overlay is active.
+              Immutable 2 px reference: 4 × 4 fixed subpixel coverage. No
+              comparison overlay is active.
             </p>
           </div>
         </section>
       </aside>
     </section>
 
-    <section class="status" id="status-panel" data-state="ready" role="status" aria-live="polite" aria-atomic="true">
-      <strong id="status-label">Ready</strong>
-      <output id="status-message">Original fixture loaded: six paths are on the 2 px grid at 800% zoom.</output>
+    <section class="status" id="status-panel" data-state="reset" role="status" aria-live="polite" aria-atomic="true">
+      <strong id="status-label">Restored</strong>
+      <output id="status-message">Immutable 2 px reference fixture loaded: six paths are on the 2 px grid at 800% zoom.</output>
     </section>
 
     <details>
@@ -561,7 +561,7 @@
 {
   "positive": {
     "accepted": {
-      "fixture": "shared-stroke-2",
+      "fixture": "reference-stroke-2",
       "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
       "rules": {
         "grid": 2,
@@ -602,7 +602,7 @@
   },
   "rejected": {
     "accepted": {
-      "fixture": "shared-stroke-2",
+      "fixture": "reference-stroke-2",
       "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
       "rules": {
         "grid": 2,
@@ -659,16 +659,16 @@
   },
   "reset": {
     "accepted": {
-      "fixture": "original",
+      "fixture": "reference-stroke-2",
       "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
       "rules": {
         "grid": 2,
         "linecap": "round",
         "linejoin": "round",
-        "stroke": 1.5,
+        "stroke": 2,
         "viewBox": "0 0 24 24"
       },
-      "spriteSha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+      "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
       "symbols": [
         "bloom",
         "cairn",
@@ -685,13 +685,68 @@
       "status": "pass",
       "totalPixels": 3456
     },
-    "draftStroke": 1.5,
+    "draftStroke": 2,
     "invalidEdit": null,
     "lastExport": null,
-    "message": "Original fixture restored: six paths are on the 2 px grid at 800% zoom.",
+    "message": "Immutable 2 px reference fixture restored: six paths are on the 2 px grid at 800% zoom.",
     "selection": "bloom",
     "status": "reset",
     "zoom": 800
+  }
+}
+  </script>
+
+  <script type="application/json" id="stroke-records">
+{
+  "1": {
+    "bytes": 2234,
+    "comparison": {
+      "differingPercent": 27.2859,
+      "differingPixels": 943,
+      "status": "fail",
+      "totalPixels": 3456
+    },
+    "sha256": "c8ca7d61b74ac74269f5878c4edbb939153d3bc845e29aa6e087f6ffefc80e88"
+  },
+  "1.5": {
+    "bytes": 2246,
+    "comparison": {
+      "differingPercent": 24.3345,
+      "differingPixels": 841,
+      "status": "fail",
+      "totalPixels": 3456
+    },
+    "sha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61"
+  },
+  "2": {
+    "bytes": 2234,
+    "comparison": {
+      "differingPercent": 0.0,
+      "differingPixels": 0,
+      "status": "pass",
+      "totalPixels": 3456
+    },
+    "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2"
+  },
+  "2.5": {
+    "bytes": 2246,
+    "comparison": {
+      "differingPercent": 26.1574,
+      "differingPixels": 904,
+      "status": "fail",
+      "totalPixels": 3456
+    },
+    "sha256": "019cd1a5234d86972d7ee16f38074b15893532c56db07a31b66d75fb6d445e85"
+  },
+  "3": {
+    "bytes": 2234,
+    "comparison": {
+      "differingPercent": 27.3727,
+      "differingPixels": 946,
+      "status": "fail",
+      "totalPixels": 3456
+    },
+    "sha256": "be4e159c82e877643862a0bc53ee2590dc1305ec843b0c97679144f4e273b223"
   }
 }
   </script>
@@ -735,18 +790,9 @@
     const CONTRACT_STATES = Object.freeze(
       JSON.parse(document.getElementById("contract-states").textContent)
     );
-    const SPRITE_HASHES = Object.freeze({
-      "1.5": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
-      "2": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2"
-    });
-    const EXPORT_RECORDS = Object.freeze({
-      "2": Object.freeze({
-        bytes: 2234,
-        path: "exports/six-shapes.svg",
-        sha256: SPRITE_HASHES["2"],
-        symbolCount: 6
-      })
-    });
+    const STROKE_RECORDS = Object.freeze(
+      JSON.parse(document.getElementById("stroke-records").textContent)
+    );
     const SVG_NAMESPACE = "http:" + "//www.w3.org/2000/svg";
     let activeDownloadUrl = null;
 
@@ -785,10 +831,26 @@
       return lines.join("\n");
     }
 
+    function strokeKey(value) {
+      return String(Number(value));
+    }
+
+    function strokeRecord(value) {
+      const key = strokeKey(value);
+      return Object.prototype.hasOwnProperty.call(STROKE_RECORDS, key)
+        ? STROKE_RECORDS[key]
+        : null;
+    }
+
     function acceptedSystem(stroke) {
-      const fixture = stroke === 1.5 ? "original" : "shared-stroke-2";
+      const record = strokeRecord(stroke);
+      if (!record || typeof record.sha256 !== "string") {
+        return null;
+      }
       return {
-        fixture,
+        fixture: stroke === 2
+          ? "reference-stroke-2"
+          : `shared-stroke-${strokeKey(stroke)}`,
         pathSetSha256: "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
         rules: {
           grid: 2,
@@ -797,26 +859,24 @@
           stroke,
           viewBox: "0 0 24 24"
         },
-        spriteSha256: SPRITE_HASHES[String(stroke)],
+        spriteSha256: record.sha256,
         symbols: ICONS.map((icon) => icon.name)
       };
     }
 
-    function passComparison() {
+    function comparisonForStroke(stroke) {
+      const record = strokeRecord(stroke);
+      if (!record) {
+        return null;
+      }
       return {
-        differingPercent: 0,
-        differingPixels: 0,
+        ...clone(record.comparison),
         overlay: [],
-        status: "pass",
-        totalPixels: 3456
       };
     }
 
     function validStroke(value) {
-      return Number.isFinite(value)
-        && value >= 1
-        && value <= 3
-        && Math.round(value * 2) === value * 2;
+      return Number.isFinite(value) && strokeRecord(value) !== null;
     }
 
     function reduce(state, action) {
@@ -845,37 +905,60 @@
               message: "Rejected stroke token: use 1–3 px in exact 0.5 px steps. Accepted symbols are unchanged."
             };
           }
+          const accepted = acceptedSystem(state.draftStroke);
+          const comparison = comparisonForStroke(state.draftStroke);
+          if (!accepted || !comparison) {
+            return {
+              ...clone(state),
+              status: "rejected",
+              message: "Rejected stroke token: deterministic hash or raster evidence is unavailable."
+            };
+          }
+          const passes = comparison.status === "pass";
           return {
             ...clone(state),
-            accepted: acceptedSystem(state.draftStroke),
-            comparison: passComparison(),
+            accepted,
+            comparison,
             invalidEdit: null,
             lastExport: null,
-            status: "accepted",
-            message: `Regenerated all 6 symbols with shared stroke ${state.draftStroke} px; reference difference is 0.0000%.`
+            status: passes ? "accepted" : "rejected",
+            message: passes
+              ? `Regenerated all 6 symbols with shared stroke ${state.draftStroke} px; immutable reference difference is 0.0000%.`
+              : `Regenerated all 6 symbols with shared stroke ${state.draftStroke} px; ${comparison.differingPixels} pixels differ (${comparison.differingPercent.toFixed(4)}%), so export remains blocked.`
           };
         }
         case "EXPORT": {
           if (
-            state.accepted.rules.stroke !== 2
-            || state.comparison.status !== "pass"
+            state.comparison.status !== "pass"
+            || !strokeRecord(state.accepted.rules.stroke)
           ) {
             return {
               ...clone(state),
               status: "rejected",
-              message: "Export blocked: regenerate the 2 px shared stroke and pass the raster gate first."
+              message: "Export blocked: regenerate a hash-bound stroke that passes the immutable raster gate first."
             };
           }
-          const key = String(state.accepted.rules.stroke);
-          const record = clone(EXPORT_RECORDS[key]);
+          const record = strokeRecord(state.accepted.rules.stroke);
           return {
             ...clone(state),
-            lastExport: record,
+            lastExport: {
+              bytes: record.bytes,
+              path: "exports/six-shapes.svg",
+              sha256: record.sha256,
+              symbolCount: ICONS.length
+            },
             status: "accepted",
             message: "Exported 6 named 24 × 24 symbols; raster difference 0.0000% passes the 0.50% gate."
           };
         }
         case "OFF_GRID":
+          if (!state.lastExport || state.comparison.status !== "pass") {
+            return {
+              ...clone(state),
+              status: "rejected",
+              message: "Off-grid inspection requires a passing exported reference sprite first."
+            };
+          }
           return {
             ...clone(state),
             comparison: clone(CONTRACT_STATES.rejected.comparison),
@@ -933,7 +1016,11 @@
       document.getElementById("stroke-rule").value = String(state.draftStroke);
       document.getElementById("zoom-value").textContent = `${state.zoom}%`;
       document.getElementById("accepted-stroke").textContent = `${state.accepted.rules.stroke} px`;
-      document.getElementById("sprite-hash").textContent = `${state.accepted.spriteSha256.slice(0, 12)}…`;
+      const spriteHash = state.accepted && state.accepted.spriteSha256;
+      document.getElementById("sprite-hash").textContent =
+        typeof spriteHash === "string" && spriteHash.length >= 12
+          ? `${spriteHash.slice(0, 12)}…`
+          : "unavailable";
       document.getElementById("symbol-count").textContent = `${state.accepted.symbols.length} named`;
 
       document.querySelectorAll("[data-icon-preview]").forEach((svg) => {
@@ -967,10 +1054,17 @@
       const invalidPulse = [[2,12],[6,12],[8,6],[13,17],[16,6],[18,12],[22,12]];
       document.getElementById("invalid-pulse").setAttribute("d", pathData(invalidPulse));
       overlay.hidden = state.comparison.overlay.length === 0;
-      document.getElementById("comparison-copy").textContent =
-        state.comparison.status === "fail"
-          ? "51 changed pixels are highlighted. The 1.4757% candidate fails; accepted paths, rules, names, and export hash remain unchanged."
-          : "Passing reference: 4 × 4 fixed subpixel coverage. No comparison overlay is active.";
+      const comparisonCopy = document.getElementById("comparison-copy");
+      if (state.invalidEdit) {
+        comparisonCopy.textContent =
+          "51 changed pixels are highlighted. The 1.4757% candidate fails; accepted paths, rules, names, and export hash remain unchanged.";
+      } else if (state.comparison.status === "fail") {
+        comparisonCopy.textContent =
+          `${state.comparison.differingPixels} pixels differ from the immutable 2 px reference (${state.comparison.differingPercent.toFixed(4)}%); export remains blocked.`;
+      } else {
+        comparisonCopy.textContent =
+          "Immutable 2 px reference: 4 × 4 fixed subpixel coverage. No comparison overlay is active.";
+      }
 
       const panel = document.getElementById("status-panel");
       panel.dataset.state = state.status;
@@ -984,8 +1078,8 @@
       const text = spriteText(state.accepted.rules.stroke);
       document.getElementById("sprite-output").value = text;
       document.getElementById("export-btn").disabled =
-        state.accepted.rules.stroke !== 2
-        || state.comparison.status !== "pass";
+        state.comparison.status !== "pass"
+        || typeof spriteHash !== "string";
       document.getElementById("off-grid-btn").disabled = !state.lastExport;
       replaceDownload(text, Boolean(state.lastExport));
     }
@@ -1027,6 +1121,10 @@
     window.vectorIconSystem = Object.freeze({
       contractStates: CONTRACT_STATES,
       iconNames: Object.freeze(ICONS.map((icon) => icon.name)),
+      strokeRecords: STROKE_RECORDS,
+      supportedStrokes: Object.freeze(
+        Object.keys(STROKE_RECORDS).map(Number).sort((a, b) => a - b)
+      ),
       initialState,
       reduce,
       spriteText,

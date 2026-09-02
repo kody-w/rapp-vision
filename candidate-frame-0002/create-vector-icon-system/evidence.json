@@ -1,4 +1,22 @@
 {
+  "browserReplay": {
+    "assertion": "The test suite launches a real Chromium-family browser, drives each selector, captures reducer state after every click, and fails on console or page exceptions.",
+    "nondefaultSupportedStrokes": [
+      1.0,
+      1.5,
+      2.5,
+      3.0
+    ],
+    "runner": "tests/frame_0002_09_browser.mjs",
+    "selectors": [
+      "#stroke-2-btn",
+      "#regenerate-btn",
+      "#export-btn",
+      "#off-grid-btn",
+      "#restore-btn"
+    ],
+    "source": "channel.production.json#videos[0].live.scenes[0].actions"
+  },
   "claims": [
     {
       "actions": [
@@ -47,7 +65,7 @@
       "claim": "Editing the shared stroke token to 2 px regenerates all six symbols and exports the exact passing sprite.",
       "expectedState": {
         "accepted": {
-          "fixture": "shared-stroke-2",
+          "fixture": "reference-stroke-2",
           "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
           "rules": {
             "grid": 2,
@@ -110,7 +128,7 @@
       "assertions": [
         {
           "equals": {
-            "fixture": "shared-stroke-2",
+            "fixture": "reference-stroke-2",
             "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
             "rules": {
               "grid": 2,
@@ -159,7 +177,7 @@
       "claim": "Moving the Pulse anchor from 12,18 to off-grid 13,17 fails the comparison and highlights changed pixels without changing the accepted icon system or export.",
       "expectedState": {
         "accepted": {
-          "fixture": "shared-stroke-2",
+          "fixture": "reference-stroke-2",
           "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
           "rules": {
             "grid": 2,
@@ -427,11 +445,11 @@
       ],
       "assertions": [
         {
-          "equals": "original",
+          "equals": "reference-stroke-2",
           "path": "accepted.fixture"
         },
         {
-          "equals": 1.5,
+          "equals": 2.0,
           "path": "accepted.rules.stroke"
         },
         {
@@ -462,19 +480,19 @@
           "path": "comparison.status"
         }
       ],
-      "claim": "Restore icon fixture returns all original paths and rules, selects Bloom, sets 800% zoom, and clears every overlay.",
+      "claim": "Restore icon fixture returns the immutable 2 px reference geometry, selects Bloom, sets 800% zoom, and clears every overlay.",
       "expectedState": {
         "accepted": {
-          "fixture": "original",
+          "fixture": "reference-stroke-2",
           "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
           "rules": {
             "grid": 2,
             "linecap": "round",
             "linejoin": "round",
-            "stroke": 1.5,
+            "stroke": 2,
             "viewBox": "0 0 24 24"
           },
-          "spriteSha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+          "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
           "symbols": [
             "bloom",
             "cairn",
@@ -491,10 +509,10 @@
           "status": "pass",
           "totalPixels": 3456
         },
-        "draftStroke": 1.5,
+        "draftStroke": 2,
         "invalidEdit": null,
         "lastExport": null,
-        "message": "Original fixture restored: six paths are on the 2 px grid at 800% zoom.",
+        "message": "Immutable 2 px reference fixture restored: six paths are on the 2 px grid at 800% zoom.",
         "selection": "bloom",
         "status": "reset",
         "zoom": 800
@@ -512,11 +530,61 @@
       "acceptedDifferingPixels": 0,
       "acceptedStatus": "pass",
       "highlightCount": 51,
+      "immutable": true,
       "invalidDifferingPercent": 1.4757,
       "invalidDifferingPixels": 51,
       "invalidStatus": "fail",
-      "method": "Round polyline coverage at 4x4 fixed subpixel centers; a pixel differs when its 8-bit coverage value differs.",
+      "method": "Independent frozen 2.0 px round-polyline coverage sampled at 4x4 fixed subpixel centers.",
       "reference": "reference/reference-raster.json",
+      "referenceSha256": "61744b14a3c1e4f360d77207712e12f33e626259e1ff9eaca7cd46dd5ebd2d46",
+      "referenceStroke": 2.0,
+      "supportedStrokes": [
+        {
+          "differingPercent": 27.2859,
+          "differingPixels": 943,
+          "spriteBytes": 2234,
+          "spriteSha256": "c8ca7d61b74ac74269f5878c4edbb939153d3bc845e29aa6e087f6ffefc80e88",
+          "status": "fail",
+          "stroke": 1.0,
+          "totalPixels": 3456
+        },
+        {
+          "differingPercent": 24.3345,
+          "differingPixels": 841,
+          "spriteBytes": 2246,
+          "spriteSha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+          "status": "fail",
+          "stroke": 1.5,
+          "totalPixels": 3456
+        },
+        {
+          "differingPercent": 0.0,
+          "differingPixels": 0,
+          "spriteBytes": 2234,
+          "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+          "status": "pass",
+          "stroke": 2.0,
+          "totalPixels": 3456
+        },
+        {
+          "differingPercent": 26.1574,
+          "differingPixels": 904,
+          "spriteBytes": 2246,
+          "spriteSha256": "019cd1a5234d86972d7ee16f38074b15893532c56db07a31b66d75fb6d445e85",
+          "status": "fail",
+          "stroke": 2.5,
+          "totalPixels": 3456
+        },
+        {
+          "differingPercent": 27.3727,
+          "differingPixels": 946,
+          "spriteBytes": 2234,
+          "spriteSha256": "be4e159c82e877643862a0bc53ee2590dc1305ec843b0c97679144f4e273b223",
+          "status": "fail",
+          "stroke": 3.0,
+          "totalPixels": 3456
+        }
+      ],
       "thresholdPercent": 0.5,
       "totalPixels": 3456
     },
@@ -543,9 +611,9 @@
     "duration": 15.0,
     "fps": 12,
     "frameSamples": {
-      "0": "bcb59b23114b600e6f4ac20d5afa24fb49cb9228033fb55985f417f4209b2fa1",
-      "132": "ec28c82642a04eac5e8910619b3c1e6c51357efc4f2abafa29970eeb0ca44d21",
-      "179": "85201a48fbedbc440f8dd965cf6a419b701d40dd25604f949df423664abe8d80",
+      "0": "cb7cc7e11396cd56ba42b95b4f3f502645eebd7af5da52b5192de20a92e1a09d",
+      "132": "e0f6d1b4f29e91442b6fce862d7aa06bb6048a2d7bf2637d3f041bf21bc54c81",
+      "179": "3f8f31dc2cffcff1ba4c838a70eed5e228fd6a9f4153304f7095464cbb10c0c1",
       "42": "0dcc2fde27029b5d84aca5cdcda9be139280f187a04238bfd9acc9019a9e0ae8",
       "84": "17cfb18dc5db6ddfa3bfa5cd2490ebcd9543b413bac27f88bc0d6bce9af75c3b"
     },
@@ -559,7 +627,7 @@
     "noSecrets": true,
     "privacyAttestation": true,
     "rightsAttestation": true,
-    "statement": "All icon geometry, interface code, raster references, thumbnail, snapshot, and renderer graphics are original to this candidate; no logos, copied icons, external fonts, or network assets are used."
+    "statement": "All icon geometry, interface code, immutable raster reference, thumbnail, snapshot, and renderer graphics are original to this candidate; no logos, copied icons, external fonts, or network assets are used."
   },
   "schema": "candidate-frame-0002-create-vector-icon-system-evidence/1.0"
 }

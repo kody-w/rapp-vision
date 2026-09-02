@@ -24,11 +24,11 @@
           "t": 7
         },
         {
-          "label": "Exact fixture restore",
+          "label": "Exact 2 px reference restore",
           "t": 11
         }
       ],
-      "description": "A tiny vector bench regenerates six original 24 by 24 symbols from one shared stroke token, exports a hash-bound sprite, rejects an off-grid pulse anchor while preserving the accepted system, then restores every original path and control.",
+      "description": "A tiny vector bench starts from an immutable 2 px raster reference, regenerates six original 24 by 24 symbols from one shared stroke token, exports a hash-bound sprite, rejects an off-grid pulse anchor while preserving the accepted system, then restores the exact reference geometry and controls.",
       "duration": 15,
       "height": 540,
       "id": "create-vector-icon-system",
@@ -51,7 +51,7 @@
             "t": 7
           },
           {
-            "label": "Restore exact opening fixture",
+            "label": "Restore immutable 2 px reference",
             "t": 11
           }
         ],
@@ -89,8 +89,8 @@
             "app": "apps/create-vector-icon-system.html",
             "dur": 15,
             "lower": {
-              "bench": "Exactly six named 24 × 24 symbols; passing raster difference is below 0.50%.",
-              "fix": "Pause to inspect the sprite, changed-pixel overlay, and exact reset state.",
+              "bench": "Exactly six named 24 × 24 symbols; the 2 px fixture differs from its immutable raster by 0 pixels.",
+              "fix": "Pause to inspect supported-stroke hashes, changed pixels, and the exact 2 px reset.",
               "title": "Six Shapes, One Grid"
             },
             "ready": {

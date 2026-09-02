@@ -1,7 +1,7 @@
 {
   "positive": {
     "accepted": {
-      "fixture": "shared-stroke-2",
+      "fixture": "reference-stroke-2",
       "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
       "rules": {
         "grid": 2,
@@ -42,7 +42,7 @@
   },
   "rejected": {
     "accepted": {
-      "fixture": "shared-stroke-2",
+      "fixture": "reference-stroke-2",
       "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
       "rules": {
         "grid": 2,
@@ -300,16 +300,16 @@
   },
   "reset": {
     "accepted": {
-      "fixture": "original",
+      "fixture": "reference-stroke-2",
       "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
       "rules": {
         "grid": 2,
         "linecap": "round",
         "linejoin": "round",
-        "stroke": 1.5,
+        "stroke": 2,
         "viewBox": "0 0 24 24"
       },
-      "spriteSha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+      "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
       "symbols": [
         "bloom",
         "cairn",
@@ -326,10 +326,10 @@
       "status": "pass",
       "totalPixels": 3456
     },
-    "draftStroke": 1.5,
+    "draftStroke": 2,
     "invalidEdit": null,
     "lastExport": null,
-    "message": "Original fixture restored: six paths are on the 2 px grid at 800% zoom.",
+    "message": "Immutable 2 px reference fixture restored: six paths are on the 2 px grid at 800% zoom.",
     "selection": "bloom",
     "status": "reset",
     "zoom": 800

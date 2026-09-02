@@ -4,7 +4,7 @@
 `create-vector-icon-system` commission. The standalone live tool edits one
 shared stroke token, regenerates six original SVG symbols, exposes the exact
 sprite source and SHA-256, rejects one off-grid Pulse anchor without mutating
-the accepted export, and restores the complete opening fixture.
+the accepted export, and restores the immutable 2 px opening reference.
 
 ## Objective result
 
@@ -13,7 +13,10 @@ the accepted export, and restores the complete opening fixture.
 - accepted export: `exports/six-shapes.svg`;
 - accepted SHA-256:
   `6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2`;
-- reference method: 4 × 4 fixed subpixel round-polyline coverage;
+- immutable reference SHA-256:
+  `61744b14a3c1e4f360d77207712e12f33e626259e1ff9eaca7cd46dd5ebd2d46`;
+- reference method: independent frozen 2.0 px round-polyline coverage at
+  4 × 4 fixed subpixel centers;
 - accepted comparison: **0 / 3,456 pixels, 0.0000% (pass)**;
 - off-grid comparison: **51 / 3,456 pixels, 1.4757% (fail)**.
 
@@ -21,9 +24,22 @@ The rejected edit moves one Pulse anchor from `(12,18)` to `(13,17)`. The
 changed pixels are highlighted, while the accepted paths, rules, six names,
 sprite hash, and last export remain unchanged.
 
-`Restore icon fixture` returns the original path-set digest and 1.5 px shared
-stroke, selects Bloom, sets zoom to 800%, clears all overlays, and restores the
-passing comparison.
+All supported inputs (`1`, `1.5`, `2`, `2.5`, and `3` px) have deterministic
+sprite hashes and independently recomputed raster measurements. In particular,
+the former 1.5 px reset differs from the immutable 2 px reference by
+**841 / 3,456 pixels, 24.3345%**, so it cannot claim a zero-difference pass.
+
+| Stroke | Sprite SHA-256 | Difference vs. 2 px reference |
+| ---: | --- | ---: |
+| 1 | `c8ca7d61b74ac74269f5878c4edbb939153d3bc845e29aa6e087f6ffefc80e88` | 943 px · 27.2859% · fail |
+| 1.5 | `0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61` | 841 px · 24.3345% · fail |
+| 2 | `6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2` | 0 px · 0.0000% · pass |
+| 2.5 | `019cd1a5234d86972d7ee16f38074b15893532c56db07a31b66d75fb6d445e85` | 904 px · 26.1574% · fail |
+| 3 | `be4e159c82e877643862a0bc53ee2590dc1305ec843b0c97679144f4e273b223` | 946 px · 27.3727% · fail |
+
+`Restore icon fixture` now returns the exact 2 px immutable reference, selects
+Bloom, sets zoom to 800%, clears all overlays, and restores the truthful
+zero-difference comparison.
 
 ## Package
 
@@ -31,17 +47,17 @@ passing comparison.
 | --- | --- |
 | `apps/create-vector-icon-system.html` | Standalone accessible creation tool and deterministic reducer |
 | `exports/six-shapes.svg` | Inspectable six-symbol accepted export |
-| `reference/reference-raster.json` | Coverage digests, method, threshold, measurements, and changed pixels |
+| `reference/reference-raster.json` | Immutable per-icon coverage bytes and digests for the 2 px reference |
 | `snapshots/create-vector-icon-system.svg` | Deterministic visual state snapshot |
 | `snapshots/state-snapshot.json` | Exact positive, rejected, and reset states |
-| `evidence.json` | Commission claims, actions, assertions, rights statement, and frame samples |
+| `evidence.json` | Commission claims, supported-stroke measurements, browser replay contract, rights statement, and frame samples |
 | `render.py` | Standard-library RGB renderer and artifact/delivery generator |
 | `masters/create-vector-icon-system.mkv` | 15 s FFV1 lossless master |
 | `media/create-vector-icon-system.mp4` | H.264 / BT.709 delivery |
 | `media/create-vector-icon-system.webm` | VP9 / BT.709 delivery |
 | `channel.production.json` | Production authoring source |
 | `channel.json` | Compiled paired channel |
-| `delivery.json` | Byte counts, SHA-256 values, codecs, color tags, dimensions, and duration |
+| `delivery.json` | Byte counts, SHA-256 values, codecs, color tags, dimensions, duration, immutable reference, state snapshot, and docs |
 
 All icon geometry, reference data, UI, thumbnail, snapshot, and film graphics
 are original to this candidate. The HTML makes no network requests and uses no
@@ -52,18 +68,27 @@ copied logos, icons, web fonts, or external assets.
 Run from this directory in PowerShell:
 
 ```powershell
-$ff = "C:\Users\kowildfe\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.1-essentials_build\bin"
+$ffmpeg = python -c "import render; print(render.resolve_binary('ffmpeg', 'ffmpeg'))"
+$ffprobe = python -c "import render; print(render.resolve_binary('ffprobe', 'ffprobe'))"
 
-python .\render.py render --ffmpeg "$ff\ffmpeg.exe"
+python .\render.py render --ffmpeg $ffmpeg
 python ..\..\scripts\compile_publications.py build .\channel.production.json `
-  --ffmpeg "$ff\ffmpeg.exe" --ffprobe "$ff\ffprobe.exe"
-python .\render.py delivery --ffprobe "$ff\ffprobe.exe"
+  --ffmpeg $ffmpeg --ffprobe $ffprobe
+python .\render.py delivery --ffprobe $ffprobe
 
-$env:PATH = "$ff;$env:PATH"
+$env:PATH = "$(Split-Path $ffprobe);$env:PATH"
 python ..\..\scripts\validate_publications.py --ffprobe-local .\channel.json
-python -m unittest ..\..\tests\test_frame_0002_09.py -v
+Set-Location ..\..
+python -m unittest discover -s tests -p "test_frame_0002_09.py" -v
 ```
 
-The test suite rebuilds the master and both encoded deliveries once inside a
-candidate-local scratch directory, compares every resulting digest with the
-committed artifacts, and removes the scratch directory.
+The resolver checks an explicit argument, `FFMPEG` / `FFPROBE` environment
+variables, `PATH`, and Windows WinGet FFmpeg installations without embedding a
+username or package version.
+
+The test suite keeps all pure digest checks active regardless of media-tool
+availability. It also launches a real Chromium-family browser, drives the
+authored live selectors, exercises every nondefault supported stroke, fails on
+browser exceptions, independently rasterizes SVG geometry against the frozen
+reference, rebuilds the master and both deliveries in a candidate-local scratch
+directory, and removes every scratch artifact.

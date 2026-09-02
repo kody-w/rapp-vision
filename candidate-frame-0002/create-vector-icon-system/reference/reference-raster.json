@@ -1,416 +1,46 @@
 {
-  "comparison": {
-    "acceptedDifferingPercent": 0.0,
-    "acceptedDifferingPixels": 0,
-    "acceptedStatus": "pass",
-    "changedPixelHighlights": [
-      {
-        "candidate": 96,
-        "icon": "pulse",
-        "reference": 48,
-        "x": 9,
-        "y": 6
-      },
-      {
-        "candidate": 191,
-        "icon": "pulse",
-        "reference": 143,
-        "x": 9,
-        "y": 7
-      },
-      {
-        "candidate": 112,
-        "icon": "pulse",
-        "reference": 143,
-        "x": 14,
-        "y": 7
-      },
-      {
-        "candidate": 239,
-        "icon": "pulse",
-        "reference": 255,
-        "x": 8,
-        "y": 8
-      },
-      {
-        "candidate": 255,
-        "icon": "pulse",
-        "reference": 223,
-        "x": 9,
-        "y": 8
-      },
-      {
-        "candidate": 64,
-        "icon": "pulse",
-        "reference": 0,
-        "x": 10,
-        "y": 8
-      },
-      {
-        "candidate": 175,
-        "icon": "pulse",
-        "reference": 223,
-        "x": 14,
-        "y": 8
-      },
-      {
-        "candidate": 128,
-        "icon": "pulse",
-        "reference": 223,
-        "x": 8,
-        "y": 9
-      },
-      {
-        "candidate": 175,
-        "icon": "pulse",
-        "reference": 48,
-        "x": 10,
-        "y": 9
-      },
-      {
-        "candidate": 0,
-        "icon": "pulse",
-        "reference": 48,
-        "x": 13,
-        "y": 9
-      },
-      {
-        "candidate": 255,
-        "icon": "pulse",
-        "reference": 223,
-        "x": 15,
-        "y": 9
-      },
-      {
-        "candidate": 16,
-        "icon": "pulse",
-        "reference": 143,
-        "x": 8,
-        "y": 10
-      },
-      {
-        "candidate": 255,
-        "icon": "pulse",
-        "reference": 143,
-        "x": 10,
-        "y": 10
-      },
-      {
-        "candidate": 32,
-        "icon": "pulse",
-        "reference": 0,
-        "x": 11,
-        "y": 10
-      },
-      {
-        "candidate": 64,
-        "icon": "pulse",
-        "reference": 143,
-        "x": 13,
-        "y": 10
-      },
-      {
-        "candidate": 207,
-        "icon": "pulse",
-        "reference": 143,
-        "x": 15,
-        "y": 10
-      },
-      {
-        "candidate": 0,
-        "icon": "pulse",
-        "reference": 48,
-        "x": 8,
-        "y": 11
-      },
-      {
-        "candidate": 159,
-        "icon": "pulse",
-        "reference": 255,
-        "x": 9,
-        "y": 11
-      },
-      {
-        "candidate": 255,
-        "icon": "pulse",
-        "reference": 223,
-        "x": 10,
-        "y": 11
-      },
-      {
-        "candidate": 159,
-        "icon": "pulse",
-        "reference": 0,
-        "x": 11,
-        "y": 11
-      },
-      {
-        "candidate": 143,
-        "icon": "pulse",
-        "reference": 223,
-        "x": 13,
-        "y": 11
-      },
-      {
-        "candidate": 143,
-        "icon": "pulse",
-        "reference": 48,
-        "x": 15,
-        "y": 11
-      },
-      {
-        "candidate": 32,
-        "icon": "pulse",
-        "reference": 223,
-        "x": 9,
-        "y": 12
-      },
-      {
-        "candidate": 255,
-        "icon": "pulse",
-        "reference": 48,
-        "x": 11,
-        "y": 12
-      },
-      {
-        "candidate": 16,
-        "icon": "pulse",
-        "reference": 48,
-        "x": 12,
-        "y": 12
-      },
-      {
-        "candidate": 207,
-        "icon": "pulse",
-        "reference": 255,
-        "x": 13,
-        "y": 12
-      },
-      {
-        "candidate": 255,
-        "icon": "pulse",
-        "reference": 223,
-        "x": 14,
-        "y": 12
-      },
-      {
-        "candidate": 64,
-        "icon": "pulse",
-        "reference": 0,
-        "x": 15,
-        "y": 12
-      },
-      {
-        "candidate": 0,
-        "icon": "pulse",
-        "reference": 143,
-        "x": 9,
-        "y": 13
-      },
-      {
-        "candidate": 175,
-        "icon": "pulse",
-        "reference": 255,
-        "x": 10,
-        "y": 13
-      },
-      {
-        "candidate": 255,
-        "icon": "pulse",
-        "reference": 143,
-        "x": 11,
-        "y": 13
-      },
-      {
-        "candidate": 255,
-        "icon": "pulse",
-        "reference": 143,
-        "x": 14,
-        "y": 13
-      },
-      {
-        "candidate": 0,
-        "icon": "pulse",
-        "reference": 48,
-        "x": 9,
-        "y": 14
-      },
-      {
-        "candidate": 64,
-        "icon": "pulse",
-        "reference": 255,
-        "x": 10,
-        "y": 14
-      },
-      {
-        "candidate": 255,
-        "icon": "pulse",
-        "reference": 223,
-        "x": 11,
-        "y": 14
-      },
-      {
-        "candidate": 255,
-        "icon": "pulse",
-        "reference": 223,
-        "x": 12,
-        "y": 14
-      },
-      {
-        "candidate": 175,
-        "icon": "pulse",
-        "reference": 48,
-        "x": 14,
-        "y": 14
-      },
-      {
-        "candidate": 0,
-        "icon": "pulse",
-        "reference": 223,
-        "x": 10,
-        "y": 15
-      },
-      {
-        "candidate": 191,
-        "icon": "pulse",
-        "reference": 255,
-        "x": 11,
-        "y": 15
-      },
-      {
-        "candidate": 255,
-        "icon": "pulse",
-        "reference": 223,
-        "x": 13,
-        "y": 15
-      },
-      {
-        "candidate": 112,
-        "icon": "pulse",
-        "reference": 0,
-        "x": 14,
-        "y": 15
-      },
-      {
-        "candidate": 0,
-        "icon": "pulse",
-        "reference": 143,
-        "x": 10,
-        "y": 16
-      },
-      {
-        "candidate": 96,
-        "icon": "pulse",
-        "reference": 255,
-        "x": 11,
-        "y": 16
-      },
-      {
-        "candidate": 255,
-        "icon": "pulse",
-        "reference": 143,
-        "x": 13,
-        "y": 16
-      },
-      {
-        "candidate": 48,
-        "icon": "pulse",
-        "reference": 0,
-        "x": 14,
-        "y": 16
-      },
-      {
-        "candidate": 0,
-        "icon": "pulse",
-        "reference": 48,
-        "x": 10,
-        "y": 17
-      },
-      {
-        "candidate": 0,
-        "icon": "pulse",
-        "reference": 255,
-        "x": 11,
-        "y": 17
-      },
-      {
-        "candidate": 207,
-        "icon": "pulse",
-        "reference": 255,
-        "x": 12,
-        "y": 17
-      },
-      {
-        "candidate": 207,
-        "icon": "pulse",
-        "reference": 48,
-        "x": 13,
-        "y": 17
-      },
-      {
-        "candidate": 0,
-        "icon": "pulse",
-        "reference": 207,
-        "x": 11,
-        "y": 18
-      },
-      {
-        "candidate": 0,
-        "icon": "pulse",
-        "reference": 207,
-        "x": 12,
-        "y": 18
-      }
-    ],
-    "invalidDifferingPercent": 1.4757,
-    "invalidDifferingPixels": 51,
-    "invalidEdit": {
-      "anchorIndex": 3,
-      "from": [
-        12,
-        18
-      ],
-      "icon": "pulse",
-      "reason": "Both coordinates must be divisible by the 2 px grid token.",
-      "to": [
-        13,
-        17
-      ]
-    },
-    "invalidStatus": "fail",
-    "method": "Round polyline coverage at 4x4 fixed subpixel centers; a pixel differs when its 8-bit coverage value differs.",
-    "thresholdPercent": 0.5,
-    "totalPixels": 3456
-  },
+  "coverageEncoding": "base64 row-major unsigned 8-bit coverage; 576 bytes per icon",
+  "frozen": true,
+  "geometrySha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
   "grid": 2,
+  "height": 24,
   "icons": [
     {
+      "coverageBase64": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABDPzxAAAAAAAAAAAAAAAAAAAAAAAAAAEM///88QAAAAAAAAAAAAAAAAAAAAAAAQz//Pz//PEAAAAAAAAAAAAAAAAAAAABDP/88QEM//zxAAAAAAAAAAAAAAAAAAEM//zxAAABDP/88QAAAAAAAAAAAAAAAQz//PEAAAAAAQz//PEAAAAAAAAAAAAADP/88QAAAAAAAAEM//zwAAAAAAAAAAAADP/88QAAAAAAAAEM//zwAAAAAAAAAAAAAQz//PEAAAAAAQz//PEAAAAAAAAAAAAAAAEM//zxAAABDP/88QAAAAAAAAAAAAAAAAABDP/88QEM//zxAAAAAAAAAAAAAAAAAAAAAQz//Pz//PEAAAAAAAAAAAAAAAAAAAAAAAEM///88QAAAAAAAAAAAAAAAAAAAAAAAAABD//xAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAAAAAAAAAAAAAAAAAAAAAAAM///////////88AAAAAAAAAAAAAAAAAAM///////////88AAAAAAAAAAAAAAAAAAAAAAAD//wAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAAAAAAAAAAAAAAAAAAAAAAAAAAAADPzwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
       "coverageSha256": "03b58d76be9f7d87f3a5315df883b35feb051fa5767893a9ee782d010e2f11ec",
       "name": "bloom"
     },
     {
+      "coverageBase64": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADPzwAAAAAAAAAAAAAAAAAAAAAAAAAAAGD//2AAAAAAAAAAAAAAAAAAAAAAAAAAAN///98AAAAAAAAAAAAAAAAAAAAAAAAAYP/f3/9gAAAAAAAAAAAAAAAAAAAAAAAA3/9gYP/fAAAAAAAAAAAAAAAAAAAAAAAAz88AAM/PAAAAAAAAAAAAAAAAAAAAAAAQz//////PEAAAAAAAAAAAAAAAAAAAABDP////////zxAAAAAAAAAAAAAAAAAAEM//zxAAABDP/88QAAAAAAAAAAAAAAAQz//PEAAAAAAQz//PEAAAAAAAAAAAAADP/88QAAAAAAAAEM//zwAAAAAAAAAAAADPzxAAAAAAAAAAABDPzwAAAAAAAAAAAAAAEM///////////88QAAAAAAAAAAAAAAAQz//////////////PEAAAAAAAAAAAABDP/88QAAAAAAAAEM//zxAAAAAAAAAAEM//zxAAAAAAAAAAABDP/88QAAAAAAAAz//PEAAAAAAAAAAAAAAQz//PAAAAAAAAz88QAAAAAAAAAAAAAAAAEM/PAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
       "coverageSha256": "265c876a84208a824ba137a656606749e5855c302d0a35e76a9e5549b421ff4f",
       "name": "cairn"
     },
     {
+      "coverageBase64": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAz88AAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8AAM///////////88AAAAAAAAAAAAA//8AAP////////////8AAAAAAAAAAAAA//8AAP//AAAAAAAA//8AAAAAAAAAAAAA//8AAP//AAAAAAAA//8AAAAAAAAAAAAA////////AAAAAAAA//8AAAAAAAAAAAAA////////AAAAAAAA//8AAAAAAAAAAAAA//8AAP//AAAAAAAA//8AAAAAAAAAAAAA//8AAP//AAAAAAAA//8AAAAAAAAAAAAA//8AAP////////////8AAAAAAAAAAAAA//8AAM///////////88AAAAAAAAAAAAA//8AAAAAAAD//wAAAAAAAAAAAAAAAAAA//8AAAAAAAD//wAAAAAAAAAAAAAAAAAA///////////////////////PAAAAAAAAz//////////////////////PAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
       "coverageSha256": "bc1495924fdf71f7e4e2ee15c4277609b7113017c46ac1858a02d5fa57294f67",
       "name": "hinge"
     },
     {
+      "coverageBase64": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADDP348wAAAAAAAAAAAAAAAAAAAAAAAAYO//////348wAAAAAAAAAAAAAAAAABCf//+fQI/f////zwAAAAAAAAAAAAAAMM//72AAAAAAMI/f/4AAAAAAAAAAAABg7//PMAAAAAAAAAAw//8wAAAAAAAAEJ///58QAAAAAAAAAAAAgP/PAAAAAAAAz//vYAAAABDPzxAAAAAAAM//gAAAAAAw/98wAAAAEM///88QAAAAADD//zAAAACP/48AAAAQz//Pz//PEAAAAACA/88AAADf/zAAABDP/88QEM//zxAAAAAw/98AADD/3wAAAM//zxAAABDP/88AAACP/48AAI//jwAAAM//zxAAABDP/88AAADf/zAAAN//QAAAABDP/88QEM//zxAAADD/3wAAAM//zxAAAAAQz//Pz//PEAAAAI//jwAAABDP/88QAAAAEM///88QAAAAEN//MAAAAAAQz//PEAAAABDPzxAAAAAQz//PAAAAAAAAEM//zxAAAAAAAAAAABDP/88QAAAAAAAAABDP/88QAAAAAAAAEM//zxAAAAAAAAAAAAAQz//fjzAAAAAQz//PEAAAAAAAAAAAAAAAEM/////fj0DP/88QAAAAAAAAAAAAAAAAAAAwj9//////zxAAAAAAAAAAAAAAAAAAAAAAAAAwj9/PEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
       "coverageSha256": "5263166d60679fa9548c04fe4c4decf0ff8ea1b6c60814f25840db38db432c01",
       "name": "orbit"
     },
     {
+      "coverageBase64": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAz//////////////////////PAAAAAAAAz//////////////////////PAAAAAAAAAAAAAM/PAAAAAAAAz88AAAAAAAAAAAAAAAAAMP//MAAAAAAw//8wAAAAAAAAAAAAAAAAj///jwAAAACP//+PAAAAAAAAAAAAAAAA3///3wAAAADf///fAAAAAAAAAAAAAAAw/9/f/zAAADD/39//MAAAAAAAAAAAAACP/4+P/48AAI//j4//jwAAAAAAAM///////zAw/98AAN//MDD//////88AAM//////zwAA3/8wMP/fAADP/////88AAAAAAAAAAAAAj/+Pj/+PAAAAAAAAAAAAAAAAAAAAAAAAMP/f3/8wAAAAAAAAAAAAAAAAAAAAAAAAAN///98AAAAAAAAAAAAAAAAAAAAAAAAAAI///48AAAAAAAAAAAAAAAAAAAAAAAAAADD//zAAAAAAAAAAAAAAAAAAAAAAAAAAAADPzwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
       "coverageSha256": "6f15669487ffa3f1b9e9b348e59a1ca8488942e5e304a74f747b259afd393cb4",
       "name": "pulse"
     },
     {
+      "coverageBase64": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAz//////PAAAAAAAAz//////PAAAAAAAAz///////gAAAAACA///////PAAAAAAAAAAAAADD//zAAADD//zAAAAAAAAAAAAAAAAAAAACA/88AAM//gAAAAAAAAAAAAAAAAAAAAAAAz/+AgP/PAAAAAAAAAAAAAAAAAAAAAAAAMP////8wAAAAAAAAAAAAAAAAz//////PAID//4AAz//////PAAAAAAAAz//////PAID//4AAz//////PAAAAAAAAAAAAAAAAMP////8wAAAAAAAAAAAAAAAAAAAAAAAAz/+AgP/PAAAAAAAAAAAAAAAAAAAAAACA/88AAM//gAAAAAAAAAAAAAAAAAAAADD//zAAADD//zAAAAAAAAAAAAAAz///////gAAAAACA///////PAAAAAAAAz//////PAAAAAAAAz//////PAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
       "coverageSha256": "1cb235fbd5f83f968a07f19b3a197038f09725e34271f0004a0aa407717a325e",
       "name": "weave"
     }
   ],
-  "schema": "six-shapes-reference-raster/1.0",
+  "method": "Independent frozen 2.0 px round-polyline coverage sampled at 4x4 fixed subpixel centers.",
+  "schema": "six-shapes-immutable-reference-raster/2.0",
   "stroke": 2.0,
   "supersample": "4x4",
-  "viewBox": "0 0 24 24"
+  "systemCoverageSha256": "9e63987fca6d05cf851d6b00ae7f6b4747afe7120243216b12821cfdedd8b79e",
+  "viewBox": "0 0 24 24",
+  "width": 24
 }

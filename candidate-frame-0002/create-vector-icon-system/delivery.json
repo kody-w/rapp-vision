@@ -1,22 +1,27 @@
 {
   "artifacts": {
     "app": {
-      "bytes": 32131,
+      "bytes": 35413,
       "path": "apps/create-vector-icon-system.html",
-      "sha256": "3c274cc89e86720d81a4164cfef28f26319f8d5338b77051e08986284f1fa639"
+      "sha256": "fc3dc03b647453995baa3493100324cb19fe841dda53319c50dda61ea255b311"
     },
     "channel": {
-      "bytes": 3540,
+      "bytes": 3639,
       "path": "channel.json",
-      "sha256": "987a7dfa237cca7c546c7c990cb37dfb7c27c229dbf0f34db8d4a2917c4826e4"
+      "sha256": "929c1e66266397d7e48d8fa27153523370ad7cc9ba9e9ff367775619566ca2aa"
+    },
+    "documentation": {
+      "bytes": 4947,
+      "path": "README.md",
+      "sha256": "bb764aa4508b32723751b1d0c0581f30948f42e2c7a62f6fb5bb5860d74d62d2"
     },
     "evidence": {
-      "bytes": 13515,
+      "bytes": 15795,
       "path": "evidence.json",
-      "sha256": "c1a279261ffa81a7349f30790f76d32a30a588a82e38e20ef35b2d7d48bb3470"
+      "sha256": "47c455447ec2d72e4d00f9eaa302a96a00a4bb458664178b8ee9bed9f570bdb6"
     },
     "master": {
-      "bytes": 4847771,
+      "bytes": 4841896,
       "codec": "ffv1",
       "color_primaries": null,
       "color_range": "pc",
@@ -26,11 +31,11 @@
       "height": 540,
       "path": "masters/create-vector-icon-system.mkv",
       "pixel_format": "bgr0",
-      "sha256": "1f8472f7f649e9f7f3d020c3d4382cc61e227ef640b28e9440c9eda32496c101",
+      "sha256": "29a0acf1940564854db973b7fdafa3c7e111fd19d59513586cfb397cbc40457f",
       "width": 960
     },
     "mp4": {
-      "bytes": 70804,
+      "bytes": 58886,
       "codec": "h264",
       "color_primaries": "bt709",
       "color_range": "tv",
@@ -40,23 +45,38 @@
       "height": 540,
       "path": "media/create-vector-icon-system.mp4",
       "pixel_format": "yuv420p",
-      "sha256": "6de1eff552823231aefa537e63f5a947e0b2a71c5a7e4a4b2b17fbc3f2619125",
+      "sha256": "dc3f6ebf83612b3a7a0fa2d6a46629f8d1b3cf442057ff7b8e97b1bcd865bf22",
       "width": 960
     },
     "production": {
-      "bytes": 3389,
+      "bytes": 3488,
       "path": "channel.production.json",
-      "sha256": "9ad523f1ef9a38ac2f5fbc0a0487e108132b715989ed89395b7bfddd6e1f43ff"
+      "sha256": "64225d6e709e8604b27311a8bc825ef91c180f8026afbc1ef423cc4c36b8e646"
+    },
+    "reference": {
+      "bytes": 6116,
+      "path": "reference/reference-raster.json",
+      "sha256": "61744b14a3c1e4f360d77207712e12f33e626259e1ff9eaca7cd46dd5ebd2d46"
+    },
+    "renderer": {
+      "bytes": 51601,
+      "path": "render.py",
+      "sha256": "9d905ec977be12c78e3d08bf1cc8f6a198120ff4a380f573146a2c7925b2455c"
     },
     "snapshot": {
-      "bytes": 3227,
+      "bytes": 3230,
       "path": "snapshots/create-vector-icon-system.svg",
-      "sha256": "e71776adbd910bd819744814514940ee96d39aab51c3175a61e823da752ad45e"
+      "sha256": "bc191db613b935b5c697c72bea74f3962f21bbb40602c1a838f8b96691720dfa"
     },
     "sprite": {
       "bytes": 2234,
       "path": "exports/six-shapes.svg",
       "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2"
+    },
+    "stateSnapshot": {
+      "bytes": 5826,
+      "path": "snapshots/state-snapshot.json",
+      "sha256": "288965fb68cf774ca4673bd4f868a17beec5510783618aa0a9248b465f128692"
     },
     "thumbnail": {
       "bytes": 4399,
@@ -64,7 +84,7 @@
       "sha256": "728f35b2dd6f8d48bfc8497eadba4359e121c01daf47865d7b6d403efff045c3"
     },
     "webm": {
-      "bytes": 75246,
+      "bytes": 70227,
       "codec": "vp9",
       "color_primaries": "bt709",
       "color_range": "tv",
@@ -74,7 +94,7 @@
       "height": 540,
       "path": "media/create-vector-icon-system.webm",
       "pixel_format": "yuv420p",
-      "sha256": "06e98a673f2fbf62924230230e8b0e3061bbe12c3725e9d13ad02268783c320b",
+      "sha256": "e304e85a18a2378e2bca2aef5f6d2363bf5e62db0ab9711892155b1e3a9a519d",
       "width": 960
     }
   },

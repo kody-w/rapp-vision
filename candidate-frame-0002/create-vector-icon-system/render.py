@@ -4,10 +4,12 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import functools
 import hashlib
 import json
 import math
+import os
 import re
 import shutil
 import subprocess
@@ -28,9 +30,16 @@ FRAME_COUNT = 180
 DURATION = FRAME_COUNT / FPS
 VIEW_BOX = "0 0 24 24"
 GRID = 2
-BASE_STROKE = 1.5
-EXPORT_STROKE = 2.0
+REFERENCE_STROKE = 2.0
+BASE_STROKE = REFERENCE_STROKE
+EXPORT_STROKE = REFERENCE_STROKE
+SUPPORTED_STROKES = (1.0, 1.5, 2.0, 2.5, 3.0)
+RASTER_THRESHOLD_PERCENT = 0.5
 SUPERSAMPLE = 4
+REFERENCE_RELATIVE = Path("reference") / "reference-raster.json"
+IMMUTABLE_REFERENCE_SHA256 = (
+    "61744b14a3c1e4f360d77207712e12f33e626259e1ff9eaca7cd46dd5ebd2d46"
+)
 RGB = tuple[int, int, int]
 Point = tuple[float, float]
 Polyline = tuple[Point, ...]
@@ -278,22 +287,95 @@ def rasterize_icon(
     return bytes(coverage)
 
 
-def rasterize_system(*, invalid: bool = False) -> dict[str, bytes]:
+def rasterize_system(
+    *,
+    stroke: float = EXPORT_STROKE,
+    invalid: bool = False,
+) -> dict[str, bytes]:
     return {
-        icon.name: rasterize_icon(icon, invalid=invalid)
+        icon.name: rasterize_icon(icon, stroke=stroke, invalid=invalid)
         for icon in ICONS
     }
 
 
-@functools.lru_cache(maxsize=1)
-def reference_document() -> dict[str, object]:
-    reference = rasterize_system()
-    invalid = rasterize_system(invalid=True)
+@functools.lru_cache(maxsize=4)
+def immutable_reference(
+    path: Path = ROOT / REFERENCE_RELATIVE,
+) -> dict[str, object]:
+    raw = path.read_bytes()
+    actual_sha256 = sha256_bytes(raw)
+    if actual_sha256 != IMMUTABLE_REFERENCE_SHA256:
+        raise RuntimeError(
+            "immutable raster reference digest mismatch: "
+            f"{actual_sha256} != {IMMUTABLE_REFERENCE_SHA256}"
+        )
+    document = json.loads(raw.decode("utf-8"))
+    if document.get("schema") != "six-shapes-immutable-reference-raster/2.0":
+        raise RuntimeError("immutable raster reference has the wrong schema")
+    expected = {
+        "viewBox": VIEW_BOX,
+        "width": 24,
+        "height": 24,
+        "grid": GRID,
+        "stroke": REFERENCE_STROKE,
+        "supersample": f"{SUPERSAMPLE}x{SUPERSAMPLE}",
+        "geometrySha256": geometry_sha256(),
+    }
+    for key, value in expected.items():
+        if document.get(key) != value:
+            raise RuntimeError(
+                f"immutable raster reference {key} mismatch: "
+                f"{document.get(key)!r} != {value!r}"
+            )
+    icons = document.get("icons")
+    if not isinstance(icons, list):
+        raise RuntimeError("immutable raster reference icons are missing")
+    if tuple(item.get("name") for item in icons) != ICON_NAMES:
+        raise RuntimeError("immutable raster reference icon order differs")
+    coverages: list[bytes] = []
+    for item in icons:
+        try:
+            coverage = base64.b64decode(
+                item["coverageBase64"],
+                validate=True,
+            )
+        except (KeyError, ValueError) as exc:
+            raise RuntimeError("immutable raster coverage is invalid") from exc
+        if len(coverage) != 24 * 24:
+            raise RuntimeError("immutable raster coverage has the wrong size")
+        if sha256_bytes(coverage) != item.get("coverageSha256"):
+            raise RuntimeError("immutable raster coverage digest mismatch")
+        coverages.append(coverage)
+    if sha256_bytes(b"".join(coverages)) != document.get(
+        "systemCoverageSha256"
+    ):
+        raise RuntimeError("immutable system coverage digest mismatch")
+    return document
+
+
+def reference_coverages(
+    path: Path = ROOT / REFERENCE_RELATIVE,
+) -> dict[str, bytes]:
+    document = immutable_reference(path)
+    return {
+        item["name"]: base64.b64decode(item["coverageBase64"], validate=True)
+        for item in document["icons"]
+    }
+
+
+def compare_to_reference(
+    candidate: dict[str, bytes],
+    *,
+    reference_path: Path = ROOT / REFERENCE_RELATIVE,
+) -> dict[str, object]:
+    reference = reference_coverages(reference_path)
     highlights: list[dict[str, object]] = []
     for icon in ICONS:
         baseline = reference[icon.name]
-        candidate = invalid[icon.name]
-        for offset, (before, after) in enumerate(zip(baseline, candidate)):
+        rendered = candidate[icon.name]
+        if len(rendered) != len(baseline):
+            raise RuntimeError(f"candidate raster size differs for {icon.name}")
+        for offset, (before, after) in enumerate(zip(baseline, rendered)):
             if before != after:
                 highlights.append(
                     {
@@ -305,23 +387,57 @@ def reference_document() -> dict[str, object]:
                     }
                 )
     total_pixels = len(ICONS) * 24 * 24
-    invalid_count = len(highlights)
+    differing_pixels = len(highlights)
+    differing_percent = round(differing_pixels / total_pixels * 100, 4)
     return {
-        "schema": "six-shapes-reference-raster/1.0",
-        "viewBox": VIEW_BOX,
-        "grid": GRID,
-        "stroke": EXPORT_STROKE,
-        "supersample": f"{SUPERSAMPLE}x{SUPERSAMPLE}",
+        "differingPixels": differing_pixels,
+        "differingPercent": differing_percent,
+        "status": (
+            "pass"
+            if differing_percent < RASTER_THRESHOLD_PERCENT
+            else "fail"
+        ),
+        "totalPixels": total_pixels,
+        "changedPixelHighlights": highlights,
+    }
+
+
+def stroke_comparison(
+    stroke: float,
+    *,
+    invalid: bool = False,
+    reference_path: Path = ROOT / REFERENCE_RELATIVE,
+) -> dict[str, object]:
+    if stroke not in SUPPORTED_STROKES:
+        raise ValueError(f"unsupported stroke: {stroke}")
+    return compare_to_reference(
+        rasterize_system(stroke=stroke, invalid=invalid),
+        reference_path=reference_path,
+    )
+
+
+@functools.lru_cache(maxsize=1)
+def reference_document() -> dict[str, object]:
+    reference = immutable_reference()
+    accepted = stroke_comparison(REFERENCE_STROKE)
+    invalid = stroke_comparison(REFERENCE_STROKE, invalid=True)
+    return {
+        "schema": "six-shapes-reference-comparison/2.0",
+        "reference": {
+            "path": REFERENCE_RELATIVE.as_posix(),
+            "sha256": IMMUTABLE_REFERENCE_SHA256,
+            "stroke": REFERENCE_STROKE,
+            "method": reference["method"],
+            "coverageEncoding": reference["coverageEncoding"],
+            "systemCoverageSha256": reference["systemCoverageSha256"],
+        },
         "comparison": {
-            "method": (
-                "Round polyline coverage at 4x4 fixed subpixel centers; a pixel "
-                "differs when its 8-bit coverage value differs."
-            ),
-            "thresholdPercent": 0.5,
-            "totalPixels": total_pixels,
-            "acceptedDifferingPixels": 0,
-            "acceptedDifferingPercent": 0.0,
-            "acceptedStatus": "pass",
+            "method": reference["method"],
+            "thresholdPercent": RASTER_THRESHOLD_PERCENT,
+            "totalPixels": accepted["totalPixels"],
+            "acceptedDifferingPixels": accepted["differingPixels"],
+            "acceptedDifferingPercent": accepted["differingPercent"],
+            "acceptedStatus": accepted["status"],
             "invalidEdit": {
                 "icon": "pulse",
                 "anchorIndex": 3,
@@ -329,19 +445,30 @@ def reference_document() -> dict[str, object]:
                 "to": [13, 17],
                 "reason": "Both coordinates must be divisible by the 2 px grid token.",
             },
-            "invalidDifferingPixels": invalid_count,
-            "invalidDifferingPercent": round(invalid_count / total_pixels * 100, 4),
-            "invalidStatus": "fail",
-            "changedPixelHighlights": highlights,
+            "invalidDifferingPixels": invalid["differingPixels"],
+            "invalidDifferingPercent": invalid["differingPercent"],
+            "invalidStatus": invalid["status"],
+            "changedPixelHighlights": invalid["changedPixelHighlights"],
         },
-        "icons": [
-            {
-                "name": icon.name,
-                "coverageSha256": sha256_bytes(reference[icon.name]),
-            }
-            for icon in ICONS
-        ],
     }
+
+
+def stroke_records() -> dict[str, object]:
+    records: dict[str, object] = {}
+    for stroke in SUPPORTED_STROKES:
+        comparison = stroke_comparison(stroke)
+        sprite = sprite_svg(stroke)
+        records[_number(stroke)] = {
+            "bytes": len(sprite.encode("utf-8")),
+            "sha256": sha256_text(sprite),
+            "comparison": {
+                "differingPixels": comparison["differingPixels"],
+                "differingPercent": comparison["differingPercent"],
+                "status": comparison["status"],
+                "totalPixels": comparison["totalPixels"],
+            },
+        }
+    return records
 
 
 def deterministic_json(value: object) -> str:
@@ -397,6 +524,7 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
     states = contract_states(output_root)
     reference = reference_document()
     comparison = reference["comparison"]
+    supported = stroke_records()
     return {
         "schema": "candidate-frame-0002-create-vector-icon-system-evidence/1.0",
         "commission": {
@@ -421,6 +549,9 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
             },
             "rasterComparison": {
                 "reference": "reference/reference-raster.json",
+                "referenceSha256": IMMUTABLE_REFERENCE_SHA256,
+                "referenceStroke": REFERENCE_STROKE,
+                "immutable": True,
                 "method": comparison["method"],
                 "thresholdPercent": comparison["thresholdPercent"],
                 "totalPixels": comparison["totalPixels"],
@@ -431,6 +562,15 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
                 "invalidDifferingPercent": comparison["invalidDifferingPercent"],
                 "invalidStatus": comparison["invalidStatus"],
                 "highlightCount": len(comparison["changedPixelHighlights"]),
+                "supportedStrokes": [
+                    {
+                        "stroke": float(stroke),
+                        "spriteSha256": record["sha256"],
+                        "spriteBytes": record["bytes"],
+                        **record["comparison"],
+                    }
+                    for stroke, record in supported.items()
+                ],
             },
         },
         "claims": [
@@ -486,16 +626,23 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
             {
                 "id": "reset",
                 "claim": (
-                    "Restore icon fixture returns all original paths and rules, "
-                    "selects Bloom, sets 800% zoom, and clears every overlay."
+                    "Restore icon fixture returns the immutable 2 px reference "
+                    "geometry, selects Bloom, sets 800% zoom, and clears every "
+                    "overlay."
                 ),
                 "actions": [
                     {"type": "RESTORE", "selector": "#restore-btn"},
                 ],
                 "expectedState": states["reset"],
                 "assertions": [
-                    {"path": "accepted.fixture", "equals": "original"},
-                    {"path": "accepted.rules.stroke", "equals": BASE_STROKE},
+                    {
+                        "path": "accepted.fixture",
+                        "equals": "reference-stroke-2",
+                    },
+                    {
+                        "path": "accepted.rules.stroke",
+                        "equals": REFERENCE_STROKE,
+                    },
                     {"path": "accepted.symbols", "equals": list(ICON_NAMES)},
                     {"path": "selection", "equals": "bloom"},
                     {"path": "zoom", "equals": 800},
@@ -504,6 +651,25 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
                 ],
             },
         ],
+        "browserReplay": {
+            "runner": "tests/frame_0002_09_browser.mjs",
+            "source": (
+                "channel.production.json#videos[0].live.scenes[0].actions"
+            ),
+            "selectors": [
+                "#stroke-2-btn",
+                "#regenerate-btn",
+                "#export-btn",
+                "#off-grid-btn",
+                "#restore-btn",
+            ],
+            "nondefaultSupportedStrokes": [1.0, 1.5, 2.5, 3.0],
+            "assertion": (
+                "The test suite launches a real Chromium-family browser, drives "
+                "each selector, captures reducer state after every click, and "
+                "fails on console or page exceptions."
+            ),
+        },
         "renderer": {
             "path": "render.py",
             "width": WIDTH,
@@ -522,9 +688,10 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
             "privacyAttestation": True,
             "noSecrets": True,
             "statement": (
-                "All icon geometry, interface code, raster references, thumbnail, "
-                "snapshot, and renderer graphics are original to this candidate; "
-                "no logos, copied icons, external fonts, or network assets are used."
+                "All icon geometry, interface code, immutable raster reference, "
+                "thumbnail, snapshot, and renderer graphics are original to this "
+                "candidate; no logos, copied icons, external fonts, or network "
+                "assets are used."
             ),
         },
     }
@@ -629,7 +796,7 @@ def snapshot_svg() -> str:
         f'font-size="15">{invalid_percent:.4f}% PIXELS DIFFER</text>\n'
         '  <rect x="66" y="410" width="828" height="66" rx="12" fill="#102b25"/>\n'
         '  <text x="90" y="438" fill="#86efac" font-family="monospace" '
-        'font-size="16">RESET: ORIGINAL PATHS · STROKE 1.5 · BLOOM SELECTED</text>\n'
+        'font-size="16">RESET: IMMUTABLE REFERENCE · STROKE 2 · BLOOM SELECTED</text>\n'
         '  <text x="90" y="463" fill="#86efac" font-family="monospace" '
         'font-size="16">ZOOM 800% · OVERLAYS CLEAR · REFERENCE PASS</text>\n'
         "</svg>\n"
@@ -760,8 +927,8 @@ def frame_rgb(frame_index: int) -> bytes:
         phase = "baseline"
         stroke = BASE_STROKE
         accent = (96, 165, 250)
-        status = "ORIGINAL FIXTURE / GRID 2"
-        detail = "EDIT ONE SHARED TOKEN"
+        status = "IMMUTABLE REFERENCE / GRID 2"
+        detail = "STROKE 2 / ZERO DIFF"
     elif second < 6.8:
         phase = "accepted"
         stroke = EXPORT_STROKE
@@ -779,7 +946,7 @@ def frame_rgb(frame_index: int) -> bytes:
         stroke = BASE_STROKE
         accent = (167, 139, 250)
         status = "RESTORE FIXTURE / EXACT"
-        detail = "800% / BLOOM / CLEAR"
+        detail = "2PX / 800% / BLOOM / CLEAR"
 
     canvas = Canvas(WIDTH, HEIGHT, (8, 11, 18))
     for x in range(0, WIDTH, 48):
@@ -881,8 +1048,8 @@ def frame_rgb(frame_index: int) -> bytes:
         canvas.text(panel_x + 40, 354, "OVERLAY CLEAR", (221, 214, 254), 2)
     else:
         canvas.rect(panel_x + 22, 282, 230, 96, (16, 30, 51))
-        canvas.text(panel_x + 40, 302, "FIXTURE", (147, 197, 253), 2)
-        canvas.text(panel_x + 40, 328, "STROKE 1.5", (147, 197, 253), 2)
+        canvas.text(panel_x + 40, 302, "REFERENCE", (147, 197, 253), 2)
+        canvas.text(panel_x + 40, 328, "STROKE 2", (147, 197, 253), 2)
         canvas.text(panel_x + 40, 354, "READY", (147, 197, 253), 2)
 
     canvas.rect(36, 474, 888, 42, (17, 24, 39))
@@ -951,16 +1118,35 @@ def ffmpeg_command(ffmpeg: str, target: Path) -> list[str]:
     ]
 
 
-def _resolve_binary(value: str, label: str) -> str:
+def resolve_binary(value: str, label: str) -> str:
     candidate = Path(value)
     if candidate.is_absolute() or candidate.parent != Path("."):
         if not candidate.is_file():
             raise RuntimeError(f"{label} executable does not exist: {candidate}")
         return str(candidate.resolve())
+    if value == label:
+        for environment_name in (
+            label.upper(),
+            f"{label.upper()}_PATH",
+        ):
+            environment_value = os.environ.get(environment_name)
+            if environment_value and Path(environment_value).is_file():
+                return str(Path(environment_value).resolve())
     resolved = shutil.which(value)
-    if not resolved:
-        raise RuntimeError(f"{label} executable not found: {value}")
-    return resolved
+    if resolved:
+        return resolved
+    if value == label:
+        local_app_data = os.environ.get("LOCALAPPDATA")
+        if local_app_data:
+            executable = f"{label}.exe" if os.name == "nt" else label
+            pattern = (
+                "Microsoft/WinGet/Packages/Gyan.FFmpeg*/"
+                f"**/bin/{executable}"
+            )
+            matches = sorted(Path(local_app_data).glob(pattern))
+            if matches:
+                return str(matches[-1].resolve())
+    raise RuntimeError(f"{label} executable not found: {value}")
 
 
 def _write_text(path: Path, value: str) -> None:
@@ -970,12 +1156,18 @@ def _write_text(path: Path, value: str) -> None:
     partial.replace(path)
 
 
+def _write_bytes(path: Path, value: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    partial = path.with_name(path.name + ".partial")
+    partial.write_bytes(value)
+    partial.replace(path)
+
+
 def generated_text_assets() -> dict[Path, str]:
     states = contract_states()
     return {
         Path("exports/six-shapes.svg"): sprite_svg(),
         Path("evidence.json"): deterministic_json(evidence_document()),
-        Path("reference/reference-raster.json"): deterministic_json(reference_document()),
         Path("snapshots/create-vector-icon-system.svg"): snapshot_svg(),
         Path("snapshots/state-snapshot.json"): deterministic_json(states),
         Path("thumbs/create-vector-icon-system.svg"): thumbnail_svg(),
@@ -983,6 +1175,12 @@ def generated_text_assets() -> dict[Path, str]:
 
 
 def write_text_assets(output_root: Path) -> None:
+    source_reference = ROOT / REFERENCE_RELATIVE
+    target_reference = output_root / REFERENCE_RELATIVE
+    if source_reference.resolve() != target_reference.resolve():
+        _write_bytes(target_reference, source_reference.read_bytes())
+    immutable_reference.cache_clear()
+    immutable_reference(target_reference)
     for relative, content in generated_text_assets().items():
         _write_text(output_root / relative, content)
 
@@ -1093,6 +1291,10 @@ def delivery_document(output_root: Path, ffprobe: str) -> dict[str, object]:
     app = output_root / "apps" / f"{PUBLICATION_ID}.html"
     production = output_root / "channel.production.json"
     evidence = output_root / "evidence.json"
+    reference = output_root / REFERENCE_RELATIVE
+    state_snapshot = output_root / "snapshots" / "state-snapshot.json"
+    readme = output_root / "README.md"
+    renderer = output_root / "render.py"
     required = (
         master,
         mp4,
@@ -1104,6 +1306,10 @@ def delivery_document(output_root: Path, ffprobe: str) -> dict[str, object]:
         app,
         production,
         evidence,
+        reference,
+        state_snapshot,
+        readme,
+        renderer,
     )
     missing = [path for path in required if not path.is_file()]
     if missing:
@@ -1122,11 +1328,18 @@ def delivery_document(output_root: Path, ffprobe: str) -> dict[str, object]:
             "production": _artifact(production, output_root),
             "app": _artifact(app, output_root),
             "evidence": _artifact(evidence, output_root),
+            "reference": _artifact(reference, output_root),
+            "stateSnapshot": _artifact(state_snapshot, output_root),
+            "documentation": _artifact(readme, output_root),
+            "renderer": _artifact(renderer, output_root),
         },
     }
 
 
 def verify_text_assets(output_root: Path) -> None:
+    reference_path = output_root / REFERENCE_RELATIVE
+    immutable_reference.cache_clear()
+    immutable_reference(reference_path)
     for relative, expected in generated_text_assets().items():
         path = output_root / relative
         if not path.is_file():
@@ -1145,6 +1358,10 @@ def render_plan(output_root: Path, ffmpeg: str) -> dict[str, object]:
         "frames": FRAME_COUNT,
         "duration": DURATION,
         "master": str(output_root / "masters" / f"{PUBLICATION_ID}.mkv"),
+        "immutableReference": {
+            "path": str(output_root / REFERENCE_RELATIVE),
+            "sha256": IMMUTABLE_REFERENCE_SHA256,
+        },
         "textArtifacts": [
             relative.as_posix() for relative in generated_text_assets()
         ],
@@ -1182,14 +1399,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             if args.dry_run:
                 print(deterministic_json(render_plan(output_root, args.ffmpeg)), end="")
                 return 0
-            ffmpeg = _resolve_binary(args.ffmpeg, "ffmpeg")
+            ffmpeg = resolve_binary(args.ffmpeg, "ffmpeg")
             write_text_assets(output_root)
             master = render_master(ffmpeg, output_root)
             print(master)
         elif args.command == "delivery":
             if args.dry_run:
                 raise RuntimeError("delivery dry-run is not supported")
-            ffprobe = _resolve_binary(args.ffprobe, "ffprobe")
+            ffprobe = resolve_binary(args.ffprobe, "ffprobe")
             document = delivery_document(output_root, ffprobe)
             path = output_root / "delivery.json"
             _write_text(path, deterministic_json(document))

@@ -13,6 +13,6 @@
   <g transform="translate(696 205) scale(4.8)" fill="none" stroke="#fb7185" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12L6 12L8 6L13 17L16 6L18 12L22 12"/><path d="M4 4L20 4"/></g>
   <text x="638" y="346" fill="#f8fafc" font-family="monospace" font-size="15">1.4757% PIXELS DIFFER</text>
   <rect x="66" y="410" width="828" height="66" rx="12" fill="#102b25"/>
-  <text x="90" y="438" fill="#86efac" font-family="monospace" font-size="16">RESET: ORIGINAL PATHS · STROKE 1.5 · BLOOM SELECTED</text>
+  <text x="90" y="438" fill="#86efac" font-family="monospace" font-size="16">RESET: IMMUTABLE REFERENCE · STROKE 2 · BLOOM SELECTED</text>
   <text x="90" y="463" fill="#86efac" font-family="monospace" font-size="16">ZOOM 800% · OVERLAYS CLEAR · REFERENCE PASS</text>
 </svg>
