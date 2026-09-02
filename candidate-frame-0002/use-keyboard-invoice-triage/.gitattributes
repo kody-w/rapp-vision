@@ -1,0 +1,4 @@
+* text eol=lf
+*.mkv binary
+*.mp4 binary
+*.webm binary
