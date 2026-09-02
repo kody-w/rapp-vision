@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -233,7 +234,7 @@ def _draw_broken_viewport(canvas: Canvas, scroll_x: int = 0) -> None:
     canvas.rect(grid_left + 130, top + 32, 480, 118, (252, 210, 103))
     canvas.text(grid_left + 150, top + 59, "UNBREAKABLE", INK, 2)
     canvas.text(grid_left + 150, top + 88, "BUILD HASH TOKEN", INK, 2)
-    canvas.text(grid_left + 150, top + 117, "MIN WIDTH 480", RED_DARK, 2)
+    canvas.text(grid_left + 150, top + 117, "CONTENT RAIL 480", RED_DARK, 2)
 
     canvas.rect(left, top + 176, client, 18, (203, 211, 213))
     thumb_x = left + 4 + round(scroll_x / 292 * 217)
@@ -252,22 +253,22 @@ def _render_measure(canvas: Canvas, time_seconds: float) -> None:
     canvas.text(620, 329, "612 > 320", RED, 3)
     if time_seconds > 1.2:
         canvas.rect(92, 422, 792, 68, RED_DARK)
-        canvas.text(122, 445, "1FR KEPT THE 480 PX ITEM MINIMUM", PAPER, 3)
+        canvas.text(122, 445, "AUTO MIN KEPT THE 480 PX CONTENT", PAPER, 3)
 
 
 def _render_fix(canvas: Canvas, time_seconds: float) -> None:
-    _header(canvas, "STEP 2 / FIX", "LET THE TRACK SHRINK", GREEN)
+    _header(canvas, "STEP 2 / FIX", "ZERO THE ITEM MINIMUM", GREEN)
     _panel(canvas, 68, 122, 824, 310)
     canvas.text(102, 153, "BROKEN", RED_DARK, 2)
-    canvas.text(102, 187, "GRID COLUMNS  92PX  1FR", INK, 3)
+    canvas.text(102, 187, "PAYLOAD  MIN-WIDTH AUTO", INK, 3)
     canvas.line((428, 213), (550, 213), RED, 5)
     canvas.text(102, 250, "FIXED", GREEN_DARK, 2)
-    canvas.text(102, 284, "92PX  MINMAX(0, 1FR)", GREEN_DARK, 4)
-    canvas.text(102, 341, "PAYLOAD  MIN-WIDTH 0", BLUE, 3)
+    canvas.text(102, 284, "PAYLOAD  MIN-WIDTH 0", GREEN_DARK, 4)
+    canvas.text(102, 341, "92PX  1FR  /  RAIL 480 UNCHANGED", BLUE, 3)
     canvas.rect(68, 455, 824, 56, GREEN)
     label = "SCROLLWIDTH 320 = CLIENTWIDTH 320"
     if time_seconds < 5.0:
-        label = "APPLY BOTH SOURCE CHANGES"
+        label = "CHANGE ONE DECLARATION"
     canvas.centered_text(480, 475, label, PAPER, 3)
 
 
@@ -302,7 +303,7 @@ def _render_restore(canvas: Canvas, time_seconds: float) -> None:
     canvas.text(620, 151, "RESTORED", RED_DARK, 2)
     canvas.text(620, 186, "1FR", INK, 5)
     canvas.text(620, 244, "MIN WIDTH", MUTED, 2)
-    canvas.text(620, 272, "480 PX", RED_DARK, 4)
+    canvas.text(620, 272, "AUTO", RED_DARK, 4)
     canvas.text(620, 329, "X", MUTED, 2)
     canvas.text(656, 319, str(scroll_x), RED, 4)
     canvas.rect(92, 438, 792, 62, RED_DARK)
@@ -379,7 +380,7 @@ def thumbnail_svg(spec: RenderSpec = SPEC) -> str:
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '
         f'{spec.width} {spec.height}" role="img" aria-labelledby="title desc">\n'
         f'  <title id="title">{title}</title>\n'
-        f'  <desc id="desc">A measured CSS Grid track extends beyond a 320 pixel viewport, then minmax and min-width restore equality.</desc>\n'
+        f'  <desc id="desc">A 480 pixel intrinsic rail sets a grid item automatic minimum; changing only min-width to zero restores equality.</desc>\n'
         '  <rect width="960" height="540" fill="#f5f7f4"/>\n'
         '  <path d="M0 48H960M0 96H960M0 144H960M0 192H960M0 240H960M0 288H960M0 336H960M0 384H960M0 432H960M0 480H960" stroke="#d3dcdd"/>\n'
         '  <rect width="960" height="88" fill="#0c1522"/>\n'
@@ -390,11 +391,11 @@ def thumbnail_svg(spec: RenderSpec = SPEC) -> str:
         '  <rect x="94" y="178" width="118" height="118" fill="#2d68c4"/>\n'
         '  <rect x="224" y="178" width="480" height="118" fill="#fcd267"/>\n'
         '  <text x="115" y="246" fill="#fff" font-family="monospace" font-size="22" font-weight="800">META</text>\n'
-        '  <text x="250" y="224" fill="#0c1522" font-family="monospace" font-size="21" font-weight="800">UNBREAKABLE BUILD HASH</text>\n'
-        '  <text x="250" y="264" fill="#7e1e24" font-family="monospace" font-size="19" font-weight="800">MIN-WIDTH: 480PX</text>\n'
+        '  <text x="250" y="224" fill="#0c1522" font-family="monospace" font-size="21" font-weight="800">480PX INTRINSIC RAIL</text>\n'
+        '  <text x="250" y="264" fill="#7e1e24" font-family="monospace" font-size="19" font-weight="800">ITEM MIN-WIDTH: AUTO</text>\n'
         '  <rect x="72" y="389" width="816" height="92" fill="#fff" stroke="#0c1522" stroke-width="4"/>\n'
         '  <text x="104" y="430" fill="#d33a3d" font-family="monospace" font-size="28" font-weight="900">612 &gt; 320</text>\n'
-        '  <text x="330" y="430" fill="#0c1522" font-family="monospace" font-size="22">→ MINMAX(0, 1FR) + MIN-WIDTH: 0 →</text>\n'
+        '  <text x="330" y="430" fill="#0c1522" font-family="monospace" font-size="22">→ MIN-WIDTH: 0 ONLY →</text>\n'
         '  <text x="704" y="430" fill="#1b845b" font-family="monospace" font-size="28" font-weight="900">320 = 320</text>\n'
         '  <text x="104" y="463" fill="#5b6b77" font-family="sans-serif" font-size="18">Exact scrollWidth and clientWidth stay visible.</text>\n'
         '</svg>\n'
@@ -474,16 +475,62 @@ def validate_manifest(path: Path = MANIFEST_PATH, spec: RenderSpec = SPEC) -> No
         raise RuntimeError("production manifest must not define delivery sources")
 
 
-def _resolve_ffmpeg(value: str) -> str:
-    candidate = Path(value)
-    if candidate.is_absolute() or candidate.parent != Path("."):
-        if not candidate.is_file():
-            raise RuntimeError(f"ffmpeg executable does not exist: {candidate}")
-        return str(candidate.resolve())
-    resolved = shutil.which(value)
-    if not resolved:
-        raise RuntimeError(f"ffmpeg executable not found: {value}")
-    return resolved
+def _resolve_executable(value: str) -> str | None:
+    expanded = Path(os.path.expandvars(value)).expanduser()
+    if expanded.is_absolute() or expanded.parent != Path("."):
+        return str(expanded.resolve()) if expanded.is_file() else None
+    return shutil.which(value)
+
+
+def _ffmpeg_common_paths() -> list[Path]:
+    candidates = [
+        Path("/usr/bin/ffmpeg"),
+        Path("/usr/local/bin/ffmpeg"),
+        Path("/opt/homebrew/bin/ffmpeg"),
+        Path("/opt/local/bin/ffmpeg"),
+    ]
+    for variable in ("ProgramFiles", "ProgramFiles(x86)"):
+        root = os.environ.get(variable)
+        if root:
+            candidates.extend(
+                [
+                    Path(root) / "ffmpeg" / "bin" / "ffmpeg.exe",
+                    Path(root) / "FFmpeg" / "bin" / "ffmpeg.exe",
+                ]
+            )
+    local_app_data = os.environ.get("LOCALAPPDATA")
+    if local_app_data:
+        packages = (
+            Path(local_app_data)
+            / "Microsoft"
+            / "WinGet"
+            / "Packages"
+        )
+        if packages.is_dir():
+            for package in sorted(packages.glob("Gyan.FFmpeg.*")):
+                candidates.extend(sorted(package.glob("ffmpeg-*/bin/ffmpeg.exe")))
+    return candidates
+
+
+def _resolve_ffmpeg(value: str | None) -> str:
+    requested = [
+        value,
+        os.environ.get("FRAME_FFMPEG"),
+        os.environ.get("FFMPEG"),
+        "ffmpeg",
+    ]
+    for candidate in requested:
+        if candidate:
+            resolved = _resolve_executable(candidate)
+            if resolved:
+                return resolved
+    for candidate in _ffmpeg_common_paths():
+        if candidate.is_file():
+            return str(candidate.resolve())
+    raise RuntimeError(
+        "ffmpeg executable not found via --ffmpeg, FRAME_FFMPEG, FFMPEG, "
+        "PATH, or common install locations"
+    )
 
 
 def render_master(ffmpeg: str, target: Path, spec: RenderSpec = SPEC) -> None:
@@ -543,7 +590,7 @@ def render(output_root: Path, ffmpeg: str, spec: RenderSpec = SPEC) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--ffmpeg", default="ffmpeg")
+    parser.add_argument("--ffmpeg")
     parser.add_argument("--output-root", type=Path, default=ROOT)
     parser.add_argument("--dry-run", action="store_true")
     return parser
@@ -567,7 +614,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                         "duration": SPEC.duration,
                         "master": str(target),
                         "thumbnail": str(args.output_root / SPEC.thumbnail_relative),
-                        "command": ffmpeg_command(args.ffmpeg, target),
+                        "command": ffmpeg_command(args.ffmpeg or "ffmpeg", target),
                     },
                     indent=2,
                     sort_keys=True,

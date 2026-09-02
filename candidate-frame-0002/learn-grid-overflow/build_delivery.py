@@ -6,6 +6,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -141,9 +143,67 @@ def deterministic_json(value: Any) -> str:
     ) + "\n"
 
 
+def _resolve_executable(value: str) -> str | None:
+    expanded = Path(os.path.expandvars(value)).expanduser()
+    if expanded.is_absolute() or expanded.parent != Path("."):
+        return str(expanded.resolve()) if expanded.is_file() else None
+    return shutil.which(value)
+
+
+def _ffprobe_common_paths() -> list[Path]:
+    candidates = [
+        Path("/usr/bin/ffprobe"),
+        Path("/usr/local/bin/ffprobe"),
+        Path("/opt/homebrew/bin/ffprobe"),
+        Path("/opt/local/bin/ffprobe"),
+    ]
+    for variable in ("ProgramFiles", "ProgramFiles(x86)"):
+        root = os.environ.get(variable)
+        if root:
+            candidates.extend(
+                [
+                    Path(root) / "ffmpeg" / "bin" / "ffprobe.exe",
+                    Path(root) / "FFmpeg" / "bin" / "ffprobe.exe",
+                ]
+            )
+    local_app_data = os.environ.get("LOCALAPPDATA")
+    if local_app_data:
+        packages = (
+            Path(local_app_data)
+            / "Microsoft"
+            / "WinGet"
+            / "Packages"
+        )
+        if packages.is_dir():
+            for package in sorted(packages.glob("Gyan.FFmpeg.*")):
+                candidates.extend(sorted(package.glob("ffmpeg-*/bin/ffprobe.exe")))
+    return candidates
+
+
+def resolve_ffprobe(value: str | None) -> str:
+    requested = [
+        value,
+        os.environ.get("FRAME_FFPROBE"),
+        os.environ.get("FFPROBE"),
+        "ffprobe",
+    ]
+    for candidate in requested:
+        if candidate:
+            resolved = _resolve_executable(candidate)
+            if resolved:
+                return resolved
+    for candidate in _ffprobe_common_paths():
+        if candidate.is_file():
+            return str(candidate.resolve())
+    raise RuntimeError(
+        "ffprobe executable not found via --ffprobe, FRAME_FFPROBE, FFPROBE, "
+        "PATH, or common install locations"
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--ffprobe", default="ffprobe")
+    parser.add_argument("--ffprobe")
     parser.add_argument("--check", action="store_true")
     return parser
 
@@ -151,7 +211,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
-        content = deterministic_json(delivery_document(args.ffprobe))
+        content = deterministic_json(delivery_document(resolve_ffprobe(args.ffprobe)))
         if args.check:
             if not OUTPUT_PATH.is_file():
                 raise RuntimeError(f"delivery file does not exist: {OUTPUT_PATH}")

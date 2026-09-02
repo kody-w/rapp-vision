@@ -1,4 +1,4 @@
-"""Exact offline contracts for candidate frame 0002-04."""
+"""Portable, exact contracts for candidate frame 0002-04."""
 
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ import ast
 import hashlib
 import importlib.util
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -19,6 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CANDIDATE = ROOT / "candidate-frame-0002" / "learn-grid-overflow"
 APP_PATH = CANDIDATE / "apps" / "learn-grid-overflow.html"
+README_PATH = CANDIDATE / "README.md"
 MANIFEST_PATH = CANDIDATE / "channel.production.json"
 CHANNEL_PATH = CANDIDATE / "channel.json"
 EVIDENCE_PATH = CANDIDATE / "evidence.json"
@@ -30,14 +32,6 @@ THUMB_PATH = CANDIDATE / "thumbs" / "learn-grid-overflow.svg"
 COMPILER_PATH = ROOT / "scripts" / "compile_publications.py"
 VALIDATOR_PATH = ROOT / "scripts" / "validate_publications.py"
 POLICY_PATH = ROOT / "policy" / "legacy-publications.json"
-FFMPEG_BIN = Path(
-    r"C:\Users\kowildfe\AppData\Local\Microsoft\WinGet\Packages"
-    r"\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe"
-    r"\ffmpeg-8.1.1-essentials_build\bin"
-)
-FFMPEG = FFMPEG_BIN / "ffmpeg.exe"
-FFPROBE = FFMPEG_BIN / "ffprobe.exe"
-EDGE = Path(r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe")
 
 EXPECTED_ACTION_SELECTORS = [
     "#inspect-btn",
@@ -55,6 +49,7 @@ REQUIRED_IDS = {
     "preview-viewport",
     "fixture-grid",
     "payload",
+    "token-rail",
     "fixture-token",
     "viewport-value",
     "scroll-width",
@@ -72,10 +67,10 @@ REQUIRED_IDS = {
     "contract-states",
 }
 FRAME_SAMPLES = {
-    0: "d05fd88895ec1e1f02355cbe22e3f3f9442de4543249a766ffa5dd6e0c29ad29",
-    48: "1979c54d216745f66249d6f0f9c34d8febd717195cf7f0da91fc5b5b08bb2f10",
+    0: "988f000b2d514c368300a0c24242f8fdd4b0ef8d82c9f09d319ec3a1f082d7a9",
+    48: "3cf3a10ca0948549710916f51effac9b0028ae530362d8de7f00bc9172863652",
     96: "6b9734d801c9dd2c97d438e0df9a2dc2130cd7c37b388904597dfc14deb2eb3f",
-    132: "d6058e90c1b491f2a16ec14f11a06380b6896bf85458ca74b7fe93bbec6eae4d",
+    132: "504194fd91a1b5685540b046b868ad9c5059bc4a877ee106af6b339041c53da8",
     168: "1126a00a761fa9e9822bef87adcf7912063f6b31f68bbc1a24775f17cb8c2429",
     215: "05ba5aadee478a7d07338708c3bfda358adaa58d428e655b58ea290e44136b0e",
 }
@@ -99,6 +94,114 @@ DELIVERY_BUILDER = load_module(
 )
 COMPILER = load_module("frame_0002_04_compiler", COMPILER_PATH)
 VALIDATOR = load_module("frame_0002_04_validator", VALIDATOR_PATH)
+
+
+def executable(value: str | None) -> str | None:
+    if not value:
+        return None
+    expanded = Path(os.path.expandvars(value)).expanduser()
+    if expanded.is_absolute() or expanded.parent != Path("."):
+        return str(expanded.resolve()) if expanded.is_file() else None
+    return shutil.which(value)
+
+
+def discover(
+    environment: tuple[str, ...],
+    names: tuple[str, ...],
+    common: tuple[Path, ...],
+) -> str | None:
+    for variable in environment:
+        resolved = executable(os.environ.get(variable))
+        if resolved:
+            return resolved
+    for name in names:
+        resolved = shutil.which(name)
+        if resolved:
+            return resolved
+    for path in common:
+        if path.is_file():
+            return str(path.resolve())
+    return None
+
+
+def common_browser_paths() -> tuple[Path, ...]:
+    paths = [
+        Path("/usr/bin/google-chrome"),
+        Path("/usr/bin/google-chrome-stable"),
+        Path("/usr/bin/chromium"),
+        Path("/usr/bin/chromium-browser"),
+        Path("/opt/google/chrome/chrome"),
+        Path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
+        Path("/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"),
+    ]
+    for variable in ("ProgramFiles", "ProgramFiles(x86)", "LOCALAPPDATA"):
+        root = os.environ.get(variable)
+        if root:
+            paths.extend(
+                [
+                    Path(root) / "Microsoft" / "Edge" / "Application" / "msedge.exe",
+                    Path(root) / "Google" / "Chrome" / "Application" / "chrome.exe",
+                ]
+            )
+    return tuple(paths)
+
+
+def common_node_paths() -> tuple[Path, ...]:
+    paths = [Path("/usr/bin/node"), Path("/usr/local/bin/node")]
+    for variable in ("ProgramFiles", "ProgramFiles(x86)"):
+        root = os.environ.get(variable)
+        if root:
+            paths.append(Path(root) / "nodejs" / "node.exe")
+    return tuple(paths)
+
+
+NODE = discover(("FRAME_NODE",), ("node", "nodejs"), common_node_paths())
+BROWSER = discover(
+    ("FRAME_BROWSER", "BROWSER", "EDGE_PATH", "CHROME_PATH"),
+    (
+        "msedge",
+        "microsoft-edge",
+        "microsoft-edge-stable",
+        "google-chrome",
+        "google-chrome-stable",
+        "chromium",
+        "chromium-browser",
+    ),
+    common_browser_paths(),
+)
+try:
+    FFMPEG = RENDERER._resolve_ffmpeg(None)
+except RuntimeError:
+    FFMPEG = None
+try:
+    FFPROBE = DELIVERY_BUILDER.resolve_ffprobe(None)
+except RuntimeError:
+    FFPROBE = None
+
+
+def truthy(value: str | None) -> bool:
+    return bool(value and value.strip().lower() in {"1", "true", "yes", "on"})
+
+
+RELEASE_MODE = truthy(os.environ.get("CI")) or truthy(
+    os.environ.get("FRAME_0002_04_RELEASE")
+)
+REQUIRED_RELEASE_TOOLS = {
+    "Node.js": NODE,
+    "Edge/Chrome": BROWSER,
+    "FFmpeg": FFMPEG,
+    "FFprobe": FFPROBE,
+}
+
+
+def require_tools(test: unittest.TestCase, **tools: str | None) -> None:
+    missing = [name for name, path in tools.items() if not path]
+    if not missing:
+        return
+    message = "required tool(s) not found: " + ", ".join(missing)
+    if RELEASE_MODE:
+        test.fail(message)
+    test.skipTest(message)
 
 
 class AppIndex(HTMLParser):
@@ -141,7 +244,7 @@ def is_subsequence(needle, haystack):
     return all(any(candidate == item for candidate in cursor) for item in needle)
 
 
-class TestFrame000204SourceContract(unittest.TestCase):
+class TestFrame000204AlwaysOn(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.manifest = load_json(MANIFEST_PATH)
@@ -170,19 +273,16 @@ class TestFrame000204SourceContract(unittest.TestCase):
         self.assertNotIn("sources", self.video)
         self.assertEqual(self.video["live"]["kind"], "rapp-vision-live/1.0")
         self.assertEqual(self.video["live"]["duration"], 18)
+        scene = self.video["live"]["scenes"][0]
         self.assertEqual(
-            [action["selector"] for action in self.video["live"]["scenes"][0]["actions"]],
+            [action["selector"] for action in scene["actions"]],
             EXPECTED_ACTION_SELECTORS,
         )
-        self.assertTrue(
-            all(
-                action["at"] < self.video["live"]["scenes"][0]["dur"]
-                for action in self.video["live"]["scenes"][0]["actions"]
-            )
-        )
+        self.assertTrue(all(action["at"] < scene["dur"] for action in scene["actions"]))
         self.assertIn("scrollWidth 612 > clientWidth 320", self.video["description"])
-        self.assertIn("minmax(0, 1fr)", self.video["description"])
-        self.assertIn("min-width: 0", self.video["description"])
+        self.assertIn("min-width: auto", self.video["description"])
+        self.assertIn("changes only that declaration", self.video["description"])
+        self.assertNotIn("minmax(0, 1fr)", self.video["description"])
 
     def test_evidence_and_embedded_snapshots_are_exact(self):
         self.assertEqual(
@@ -206,11 +306,11 @@ class TestFrame000204SourceContract(unittest.TestCase):
                     resolve_path(claim["expectedState"], assertion["path"]),
                     assertion["equals"],
                 )
-
         reset = self.claims["reset"]["expectedState"]
         failure = self.claims["failure"]["expectedState"]
         self.assertEqual(failure["cssText"], reset["cssText"])
         self.assertEqual(failure["token"], reset["token"])
+        self.assertEqual(failure["cause"], reset["cause"])
         self.assertGreater(failure["x"], 0)
         self.assertEqual(reset["x"], 0)
         self.assertEqual(
@@ -222,41 +322,76 @@ class TestFrame000204SourceContract(unittest.TestCase):
             ],
         )
 
+    def test_the_advertised_fix_changes_exactly_one_declaration(self):
+        before = self.claims["reset"]["expectedState"]["cssText"].splitlines()
+        after = self.claims["positive"]["expectedState"]["cssText"].splitlines()
+        self.assertEqual(len(before), len(after))
+        changed = [
+            (old, new)
+            for old, new in zip(before, after)
+            if old != new
+        ]
+        self.assertEqual(
+            changed,
+            [("  min-width: auto;", "  min-width: 0;")],
+        )
+        source_fix = self.publication["sourceFix"]
+        self.assertEqual(source_fix["changedDeclarations"], 1)
+        self.assertEqual(source_fix["before"], ["min-width: auto;"])
+        self.assertEqual(source_fix["after"], ["min-width: 0;"])
+        self.assertEqual(
+            source_fix["unchanged"],
+            [
+                "grid-template-columns: 92px 1fr;",
+                "overflow: clip;",
+                "width: 480px;",
+            ],
+        )
+
     def test_live_replay_covers_success_failure_and_exact_reset(self):
-        live_actions = EXPECTED_ACTION_SELECTORS
         for claim_id in ("positive", "failure", "reset"):
             selectors = [
                 action["selector"] for action in self.claims[claim_id]["actions"]
             ]
             self.assertTrue(
-                is_subsequence(selectors, live_actions),
-                (claim_id, selectors, live_actions),
+                is_subsequence(selectors, EXPECTED_ACTION_SELECTORS),
+                (claim_id, selectors, EXPECTED_ACTION_SELECTORS),
             )
         scene = self.video["live"]["scenes"][0]
         self.assertEqual(scene["t"], 0)
         self.assertEqual(scene["dur"], self.video["live"]["duration"])
         self.assertEqual(scene["ready"], {"selector": "#inspect-btn"})
 
-    def test_html_is_standalone_original_and_inspectable(self):
+    def test_html_is_standalone_original_and_measures_the_real_dom(self):
         index = AppIndex()
         index.feed(self.source)
         self.assertEqual(index.resources, [])
         self.assertTrue(REQUIRED_IDS <= index.ids)
-        self.assertIn('<html lang="en">', self.source)
-        self.assertIn("window.gridOverflowLesson = contract", self.source)
-        self.assertIn("window.tinySystem = contract", self.source)
-        self.assertIn("function initialState()", self.source)
-        self.assertIn("function reduce(state, action)", self.source)
-        self.assertIn("function snapshot(value = state)", self.source)
-        self.assertIn('data-reset="exact"', self.source)
-        self.assertIn("Restore broken CSS", self.source)
-        self.assertIn("Scroll to x = 0", self.source)
-        self.assertIn("grid-template-columns: 92px minmax(0, 1fr);", self.source)
-        self.assertIn("min-width: 0;", self.source)
-        self.assertIn("overflow-wrap: anywhere;", self.source)
-        self.assertIn("scrollWidth", self.source)
-        self.assertIn("clientWidth", self.source)
-
+        for value in (
+            '<html lang="en">',
+            "window.gridOverflowLesson = contract",
+            "window.tinySystem = contract",
+            "function initialState()",
+            "function reduce(state, action)",
+            "function readDomMetrics(viewport)",
+            "function snapshot(value = state)",
+            'data-reset="exact"',
+            "Restore broken CSS",
+            "Scroll to x = 0",
+            "grid-template-columns: 92px 1fr;",
+            "min-width: auto;",
+            "min-width: 0;",
+            "overflow: clip;",
+            "width: 480px;",
+            "preview.scrollWidth",
+            "preview.clientWidth",
+            "preview.scrollLeft",
+            "getComputedStyle(payload)",
+        ):
+            self.assertIn(value, self.source)
+        self.assertNotIn("BROKEN_SCROLL_WIDTH", self.source)
+        self.assertNotIn("expectedMetrics", self.source)
+        self.assertNotIn("overflow-wrap: anywhere", self.source)
         forbidden = (
             r"\bfetch\s*\(",
             r"\bXMLHttpRequest\b",
@@ -278,7 +413,7 @@ class TestFrame000204SourceContract(unittest.TestCase):
                 pattern,
             )
 
-    def test_source_math_proves_the_commission(self):
+    def test_recorded_browser_geometry_proves_the_automatic_minimum(self):
         measurements = self.publication["measurements"]
         opening = measurements["opening"]
         fixed = measurements["fixed"]
@@ -287,59 +422,58 @@ class TestFrame000204SourceContract(unittest.TestCase):
         self.assertEqual(opening["clientWidth"], opening["viewport"])
         self.assertGreater(opening["scrollWidth"], opening["clientWidth"])
         self.assertEqual(opening["scrollWidth"] - opening["clientWidth"], 292)
-        self.assertEqual(fixed["320"], {"clientWidth": 320, "scrollWidth": 320})
         self.assertEqual(
-            fixed["1280"],
-            {"clientWidth": 1280, "scrollWidth": 1280},
+            opening["cause"],
+            {
+                "itemMinWidth": "auto",
+                "itemOverflow": "clip",
+                "payloadWidth": 480,
+                "railWidth": 480,
+            },
         )
+        self.assertEqual(fixed["320"]["scrollWidth"], 320)
+        self.assertEqual(fixed["320"]["clientWidth"], 320)
+        self.assertEqual(fixed["320"]["cause"]["payloadWidth"], 174)
+        self.assertEqual(fixed["320"]["cause"]["railWidth"], 480)
+        self.assertEqual(fixed["1280"]["scrollWidth"], 1280)
+        self.assertEqual(fixed["1280"]["clientWidth"], 1280)
+        self.assertEqual(fixed["1280"]["cause"]["payloadWidth"], 1134)
         self.assertEqual(restored["scrollWidth"], opening["scrollWidth"])
         self.assertEqual(restored["clientWidth"], opening["clientWidth"])
+        self.assertEqual(restored["cause"], opening["cause"])
         self.assertEqual(restored["x"], 292)
 
-    def test_rights_privacy_and_no_external_resources_are_attested(self):
-        rights = self.evidence["rightsPrivacy"]
-        self.assertTrue(rights["rightsAttestation"])
-        self.assertTrue(rights["privacyAttestation"])
-        self.assertTrue(rights["noSecrets"])
-        self.assertTrue(rights["originalFixture"])
-        self.assertEqual(rights["externalResources"], [])
-
-
-@unittest.skipUnless(
-    EDGE.is_file() and shutil.which("node"),
-    "Edge and Node.js are required for exact DOM verification",
-)
-class TestFrame000204BrowserDOM(unittest.TestCase):
-    def test_actual_dom_measurements_actions_and_reset(self):
-        profile = CANDIDATE / "_test-browser-profile"
-        shutil.rmtree(profile, ignore_errors=True)
-        completed = subprocess.run(
-            [
-                shutil.which("node"),
-                str(DOM_VERIFIER_PATH),
-                str(EDGE),
-                str(APP_PATH),
-                str(EVIDENCE_PATH),
-                str(profile),
-            ],
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=60,
+    def test_compiled_channel_schema_and_registry_policy_always_validate(self):
+        compilation = COMPILER.prepare_compilation(MANIFEST_PATH)
+        self.assertEqual(load_json(CHANNEL_PATH), compilation.channel)
+        policy = load_json(POLICY_PATH)
+        errors = VALIDATOR.validate_channel(
+            compilation.channel,
+            "https://example.test/candidate-frame-0002/learn-grid-overflow/channel.json",
+            policy,
         )
-        self.assertEqual(completed.returncode, 0, completed.stderr)
-        result = json.loads(completed.stdout)
-        self.assertEqual(result["opening"], "612>320")
-        self.assertEqual(result["fixed320"], "320=320")
-        self.assertEqual(result["fixed1280"], "1280=1280")
-        self.assertEqual(result["restoredX"], 292)
-        self.assertEqual(result["resetX"], 0)
-        self.assertEqual(result["browserErrors"], 0)
-        shutil.rmtree(profile, ignore_errors=True)
+        self.assertEqual(errors, [])
 
+    def test_delivery_schema_and_hashes_always_validate(self):
+        delivery = load_json(DELIVERY_PATH)
+        self.assertEqual(delivery["schema"], "candidate-frame-delivery/1.0")
+        self.assertEqual(delivery["channel"], "candidate-frame-0002-04")
+        self.assertEqual(delivery["publication"], "learn-grid-overflow")
+        self.assertEqual(set(delivery["artifacts"]), set(DELIVERY_BUILDER.FILES))
+        for relative, record in delivery["artifacts"].items():
+            path = CANDIDATE / relative
+            self.assertTrue(path.is_file(), path)
+            content = path.read_bytes()
+            self.assertEqual(record["path"], relative)
+            self.assertEqual(record["bytes"], len(content))
+            self.assertEqual(
+                record["sha256"], hashlib.sha256(content).hexdigest()
+            )
+        self.assertEqual(delivery["media"]["master"]["codec"], "ffv1")
+        self.assertEqual(delivery["media"]["mp4"]["codec"], "h264")
+        self.assertEqual(delivery["media"]["webm"]["codec"], "vp9")
 
-class TestFrame000204Renderer(unittest.TestCase):
-    def test_renderer_is_standard_library_and_has_fixed_contract(self):
+    def test_renderer_frames_and_thumbnail_are_byte_stable(self):
         tree = ast.parse(RENDERER_PATH.read_text(encoding="utf-8"))
         imported = set()
         for node in ast.walk(tree):
@@ -355,6 +489,7 @@ class TestFrame000204Renderer(unittest.TestCase):
                 "dataclasses",
                 "hashlib",
                 "json",
+                "os",
                 "pathlib",
                 "shutil",
                 "subprocess",
@@ -376,19 +511,9 @@ class TestFrame000204Renderer(unittest.TestCase):
             (960, 540, 12, 216, 18),
         )
         command = RENDERER.ffmpeg_command("fixed-ffmpeg", Path("master.mkv"))
-        for value in (
-            "rawvideo",
-            "rgb24",
-            "pipe:0",
-            "ffv1",
-            "bgr0",
-            "+bitexact",
-        ):
+        for value in ("rawvideo", "rgb24", "pipe:0", "ffv1", "bgr0", "+bitexact"):
             self.assertIn(value, command)
         self.assertEqual(command[command.index("-threads") + 1], "1")
-        self.assertEqual(command[-1], "master.mkv")
-
-    def test_renderer_frame_samples_are_byte_stable(self):
         for frame_index, expected in FRAME_SAMPLES.items():
             with self.subTest(frame=frame_index):
                 self.assertEqual(RENDERER.frame_digest(frame_index), expected)
@@ -397,8 +522,6 @@ class TestFrame000204Renderer(unittest.TestCase):
             len(RENDERER.frame_rgb(RENDERER.SPEC, 0)),
             960 * 540 * 3,
         )
-
-    def test_thumbnail_is_safe_and_exactly_renderer_owned(self):
         source = THUMB_PATH.read_text(encoding="utf-8")
         self.assertEqual(source, RENDERER.thumbnail_svg())
         root = ET.fromstring(source)
@@ -415,49 +538,145 @@ class TestFrame000204Renderer(unittest.TestCase):
                 self.assertNotIn("data:", value.lower())
                 self.assertNotIn("url(", value.lower())
 
+    def test_rights_privacy_and_portable_docs_are_attested(self):
+        rights = self.evidence["rightsPrivacy"]
+        self.assertTrue(rights["rightsAttestation"])
+        self.assertTrue(rights["privacyAttestation"])
+        self.assertTrue(rights["noSecrets"])
+        self.assertTrue(rights["originalFixture"])
+        self.assertEqual(rights["externalResources"], [])
+        for path in (
+            README_PATH,
+            RENDERER_PATH,
+            DELIVERY_BUILDER_PATH,
+            DOM_VERIFIER_PATH,
+        ):
+            self.assertNotIn("kowildfe", path.read_text(encoding="utf-8").lower())
+        readme = README_PATH.read_text(encoding="utf-8")
+        self.assertIn("FRAME_BROWSER", readme)
+        self.assertIn("FRAME_FFMPEG", readme)
+        self.assertIn("FRAME_0002_04_RELEASE=1", readme)
 
-@unittest.skipUnless(
-    FFMPEG.is_file() and FFPROBE.is_file(),
-    "the commissioned fixed FFmpeg 8.1.1 build is required",
-)
-class TestFrame000204CompiledDelivery(unittest.TestCase):
-    def test_compiled_channel_matches_existing_compiler_and_validator(self):
-        compilation = COMPILER.prepare_compilation(MANIFEST_PATH)
-        self.assertEqual(load_json(CHANNEL_PATH), compilation.channel)
-        policy = load_json(POLICY_PATH)
-        errors = VALIDATOR.validate_channel(
-            compilation.channel,
-            "https://example.test/candidate-frame-0002/learn-grid-overflow/channel.json",
-            policy,
+
+class TestFrame000204ReleaseGate(unittest.TestCase):
+    def test_release_requires_the_full_execution_toolchain(self):
+        if not RELEASE_MODE:
+            self.skipTest(
+                "set FRAME_0002_04_RELEASE=1 (CI implies it) to require tools"
+            )
+        missing = [
+            name for name, path in REQUIRED_RELEASE_TOOLS.items() if not path
+        ]
+        self.assertEqual(
+            missing,
+            [],
+            "release validation cannot skip missing tools: " + ", ".join(missing),
         )
-        self.assertEqual(errors, [])
+
+
+class TestFrame000204BrowserExecution(unittest.TestCase):
+    def test_real_edge_or_chrome_measurements_actions_and_reset(self):
+        require_tools(self, Node=NODE, Browser=BROWSER)
+        profile = CANDIDATE / "_test-browser-profile"
+        shutil.rmtree(profile, ignore_errors=True)
+        try:
+            completed = subprocess.run(
+                [
+                    NODE,
+                    str(DOM_VERIFIER_PATH),
+                    BROWSER,
+                    str(APP_PATH),
+                    str(EVIDENCE_PATH),
+                    str(profile),
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            result = json.loads(completed.stdout)
+            self.assertRegex(result["browser"], r"(Chrome|Chromium|Edge|Edg)/")
+            self.assertEqual(result["opening"], "612>320")
+            self.assertEqual(result["fixed320"], "320=320")
+            self.assertEqual(result["fixed1280"], "1280=1280")
+            self.assertEqual(result["sourceChanges"], 1)
+            self.assertEqual(result["fixedPayload320"], 174)
+            self.assertEqual(result["restoredX"], 292)
+            self.assertEqual(result["resetX"], 0)
+            self.assertEqual(result["browserErrors"], 0)
+        finally:
+            shutil.rmtree(profile, ignore_errors=True)
+
+
+class TestFrame000204MediaExecution(unittest.TestCase):
+    def test_lossless_master_decodes_to_the_renderer_frames(self):
+        require_tools(self, FFmpeg=FFMPEG)
+        frame_size = RENDERER.SPEC.width * RENDERER.SPEC.height * 3
+        process = subprocess.Popen(
+            [
+                FFMPEG,
+                "-v",
+                "error",
+                "-i",
+                str(CANDIDATE / RENDERER.SPEC.master_relative),
+                "-map",
+                "0:v:0",
+                "-f",
+                "rawvideo",
+                "-pix_fmt",
+                "rgb24",
+                "pipe:1",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        self.assertIsNotNone(process.stdout)
+        self.assertIsNotNone(process.stderr)
+
+        def read_exact(size):
+            chunks = []
+            remaining = size
+            while remaining:
+                chunk = process.stdout.read(remaining)
+                if not chunk:
+                    break
+                chunks.append(chunk)
+                remaining -= len(chunk)
+            return b"".join(chunks)
+
+        for frame_index in range(RENDERER.SPEC.frame_count):
+            frame = read_exact(frame_size)
+            self.assertEqual(len(frame), frame_size, frame_index)
+            if frame_index in FRAME_SAMPLES:
+                self.assertEqual(
+                    hashlib.sha256(frame).hexdigest(),
+                    FRAME_SAMPLES[frame_index],
+                    frame_index,
+                )
+        self.assertEqual(process.stdout.read(1), b"")
+        stderr = process.stderr.read().decode("utf-8", errors="replace").strip()
+        return_code = process.wait()
+        process.stdout.close()
+        process.stderr.close()
+        self.assertEqual(return_code, 0, stderr)
+
+    def test_real_ffprobe_matches_delivery_and_publication_contracts(self):
+        require_tools(self, FFprobe=FFPROBE)
+        compilation = COMPILER.prepare_compilation(MANIFEST_PATH)
         self.assertEqual(
             VALIDATOR.ffprobe_local_media(
                 compilation.channel,
                 CHANNEL_PATH,
-                executable=str(FFPROBE),
+                executable=FFPROBE,
             ),
             [],
         )
-
-    def test_delivery_hashes_codecs_color_and_duration_are_exact(self):
         delivery = load_json(DELIVERY_PATH)
-        self.assertEqual(delivery["schema"], "candidate-frame-delivery/1.0")
-        self.assertEqual(delivery["channel"], "candidate-frame-0002-04")
-        self.assertEqual(delivery["publication"], "learn-grid-overflow")
         self.assertEqual(
             delivery,
-            DELIVERY_BUILDER.delivery_document(str(FFPROBE)),
+            DELIVERY_BUILDER.delivery_document(FFPROBE),
         )
-        for relative, record in delivery["artifacts"].items():
-            path = CANDIDATE / relative
-            self.assertTrue(path.is_file(), path)
-            content = path.read_bytes()
-            self.assertEqual(record["bytes"], len(content))
-            self.assertEqual(
-                record["sha256"], hashlib.sha256(content).hexdigest()
-            )
-
         master = delivery["media"]["master"]
         self.assertEqual(master["codec"], "ffv1")
         self.assertEqual(master["pixelFormat"], "bgr0")
@@ -473,7 +692,8 @@ class TestFrame000204CompiledDelivery(unittest.TestCase):
                 self.assertEqual(record["colorPrimaries"], "bt709")
                 self.assertEqual(record["colorRange"], "tv")
 
-    def test_existing_compiler_rebuild_is_byte_stable(self):
+    def test_compiler_rebuild_is_deterministic_with_discovered_tools(self):
+        require_tools(self, FFmpeg=FFMPEG, FFprobe=FFPROBE)
         outputs = [
             CANDIDATE / "_test-rebuild-a",
             CANDIDATE / "_test-rebuild-b",
@@ -485,8 +705,8 @@ class TestFrame000204CompiledDelivery(unittest.TestCase):
                 compilation = COMPILER.prepare_compilation(MANIFEST_PATH, output)
                 COMPILER.build_compilation(
                     compilation,
-                    ffmpeg=str(FFMPEG),
-                    ffprobe=str(FFPROBE),
+                    ffmpeg=FFMPEG,
+                    ffprobe=FFPROBE,
                 )
             for relative in (
                 Path("channel.json"),
@@ -500,11 +720,10 @@ class TestFrame000204CompiledDelivery(unittest.TestCase):
                     hashlib.sha256(second).hexdigest(),
                     relative,
                 )
-                self.assertEqual(
-                    hashlib.sha256(first).hexdigest(),
-                    hashlib.sha256((CANDIDATE / relative).read_bytes()).hexdigest(),
-                    relative,
-                )
+            self.assertEqual(
+                (outputs[0] / "channel.json").read_bytes(),
+                CHANNEL_PATH.read_bytes(),
+            )
         finally:
             for output in outputs:
                 shutil.rmtree(output, ignore_errors=True)

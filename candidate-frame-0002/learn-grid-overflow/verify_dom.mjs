@@ -1,19 +1,22 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { readFile, rm } from "node:fs/promises";
+import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
-const [edgePath, appPath, evidencePath, profilePath] = process.argv.slice(2);
-if (!edgePath || !appPath || !evidencePath || !profilePath) {
+const [browserPath, appPath, evidencePath, profilePath] = process.argv.slice(2);
+if (!browserPath || !appPath || !evidencePath || !profilePath) {
   throw new Error(
-    "usage: node verify_dom.mjs <edge> <app> <evidence> <profile>"
+    "usage: node verify_dom.mjs <edge-or-chrome> <app> <evidence> <profile>"
   );
 }
 
 await rm(profilePath, { recursive: true, force: true });
-const browser = spawn(edgePath, [
+const browser = spawn(browserPath, [
   "--headless=new",
   "--disable-gpu",
+  "--disable-dev-shm-usage",
+  "--no-sandbox",
   "--no-first-run",
   "--no-default-browser-check",
   "--remote-debugging-port=0",
@@ -24,7 +27,7 @@ const browser = spawn(edgePath, [
 const delay = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
 async function waitForActivePort(timeout = 15000) {
-  const activePortPath = `${profilePath}\\DevToolsActivePort`;
+  const activePortPath = join(profilePath, "DevToolsActivePort");
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
     try {
@@ -161,6 +164,9 @@ async function setViewport(width, height = 900) {
 async function assertDisplayed(snapshot) {
   const displayed = await evaluate(`(() => {
     const preview = document.querySelector("#preview-viewport");
+    const payload = document.querySelector("#payload");
+    const rail = document.querySelector("#token-rail");
+    const itemStyle = getComputedStyle(payload);
     return {
       viewport: document.querySelector("#viewport-value").textContent,
       scrollWidth: document.querySelector("#scroll-width").textContent,
@@ -170,7 +176,13 @@ async function assertDisplayed(snapshot) {
       token: document.querySelector("#fixture-token").textContent,
       domScrollWidth: preview.scrollWidth,
       domClientWidth: preview.clientWidth,
-      domX: Math.round(preview.scrollLeft)
+      domX: Math.round(preview.scrollLeft),
+      cause: {
+        itemMinWidth: itemStyle.minWidth,
+        itemOverflow: itemStyle.overflow,
+        payloadWidth: payload.offsetWidth,
+        railWidth: rail.offsetWidth
+      }
     };
   })()`);
   const operator = snapshot.verdict === "overflow" ? ">" : "=";
@@ -186,15 +198,22 @@ async function assertDisplayed(snapshot) {
   assert.equal(displayed.domScrollWidth, snapshot.scrollWidth);
   assert.equal(displayed.domClientWidth, snapshot.clientWidth);
   assert.equal(displayed.domX, snapshot.x);
+  assert.deepEqual(displayed.cause, snapshot.cause);
 }
 
 try {
   const { port } = await waitForActivePort();
   const targets = await readJson(`http://127.0.0.1:${port}/json/list`);
   const pageTarget = targets.find(target => target.type === "page");
-  assert.ok(pageTarget?.webSocketDebuggerUrl, "Edge exposed no page target");
+  assert.ok(pageTarget?.webSocketDebuggerUrl, "browser exposed no page target");
   cdp = new Cdp(pageTarget.webSocketDebuggerUrl);
   await cdp.connect();
+  const browserVersion = await cdp.command("Browser.getVersion");
+  assert.match(
+    browserVersion.product,
+    /(Chrome|Chromium|Edge|Edg)\//,
+    "verification requires an Edge/Chrome-family browser"
+  );
   await Promise.all([
     cdp.command("Page.enable"),
     cdp.command("Runtime.enable"),
@@ -227,6 +246,12 @@ try {
   const opening = await evaluate("window.gridOverflowLesson.snapshot()");
   assert.deepEqual(opening, claims.get("reset").expectedState);
   assert.ok(opening.scrollWidth > opening.clientWidth);
+  assert.deepEqual(opening.cause, {
+    itemMinWidth: "auto",
+    itemOverflow: "clip",
+    payloadWidth: 480,
+    railWidth: 480,
+  });
   await assertDisplayed(opening);
   await setViewport(320);
   assert.equal(
@@ -253,9 +278,32 @@ try {
     if (claimId === "positive") {
       assert.equal(actual.checks["320"].scrollWidth, actual.checks["320"].clientWidth);
       assert.equal(actual.checks["1280"].scrollWidth, actual.checks["1280"].clientWidth);
+      assert.deepEqual(actual.checks["320"].cause, {
+        itemMinWidth: "0px",
+        itemOverflow: "clip",
+        payloadWidth: 174,
+        railWidth: 480,
+      });
+      assert.deepEqual(actual.checks["1280"].cause, {
+        itemMinWidth: "0px",
+        itemOverflow: "clip",
+        payloadWidth: 1134,
+        railWidth: 480,
+      });
+      const before = claims.get("reset").expectedState.cssText.split("\n");
+      const after = actual.cssText.split("\n");
+      assert.equal(before.length, after.length);
+      const changed = before
+        .map((line, index) => ({ before: line, after: after[index] }))
+        .filter(pair => pair.before !== pair.after);
+      assert.deepEqual(changed, [
+        { before: "  min-width: auto;", after: "  min-width: 0;" },
+      ]);
     } else {
       assert.ok(actual.x > 0);
       assert.ok(actual.scrollWidth > actual.clientWidth);
+      assert.equal(actual.cause.itemMinWidth, "auto");
+      assert.equal(actual.cause.payloadWidth, 480);
     }
   }
 
@@ -268,9 +316,12 @@ try {
   assert.deepEqual(browserErrors, []);
 
   console.log(JSON.stringify({
+    browser: browserVersion.product,
     opening: `${opening.scrollWidth}>${opening.clientWidth}`,
     fixed320: `${claims.get("positive").expectedState.checks["320"].scrollWidth}=${claims.get("positive").expectedState.checks["320"].clientWidth}`,
     fixed1280: `${claims.get("positive").expectedState.checks["1280"].scrollWidth}=${claims.get("positive").expectedState.checks["1280"].clientWidth}`,
+    sourceChanges: 1,
+    fixedPayload320: claims.get("positive").expectedState.checks["320"].cause.payloadWidth,
     restoredX: claims.get("failure").expectedState.x,
     resetX: resetState.x,
     browserErrors: browserErrors.length,

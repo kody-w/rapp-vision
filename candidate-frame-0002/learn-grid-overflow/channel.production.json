@@ -7,7 +7,7 @@
   "id": "candidate-frame-0002-04",
   "name": "Candidate Frame 0002 · Grid Overflow",
   "schema": "rapp-vision-production/1.0",
-  "tagline": "Measure the automatic minimum, fix the track, then undo it exactly.",
+  "tagline": "Measure the automatic minimum, change one declaration, then undo it exactly.",
   "videos": [
     {
       "chapters": [
@@ -16,7 +16,7 @@
           "t": 0
         },
         {
-          "label": "Apply minmax and min-width",
+          "label": "Zero the item minimum",
           "t": 4
         },
         {
@@ -32,7 +32,7 @@
           "t": 14
         }
       ],
-      "description": "A measured CSS Grid lesson shows an unbreakable token forcing scrollWidth 612 > clientWidth 320. The paired live proof applies minmax(0, 1fr) and min-width: 0, verifies equality at 320 and 1280 px, restores the broken source and horizontal scroll, then performs the exact three-step reset to x = 0.",
+      "description": "A measured CSS Grid lesson shows a 480 px intrinsic rail contributing through the grid item's default min-width: auto, producing scrollWidth 612 > clientWidth 320. The paired live proof changes only that declaration to min-width: 0, verifies equality at 320 and 1280 px, restores the automatic minimum and horizontal scroll, then performs the exact three-step reset to x = 0.",
       "duration": 18,
       "height": 540,
       "id": "learn-grid-overflow",
@@ -43,7 +43,7 @@
             "t": 0
           },
           {
-            "label": "Apply the source fix",
+            "label": "Apply the one-line fix",
             "t": 2.4
           },
           {
@@ -117,8 +117,8 @@
             "app": "apps/learn-grid-overflow.html",
             "dur": 18,
             "lower": {
-              "bench": "Broken at 320: scrollWidth 612 > clientWidth 320. Fixed: equality at 320 and 1280.",
-              "fix": "Pause, restore the source, and inspect every measured snapshot.",
+              "bench": "min-width: auto keeps a 480 px item minimum. min-width: 0 alone yields equality at 320 and 1280.",
+              "fix": "Pause, compare the one changed declaration, and inspect each real DOM snapshot.",
               "title": "Why the Grid Overflows"
             },
             "ready": {
@@ -135,8 +135,9 @@
       "published": "2026-09-02",
       "tags": [
         "css-grid",
+        "automatic-minimum",
+        "intrinsic-sizing",
         "overflow",
-        "responsive-layout",
         "deterministic",
         "live-replay"
       ],

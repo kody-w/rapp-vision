@@ -164,7 +164,7 @@
     }
 
     .fixture-meta,
-    #payload {
+    .token-rail {
       min-height: 128px;
       padding: 12px;
       border: 2px solid #0c1522;
@@ -195,11 +195,14 @@
 
     #payload {
       overflow: visible;
-      background: #fcd267;
       font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
     }
 
-    #payload small {
+    .token-rail {
+      background: #fcd267;
+    }
+
+    .token-rail small {
       display: block;
       margin-bottom: 13px;
       color: #663b00;
@@ -411,7 +414,7 @@
         <p class="eyebrow">CSS Grid / measured source lesson</p>
         <h1>Why the Grid Overflows</h1>
       </div>
-      <p class="rule">A plain <code>1fr</code> track keeps the grid item's automatic minimum. Measure first; then let the track and item shrink.</p>
+      <p class="rule">A plain <code>1fr</code> track honors the grid item's default <code>min-width: auto</code>. One line lets that item shrink.</p>
     </header>
 
     <div class="workspace">
@@ -429,8 +432,10 @@
                 <span>fixed track</span>
               </div>
               <div id="payload">
-                <small>unbreakable build token</small>
-                <span id="fixture-token" class="token">BUILD_HASH_7F4C9A2E6B81D03F5A7C9E2B4D6F8A1C3E5B7</span>
+                <div id="token-rail" class="token-rail">
+                  <small>480 px intrinsic content rail</small>
+                  <span id="fixture-token" class="token">BUILD_HASH_7F4C9A2E6B81D03F5A7C9E2B4D6F8A1C3E5B7</span>
+                </div>
               </div>
             </div>
           </div>
@@ -472,7 +477,7 @@
 
     <div class="controls" aria-label="Grid overflow lesson actions">
       <button id="inspect-btn" type="button" data-action="INSPECT">Inspect overflow</button>
-      <button id="apply-fix-btn" type="button" data-action="APPLY_FIX">Apply minmax fix</button>
+      <button id="apply-fix-btn" type="button" data-action="APPLY_FIX">Apply min-width: 0</button>
       <button id="viewport-1280-btn" type="button" data-action="SET_VIEWPORT_1280">Viewport 1280 px</button>
       <button id="restore-broken-btn" type="button" data-action="RESTORE_BROKEN">Restore broken CSS</button>
       <button id="viewport-320-btn" type="button" data-action="SET_VIEWPORT_320">Viewport 320 px</button>
@@ -480,19 +485,25 @@
       <button id="scroll-zero-btn" type="button" data-action="SCROLL_ZERO" data-reset="exact">Scroll to x = 0</button>
     </div>
 
-    <p class="reset-note"><strong>Exact reset:</strong> Restore broken CSS → choose 320 px → scroll preview to x = 0. The CSS text, token, viewport, measured overflow, and x position then match the opening snapshot.</p>
+    <p class="reset-note"><strong>Exact reset:</strong> Restore broken CSS → choose 320 px → scroll preview to x = 0. The default automatic minimum, intrinsic rail, measured overflow, and x position then match the opening snapshot.</p>
   </main>
 
   <script type="application/json" id="contract-states">
 {
   "positive": {
     "mode": "fixed",
-    "cssText": "#fixture-grid {\n  grid-template-columns: 92px minmax(0, 1fr);\n  gap: 26px;\n}\n#payload {\n  min-width: 0;\n  white-space: normal;\n}\n#payload .token {\n  overflow-wrap: anywhere;\n}",
+    "cssText": "#fixture-grid {\n  grid-template-columns: 92px 1fr;\n  gap: 26px;\n}\n#payload {\n  min-width: 0;\n  overflow: clip;\n}\n#payload .token-rail {\n  width: 480px;\n}",
     "token": "BUILD_HASH_7F4C9A2E6B81D03F5A7C9E2B4D6F8A1C3E5B7",
     "viewport": 1280,
     "scrollWidth": 1280,
     "clientWidth": 1280,
     "x": 0,
+    "cause": {
+      "itemMinWidth": "0px",
+      "itemOverflow": "clip",
+      "payloadWidth": 1134,
+      "railWidth": 480
+    },
     "diagnosed": true,
     "restored": false,
     "checks": {
@@ -500,48 +511,72 @@
         "viewport": 320,
         "scrollWidth": 320,
         "clientWidth": 320,
-        "verdict": "fits"
+        "verdict": "fits",
+        "cause": {
+          "itemMinWidth": "0px",
+          "itemOverflow": "clip",
+          "payloadWidth": 174,
+          "railWidth": 480
+        }
       },
       "1280": {
         "viewport": 1280,
         "scrollWidth": 1280,
         "clientWidth": 1280,
-        "verdict": "fits"
+        "verdict": "fits",
+        "cause": {
+          "itemMinWidth": "0px",
+          "itemOverflow": "clip",
+          "payloadWidth": 1134,
+          "railWidth": 480
+        }
       }
     },
     "verdict": "fits",
     "status": "verified",
-    "message": "Fix verified: 320 = 320 and 1280 = 1280."
+    "message": "One-line fix verified: 320 = 320 and 1280 = 1280."
   },
   "failure": {
     "mode": "broken",
-    "cssText": "#fixture-grid {\n  grid-template-columns: 92px 1fr;\n  gap: 26px;\n}\n#payload {\n  min-width: 480px;\n  white-space: nowrap;\n}\n#payload .token {\n  overflow-wrap: normal;\n}",
+    "cssText": "#fixture-grid {\n  grid-template-columns: 92px 1fr;\n  gap: 26px;\n}\n#payload {\n  min-width: auto;\n  overflow: clip;\n}\n#payload .token-rail {\n  width: 480px;\n}",
     "token": "BUILD_HASH_7F4C9A2E6B81D03F5A7C9E2B4D6F8A1C3E5B7",
     "viewport": 320,
     "scrollWidth": 612,
     "clientWidth": 320,
     "x": 292,
+    "cause": {
+      "itemMinWidth": "auto",
+      "itemOverflow": "clip",
+      "payloadWidth": 480,
+      "railWidth": 480
+    },
     "diagnosed": false,
     "restored": true,
     "checks": {},
     "verdict": "overflow",
     "status": "restored-overflow",
-    "message": "Broken CSS restored: scrollWidth 612 > clientWidth 320; preview x = 292."
+    "message": "Automatic minimum restored: scrollWidth 612 > clientWidth 320; preview x = 292."
   },
   "reset": {
     "mode": "broken",
-    "cssText": "#fixture-grid {\n  grid-template-columns: 92px 1fr;\n  gap: 26px;\n}\n#payload {\n  min-width: 480px;\n  white-space: nowrap;\n}\n#payload .token {\n  overflow-wrap: normal;\n}",
+    "cssText": "#fixture-grid {\n  grid-template-columns: 92px 1fr;\n  gap: 26px;\n}\n#payload {\n  min-width: auto;\n  overflow: clip;\n}\n#payload .token-rail {\n  width: 480px;\n}",
     "token": "BUILD_HASH_7F4C9A2E6B81D03F5A7C9E2B4D6F8A1C3E5B7",
     "viewport": 320,
     "scrollWidth": 612,
     "clientWidth": 320,
     "x": 0,
+    "cause": {
+      "itemMinWidth": "auto",
+      "itemOverflow": "clip",
+      "payloadWidth": 480,
+      "railWidth": 480
+    },
     "diagnosed": false,
     "restored": false,
     "checks": {},
     "verdict": "overflow",
     "status": "overflow",
-    "message": "Opening bug: scrollWidth 612 > clientWidth 320 at 320 px; x = 0."
+    "message": "Opening bug: automatic min-width keeps 480 px; scrollWidth 612 > clientWidth 320; x = 0."
   }
 }
   </script>
@@ -549,111 +584,75 @@
     "use strict";
 
     const TOKEN = "BUILD_HASH_7F4C9A2E6B81D03F5A7C9E2B4D6F8A1C3E5B7";
-    const BROKEN_SCROLL_WIDTH = 612;
     const BROKEN_CSS = `#fixture-grid {
   grid-template-columns: 92px 1fr;
   gap: 26px;
 }
 #payload {
-  min-width: 480px;
-  white-space: nowrap;
+  min-width: auto;
+  overflow: clip;
 }
-#payload .token {
-  overflow-wrap: normal;
+#payload .token-rail {
+  width: 480px;
 }`;
     const FIXED_CSS = `#fixture-grid {
-  grid-template-columns: 92px minmax(0, 1fr);
+  grid-template-columns: 92px 1fr;
   gap: 26px;
 }
 #payload {
   min-width: 0;
-  white-space: normal;
+  overflow: clip;
 }
-#payload .token {
-  overflow-wrap: anywhere;
+#payload .token-rail {
+  width: 480px;
 }`;
     const CONTRACT_STATES = JSON.parse(
       document.querySelector("#contract-states").textContent
     );
 
-    function cloneChecks(checks) {
-      const result = {};
-      for (const width of ["320", "1280"]) {
-        if (checks[width]) {
-          result[width] = Object.freeze({ ...checks[width] });
-        }
-      }
-      return Object.freeze(result);
+    function copyCause(cause) {
+      return {
+        itemMinWidth: cause.itemMinWidth,
+        itemOverflow: cause.itemOverflow,
+        payloadWidth: cause.payloadWidth,
+        railWidth: cause.railWidth
+      };
     }
 
-    function expectedMetrics(mode, viewport) {
-      const scrollWidth =
-        mode === "broken" ? Math.max(BROKEN_SCROLL_WIDTH, viewport) : viewport;
+    function checkSnapshot(metrics) {
       return Object.freeze({
-        viewport,
-        scrollWidth,
-        clientWidth: viewport,
-        verdict: scrollWidth > viewport ? "overflow" : "fits"
-      });
-    }
-
-    function messageFor(value, metrics) {
-      if (value.mode === "fixed" && value.checks["320"] && value.checks["1280"]) {
-        return "Fix verified: 320 = 320 and 1280 = 1280.";
-      }
-      if (value.mode === "fixed") {
-        return `Fix applied: scrollWidth ${metrics.scrollWidth} = clientWidth ${metrics.clientWidth} at ${value.viewport} px.`;
-      }
-      if (value.restored && value.x > 0) {
-        return `Broken CSS restored: scrollWidth ${metrics.scrollWidth} > clientWidth ${metrics.clientWidth}; preview x = ${value.x}.`;
-      }
-      if (value.restored && value.viewport === 1280) {
-        return "Broken CSS restored. Choose 320 px to reproduce the overflow.";
-      }
-      if (value.restored) {
-        return `Broken CSS restored: scrollWidth ${metrics.scrollWidth} > clientWidth ${metrics.clientWidth}; preview x = ${value.x}.`;
-      }
-      if (value.diagnosed) {
-        return "Diagnosis: the 1fr track kept the payload's 480 px automatic minimum.";
-      }
-      return `Opening bug: scrollWidth ${metrics.scrollWidth} > clientWidth ${metrics.clientWidth} at 320 px; x = 0.`;
-    }
-
-    function makeState(value) {
-      const metrics = expectedMetrics(value.mode, value.viewport);
-      const maximumX = metrics.scrollWidth - metrics.clientWidth;
-      const x = Math.max(0, Math.min(maximumX, value.x));
-      const checks = cloneChecks(value.checks);
-      const complete = value.mode === "fixed" && checks["320"] && checks["1280"];
-      const status = complete
-        ? "verified"
-        : value.mode === "fixed"
-          ? "fixed"
-          : value.restored
-            ? "restored-overflow"
-            : "overflow";
-      const prepared = {
-        mode: value.mode,
-        cssText: value.mode === "fixed" ? FIXED_CSS : BROKEN_CSS,
-        token: TOKEN,
-        viewport: value.viewport,
+        viewport: metrics.viewport,
         scrollWidth: metrics.scrollWidth,
         clientWidth: metrics.clientWidth,
-        x,
-        diagnosed: value.diagnosed,
-        restored: value.restored,
-        checks,
         verdict: metrics.verdict,
-        status
-      };
-      return Object.freeze({
-        ...prepared,
-        message: messageFor(prepared, metrics)
+        cause: Object.freeze(copyCause(metrics.cause))
       });
+    }
+
+    function messageFor(value) {
+      if (value.mode === "fixed" && value.checks["320"] && value.checks["1280"]) {
+        return "One-line fix verified: 320 = 320 and 1280 = 1280.";
+      }
+      if (value.mode === "fixed") {
+        return `min-width: 0 alone applied: scrollWidth ${value.scrollWidth} = clientWidth ${value.clientWidth} at ${value.viewport} px.`;
+      }
+      if (value.restored && value.x > 0) {
+        return `Automatic minimum restored: scrollWidth ${value.scrollWidth} > clientWidth ${value.clientWidth}; preview x = ${value.x}.`;
+      }
+      if (value.restored && value.viewport === 1280) {
+        return "Automatic minimum restored. Choose 320 px to reproduce the overflow.";
+      }
+      if (value.restored) {
+        return `Automatic minimum restored: scrollWidth ${value.scrollWidth} > clientWidth ${value.clientWidth}; preview x = ${value.x}.`;
+      }
+      if (value.diagnosed) {
+        return "Diagnosis: min-width: auto contributes the 480 px intrinsic rail to the 1fr track minimum.";
+      }
+      return `Opening bug: automatic min-width keeps 480 px; scrollWidth ${value.scrollWidth} > clientWidth ${value.clientWidth}; x = 0.`;
     }
 
     function initialState() {
-      return makeState({
+      return Object.freeze({
         mode: "broken",
         viewport: 320,
         x: 0,
@@ -663,69 +662,56 @@
       });
     }
 
-    function recordCheck(checks, mode, viewport) {
-      if (mode !== "fixed") {
-        return {};
-      }
-      return {
-        ...checks,
-        [String(viewport)]: expectedMetrics(mode, viewport)
-      };
-    }
-
     function reduce(state, action) {
       switch (action.type) {
         case "INSPECT":
-          return makeState({
+          return {
             ...state,
             diagnosed: true,
             restored: false
-          });
+          };
         case "APPLY_FIX":
-          return makeState({
+          return {
             mode: "fixed",
             viewport: state.viewport,
             x: 0,
             diagnosed: true,
             restored: false,
-            checks: recordCheck(state.checks, "fixed", state.viewport)
-          });
+            checks: {}
+          };
         case "SET_VIEWPORT": {
           const viewport = action.width;
           if (viewport !== 320 && viewport !== 1280) {
             return state;
           }
-          return makeState({
+          return {
             ...state,
-            viewport,
-            checks: recordCheck(state.checks, state.mode, viewport)
-          });
+            viewport
+          };
         }
         case "RESTORE_BROKEN":
-          return makeState({
+          return {
             mode: "broken",
             viewport: state.viewport,
             x: state.x,
             diagnosed: false,
             restored: true,
             checks: {}
-          });
-        case "SCROLL_END": {
-          const metrics = expectedMetrics(state.mode, state.viewport);
-          return makeState({
+          };
+        case "SCROLL_END":
+          return {
             ...state,
-            x: metrics.scrollWidth - metrics.clientWidth
-          });
-        }
+            x: state.scrollWidth - state.clientWidth
+          };
         case "SCROLL_ZERO":
-          return makeState({
+          return {
             ...state,
             x: 0,
             restored: !(
               state.mode === "broken" &&
               state.viewport === 320
             )
-          });
+          };
         default:
           return state;
       }
@@ -746,6 +732,7 @@
         scrollWidth: value.scrollWidth,
         clientWidth: value.clientWidth,
         x: value.x,
+        cause: copyCause(value.cause),
         diagnosed: value.diagnosed,
         restored: value.restored,
         checks,
@@ -763,11 +750,12 @@
       }
     }
 
-    let state = initialState();
     const fixtureStyle = document.querySelector("#fixture-css");
     const source = document.querySelector("#css-source");
     const preview = document.querySelector("#preview-viewport");
     const stage = document.querySelector("#preview-stage");
+    const payload = document.querySelector("#payload");
+    const tokenRail = document.querySelector("#token-rail");
     const mode = document.querySelector("#mode-badge");
     const viewportValue = document.querySelector("#viewport-value");
     const scrollWidthValue = document.querySelector("#scroll-width");
@@ -778,18 +766,89 @@
     const check1280 = document.querySelector("#check-1280");
     const scrollEnd = document.querySelector("#scroll-end-btn");
     const scrollZero = document.querySelector("#scroll-zero-btn");
+    let state;
 
-    function updateScale() {
+    function updateScale(viewport) {
       const available = Math.max(1, stage.clientWidth - 32);
-      const scale = Math.min(1, available / state.viewport);
+      const scale = Math.min(1, available / viewport);
       preview.style.transform = `scale(${scale})`;
     }
 
+    function readDomMetrics(viewport) {
+      const itemStyle = getComputedStyle(payload);
+      const scrollWidth = preview.scrollWidth;
+      const clientWidth = preview.clientWidth;
+      return Object.freeze({
+        viewport,
+        scrollWidth,
+        clientWidth,
+        x: Math.round(preview.scrollLeft),
+        cause: Object.freeze({
+          itemMinWidth: itemStyle.minWidth,
+          itemOverflow: itemStyle.overflow,
+          payloadWidth: payload.offsetWidth,
+          railWidth: tokenRail.offsetWidth
+        }),
+        verdict: scrollWidth > clientWidth ? "overflow" : "fits"
+      });
+    }
+
+    function materialize(value, recordCurrent = false) {
+      const cssText = value.mode === "fixed" ? FIXED_CSS : BROKEN_CSS;
+      fixtureStyle.textContent = cssText;
+      preview.style.width = `${value.viewport}px`;
+      updateScale(value.viewport);
+      preview.scrollLeft = value.x;
+      const metrics = readDomMetrics(value.viewport);
+      const checks = {};
+      for (const width of ["320", "1280"]) {
+        if (value.checks[width]) {
+          checks[width] = Object.freeze({
+            ...value.checks[width],
+            cause: Object.freeze(copyCause(value.checks[width].cause))
+          });
+        }
+      }
+      if (recordCurrent && value.mode === "fixed") {
+        checks[String(value.viewport)] = checkSnapshot(metrics);
+      }
+      const frozenChecks = Object.freeze(checks);
+      const complete =
+        value.mode === "fixed" && frozenChecks["320"] && frozenChecks["1280"];
+      const prepared = {
+        mode: value.mode,
+        cssText,
+        token: TOKEN,
+        viewport: value.viewport,
+        scrollWidth: metrics.scrollWidth,
+        clientWidth: metrics.clientWidth,
+        x: metrics.x,
+        cause: metrics.cause,
+        diagnosed: value.diagnosed,
+        restored: value.restored,
+        checks: frozenChecks,
+        verdict: metrics.verdict,
+        status: complete
+          ? "verified"
+          : value.mode === "fixed"
+            ? "fixed"
+            : value.restored
+              ? "restored-overflow"
+              : "overflow"
+      };
+      return Object.freeze({
+        ...prepared,
+        message: messageFor(prepared)
+      });
+    }
+
     function verifyDomMeasurements() {
-      const actual = {
+      const actual = readDomMetrics(state.viewport);
+      const expected = {
         scrollWidth: preview.scrollWidth,
         clientWidth: preview.clientWidth,
-        x: Math.round(preview.scrollLeft)
+        x: Math.round(preview.scrollLeft),
+        cause: copyCause(state.cause)
       };
       for (const key of ["scrollWidth", "clientWidth", "x"]) {
         if (actual[key] !== state[key]) {
@@ -798,14 +857,15 @@
           );
         }
       }
+      if (JSON.stringify(actual.cause) !== JSON.stringify(expected.cause)) {
+        throw new Error(
+          `cause mismatch: DOM ${JSON.stringify(actual.cause)} versus contract ${JSON.stringify(expected.cause)}`
+        );
+      }
     }
 
-    function render() {
-      fixtureStyle.textContent = state.cssText;
+    function renderPresentation() {
       source.textContent = state.cssText;
-      preview.style.width = `${state.viewport}px`;
-      updateScale();
-      preview.scrollLeft = state.x;
       verifyDomMeasurements();
 
       mode.textContent = state.mode === "fixed" ? "fixed CSS" : "broken CSS";
@@ -835,8 +895,12 @@
     }
 
     function dispatch(action, claim = null) {
-      state = reduce(state, action);
-      render();
+      const reduced = reduce(state, action);
+      const recordCurrent =
+        reduced.mode === "fixed" &&
+        (action.type === "APPLY_FIX" || action.type === "SET_VIEWPORT");
+      state = materialize(reduced, recordCurrent);
+      renderPresentation();
       if (claim) {
         verifyClaim(claim);
       }
@@ -867,12 +931,12 @@
       const reset = state.mode === "broken" && state.viewport === 320;
       dispatch({ type: "SCROLL_ZERO" }, reset ? "reset" : null);
     });
-    window.addEventListener("resize", updateScale);
+    window.addEventListener("resize", () => updateScale(state.viewport));
 
     const contract = Object.freeze({
       initialState,
       reduce,
-      expectedMetrics,
+      measureFixture: () => readDomMetrics(state.viewport),
       snapshot: () => snapshot(),
       contractStates: CONTRACT_STATES,
       dispatch
@@ -880,7 +944,8 @@
     window.gridOverflowLesson = contract;
     window.tinySystem = contract;
 
-    render();
+    state = materialize(initialState());
+    renderPresentation();
     verifyClaim("reset");
   </script>
 </body>
