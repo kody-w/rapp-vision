@@ -1,0 +1,268 @@
+{
+  "channel": "candidate-frame-0002-04",
+  "commission": {
+    "criterion": "The failing fixture has scrollWidth greater than clientWidth at 320 px; after the fix those values are equal at both 320 px and 1280 px.",
+    "id": "learn-grid-overflow",
+    "reset": [
+      "Activate Restore broken CSS.",
+      "Set the viewport control to 320 px.",
+      "Scroll the preview back to x = 0."
+    ]
+  },
+  "publications": [
+    {
+      "app": "apps/learn-grid-overflow.html",
+      "claims": [
+        {
+          "actions": [
+            {
+              "selector": "#inspect-btn",
+              "type": "INSPECT"
+            },
+            {
+              "selector": "#apply-fix-btn",
+              "type": "APPLY_FIX"
+            },
+            {
+              "selector": "#viewport-1280-btn",
+              "type": "SET_VIEWPORT",
+              "value": 1280
+            }
+          ],
+          "assertions": [
+            {
+              "equals": "fixed",
+              "path": "mode"
+            },
+            {
+              "equals": 320,
+              "path": "checks.320.scrollWidth"
+            },
+            {
+              "equals": 320,
+              "path": "checks.320.clientWidth"
+            },
+            {
+              "equals": 1280,
+              "path": "checks.1280.scrollWidth"
+            },
+            {
+              "equals": 1280,
+              "path": "checks.1280.clientWidth"
+            },
+            {
+              "equals": 0,
+              "path": "x"
+            }
+          ],
+          "claim": "After inspection, minmax(0, 1fr) and min-width: 0 remove the automatic minimum; displayed scrollWidth and clientWidth are equal at both 320 px and 1280 px.",
+          "expectedState": {
+            "checks": {
+              "320": {
+                "clientWidth": 320,
+                "scrollWidth": 320,
+                "verdict": "fits",
+                "viewport": 320
+              },
+              "1280": {
+                "clientWidth": 1280,
+                "scrollWidth": 1280,
+                "verdict": "fits",
+                "viewport": 1280
+              }
+            },
+            "clientWidth": 1280,
+            "cssText": "#fixture-grid {\n  grid-template-columns: 92px minmax(0, 1fr);\n  gap: 26px;\n}\n#payload {\n  min-width: 0;\n  white-space: normal;\n}\n#payload .token {\n  overflow-wrap: anywhere;\n}",
+            "diagnosed": true,
+            "message": "Fix verified: 320 = 320 and 1280 = 1280.",
+            "mode": "fixed",
+            "restored": false,
+            "scrollWidth": 1280,
+            "status": "verified",
+            "token": "BUILD_HASH_7F4C9A2E6B81D03F5A7C9E2B4D6F8A1C3E5B7",
+            "verdict": "fits",
+            "viewport": 1280,
+            "x": 0
+          },
+          "id": "positive"
+        },
+        {
+          "actions": [
+            {
+              "selector": "#inspect-btn",
+              "type": "INSPECT"
+            },
+            {
+              "selector": "#apply-fix-btn",
+              "type": "APPLY_FIX"
+            },
+            {
+              "selector": "#viewport-1280-btn",
+              "type": "SET_VIEWPORT",
+              "value": 1280
+            },
+            {
+              "selector": "#restore-broken-btn",
+              "type": "RESTORE_BROKEN"
+            },
+            {
+              "selector": "#viewport-320-btn",
+              "type": "SET_VIEWPORT",
+              "value": 320
+            },
+            {
+              "selector": "#scroll-end-btn",
+              "type": "SCROLL_END"
+            }
+          ],
+          "assertions": [
+            {
+              "equals": "broken",
+              "path": "mode"
+            },
+            {
+              "equals": 612,
+              "path": "scrollWidth"
+            },
+            {
+              "equals": 320,
+              "path": "clientWidth"
+            },
+            {
+              "equals": 292,
+              "path": "x"
+            },
+            {
+              "equals": "overflow",
+              "path": "verdict"
+            }
+          ],
+          "claim": "Restoring the original 1fr and 480 px minimum source, returning to 320 px, and scrolling to the end visibly reproduces the 612 > 320 failure at x = 292.",
+          "expectedState": {
+            "checks": {},
+            "clientWidth": 320,
+            "cssText": "#fixture-grid {\n  grid-template-columns: 92px 1fr;\n  gap: 26px;\n}\n#payload {\n  min-width: 480px;\n  white-space: nowrap;\n}\n#payload .token {\n  overflow-wrap: normal;\n}",
+            "diagnosed": false,
+            "message": "Broken CSS restored: scrollWidth 612 > clientWidth 320; preview x = 292.",
+            "mode": "broken",
+            "restored": true,
+            "scrollWidth": 612,
+            "status": "restored-overflow",
+            "token": "BUILD_HASH_7F4C9A2E6B81D03F5A7C9E2B4D6F8A1C3E5B7",
+            "verdict": "overflow",
+            "viewport": 320,
+            "x": 292
+          },
+          "id": "failure",
+          "preserves": "reset.cssText+reset.token"
+        },
+        {
+          "actions": [
+            {
+              "selector": "#restore-broken-btn",
+              "type": "RESTORE_BROKEN"
+            },
+            {
+              "selector": "#viewport-320-btn",
+              "type": "SET_VIEWPORT",
+              "value": 320
+            },
+            {
+              "selector": "#scroll-zero-btn",
+              "type": "SCROLL_ZERO"
+            }
+          ],
+          "assertions": [
+            {
+              "equals": "broken",
+              "path": "mode"
+            },
+            {
+              "equals": 320,
+              "path": "viewport"
+            },
+            {
+              "equals": 612,
+              "path": "scrollWidth"
+            },
+            {
+              "equals": 320,
+              "path": "clientWidth"
+            },
+            {
+              "equals": 0,
+              "path": "x"
+            },
+            {
+              "equals": {},
+              "path": "checks"
+            }
+          ],
+          "claim": "The required three actions restore the exact opening CSS text, long token, 320 px viewport, 612 > 320 measurement, empty verification record, and x = 0.",
+          "expectedState": {
+            "checks": {},
+            "clientWidth": 320,
+            "cssText": "#fixture-grid {\n  grid-template-columns: 92px 1fr;\n  gap: 26px;\n}\n#payload {\n  min-width: 480px;\n  white-space: nowrap;\n}\n#payload .token {\n  overflow-wrap: normal;\n}",
+            "diagnosed": false,
+            "message": "Opening bug: scrollWidth 612 > clientWidth 320 at 320 px; x = 0.",
+            "mode": "broken",
+            "restored": false,
+            "scrollWidth": 612,
+            "status": "overflow",
+            "token": "BUILD_HASH_7F4C9A2E6B81D03F5A7C9E2B4D6F8A1C3E5B7",
+            "verdict": "overflow",
+            "viewport": 320,
+            "x": 0
+          },
+          "id": "reset"
+        }
+      ],
+      "id": "learn-grid-overflow",
+      "measurements": {
+        "fixed": {
+          "1280": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "320": {
+            "clientWidth": 320,
+            "scrollWidth": 320
+          }
+        },
+        "opening": {
+          "clientWidth": 320,
+          "scrollWidth": 612,
+          "viewport": 320,
+          "x": 0
+        },
+        "restoredFailure": {
+          "clientWidth": 320,
+          "scrollWidth": 612,
+          "viewport": 320,
+          "x": 292
+        }
+      },
+      "sourceFix": {
+        "after": [
+          "grid-template-columns: 92px minmax(0, 1fr);",
+          "min-width: 0;",
+          "overflow-wrap: anywhere;"
+        ],
+        "before": [
+          "grid-template-columns: 92px 1fr;",
+          "min-width: 480px;",
+          "white-space: nowrap;"
+        ]
+      }
+    }
+  ],
+  "rightsPrivacy": {
+    "externalResources": [],
+    "fonts": "System UI and monospace fallbacks only; no font files are embedded or fetched.",
+    "noSecrets": true,
+    "originalFixture": true,
+    "privacyAttestation": true,
+    "rightsAttestation": true
+  },
+  "schema": "candidate-frame-evidence/1.0"
+}
