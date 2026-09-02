@@ -22,6 +22,7 @@ import unittest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+WORKFLOW_PATH = REPO_ROOT / ".github" / "workflows" / "content-machine.yml"
 _spec = importlib.util.spec_from_file_location(
     "content_machine", REPO_ROOT / "scripts" / "content_machine.py")
 cm = importlib.util.module_from_spec(_spec)
@@ -66,6 +67,18 @@ def network(channels, offline=None, registry_count=None):
         "offline": offline or [],
         "registry_count": registry_count if registry_count is not None else len(channels),
     }
+
+
+def workflow_source():
+    return WORKFLOW_PATH.read_text(encoding="utf-8")
+
+
+def workflow_step(name):
+    source = workflow_source()
+    marker = "      - name: {}\n".format(name)
+    start = source.index(marker)
+    end = source.find("\n      - name: ", start + len(marker))
+    return source[start:] if end < 0 else source[start:end]
 
 
 class ExplodingAdapter:
@@ -172,6 +185,66 @@ class TestPublishGuard(unittest.TestCase):
             self.assertTrue(cm.write_json(state / "x.json", payload, state))
             self.assertFalse(cm.write_json(state / "x.json", dict(payload), state))
             self.assertFalse(cm.write_json(state / "x.json", {"a": 1, "b": 2}, state))
+
+
+class TestWorkflowReliability(unittest.TestCase):
+    def test_checkout_does_not_persist_write_credentials(self):
+        checkout = workflow_step("Checkout")
+        self.assertIn("persist-credentials: false", checkout)
+
+    def test_only_candidate_snapshots_are_staged(self):
+        source = workflow_source()
+        commit = workflow_step("Commit state if changed")
+        propose = workflow_step("Refresh proposal queue")
+        self.assertIn(
+            'ALLOWED_STATE_FILES: "state/proposals.json state/editorial_reviews.json"',
+            source,
+        )
+        self.assertIn("state/editorial_reviews.json", commit)
+        self.assertNotIn("state/editorial.json", source)
+        self.assertNotIn("state/metrics.json", commit)
+        self.assertIn("--metrics state/metrics.json", propose)
+
+    def test_changed_path_guard_covers_tracked_staged_and_untracked_files(self):
+        commit = workflow_step("Commit state if changed")
+        self.assertIn("git diff --name-only --no-renames", commit)
+        self.assertIn("git diff --cached --name-only --no-renames", commit)
+        self.assertIn("git ls-files --others --exclude-standard", commit)
+        self.assertIn("Unexpected changed paths; refusing to commit", commit)
+        self.assertLess(
+            commit.index("origin/main...HEAD"),
+            commit.index("Unexpected changed paths; refusing to commit"),
+        )
+        self.assertIn("exit 1", commit)
+
+    def test_proposal_and_review_steps_receive_no_github_token(self):
+        for name in ("Refresh proposal queue",
+                     "Review published videos (editorial lane)"):
+            step = workflow_step(name)
+            self.assertNotIn("GITHUB_TOKEN", step)
+            self.assertNotIn("GH_TOKEN", step)
+            self.assertNotIn("secrets.", step)
+
+    def test_existing_branch_is_verified_and_rebased_before_use(self):
+        resume = workflow_step("Resume automation branch on current main")
+        commit = workflow_step("Commit state if changed")
+        self.assertIn('refs/heads/$AUTOMATION_BRANCH', resume)
+        self.assertIn("git diff --name-only --no-renames origin/main", resume)
+        self.assertIn('git checkout -B "$AUTOMATION_BRANCH" "$remote_ref"', resume)
+        self.assertIn("git rebase origin/main", resume)
+        self.assertIn("--force-with-lease=", commit)
+
+    def test_workflow_pushes_only_the_fixed_pr_branch(self):
+        source = workflow_source()
+        commit = workflow_step("Commit state if changed")
+        self.assertIn('origin "HEAD:$AUTOMATION_BRANCH"', commit)
+        self.assertIn('--base main --head "$AUTOMATION_BRANCH"', commit)
+        self.assertIn("gh pr create", commit)
+        self.assertNotIn('origin "HEAD:main"', source)
+        self.assertNotIn("git push origin main", source)
+        for line in source.splitlines():
+            if "git push" in line:
+                self.assertNotIn(" main", line)
 
 
 class TestPlayerDirectLinks(unittest.TestCase):
@@ -788,10 +861,57 @@ class TestEditorialLane(unittest.TestCase):
 
     def test_the_lane_resolves_and_reports_how_it_bound(self):
         lane = cm.editorial_lane(REPO_ROOT / "state")
-        self.assertTrue(lane.writer is None or callable(lane.writer))
         self.assertIsInstance(lane.binding, str)
+        self.assertIn("write_json", lane.binding)
         self.assertTrue(lane.marker.strip())
         self.assertIsInstance(lane.as_dict()["machinery_exclusion_verified"], bool)
+
+    def test_review_snapshot_ignores_discovered_writers_and_uses_write_json(self):
+        calls = []
+        original_write_json = cm.write_json
+        previous_metrics = sys.modules.get("rapp_metrics")
+
+        class FakeMetrics:
+            EDITORIAL_MARKER = "<!-- guarded-editorial -->"
+            MACHINERY_MARKERS = (EDITORIAL_MARKER,)
+            EDITORIAL_NOTE = "machine"
+
+            @staticmethod
+            def write_editorial_reviews(*_args):
+                raise AssertionError("an auto-discovered writer must never run")
+
+        def recording_write_json(path, payload, state_dir):
+            calls.append((Path(path), Path(state_dir)))
+            return original_write_json(path, payload, state_dir)
+
+        sys.modules["rapp_metrics"] = FakeMetrics
+        cm.write_json = recording_write_json
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                state = Path(tmp) / "state"
+                args = type("Args", (), {"strict": True})()
+                rc = cm.cmd_review(
+                    args,
+                    state,
+                    cm.DryRunAdapter(),
+                    network([channel("chan")]),
+                    dict(cm.DEFAULTS),
+                )
+                self.assertEqual(rc, 0)
+                self.assertEqual(
+                    json.loads((state / "editorial_reviews.json").read_text())["lane"],
+                    "editorial",
+                )
+        finally:
+            cm.write_json = original_write_json
+            if previous_metrics is None:
+                sys.modules.pop("rapp_metrics", None)
+            else:
+                sys.modules["rapp_metrics"] = previous_metrics
+
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(calls[0][0].name, "editorial_reviews.json")
+        self.assertEqual(calls[0][0].parent, calls[0][1])
 
     def test_the_payload_publishes_whether_the_binding_was_verified(self):
         """An unverified binding must be visible in the artifact, not just on stderr."""

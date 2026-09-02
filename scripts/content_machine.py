@@ -11,7 +11,7 @@ Two jobs, one script:
 
               It NEVER writes a channel.json. A proposal is an entry in a queue
               that a human — or an explicit, separate promotion step — turns
-              into an episode. See docs/CONTENT_MACHINE.md for why: an
+              into an episode. See docs/CONTENT-MACHINE.md for why: an
               unattended bot that publishes into a channel Kody points
               customers at is a reputational risk, and the queue is the guard.
               write_json() below refuses any path outside state/, so the guard
@@ -1416,16 +1416,17 @@ class EditorialLane:
     nobody checks is not a binding.
 
     The whole import is wrapped: rapp_metrics.py is owned by another writer,
-    and an error over there must never take this script down.
+    and an error over there must never take this script down. It supplies lane
+    constants only; review snapshots always use this script's guarded
+    write_json() path.
     """
 
     def __init__(self, marker: str, note: str, binding: str,
-                 verified: bool, writer=None, problems=None):
+                 verified: bool, problems=None):
         self.marker = marker
         self.note = note
         self.binding = binding
         self.verified = verified
-        self.writer = writer
         self.problems = list(problems or [])
 
     def as_dict(self) -> dict:
@@ -1456,7 +1457,8 @@ def editorial_lane(state_dir: Path) -> EditorialLane:
         return EditorialLane(
             marker=FALLBACK_EDITORIAL_MARKER,
             note=FALLBACK_LANE_NOTE,
-            binding="fallback constants (rapp_metrics not importable: {})".format(exc),
+            binding="fallback constants + write_json snapshot guard "
+                    "(rapp_metrics not importable: {})".format(exc),
             verified=False,
             problems=["rapp_metrics could not be imported; the lane marker is an "
                       "unchecked copy and machinery exclusion is unconfirmed"],
@@ -1479,19 +1481,13 @@ def editorial_lane(state_dir: Path) -> EditorialLane:
     if not isinstance(note, str) or not note.strip():
         note = FALLBACK_LANE_NOTE
 
-    # A writer function is optional and does not exist today. Probing for one
-    # costs nothing and means the day rapp_metrics grows a canonical writer,
-    # this script uses it without an edit.
-    writer, binding = None, "rapp_metrics constants + direct snapshot write"
-    for name in ("write_editorial_reviews", "write_editorial",
-                 "record_editorial_reviews", "editorial_write"):
-        fn = getattr(rapp_metrics, name, None)
-        if callable(fn):
-            writer, binding = fn, "rapp_metrics.{}()".format(name)
-            break
-
-    return EditorialLane(marker=marker, note=note, binding=binding,
-                         verified=verified, writer=writer, problems=problems)
+    return EditorialLane(
+        marker=marker,
+        note=note,
+        binding="rapp_metrics constants + write_json snapshot guard",
+        verified=verified,
+        problems=problems,
+    )
 
 
 def render_lane_comment(subject: str, review: dict, lane: EditorialLane) -> str:
@@ -1589,20 +1585,11 @@ def cmd_review(args, state_dir: Path, adapter, network: dict, cfg: dict) -> int:
     for problem in lane.problems:
         warn("editorial lane: " + problem)
     payload = editorial_payload(reviews, RUBRIC, network, adapter, lane)
-    writer, how = lane.writer, lane.binding
-    changed = False
-    if writer is not None:
-        try:
-            changed = bool(writer(payload, path))
-        except Exception as exc:                              # noqa: BLE001 - never fatal
-            warn("editorial lane writer failed ({}); falling back to a direct write".format(exc))
-            writer, how = None, "direct write (lane writer raised)"
-    if writer is None:
-        changed = write_json(path, payload, state_dir)
+    changed = write_json(path, payload, state_dir)
 
     remaining = max(0, len([e for e in entries if needs_review(reviews.get(e[2]), e[1], adapter, RUBRIC)]))
     print("review: {} scored, {} unchanged, {} still pending, via {} -> {}".format(
-        done, skipped, remaining, how, "written" if changed else "unchanged"))
+        done, skipped, remaining, lane.binding, "written" if changed else "unchanged"))
     if failed:
         print("review: stopped early after an adapter failure; the next run resumes here")
     return 0
