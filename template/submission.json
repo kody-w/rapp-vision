@@ -1,0 +1,102 @@
+{
+  "$schema": "../submission.schema.json",
+  "schema": "rapp-vision-submission/1.0",
+  "id": "offline-field-log-submission",
+  "phase": "submitted",
+  "commission_id": "use-offline-field-log",
+  "creator": {
+    "id": "github-your-handle",
+    "display_name": "Your public display name",
+    "profile": "https://github.com/your-handle"
+  },
+  "pull_request": {
+    "repository": "https://github.com/kody-w/rapp-vision",
+    "number": 1,
+    "head_ref": "creator/offline-field-log"
+  },
+  "claim": {
+    "effect": "coordination-only",
+    "curation": "none",
+    "note": "This claim coordinates work on the commission and does not reserve publication or default-registry placement."
+  },
+  "artifact": {
+    "repository": "https://github.com/your-handle/rappvision-offline-field-log",
+    "path": "channel.json",
+    "publication_id": "offline-field-log",
+    "commit": "1111111111111111111111111111111111111111",
+    "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+    "digest_scope": "raw-file-bytes"
+  },
+  "deliverables": {
+    "mp4": {
+      "path": "media/offline-field-log.mp4",
+      "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    },
+    "webm": {
+      "path": "media/offline-field-log.webm",
+      "sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+    },
+    "live": {
+      "channel_path": "channel.json",
+      "publication_id": "offline-field-log",
+      "kind": "rapp-vision-live/1.0"
+    }
+  },
+  "evidence": {
+    "objective_evidence": {
+      "criterion": "State the commission's measurable pass condition verbatim.",
+      "observed": "Record the measured result, units, tolerance, and whether it passed.",
+      "evidence_path": "evidence/objective-result.json"
+    },
+    "positive_path": {
+      "description": "Describe the successful path that the replay visibly completes.",
+      "live_scene_t": 6
+    },
+    "visible_failure": {
+      "description": "Describe the intentional failure and the visible state proving it occurred.",
+      "live_scene_t": 18
+    },
+    "exact_reset": {
+      "steps": [
+        "Name the exact reset control or command.",
+        "List every follow-up input needed to restore the opening fixture."
+      ],
+      "restored_state": "Name the values, selection, seed, clock, and persisted state that match the opening state.",
+      "live_scene_t": 28
+    }
+  },
+  "attestations": {
+    "rights": {
+      "attested": true,
+      "statement": "I have the right to publish and redistribute every submitted code, media, font, sound, image, and data asset."
+    },
+    "privacy": {
+      "attested": true,
+      "statement": "I checked the artifact and recordings for personal data, private locations, credentials, tokens, and unconsented likenesses."
+    },
+    "no_secrets": true
+  },
+  "review_request": {
+    "minimum_approvals": 2,
+    "required_roles": [
+      "technical",
+      "curation"
+    ],
+    "independent_reviewers": true,
+    "reviews": [
+      {
+        "role": "technical",
+        "reviewer": "github-technical-reviewer"
+      },
+      {
+        "role": "curation",
+        "reviewer": "github-curation-reviewer"
+      }
+    ]
+  },
+  "_replace": [
+    "Replace every example identity, repository, pull request, path, commit, digest, measurement, replay time, statement, and reviewer before marking the pull request ready.",
+    "The artifact commit is the immutable commit containing the reviewed channel and deliverables; the manifest may be added in a later pull-request commit.",
+    "Do not add a creator-authored approval, quality pass, or default-registry listing field."
+  ]
+}

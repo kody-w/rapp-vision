@@ -1,0 +1,331 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "commissions.schema.json",
+  "title": "RAPP Vision creator commissions",
+  "type": "object",
+  "required": [
+    "$schema",
+    "schema",
+    "id",
+    "name",
+    "brand",
+    "status",
+    "claim_policy",
+    "submission_protocol",
+    "submission_schema",
+    "quality_schema",
+    "commissions"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "commissions.schema.json"
+    },
+    "schema": {
+      "const": "rapp-vision-commissions/1.0"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "brand": {
+      "const": "RAPP Vision"
+    },
+    "status": {
+      "const": "open"
+    },
+    "claim_policy": {
+      "type": "object",
+      "required": [
+        "phase",
+        "effect",
+        "curation"
+      ],
+      "properties": {
+        "phase": {
+          "const": "claim"
+        },
+        "effect": {
+          "const": "coordination-only"
+        },
+        "curation": {
+          "const": "none"
+        }
+      },
+      "additionalProperties": true
+    },
+    "submission_protocol": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "submission_schema": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "quality_schema": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "commissions": {
+      "type": "array",
+      "minItems": 12,
+      "items": {
+        "$ref": "#/$defs/commission"
+      }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "relativeReference": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:|//|/)(?!.*\\\\)[^\\s]+$"
+    },
+    "requiredGate": {
+      "type": "object",
+      "required": [
+        "required"
+      ],
+      "properties": {
+        "required": {
+          "const": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "pairedDelivery": {
+      "type": "object",
+      "required": [
+        "mp4",
+        "webm",
+        "live",
+        "same_publication"
+      ],
+      "properties": {
+        "mp4": {
+          "const": true
+        },
+        "webm": {
+          "const": true
+        },
+        "live": {
+          "const": true
+        },
+        "same_publication": {
+          "const": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "objectiveEvidence": {
+      "type": "object",
+      "required": [
+        "required",
+        "criterion",
+        "acceptance"
+      ],
+      "properties": {
+        "required": {
+          "const": true
+        },
+        "criterion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "acceptance": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "demonstration": {
+      "type": "object",
+      "required": [
+        "required",
+        "demonstration"
+      ],
+      "properties": {
+        "required": {
+          "const": true
+        },
+        "demonstration": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "exactReset": {
+      "type": "object",
+      "required": [
+        "required",
+        "steps",
+        "restored_state"
+      ],
+      "properties": {
+        "required": {
+          "const": true
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "restored_state": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "rightsPrivacy": {
+      "type": "object",
+      "required": [
+        "rights_attestation",
+        "privacy_attestation",
+        "no_secrets"
+      ],
+      "properties": {
+        "rights_attestation": {
+          "const": true
+        },
+        "privacy_attestation": {
+          "const": true
+        },
+        "no_secrets": {
+          "const": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "reviewQuorum": {
+      "type": "object",
+      "required": [
+        "minimum_approvals",
+        "required_roles",
+        "independent_reviewers"
+      ],
+      "properties": {
+        "minimum_approvals": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "required_roles": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "allOf": [
+            {
+              "contains": {
+                "const": "technical"
+              }
+            },
+            {
+              "contains": {
+                "const": "curation"
+              }
+            }
+          ]
+        },
+        "independent_reviewers": {
+          "const": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "gates": {
+      "type": "object",
+      "required": [
+        "paired_delivery",
+        "objective_evidence",
+        "positive_path",
+        "visible_failure",
+        "exact_reset",
+        "rights_privacy",
+        "review_quorum"
+      ],
+      "properties": {
+        "paired_delivery": {
+          "$ref": "#/$defs/pairedDelivery"
+        },
+        "objective_evidence": {
+          "$ref": "#/$defs/objectiveEvidence"
+        },
+        "positive_path": {
+          "$ref": "#/$defs/demonstration"
+        },
+        "visible_failure": {
+          "$ref": "#/$defs/demonstration"
+        },
+        "exact_reset": {
+          "$ref": "#/$defs/exactReset"
+        },
+        "rights_privacy": {
+          "$ref": "#/$defs/rightsPrivacy"
+        },
+        "review_quorum": {
+          "$ref": "#/$defs/reviewQuorum"
+        }
+      },
+      "additionalProperties": true
+    },
+    "commission": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "category",
+        "status",
+        "brief",
+        "gates"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "enum": [
+            "use",
+            "learn",
+            "prove",
+            "play",
+            "create",
+            "explore"
+          ]
+        },
+        "status": {
+          "enum": [
+            "open",
+            "paused",
+            "closed"
+          ]
+        },
+        "brief": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gates": {
+          "$ref": "#/$defs/gates"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

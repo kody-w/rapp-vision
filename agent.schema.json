@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agent.schema.json",
+  "title": "RAPP Vision static creator ingress",
+  "type": "object",
+  "required": [
+    "$schema",
+    "schema",
+    "id",
+    "name",
+    "publication_contract",
+    "publication_schema",
+    "channel_contract",
+    "channel_schema",
+    "commissions",
+    "commissions_schema",
+    "submission_protocol",
+    "submission_schema",
+    "quality_schema",
+    "submission_template",
+    "submission_transport",
+    "submission_manifest_location",
+    "validator",
+    "repository",
+    "default_registry",
+    "authority"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "agent.schema.json"
+    },
+    "schema": {
+      "const": "rapp-vision-agent/1.0"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "name": {
+      "const": "RAPP Vision"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "publication_contract": {
+      "const": "rapp-vision-channel/2.0"
+    },
+    "publication_schema": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "channel_contract": {
+      "const": "rapp-vision-channel/2.0"
+    },
+    "channel_schema": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "commissions": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "commissions_schema": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "submission_protocol": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "submission_schema": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "quality_schema": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "submission_template": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "submission_transport": {
+      "const": "pull-request"
+    },
+    "submission_manifest_location": {
+      "const": "pull-request-body"
+    },
+    "validator": {
+      "type": "object",
+      "required": [
+        "command",
+        "argument"
+      ],
+      "properties": {
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "argument": {
+          "const": "{channel_json}"
+        }
+      },
+      "additionalProperties": true
+    },
+    "repository": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://"
+    },
+    "default_registry": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "authority": {
+      "type": "object",
+      "required": [
+        "claim",
+        "technical_pass",
+        "default_registry"
+      ],
+      "properties": {
+        "claim": {
+          "const": "coordination-only"
+        },
+        "technical_pass": {
+          "const": "not-listing"
+        },
+        "default_registry": {
+          "const": "registry-entry-only"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "relativeReference": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:|//|/)(?!.*\\\\)[^\\s]+$"
+    }
+  }
+}

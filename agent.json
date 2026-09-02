@@ -1,0 +1,30 @@
+{
+  "$schema": "agent.schema.json",
+  "schema": "rapp-vision-agent/1.0",
+  "id": "rapp-vision",
+  "name": "RAPP Vision",
+  "description": "Static, agent-first discovery for creating paired RAPP Vision publications.",
+  "publication_contract": "rapp-vision-channel/2.0",
+  "publication_schema": "channel.schema.json#/$defs/publication",
+  "channel_contract": "rapp-vision-channel/2.0",
+  "channel_schema": "channel.schema.json",
+  "commissions": "commissions.json",
+  "commissions_schema": "commissions.schema.json",
+  "submission_protocol": "docs/CREATOR-INGRESS.md",
+  "submission_schema": "submission.schema.json",
+  "quality_schema": "quality.schema.json",
+  "submission_template": "template/submission.json",
+  "submission_transport": "pull-request",
+  "submission_manifest_location": "pull-request-body",
+  "validator": {
+    "command": "python3 scripts/validate_publications.py {channel_json}",
+    "argument": "{channel_json}"
+  },
+  "repository": "https://github.com/kody-w/rapp-vision",
+  "default_registry": "channels.json",
+  "authority": {
+    "claim": "coordination-only",
+    "technical_pass": "not-listing",
+    "default_registry": "registry-entry-only"
+  }
+}
