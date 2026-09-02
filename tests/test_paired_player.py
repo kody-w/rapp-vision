@@ -8,8 +8,19 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-INDEX = (ROOT / "index.html").read_text(encoding="utf-8")
+INDEX = (
+    (ROOT / "index.html")
+    .read_text(encoding="utf-8")
+    .replace("\r\n", "\n")
+    .replace("\r", "\n")
+)
 NODE = shutil.which("node")
+
+
+def source_block(start_marker, end_marker):
+    start = INDEX.index(start_marker)
+    end = INDEX.index(end_marker, start)
+    return INDEX[start:end]
 
 
 def contract_block():
@@ -36,12 +47,95 @@ def channel_loader_block():
     return INDEX[start:end]
 
 
+class TestConsumerDiscovery(unittest.TestCase):
+    def test_machine_readable_creator_and_catalog_discovery(self):
+        head = source_block("<head>", "</head>")
+        self.assertRegex(
+            head,
+            r"<link\s+rel=(?:['\"])?alternate(?:['\"])?\s+"
+            r"type=(?:['\"])?application/json(?:['\"])?\s+"
+            r"href=(?:['\"])?agent\.json(?:['\"])?\s+"
+            r"title=['\"]RAPP Vision creator contract['\"]>",
+        )
+        self.assertRegex(
+            head,
+            r"<link\s+rel=(?:['\"])?alternate(?:['\"])?\s+"
+            r"type=(?:['\"])?application/json(?:['\"])?\s+"
+            r"href=(?:['\"])?channels\.json(?:['\"])?\s+"
+            r"title=['\"]RAPP Vision channel catalog['\"]>",
+        )
+
+    def test_creator_cta_is_small_prominent_and_only_in_unfiltered_home_hero(self):
+        header = source_block("<header>", "</header>")
+        home = source_block("function viewHome(", "/* ---------------------------------------------------------------- *")
+        self.assertRegex(
+            header,
+            r'<a class="navbtn" href="agent\.json"[^>]*>Create with an agent</a>',
+        )
+        self.assertIn('${q || tag ? "" : `<section class="hero">', home)
+        self.assertRegex(
+            home,
+            r'<a class="tbtn mode-switch" href="agent\.json">'
+            r"Create with an agent</a>",
+        )
+        self.assertLess(home.index('href="agent.json"'), home.index("Under the hood"))
+        self.assertIn('id="nav-ch">RAPP Hive</button>', header)
+        self.assertIn(
+            "https://github.com/kody-w/rapp-vision/tree/main/template",
+            INDEX,
+        )
+
+    def test_machine_review_indicator_is_review_gated_and_honest(self):
+        indicator = source_block(
+            "function reviewIndicatorHTML(", "function reviewHTML(",
+        )
+        card = source_block("function cardHTML(", "function matches(")
+        watch = source_block("function viewWatch(", "function viewLibrary(")
+        self.assertIn('if (!m || !m.review) return "";', indicator)
+        self.assertIn(">Machine reviewed</span>", indicator)
+        self.assertIn("not human approval or registry curation", indicator)
+        self.assertIn("m = mget(v)", card)
+        self.assertIn("${reviewIndicatorHTML(m)}", card)
+        self.assertIn("${reviewIndicatorHTML(mget(v))}", watch)
+
+        gate = indicator[: indicator.index("return `<span")]
+        self.assertNotIn("_trustedLive", gate)
+        self.assertNotIn("_registry", gate)
+        self.assertNotRegex(indicator, r">\s*(?:Approved|Curated|Verified)\s*<")
+
+    def test_late_metrics_patch_review_indicators_once_per_surface(self):
+        patch = source_block(
+            "function patchReviewIndicator(", "function applyMetrics(",
+        )
+        apply_metrics = source_block(
+            "function applyMetrics()", "/* registry identity:start */",
+        )
+        self.assertIn("!m || !m.review", patch)
+        self.assertIn('$(".machine-reviewed", target)', patch)
+        self.assertIn(
+            'target.insertAdjacentHTML("beforeend", reviewIndicatorHTML(m));',
+            patch,
+        )
+        self.assertEqual(apply_metrics.count("patchReviewIndicator("), 2)
+        self.assertIn('const watchReview = $("#watch-review[data-vk]");', apply_metrics)
+        self.assertIn(
+            "patchReviewIndicator(watchReview, mfind(watchReview.dataset.vk));",
+            apply_metrics,
+        )
+        self.assertIn(
+            'document.querySelectorAll(".card[data-vk]").forEach',
+            apply_metrics,
+        )
+        self.assertIn("patchReviewIndicator(wrap, m);", apply_metrics)
+
+
 @unittest.skipUnless(NODE, "node not available; exact player validation test skipped")
 class TestPairedPlayer(unittest.TestCase):
     def run_node(self, body):
         completed = subprocess.run(
-            [NODE, "-e", body],
+            [NODE, "-"],
             cwd=ROOT,
+            input=body,
             text=True,
             capture_output=True,
             check=False,

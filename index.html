@@ -9,6 +9,8 @@
 <meta property="og:title" content="RAPP Vision">
 <meta property="og:description" content="Local-first video. One HTML file, no server, no account. Streams straight from public GitHub repos.">
 <meta property="og:type" content="website">
+<link rel=alternate type=application/json href=agent.json title='RAPP Vision creator contract'>
+<link rel=alternate type=application/json href=channels.json title='RAPP Vision channel catalog'>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>">
 <style>
   :root{
@@ -71,6 +73,11 @@
      patched in without moving anything already on screen. */
   .score{position:absolute;right:8px;top:8px;background:rgba(0,0,0,.8);color:var(--accent);
     padding:2px 8px;border-radius:5px;font:600 11px/1.6 var(--mono)}
+  .machine-reviewed{display:inline-flex;align-items:center;background:rgba(0,0,0,.84);color:var(--dim);
+    border:1px dashed currentColor;padding:2px 8px;border-radius:5px;font:600 10.5px/1.6 var(--mono);
+    white-space:nowrap}
+  .thumbwrap>.machine-reviewed{position:absolute;left:8px;bottom:8px}
+  .vtitle .machine-reviewed{margin-left:9px;vertical-align:middle;transform:translateY(-2px)}
   .resume{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.25)}
   .resume i{display:block;height:100%;background:var(--bad)}
   .meta{padding:11px 3px 0}
@@ -226,6 +233,7 @@
       <span aria-hidden="true">🔍</span>
       <input id="q" type="search" placeholder="Search videos, tags, chapters…" aria-label="Search">
     </div>
+    <a class="navbtn" href="agent.json" title="Machine-readable creator contract">Create with an agent</a>
     <button class="navbtn" id="nav-ch">RAPP Hive</button>
     <button class="navbtn" id="nav-lib">Library</button>
     <button class="navbtn" id="nav-about">About</button>
@@ -795,6 +803,11 @@ function scorePillHTML(m) {
   return `<span class="score" title="${esc(title)}">★ ${esc(m.score)}</span>`;
 }
 
+function reviewIndicatorHTML(m) {
+  if (!m || !m.review) return "";
+  return `<span class="machine-reviewed" title="A machine-generated review is available; this is not human approval or registry curation.">Machine reviewed</span>`;
+}
+
 function reviewHTML(r) {
   if (!r) return "";
   return `<div class="mrev">
@@ -851,13 +864,14 @@ function communityHTML(m) {
 /* ---------------------------- views ---------------------------- */
 
 function cardHTML(v) {
-  const p = prog(v), portrait = v.orientation === "portrait";
+  const p = prog(v), portrait = v.orientation === "portrait", m = mget(v);
   return `<a class="card" href="#/watch/${encodeURIComponent(vkey(v))}" data-vk="${esc(vkey(v))}">
     <div class="thumbwrap${portrait ? " portrait" : ""}">
       <img src="${esc(v.thumb)}" alt="" loading="lazy" decoding="async">
       ${portrait ? '<span class="badge">SHORT</span>' : ""}
       <span class="dur">${fmt(v.duration)}</span>
-      ${scorePillHTML(mget(v))}
+      ${scorePillHTML(m)}
+      ${reviewIndicatorHTML(m)}
       ${p > 0.02 && p < 0.97 ? `<span class="resume"><i style="width:${(p * 100).toFixed(1)}%"></i></span>` : ""}
     </div>
     <div class="meta">
@@ -883,9 +897,15 @@ function viewHome(q = "", tag = "") {
   app.innerHTML = `
     ${q || tag ? "" : `<section class="hero">
       <h1>${esc(CHANNELS[0] ? (CHANNELS[0].tagline || CHANNELS[0].about || "Local-first video.") : "Local-first video.")}</h1>
-      <p>Local-first video. This whole site is one HTML file with no backend and no account —
-         the catalog is a JSON file and the media are ordinary files in a public GitHub repo.
-         Your history, resume points and playlists stay in this browser.</p>
+      <p>Watch local-first video with no account or tracking. Your history, resume points and
+         playlists stay in this browser, and the creator contract gives an agent the portable
+         format and validation rules needed to publish.</p>
+      <div class="toolbar" style="margin-top:16px">
+        <a class="tbtn mode-switch" href="agent.json">Create with an agent</a>
+        <a class="tbtn" href="#/channels">Explore RAPP Hive</a>
+      </div>
+      <p style="margin-top:12px">Under the hood, this remains one static HTML player; its JSON
+         catalog points to media in creator-owned repositories.</p>
     </section>`}
     ${tags.length ? `<div class="chips" role="group" aria-label="Filter by tag">
       <button class="chip${tag ? "" : " on"}" data-tag="">All</button>
@@ -1571,7 +1591,7 @@ function viewWatch(id) {
     <div>
       <div id="host"></div>
       <span class="sr" id="mode-status" role="status" aria-live="polite"></span>
-      <h1 class="vtitle">${esc(v.title)}</h1>
+      <h1 class="vtitle">${esc(v.title)}<span id="watch-review" data-vk="${esc(vkey(v))}">${reviewIndicatorHTML(mget(v))}</span></h1>
       <div class="vrow">
         <div class="chan">
           ${avatarHTML(v._ch.avatar, 38)}
@@ -2103,18 +2123,27 @@ async function loadMetrics() {
 }
 
 /* Patch what is already on screen rather than re-running route(): a re-render
-   would tear down a playing <video> and start it over. Both surfaces are
-   additive — the pill is absolutely positioned inside the thumbnail and the
-   community block is the last element in the watch column — so nothing that is
-   already laid out moves when a late snapshot lands. */
+   would tear down a playing <video> and start it over. Card additions stay
+   inside the thumbnail, and the active watch view has a dedicated title slot. */
+function patchReviewIndicator(target, m) {
+  if (!target || !m || !m.review || $(".machine-reviewed", target)) return;
+  target.insertAdjacentHTML("beforeend", reviewIndicatorHTML(m));
+}
+
 function applyMetrics() {
   const slot = $("#community");
   if (slot && !slot.innerHTML) slot.innerHTML = communityHTML(mfind(slot.dataset.vk));
+  const watchReview = $("#watch-review[data-vk]");
+  if (watchReview) patchReviewIndicator(watchReview, mfind(watchReview.dataset.vk));
   document.querySelectorAll(".card[data-vk]").forEach(a => {
     const wrap = $(".thumbwrap", a);
-    if (!wrap || $(".score", wrap)) return;
-    const pill = scorePillHTML(mfind(a.dataset.vk));
-    if (pill) wrap.insertAdjacentHTML("beforeend", pill);
+    if (!wrap) return;
+    const m = mfind(a.dataset.vk);
+    if (!$(".score", wrap)) {
+      const pill = scorePillHTML(m);
+      if (pill) wrap.insertAdjacentHTML("beforeend", pill);
+    }
+    patchReviewIndicator(wrap, m);
   });
 }
 
