@@ -184,6 +184,12 @@ class TestCreatorReview(unittest.TestCase):
             "base.ref == github.event.repository.default_branch",
             workflow,
         )
+        self.assertIn(
+            "contains(github.event.pull_request.body, "
+            "'rapp-vision-submission/1.0')",
+            workflow,
+        )
+        self.assertIn("apt-get install -y --no-install-recommends ffmpeg", workflow)
         self.assertIn("persist-credentials: false", workflow)
         self.assertIn("--event \"$GITHUB_EVENT_PATH\"", workflow)
         self.assertIn("--repository \"$GITHUB_REPOSITORY\"", workflow)
