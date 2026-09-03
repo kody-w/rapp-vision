@@ -80,20 +80,21 @@
   "claims": [
     {
       "id": "positive",
-      "claim": "The 1990 and 2020 sheets compare to seven changed IDs; the changed-only filter leaves those seven visible, WL-012 can be inspected after a semantic zoom and pan, and export emits the exact sorted canonical bytes and digest.",
+      "claim": "The 1990 and 2020 sheets compare to seven changed IDs; the changed-only filter leaves those seven visible, WL-016 remains visible while it is inspected after a semantic zoom and pan, and export emits the exact sorted canonical bytes and digest.",
       "actions": [
         {"do":"click","selector":"#compare-btn"},
         {"do":"click","selector":"#filter-changed-btn"},
-        {"do":"click","selector":"#record-wl-012"},
+        {"do":"click","selector":"#record-wl-016"},
         {"do":"click","selector":"#zoom-in-btn"},
         {"do":"click","selector":"#pan-east-btn"},
         {"do":"click","selector":"#export-btn"}
       ],
       "assertions": [
         {"path":"totalRecords","equals":24},
+        {"path":"acceptedYears","equals":{"from":1990,"to":2020}},
         {"path":"changedCount","equals":7},
         {"path":"visibleCount","equals":7},
-        {"path":"focus","equals":"WL-012"},
+        {"path":"focus","equals":"WL-016"},
         {"path":"filter","equals":"changed"},
         {"path":"view.panX","equals":40},
         {"path":"view.zoom","equals":1.25},
@@ -104,14 +105,15 @@
         "schema": "archive-map-state/1.0",
         "snapshotLabels": {"from":"1990 field sheet","to":"2020 field sheet"},
         "years": {"from":1990,"to":2020},
+        "acceptedYears": {"from":1990,"to":2020},
         "totalRecords": 24,
         "visibleRecordIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
         "visibleCount": 7,
         "changedIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
         "changedCount": 7,
         "filter": "changed",
-        "focus": "WL-012",
-        "focusedRecord": {"id":"WL-012","name":"Marsh Lantern","from":"sedge-meadow","to":"reed-bed","changed":true,"coordinate":"E 1590 / N 2190"},
+        "focus": "WL-016",
+        "focusedRecord": {"id":"WL-016","name":"Quartz Reed","from":"reed-bed","to":"willow-edge","changed":true,"coordinate":"E 1400 / N 2280"},
         "view": {"panX":40,"panY":0,"zoom":1.25},
         "extent": {"minX":1000,"maxX":1600,"minY":2000,"maxY":2400,"label":"SYN E 1000–1600 / N 2000–2400"},
         "comparison": {"status":"success","message":"1990 → 2020: 7 changed records across 24 synthetic stations.","queryResultCount":7,"canonical":true},
@@ -135,6 +137,7 @@
       "assertions": [
         {"path":"years.from","equals":1880},
         {"path":"years.to","equals":1885},
+        {"path":"acceptedYears","equals":{"from":1990,"to":2020}},
         {"path":"comparison.status","equals":"rejected-empty"},
         {"path":"comparison.queryResultCount","equals":null},
         {"path":"changedCount","equals":7},
@@ -146,14 +149,15 @@
         "schema": "archive-map-state/1.0",
         "snapshotLabels": {"from":"1880 (no sheet)","to":"1885 (no sheet)"},
         "years": {"from":1880,"to":1885},
+        "acceptedYears": {"from":1990,"to":2020},
         "totalRecords": 24,
         "visibleRecordIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
         "visibleCount": 7,
         "changedIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
         "changedCount": 7,
         "filter": "changed",
-        "focus": "WL-012",
-        "focusedRecord": {"id":"WL-012","name":"Marsh Lantern","from":"sedge-meadow","to":"reed-bed","changed":true,"coordinate":"E 1590 / N 2190"},
+        "focus": "WL-016",
+        "focusedRecord": {"id":"WL-016","name":"Quartz Reed","from":"reed-bed","to":"willow-edge","changed":true,"coordinate":"E 1400 / N 2280"},
         "view": {"panX":40,"panY":0,"zoom":1.25},
         "extent": {"minX":1000,"maxX":1600,"minY":2000,"maxY":2400,"label":"SYN E 1000–1600 / N 2000–2400"},
         "comparison": {"status":"rejected-empty","message":"Empty query rejected: no archive sheets exist for 1880 → 1885. Canonical export preserved.","queryResultCount":null,"canonical":false},
@@ -172,6 +176,7 @@
       "assertions": [
         {"path":"years.from","equals":1990},
         {"path":"years.to","equals":2020},
+        {"path":"acceptedYears","equals":{"from":1990,"to":2020}},
         {"path":"totalRecords","equals":24},
         {"path":"visibleCount","equals":24},
         {"path":"changedCount","equals":7},
@@ -186,6 +191,7 @@
         "schema": "archive-map-state/1.0",
         "snapshotLabels": {"from":"1990 field sheet","to":"2020 field sheet"},
         "years": {"from":1990,"to":2020},
+        "acceptedYears": {"from":1990,"to":2020},
         "totalRecords": 24,
         "visibleRecordIds": ["WL-001","WL-002","WL-003","WL-004","WL-005","WL-006","WL-007","WL-008","WL-009","WL-010","WL-011","WL-012","WL-013","WL-014","WL-015","WL-016","WL-017","WL-018","WL-019","WL-020","WL-021","WL-022","WL-023","WL-024"],
         "visibleCount": 24,
@@ -218,10 +224,13 @@
     ],
     "framingAction": "scroll",
     "coordinateFree": true,
+    "exactTiming": true,
+    "activationVisibilityRequired": true,
+    "checkpointVisibilityRequired": true,
     "scrollSelectors": [
       "#compare-btn",
       "#filter-changed-btn",
-      "#record-wl-012",
+      "#record-wl-016",
       "#zoom-in-btn",
       "#export-btn",
       "#export-output",
@@ -261,6 +270,35 @@
         "height": 844
       }
     ]
+  },
+  "runtimeAudit": {
+    "digestEncoding": "UTF-8",
+    "unicodeDigestVector": {
+      "text": "wetland · marsh",
+      "sha256": "64ab66483871ac72d1c8f8ab01df762469d56247d8aad98fbb2100c49a58492e"
+    },
+    "invalidQuery": {
+      "input": {"from":"wetland","to":"2020"},
+      "status": "rejected-invalid",
+      "queryResultCount": null,
+      "preservesAcceptedYears": {"from":1990,"to":2020},
+      "preservesChangedCount": 7,
+      "preservesExportDigest": "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6"
+    },
+    "network": {
+      "blockedSchemes": ["http", "https", "ws", "wss"],
+      "observedVia": ["Network.requestWillBeSent", "Network.loadingFailed"],
+      "expectedExternalRequests": 0
+    },
+    "browserErrors": {
+      "observedVia": ["Runtime.exceptionThrown", "Runtime.consoleAPICalled", "Log.entryAdded"],
+      "expected": 0
+    },
+    "cleanup": {
+      "browserExitRequired": true,
+      "profileRemovalRequired": true,
+      "errorsAreFatal": true
+    }
   },
   "objective": {
     "method": "For each of the 24 records, compare the exact categorical value stored under snapshots.1990 with snapshots.2020, retain unequal records, sort their IDs lexically, serialize the compact JSON array plus one LF, and compute SHA-256 over those UTF-8 bytes.",

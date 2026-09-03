@@ -17,7 +17,7 @@ record IDs, in lexical order:
 WL-002, WL-005, WL-009, WL-012, WL-016, WL-020, WL-023
 ```
 
-The canonical export is compact JSON plus one LF. Its SHA-256 is:
+The canonical export is compact UTF-8 JSON plus one LF. Its SHA-256 is:
 
 ```text
 fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6
@@ -47,12 +47,13 @@ focused `type` actions. It performs the following path:
 
 1. Compare 1990 with 2020.
 2. Filter to seven changed records.
-3. Inspect `WL-012`, zoom once, and pan east once.
+3. Inspect `WL-016`, zoom once, and pan east once while the focused station
+   remains inside the map window.
 4. Export the exact sorted ID list.
 5. Type the supplied impossible range `1880 → 1885`.
 6. Distinctly reject the empty query with `queryResultCount: null`; the app
    never presents it as a successful zero-change result and preserves the
-   canonical export.
+   accepted 1990/2020 state and canonical export.
 7. Activate **Restore archive view**.
 
 Reset returns all 24 records, 1990/2020, seven changes, filter `all`, no
@@ -60,11 +61,19 @@ focused record, pan `0,0`, zoom `1.00`, and the expected export digest. After
 the replay, every record button and each pan/zoom control remains available
 for viewer takeover.
 
+Non-integer query text is rejected as `rejected-invalid` without poisoning the
+accepted state. The in-app SHA-256 implementation encodes all strings as
+UTF-8, and the browser audit checks a non-ASCII digest vector in addition to
+the canonical ASCII export.
+
 `verify_dom.mjs` reserves an explicit DevTools port, waits up to 45 seconds
-while detecting early browser exit, replays the production manifest in a real
-Chromium-family browser at 1120 px and 390 px, asserts DOM and state snapshots,
-captures JavaScript errors, demonstrates takeover, closes the process, and
-removes its profile.
+while detecting early browser exit, blocks HTTP(S) and WebSocket traffic via
+DevTools, observes every page request, and replays the production manifest at
+its authored timestamps in a real Chromium-family browser at 1120 px and
+390 px. It requires every activation and checkpoint result to be on-screen,
+asserts independent fixture arithmetic plus actual DOM/window state, captures
+JavaScript and console errors, demonstrates takeover through a measured map
+transform, closes the process, verifies browser exit, and removes its profile.
 
 ## Reproduce
 
@@ -85,8 +94,10 @@ their `RAPP_VISION_*` aliases, normal environment/PATH names, and common
 portable Windows, macOS, and Linux locations. Explicit command arguments take
 precedence.
 
-The focused test always validates schema, source shape, delivery hashes,
-rights, privacy, exact fixture arithmetic, and LF-normalized text contracts.
+The focused test always validates schema, source shape, complete delivery
+hash coverage, stale-hash rejection, rights, privacy, exact fixture
+arithmetic, raw canonical LF bytes, UTF-8 digest behavior, and CRLF-tolerant
+source parsing.
 When browser, FFmpeg, and FFprobe are discoverable, it also runs real-browser
 replay, codec probes, compiler checks, a clean deterministic master rebuild,
 paired recompilation, and byte-for-byte diff checks.

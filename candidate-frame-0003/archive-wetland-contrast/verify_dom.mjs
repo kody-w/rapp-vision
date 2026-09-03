@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { createServer } from "node:net";
 import { constants as fsConstants } from "node:fs";
 import { access, readFile, rm } from "node:fs/promises";
 import {
   delimiter,
+  basename,
   dirname,
   extname,
   isAbsolute,
@@ -52,7 +54,7 @@ async function isExecutable(path) {
   try {
     await access(path, fsConstants.X_OK);
     return true;
-  } catch {
+  } catch (error) {
     return false;
   }
 }
@@ -185,6 +187,13 @@ const appPath = resolve(options.app);
 const evidencePath = resolve(options.evidence);
 const manifestPath = resolve(options.manifest);
 const profilePath = resolve(options.profile);
+if (
+  profilePath === ROOT ||
+  profilePath === dirname(profilePath) ||
+  !basename(profilePath).startsWith(".")
+) {
+  throw new Error("browser profile must be a hidden, non-root scratch directory");
+}
 await rm(profilePath, { recursive: true, force: true });
 
 const debugPort = await new Promise((resolvePort, rejectPort) => {
@@ -224,33 +233,52 @@ browser.once("error", error => {
 
 const delay = milliseconds =>
   new Promise(resolveDelay => setTimeout(resolveDelay, milliseconds));
+const browserRunning = () =>
+  browser.exitCode === null && browser.signalCode === null;
+const errorText = error =>
+  error instanceof Error ? `${error.name}: ${error.message}` : String(error);
 
 async function activePort(timeout = 45000) {
   const deadline = Date.now() + timeout;
+  let lastError = null;
   while (Date.now() < deadline) {
     if (launchError) throw launchError;
-    if (browser.exitCode !== null) {
-      throw new Error(`browser exited before DevTools was ready: ${browser.exitCode}`);
+    if (!browserRunning()) {
+      throw new Error(
+        `browser exited before DevTools was ready: ${browser.exitCode ?? browser.signalCode}`
+      );
     }
     try {
       const response = await fetch(`http://127.0.0.1:${debugPort}/json/version`);
       if (response.ok) return String(debugPort);
-    } catch {}
+    } catch (error) {
+      lastError = error;
+    }
     await delay(75);
   }
-  throw new Error("browser did not publish its reserved explicit DevTools port");
+  throw new Error(
+    "browser did not publish its reserved explicit DevTools port" +
+    (lastError ? `; last error: ${errorText(lastError)}` : "")
+  );
 }
 
 async function readJson(url, timeout = 15000) {
   const deadline = Date.now() + timeout;
+  let lastError = null;
   while (Date.now() < deadline) {
     try {
       const response = await fetch(url);
       if (response.ok) return await response.json();
-    } catch {}
+      lastError = new Error(`HTTP ${response.status} from ${url}`);
+    } catch (error) {
+      lastError = error;
+    }
     await delay(75);
   }
-  throw new Error(`timed out waiting for ${url}`);
+  throw new Error(
+    `timed out waiting for ${url}` +
+    (lastError ? `; last error: ${errorText(lastError)}` : "")
+  );
 }
 
 class Cdp {
@@ -269,6 +297,7 @@ class Cdp {
         const waiter = this.pending.get(message.id);
         if (!waiter) return;
         this.pending.delete(message.id);
+        clearTimeout(waiter.timer);
         if (message.error) waiter.reject(new Error(message.error.message));
         else waiter.resolve(message.result);
         return;
@@ -281,6 +310,18 @@ class Cdp {
       this.socket.addEventListener("open", resolveConnect, { once: true });
       this.socket.addEventListener("error", rejectConnect, { once: true });
     });
+    const rejectPending = event => {
+      const reason = new Error(
+        `DevTools socket ${event.type === "close" ? "closed" : "failed"}`
+      );
+      for (const waiter of this.pending.values()) {
+        clearTimeout(waiter.timer);
+        waiter.reject(reason);
+      }
+      this.pending.clear();
+    };
+    this.socket.addEventListener("close", rejectPending);
+    this.socket.addEventListener("error", rejectPending);
   }
 
   on(method, listener) {
@@ -289,12 +330,17 @@ class Cdp {
     this.listeners.set(method, listeners);
   }
 
-  command(method, params = {}) {
+  command(method, params = {}, timeout = 15000) {
     const id = this.nextId++;
     return new Promise((resolveCommand, rejectCommand) => {
+      const timer = setTimeout(() => {
+        this.pending.delete(id);
+        rejectCommand(new Error(`DevTools command timed out: ${method}`));
+      }, timeout);
       this.pending.set(id, {
         resolve: resolveCommand,
         reject: rejectCommand,
+        timer,
       });
       this.socket.send(JSON.stringify({ id, method, params }));
     });
@@ -326,13 +372,19 @@ async function evaluate(expression) {
 
 async function waitFor(expression, timeout = 15000) {
   const deadline = Date.now() + timeout;
+  let lastError = null;
   while (Date.now() < deadline) {
     try {
       if (await evaluate(expression)) return;
-    } catch {}
+    } catch (error) {
+      lastError = error;
+    }
     await delay(75);
   }
-  throw new Error(`timed out waiting for browser condition: ${expression}`);
+  throw new Error(
+    `timed out waiting for browser condition: ${expression}` +
+    (lastError ? `; last error: ${errorText(lastError)}` : "")
+  );
 }
 
 async function setViewport(viewport) {
@@ -353,6 +405,7 @@ async function navigate(url) {
 }
 
 async function click(selector) {
+  await assertVisible(selector);
   const encoded = JSON.stringify(selector);
   await evaluate(`(() => {
     const element = document.querySelector(${encoded});
@@ -386,6 +439,8 @@ async function scroll(action) {
     });
     return true;
   })()`);
+  await delay(40);
+  await assertVisible(action.selector);
 }
 
 async function typeText(text) {
@@ -398,10 +453,28 @@ async function typeText(text) {
       editable: Boolean(
         element &&
         (element.matches("input,textarea") || element.isContentEditable)
-      )
+      ),
+      width: element?.getBoundingClientRect().width || 0,
+      height: element?.getBoundingClientRect().height || 0,
+      left: element?.getBoundingClientRect().left || 0,
+      right: element?.getBoundingClientRect().right || 0,
+      top: element?.getBoundingClientRect().top || 0,
+      bottom: element?.getBoundingClientRect().bottom || 0,
+      display: element ? getComputedStyle(element).display : "",
+      visibility: element ? getComputedStyle(element).visibility : ""
     };
   })()`);
   assert.equal(active.editable, true, `typing target ${active.id || active.tag} is not editable`);
+  assert.ok(active.width > 0 && active.height > 0, "typing target has no box");
+  assert.notEqual(active.display, "none", "typing target is display:none");
+  assert.notEqual(active.visibility, "hidden", "typing target is hidden");
+  assert.ok(
+    active.right > 0 &&
+      active.left < (await evaluate("innerWidth")) &&
+      active.bottom > 0 &&
+      active.top < (await evaluate("innerHeight")),
+    "typing target is outside the viewport"
+  );
   await cdp.command("Input.insertText", { text });
 }
 
@@ -433,16 +506,22 @@ async function assertVisible(selector) {
       height: bounds.height,
       top: bounds.top,
       bottom: bounds.bottom,
+      left: bounds.left,
+      right: bounds.right,
       display: style.display,
       visibility: style.visibility,
-      viewportHeight: innerHeight
+      opacity: style.opacity,
+      viewportHeight: innerHeight,
+      viewportWidth: innerWidth
     };
   })()`);
   assert.equal(result.exists, true, `missing visible checkpoint ${selector}`);
   assert.ok(result.width > 0 && result.height > 0, `${selector} has no box`);
   assert.notEqual(result.display, "none", `${selector} is display:none`);
   assert.notEqual(result.visibility, "hidden", `${selector} is hidden`);
+  assert.notEqual(result.opacity, "0", `${selector} is transparent`);
   assert.ok(result.bottom > 0 && result.top < result.viewportHeight, `${selector} is offscreen`);
+  assert.ok(result.right > 0 && result.left < result.viewportWidth, `${selector} is offscreen`);
 }
 
 async function assertDisplayed(snapshot, viewport) {
@@ -457,6 +536,7 @@ async function assertDisplayed(snapshot, viewport) {
       total: document.querySelector("#total-count").textContent,
       changed: document.querySelector("#changed-count").textContent,
       visibleFilter: document.querySelector("#visible-filter").textContent,
+      changedButton: document.querySelector("#filter-changed-btn").textContent,
       focus: document.querySelector("#focus-readout").textContent,
       extent: document.querySelector("#extent-readout").textContent,
       view: document.querySelector("#view-readout").textContent,
@@ -486,6 +566,7 @@ async function assertDisplayed(snapshot, viewport) {
   assert.equal(displayed.total, `${snapshot.totalRecords} records`);
   assert.equal(displayed.changed, `${snapshot.changedCount} records`);
   assert.equal(displayed.visibleFilter, `${snapshot.visibleCount} · ${snapshot.filter}`);
+  assert.equal(displayed.changedButton, `Show ${snapshot.changedCount} changed`);
   assert.equal(displayed.focus, snapshot.focus || "none");
   assert.equal(displayed.extent, `Synthetic extent · ${snapshot.extent.label}`);
   assert.equal(
@@ -494,7 +575,7 @@ async function assertDisplayed(snapshot, viewport) {
   );
   assert.equal(displayed.status, snapshot.message);
   assert.equal(displayed.statusKind, snapshot.status);
-  assert.equal(displayed.errorHidden, snapshot.comparison.status !== "rejected-empty");
+  assert.equal(displayed.errorHidden, !snapshot.comparison.status.startsWith("rejected-"));
   assert.equal(displayed.error, snapshot.comparison.message);
   assert.equal(displayed.exportText, snapshot.export.text.trimEnd());
   assert.equal(displayed.digest, `sha256 ${snapshot.export.digest}`);
@@ -513,6 +594,23 @@ async function assertDisplayed(snapshot, viewport) {
   }
 }
 
+const EXPECTED_CHANGED_IDS = [
+  "WL-002",
+  "WL-005",
+  "WL-009",
+  "WL-012",
+  "WL-016",
+  "WL-020",
+  "WL-023",
+];
+const EXPECTED_EXPORT_DIGEST =
+  "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6";
+const requestUrls = new Map();
+const externalRequests = [];
+const blockedExternalRequests = [];
+let report = null;
+let runError = null;
+
 try {
   const port = await activePort(45000);
   const targets = await readJson(`http://127.0.0.1:${port}/json/list`);
@@ -526,15 +624,38 @@ try {
     cdp.command("Page.enable"),
     cdp.command("Runtime.enable"),
     cdp.command("Log.enable"),
+    cdp.command("Network.enable"),
   ]);
+  await cdp.command("Network.setBlockedURLs", {
+    urls: ["http://*", "https://*", "ws://*", "wss://*"],
+  });
   cdp.on("Runtime.exceptionThrown", ({ exceptionDetails }) => {
     browserErrors.push(
       exceptionDetails.exception?.description || exceptionDetails.text
     );
   });
+  cdp.on("Runtime.consoleAPICalled", ({ type, args }) => {
+    if (type === "error") {
+      browserErrors.push(
+        args.map(value => value.value ?? value.description ?? "").join(" ")
+      );
+    }
+  });
   cdp.on("Log.entryAdded", ({ entry }) => {
     if (entry.level === "error" && entry.source === "javascript") {
       browserErrors.push(entry.text);
+    }
+  });
+  cdp.on("Network.requestWillBeSent", ({ requestId, request }) => {
+    requestUrls.set(requestId, request.url);
+    if (/^(?:https?|wss?):/i.test(request.url)) {
+      externalRequests.push(request.url);
+    }
+  });
+  cdp.on("Network.loadingFailed", ({ requestId, blockedReason }) => {
+    const url = requestUrls.get(requestId);
+    if (blockedReason && url && /^(?:https?|wss?):/i.test(url)) {
+      blockedExternalRequests.push({ url, blockedReason });
     }
   });
 
@@ -546,6 +667,9 @@ try {
   assert.ok(scene, "manifest replay scene is missing");
   assert.equal(scene.app, "apps/explore-archive-map-contrast.html");
   assert.equal(scene.actions.length, replay.actionCount);
+  assert.equal(replay.exactTiming, true);
+  assert.equal(replay.activationVisibilityRequired, true);
+  assert.equal(replay.checkpointVisibilityRequired, true);
   assert.deepEqual(
     [...new Set(scene.actions.map(action => action.do))].sort(),
     [...replay.allowedActions].sort()
@@ -574,6 +698,7 @@ try {
     ])
   );
   const viewportResults = [];
+  const timingSkews = [];
   let lastReset = null;
   let lastFailure = null;
 
@@ -582,10 +707,34 @@ try {
     await navigate(appUrl);
     const readySelector = scene.ready.selector;
     await waitFor(`Boolean(document.querySelector(${JSON.stringify(readySelector)}))`);
+    await assertVisible(readySelector);
     assert.equal(
       await evaluate(`document.querySelector(${JSON.stringify(readySelector)}).disabled`),
       false
     );
+    assert.equal(
+      await evaluate("window.tinySystem === window.archiveWetlandMap"),
+      true
+    );
+    const actualFixture = await evaluate("window.archiveWetlandMap.fixture");
+    assert.equal(actualFixture.synthetic, true);
+    assert.equal(actualFixture.records.length, 24);
+    assert.deepEqual(
+      actualFixture.records.map(record => record.id),
+      Array.from({ length: 24 }, (_, index) => `WL-${String(index + 1).padStart(3, "0")}`)
+    );
+    const independentlyChanged = actualFixture.records
+      .filter(record => record.snapshots["1990"] !== record.snapshots["2020"])
+      .map(record => record.id)
+      .sort();
+    const canonicalText = `${JSON.stringify(independentlyChanged)}\n`;
+    const independentDigest = createHash("sha256")
+      .update(canonicalText, "utf8")
+      .digest("hex");
+    assert.deepEqual(independentlyChanged, EXPECTED_CHANGED_IDS);
+    assert.equal(independentDigest, EXPECTED_EXPORT_DIGEST);
+    assert.equal(canonicalText, evidence.fixture.export.text);
+
     const opening = await evaluate("window.archiveWetlandMap.snapshot()");
     assert.deepEqual(opening, claims.get("reset").expectedState);
     assert.equal(
@@ -594,11 +743,30 @@ try {
       ),
       evidence.fixture.export.sha256
     );
+    assert.equal(
+      await evaluate(
+        `window.archiveWetlandMap.digestText(${JSON.stringify(
+          evidence.runtimeAudit.unicodeDigestVector.text
+        )})`
+      ),
+      evidence.runtimeAudit.unicodeDigestVector.sha256
+    );
     await assertDisplayed(opening, viewport);
 
     const observed = [];
+    let positiveState = null;
+    const replayStarted = performance.now();
     for (let index = 0; index < scene.actions.length; index += 1) {
-      await replayAction(scene.actions[index]);
+      const action = scene.actions[index];
+      const remaining = action.at * 1000 - (performance.now() - replayStarted);
+      if (remaining > 0) await delay(remaining);
+      const actualAt = performance.now() - replayStarted;
+      assert.ok(
+        actualAt + 5 >= action.at * 1000,
+        `action ${index} ran before its authored time`
+      );
+      timingSkews.push(actualAt - action.at * 1000);
+      await replayAction(action);
       const checkpoint = checkpoints.get(index);
       if (!checkpoint) continue;
       const actual = await evaluate("window.archiveWetlandMap.snapshot()");
@@ -606,11 +774,46 @@ try {
       await assertDisplayed(actual, viewport);
       await assertVisible(checkpoint.selector);
       observed.push(checkpoint.claim);
+      if (checkpoint.claim === "positive") {
+        positiveState = actual;
+        const focusPlacement = await evaluate(`(() => {
+          const marker = document.querySelector(
+            "#record-" + window.archiveWetlandMap.snapshot().focus.toLowerCase()
+          );
+          const markerBounds = marker.getBoundingClientRect();
+          const mapBounds = document.querySelector("#map-window").getBoundingClientRect();
+          const center = {
+            x: markerBounds.left + markerBounds.width / 2,
+            y: markerBounds.top + markerBounds.height / 2
+          };
+          return {
+            center,
+            inside:
+              center.x >= mapBounds.left &&
+              center.x <= mapBounds.right &&
+              center.y >= mapBounds.top &&
+              center.y <= mapBounds.bottom,
+            focused: marker.dataset.focused,
+            hidden: marker.hidden
+          };
+        })()`);
+        assert.equal(focusPlacement.inside, true);
+        assert.equal(focusPlacement.focused, "true");
+        assert.equal(focusPlacement.hidden, false);
+      }
       if (checkpoint.claim === "failure") {
         assert.equal(actual.comparison.queryResultCount, null);
         assert.equal(actual.changedCount, 7);
         assert.equal(actual.export.status, "preserved");
         assert.equal(actual.export.digest, evidence.fixture.export.sha256);
+        assert.deepEqual(actual.acceptedYears, positiveState.acceptedYears);
+        assert.deepEqual(actual.changedIds, positiveState.changedIds);
+        assert.equal(actual.filter, positiveState.filter);
+        assert.equal(actual.focus, positiveState.focus);
+        assert.deepEqual(actual.view, positiveState.view);
+        assert.deepEqual(actual.export.ids, positiveState.export.ids);
+        assert.equal(actual.export.text, positiveState.export.text);
+        assert.equal(actual.export.digest, positiveState.export.digest);
         lastFailure = actual;
       }
       if (checkpoint.claim === "reset") {
@@ -622,51 +825,197 @@ try {
     viewportResults.push(viewport.name);
   }
 
+  const beforeInvalid = await evaluate("window.archiveWetlandMap.snapshot()");
+  await scroll({ selector: "#from-year", block: "start" });
+  await click("#from-year");
+  await typeText(evidence.runtimeAudit.invalidQuery.input.from);
+  await scroll({ selector: "#compare-btn", block: "start" });
+  await click("#compare-btn");
+  const invalid = await evaluate("window.archiveWetlandMap.snapshot()");
+  assert.equal(invalid.comparison.status, "rejected-invalid");
+  assert.equal(invalid.comparison.queryResultCount, null);
+  assert.deepEqual(invalid.years, beforeInvalid.years);
+  assert.deepEqual(invalid.acceptedYears, beforeInvalid.acceptedYears);
+  assert.deepEqual(invalid.changedIds, beforeInvalid.changedIds);
+  assert.equal(invalid.filter, beforeInvalid.filter);
+  assert.equal(invalid.focus, beforeInvalid.focus);
+  assert.deepEqual(invalid.view, beforeInvalid.view);
+  assert.deepEqual(invalid.export.ids, beforeInvalid.export.ids);
+  assert.equal(invalid.export.text, beforeInvalid.export.text);
+  assert.equal(invalid.export.digest, beforeInvalid.export.digest);
+  assert.equal(invalid.export.status, "preserved");
+  await scroll({ selector: "#query-error", block: "start" });
+  await assertVisible("#query-error");
+  assert.equal(
+    await evaluate(`(() => {
+      try {
+        window.archiveWetlandMap.changedIds(1880, 1885);
+        return "not-rejected";
+      } catch (error) {
+        return error.name;
+      }
+    })()`),
+    "RangeError"
+  );
+  assert.equal(
+    await evaluate(`(() => {
+      try {
+        window.archiveWetlandMap.digestText(17);
+        return "not-rejected";
+      } catch (error) {
+        return error.name;
+      }
+    })()`),
+    "TypeError"
+  );
+  assert.equal(
+    await evaluate(`(() => {
+      try {
+        window.archiveWetlandMap.reduce(
+          window.archiveWetlandMap.initialState(),
+          { type: "UNKNOWN" }
+        );
+        return "not-rejected";
+      } catch (error) {
+        return error.name;
+      }
+    })()`),
+    "RangeError"
+  );
+  await scroll({ selector: "#restore-btn", block: "start" });
+  await click("#restore-btn");
+  assert.deepEqual(
+    await evaluate("window.archiveWetlandMap.snapshot()"),
+    lastReset
+  );
+
+  await scroll({ selector: "#record-wl-024", block: "center" });
+  const beforeTakeover = await evaluate(`(() => {
+    const marker = document.querySelector("#record-wl-024");
+    const bounds = marker.getBoundingClientRect();
+    return {
+      center: { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 },
+      mapTransform: getComputedStyle(document.querySelector("#map-sheet")).transform
+    };
+  })()`);
   await click("#record-wl-024");
+  await scroll({ selector: "#zoom-out-btn", block: "start" });
   await click("#zoom-out-btn");
   await click("#pan-north-btn");
+  await delay(250);
   const takeover = await evaluate("window.archiveWetlandMap.snapshot()");
+  const takeoverDom = await evaluate(`(() => {
+    const marker = document.querySelector("#record-wl-024");
+    const bounds = marker.getBoundingClientRect();
+    const matrix = new DOMMatrixReadOnly(
+      getComputedStyle(document.querySelector("#map-sheet")).transform
+    );
+    return {
+      center: { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 },
+      matrix: { a: matrix.a, d: matrix.d, e: matrix.e, f: matrix.f },
+      focused: marker.dataset.focused,
+      pressed: marker.getAttribute("aria-pressed"),
+      detailHidden: document.querySelector("#record-detail").hidden,
+      detailTitle: document.querySelector("#record-detail-title").textContent,
+      mapTransform: getComputedStyle(document.querySelector("#map-sheet")).transform
+    };
+  })()`);
   assert.equal(takeover.focus, "WL-024");
   assert.equal(takeover.visibleCount, 24);
   assert.deepEqual(takeover.view, { panX: 0, panY: -40, zoom: 0.75 });
-  assert.deepEqual(browserErrors, []);
-
-  console.log(
-    JSON.stringify({
-      browser: browserVersion.product,
-      actionCount: scene.actions.length,
-      viewports: viewportResults,
-      recordCount: lastReset.totalRecords,
-      changedCount: lastReset.changedCount,
-      changedIds: lastReset.changedIds,
-      digest: lastReset.export.digest,
-      failureStatus: lastFailure.comparison.status,
-      failureResultCount: lastFailure.comparison.queryResultCount,
-      failureExportStatus: lastFailure.export.status,
-      resetVisibleCount: lastReset.visibleCount,
-      resetFocus: lastReset.focus,
-      resetView: lastReset.view,
-      takeover: {
-        focus: takeover.focus,
-        visibleCount: takeover.visibleCount,
-        view: takeover.view,
-      },
-      browserErrors: browserErrors.length,
-    })
+  assert.deepEqual(takeoverDom.matrix, { a: 0.75, d: 0.75, e: 0, f: -40 });
+  assert.equal(takeoverDom.focused, "true");
+  assert.equal(takeoverDom.pressed, "true");
+  assert.equal(takeoverDom.detailHidden, false);
+  assert.equal(takeoverDom.detailTitle, "WL-024 · Zephyr Sedge");
+  assert.notEqual(takeoverDom.mapTransform, beforeTakeover.mapTransform);
+  assert.ok(
+    Math.hypot(
+      takeoverDom.center.x - beforeTakeover.center.x,
+      takeoverDom.center.y - beforeTakeover.center.y
+    ) > 5,
+    "takeover controls did not move the visible map record"
   );
-} finally {
+
+  await delay(150);
+  assert.deepEqual(externalRequests, []);
+  assert.deepEqual(blockedExternalRequests, []);
+  assert.deepEqual(browserErrors, []);
+  report = {
+    browser: browserVersion.product,
+    actionCount: scene.actions.length,
+    manifestActivationChecks: scene.actions.filter(action =>
+      ["click", "type"].includes(action.do)
+    ).length,
+    checkpointVisibilityChecks: replay.checkpoints.length * replay.viewports.length,
+    exactTiming: true,
+    maxTimingSkewMs: Math.round(Math.max(...timingSkews)),
+    viewports: viewportResults,
+    recordCount: lastReset.totalRecords,
+    changedCount: lastReset.changedCount,
+    changedIds: lastReset.changedIds,
+    digest: lastReset.export.digest,
+    failureStatus: lastFailure.comparison.status,
+    failureResultCount: lastFailure.comparison.queryResultCount,
+    failureExportStatus: lastFailure.export.status,
+    failureAcceptedYears: lastFailure.acceptedYears,
+    invalidStatus: invalid.comparison.status,
+    resetVisibleCount: lastReset.visibleCount,
+    resetFocus: lastReset.focus,
+    resetView: lastReset.view,
+    takeover: {
+      focus: takeover.focus,
+      visibleCount: takeover.visibleCount,
+      view: takeover.view,
+      transform: takeoverDom.matrix,
+    },
+    networkBlocked: true,
+    externalNetworkRequests: externalRequests.length,
+    blockedExternalRequests: blockedExternalRequests.length,
+    browserErrors: browserErrors.length,
+  };
+} catch (error) {
+  runError = error;
+}
+
+async function pathExists(path) {
+  try {
+    await access(path);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") return false;
+    throw error;
+  }
+}
+
+async function cleanupBrowser() {
+  const errors = [];
   if (cdp) {
     try {
-      await cdp.command("Browser.close");
-    } catch {}
+      await cdp.command("Browser.close", {}, 5000);
+    } catch (error) {
+      if (browserRunning()) {
+        errors.push(new Error(`Browser.close failed: ${errorText(error)}`));
+      }
+    }
     cdp.close();
   }
-  const exitDeadline = Date.now() + 2500;
-  while (browser.exitCode === null && Date.now() < exitDeadline) {
+  let exitDeadline = Date.now() + 5000;
+  while (browserRunning() && Date.now() < exitDeadline) {
     await delay(75);
   }
-  if (browser.exitCode === null) browser.kill();
-  await delay(500);
+  if (browserRunning()) {
+    if (!browser.kill()) {
+      errors.push(new Error("browser process could not be terminated"));
+    }
+    exitDeadline = Date.now() + 5000;
+    while (browserRunning() && Date.now() < exitDeadline) {
+      await delay(75);
+    }
+  }
+  if (browserRunning()) {
+    errors.push(new Error("browser process remained alive after cleanup"));
+  }
   try {
     await rm(profilePath, {
       recursive: true,
@@ -674,5 +1023,34 @@ try {
       maxRetries: 12,
       retryDelay: 150,
     });
-  } catch {}
+  } catch (error) {
+    errors.push(new Error(`profile removal failed: ${errorText(error)}`));
+  }
+  let profileRemoved = false;
+  try {
+    profileRemoved = !(await pathExists(profilePath));
+  } catch (error) {
+    errors.push(new Error(`profile verification failed: ${errorText(error)}`));
+  }
+  if (!profileRemoved) {
+    errors.push(new Error(`browser profile still exists: ${profilePath}`));
+  }
+  return {
+    browserExited: !browserRunning(),
+    profileRemoved,
+    errors,
+  };
 }
+
+const cleanup = await cleanupBrowser();
+if (runError || cleanup.errors.length) {
+  throw new AggregateError(
+    [runError, ...cleanup.errors].filter(Boolean),
+    "wetland browser verification failed"
+  );
+}
+report.cleanup = {
+  browserExited: cleanup.browserExited,
+  profileRemoved: cleanup.profileRemoved,
+};
+console.log(JSON.stringify(report));

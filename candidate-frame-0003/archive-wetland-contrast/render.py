@@ -21,6 +21,15 @@ MANIFEST_PATH = ROOT / "channel.production.json"
 PUBLICATION_ID = "explore-archive-map-contrast"
 EXPORT_DIGEST = "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6"
 CHANGED_IDS = ("WL-002", "WL-005", "WL-009", "WL-012", "WL-016", "WL-020", "WL-023")
+POSITIVE_VIEW = {"panX": 40, "panY": 0, "zoom": 1.25}
+FILM_TIMELINE = (
+    ("opening", 0.0, 3.5),
+    ("compare", 3.5, 7.0),
+    ("inspect", 7.0, 10.5),
+    ("export", 10.5, 14.0),
+    ("failure", 14.0, 18.0),
+    ("reset", 18.0, 22.0),
+)
 RECORDS = (
     ("WL-001", 1060, 2070),
     ("WL-002", 1160, 2055),
@@ -408,24 +417,24 @@ def _render_compare(canvas: Canvas, seconds: float) -> None:
 
 
 def _render_inspect(canvas: Canvas) -> None:
-    _header(canvas, "FILTER CHANGED / INSPECT WL-012", "MARSH LANTERN", "PAN 40 / ZOOM 1.25")
+    _header(canvas, "FILTER CHANGED / INSPECT WL-016", "QUARTZ REED", "PAN 40 / ZOOM 1.25")
     _wetland_map(
         canvas,
         changed=True,
         filtered=True,
-        focus="WL-012",
-        zoom=1.12,
-        pan_x=18,
+        focus="WL-016",
+        zoom=POSITIVE_VIEW["zoom"],
+        pan_x=POSITIVE_VIEW["panX"],
     )
     _panel(canvas, 654, 96, 276, 392)
     _side_metric(canvas, 120, "VISIBLE / FILTER", "7 / CHANGED", RUST)
-    _side_metric(canvas, 177, "FOCUS", "WL-012", WATER_DARK)
+    _side_metric(canvas, 177, "FOCUS", "WL-016", WATER_DARK)
     canvas.rect(674, 235, 236, 112, (217, 231, 226))
     canvas.border(674, 235, 236, 112, WATER_DARK, 2)
-    canvas.text(688, 250, "MARSH LANTERN", INK_DARK, 2)
-    canvas.text(688, 280, "SEDGE-MEADOW", MUTED, 1)
-    canvas.text(688, 301, "> REED-BED", RUST, 2)
-    canvas.text(688, 329, "E 1590 / N 2190", WATER_DARK, 1)
+    canvas.text(688, 250, "QUARTZ REED", INK_DARK, 2)
+    canvas.text(688, 280, "REED-BED", MUTED, 1)
+    canvas.text(688, 301, "> WILLOW-EDGE", RUST, 2)
+    canvas.text(688, 329, "E 1400 / N 2280", WATER_DARK, 1)
     _side_metric(canvas, 374, "VIEW", "PAN 40 / ZOOM 1.25", MOSS)
 
 
@@ -495,6 +504,13 @@ def _render_reset(canvas: Canvas, seconds: float) -> None:
     )
 
 
+def film_phase(seconds: float) -> str:
+    for name, start, end in FILM_TIMELINE:
+        if start <= seconds < end:
+            return name
+    raise ValueError(f"film time {seconds} outside 0..{SPEC.duration}")
+
+
 def frame_rgb(frame_index: int, spec: RenderSpec = SPEC) -> bytes:
     if frame_index < 0 or frame_index >= spec.frame_count:
         raise ValueError(
@@ -503,15 +519,16 @@ def frame_rgb(frame_index: int, spec: RenderSpec = SPEC) -> bytes:
     seconds = frame_index / spec.fps
     canvas = Canvas(spec.width, spec.height, PAPER)
     _paper(canvas)
-    if seconds < 3.5:
+    phase = film_phase(seconds)
+    if phase == "opening":
         _render_opening(canvas, seconds)
-    elif seconds < 7.0:
+    elif phase == "compare":
         _render_compare(canvas, seconds)
-    elif seconds < 10.5:
+    elif phase == "inspect":
         _render_inspect(canvas)
-    elif seconds < 14.0:
+    elif phase == "export":
         _render_export(canvas)
-    elif seconds < 18.0:
+    elif phase == "failure":
         _render_failure(canvas, seconds)
     else:
         _render_reset(canvas, seconds)
@@ -703,10 +720,17 @@ def _common_tool_candidates(name: str) -> Iterator[Path]:
 
 
 def _resolve_candidate(value: str) -> str | None:
-    expanded = Path(os.path.expandvars(value)).expanduser()
+    candidate = value.strip()
+    if len(candidate) >= 2 and candidate[0] == candidate[-1] and candidate[0] in {'"', "'"}:
+        candidate = candidate[1:-1]
+    expanded = Path(os.path.expandvars(candidate)).expanduser()
     if expanded.is_absolute() or expanded.parent != Path("."):
-        return str(expanded.resolve()) if expanded.is_file() else None
-    resolved = shutil.which(value)
+        return (
+            str(expanded.resolve())
+            if expanded.is_file() and os.access(expanded, os.X_OK)
+            else None
+        )
+    resolved = shutil.which(candidate)
     return str(Path(resolved).resolve()) if resolved else None
 
 
@@ -892,6 +916,12 @@ def delivery_document(
             _artifact(output_root / relative, output_root)
             for relative in SOURCE_ARTIFACTS
         ],
+        "binding": {
+            "algorithm": "sha256",
+            "artifactCount": 3 + len(SOURCE_ARTIFACTS),
+            "pathStyle": "POSIX-relative",
+            "selfExcluded": "delivery.json",
+        },
         "render": {
             "width": spec.width,
             "height": spec.height,
@@ -904,6 +934,11 @@ def delivery_document(
             },
             "masterCodec": "ffv1",
             "audio": False,
+            "timeline": [
+                {"phase": name, "start": start, "end": end}
+                for name, start, end in FILM_TIMELINE
+            ],
+            "positiveView": POSITIVE_VIEW,
         },
         "objective": {
             "records": len(RECORDS),

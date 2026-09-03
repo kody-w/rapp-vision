@@ -20,7 +20,7 @@
           "t": 4
         },
         {
-          "label": "Filter and inspect WL-012",
+          "label": "Filter and inspect WL-016",
           "t": 8
         },
         {
@@ -36,7 +36,7 @@
           "t": 19
         }
       ],
-      "description": "A tactile synthetic field map compares the 1990 and 2020 archive sheets across exactly 24 records. The guided film and live replay isolate seven changed IDs, inspect WL-012, export the deterministic sorted list with SHA-256 fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6, distinctly reject the supplied impossible 1880 to 1885 query while preserving that export, and restore all 24 records, canonical years, no focus, and the original pan and zoom.",
+      "description": "A tactile synthetic field map compares the 1990 and 2020 archive sheets across exactly 24 records. The guided film and live replay isolate seven changed IDs, inspect WL-016 while it remains visible through zoom and pan, export the deterministic sorted list with SHA-256 fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6, distinctly reject the supplied impossible 1880 to 1885 query while preserving that export, and restore all 24 records, canonical years, no focus, and the original pan and zoom.",
       "duration": 22,
       "height": 540,
       "id": "explore-archive-map-contrast",
@@ -105,12 +105,12 @@
                 "behavior": "auto",
                 "block": "center",
                 "do": "scroll",
-                "selector": "#record-wl-012"
+                "selector": "#record-wl-016"
               },
               {
                 "at": 3,
                 "do": "click",
-                "selector": "#record-wl-012"
+                "selector": "#record-wl-016"
               },
               {
                 "at": 3.8,

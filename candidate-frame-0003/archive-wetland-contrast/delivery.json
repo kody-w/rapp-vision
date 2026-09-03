@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "master": {
-      "bytes": 9481624,
+      "bytes": 9458566,
       "codec": "ffv1",
       "colorRange": "pc",
       "colorSpace": "gbr",
@@ -9,11 +9,11 @@
       "height": 540,
       "path": "masters/explore-archive-map-contrast.mkv",
       "pixelFormat": "bgr0",
-      "sha256": "36cfe70324605eb29459ceb37beaa468bce10f958a1a6e7371e0b7f424abbf6b",
+      "sha256": "51dd079d9f0733c7f20d4a0b5d2b0591272bc3802b0f61e3e8e6389052aca9e6",
       "width": 960
     },
     "mp4": {
-      "bytes": 207384,
+      "bytes": 206953,
       "codec": "h264",
       "colorPrimaries": "bt709",
       "colorRange": "tv",
@@ -23,11 +23,11 @@
       "height": 540,
       "path": "media/explore-archive-map-contrast.mp4",
       "pixelFormat": "yuv420p",
-      "sha256": "1e2a2ccd9bb9c116c2b6bc9e1fe5bef565215e79d00c8d13b712ff934e9c54ae",
+      "sha256": "26e82ba653634581e7d4384e9be5539d2960e29d90eaae2c380bb2db7fe25e25",
       "width": 960
     },
     "webm": {
-      "bytes": 191151,
+      "bytes": 190770,
       "codec": "vp9",
       "colorPrimaries": "bt709",
       "colorRange": "tv",
@@ -37,9 +37,15 @@
       "height": 540,
       "path": "media/explore-archive-map-contrast.webm",
       "pixelFormat": "yuv420p",
-      "sha256": "bd7a05681b78a1f853bdb7f97c9bec403951319227ac8271983ad7a9b62fa10d",
+      "sha256": "afd85362921bb81aeb067f0767fdf4f63dc48b8633774dbcbf1234276345b693",
       "width": 960
     }
+  },
+  "binding": {
+    "algorithm": "sha256",
+    "artifactCount": 13,
+    "pathStyle": "POSIX-relative",
+    "selfExcluded": "delivery.json"
   },
   "channel": "candidate-frame-0003-09-archive-wetland-contrast",
   "objective": {
@@ -66,11 +72,48 @@
       "186": "d59fd08a5d8a0c81d6610c9b29f57130d52089e619c2c347a299d5344d809e28",
       "263": "200852e11ddf4919a856007a0b503315ee8d35e0d48036aeb6eecea2d391c5d8",
       "42": "99dbf0ab94007c4eaa00332e3d530a41eea9d0c0da81af3831b23bcb84979f5b",
-      "90": "5d8cdf2732743fa330223d4ed4d21e18a80e289f485279edcd725a93c066d931"
+      "90": "f4f191e621357b5564264d891e668d8ddbdf2807ed635eb7f749a6c3ab3618d2"
     },
     "frames": 264,
     "height": 540,
     "masterCodec": "ffv1",
+    "positiveView": {
+      "panX": 40,
+      "panY": 0,
+      "zoom": 1.25
+    },
+    "timeline": [
+      {
+        "end": 3.5,
+        "phase": "opening",
+        "start": 0.0
+      },
+      {
+        "end": 7.0,
+        "phase": "compare",
+        "start": 3.5
+      },
+      {
+        "end": 10.5,
+        "phase": "inspect",
+        "start": 7.0
+      },
+      {
+        "end": 14.0,
+        "phase": "export",
+        "start": 10.5
+      },
+      {
+        "end": 18.0,
+        "phase": "failure",
+        "start": 14.0
+      },
+      {
+        "end": 22.0,
+        "phase": "reset",
+        "start": 18.0
+      }
+    ],
     "width": 960
   },
   "schema": "archive-wetland-contrast-delivery/1.0",
@@ -81,29 +124,29 @@
       "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
     },
     {
-      "bytes": 4186,
+      "bytes": 4906,
       "path": "README.md",
-      "sha256": "ec2e7f656b976c9583b8b9e6c0f30515900734cd6a3e39a8bb9e643231f81394"
+      "sha256": "ba479ebf1b295273f53122ee3c303d06575ecd6c8e29087dea721b0f7df7849d"
     },
     {
-      "bytes": 48390,
+      "bytes": 51197,
       "path": "apps/explore-archive-map-contrast.html",
-      "sha256": "df5afdbe98d0bf15620af03d6709ebbea80bd98900fe1efe98437b5fc55b5560"
+      "sha256": "6c4117754ffcaf3da4b656b7d7d1d1958304265245450e80b3fa41a3a9250474"
     },
     {
-      "bytes": 7480,
+      "bytes": 7526,
       "path": "channel.production.json",
-      "sha256": "a35971cbd5cf81d26e784aa76452951a6041435346d79476af18890cd53bc897"
+      "sha256": "ffd07a9e81d18d87115c6bd44b1ca7f23d121f7b646458f2aac0ae661433b2b2"
     },
     {
-      "bytes": 7634,
+      "bytes": 7680,
       "path": "channel.json",
-      "sha256": "3a8ce32cbcad7a54f9605a07e02c3c15e457e54245d5f2b12ea9762f032f196a"
+      "sha256": "421c31044b0e2b1220ec8a5c355e45d331909fd275558dc31eed3b2b7791c5da"
     },
     {
-      "bytes": 13970,
+      "bytes": 15451,
       "path": "evidence.json",
-      "sha256": "7c50b6f844184e233ee9683700b32a3d1d6db39581469f7c126bb32ca032f1b6"
+      "sha256": "55f112fd2e177369a328b102dfc8193eb6c322e55fe3e4f9667af81fd4a31c89"
     },
     {
       "bytes": 65,
@@ -111,9 +154,9 @@
       "sha256": "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6"
     },
     {
-      "bytes": 38783,
+      "bytes": 39979,
       "path": "render.py",
-      "sha256": "e44e589247aecd0f32cf84c80f222cf13e0375a1c8cf31fd40e454380ce4a7c6"
+      "sha256": "a24028c9cee7da2df9ccee551d731e9153e64bd0353ad5db4c0031c73b9d3214"
     },
     {
       "bytes": 4857,
@@ -121,9 +164,9 @@
       "sha256": "207e2e2e253cf8381b34d7e7e51d5d8859f5ee8a8a050e8d593181272c96471b"
     },
     {
-      "bytes": 22610,
+      "bytes": 36660,
       "path": "verify_dom.mjs",
-      "sha256": "76772733b8753885e74fe6a0452eb94cc56ca77c86cf8e5a2672bad1393e5432"
+      "sha256": "21374bb7c042f7bcdccd3a6b700f74405571cdc822b1562db11c129b221743b1"
     }
   ]
 }

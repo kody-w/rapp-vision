@@ -740,8 +740,8 @@
         <p id="query-error" class="query-error" role="alert" hidden>Empty query rejected.</p>
 
         <p id="record-detail" class="record-detail" hidden>
-          <strong id="record-detail-title">WL-012 · Marsh Lantern</strong><br>
-          <span id="record-detail-body">sedge-meadow → reed-bed · E 1590 / N 2190</span>
+          <strong id="record-detail-title">WL-016 · Quartz Reed</strong><br>
+          <span id="record-detail-body">reed-bed → willow-edge · E 1400 / N 2280</span>
         </p>
 
         <ol id="change-list" class="change-list" aria-label="Sorted changed record IDs">
@@ -763,6 +763,7 @@
   <script type="application/json" id="wetland-fixture">
 {
   "schema": "synthetic-wetland-archive/1.0",
+  "synthetic": true,
   "snapshotLabels": {
     "1990": "1990 field sheet",
     "2020": "2020 field sheet"
@@ -814,14 +815,15 @@
     "schema": "archive-map-state/1.0",
     "snapshotLabels": {"from":"1990 field sheet","to":"2020 field sheet"},
     "years": {"from":1990,"to":2020},
+    "acceptedYears": {"from":1990,"to":2020},
     "totalRecords": 24,
     "visibleRecordIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
     "visibleCount": 7,
     "changedIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
     "changedCount": 7,
     "filter": "changed",
-    "focus": "WL-012",
-    "focusedRecord": {"id":"WL-012","name":"Marsh Lantern","from":"sedge-meadow","to":"reed-bed","changed":true,"coordinate":"E 1590 / N 2190"},
+    "focus": "WL-016",
+    "focusedRecord": {"id":"WL-016","name":"Quartz Reed","from":"reed-bed","to":"willow-edge","changed":true,"coordinate":"E 1400 / N 2280"},
     "view": {"panX":40,"panY":0,"zoom":1.25},
     "extent": {"minX":1000,"maxX":1600,"minY":2000,"maxY":2400,"label":"SYN E 1000–1600 / N 2000–2400"},
     "comparison": {"status":"success","message":"1990 → 2020: 7 changed records across 24 synthetic stations.","queryResultCount":7,"canonical":true},
@@ -833,14 +835,15 @@
     "schema": "archive-map-state/1.0",
     "snapshotLabels": {"from":"1880 (no sheet)","to":"1885 (no sheet)"},
     "years": {"from":1880,"to":1885},
+    "acceptedYears": {"from":1990,"to":2020},
     "totalRecords": 24,
     "visibleRecordIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
     "visibleCount": 7,
     "changedIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
     "changedCount": 7,
     "filter": "changed",
-    "focus": "WL-012",
-    "focusedRecord": {"id":"WL-012","name":"Marsh Lantern","from":"sedge-meadow","to":"reed-bed","changed":true,"coordinate":"E 1590 / N 2190"},
+    "focus": "WL-016",
+    "focusedRecord": {"id":"WL-016","name":"Quartz Reed","from":"reed-bed","to":"willow-edge","changed":true,"coordinate":"E 1400 / N 2280"},
     "view": {"panX":40,"panY":0,"zoom":1.25},
     "extent": {"minX":1000,"maxX":1600,"minY":2000,"maxY":2400,"label":"SYN E 1000–1600 / N 2000–2400"},
     "comparison": {"status":"rejected-empty","message":"Empty query rejected: no archive sheets exist for 1880 → 1885. Canonical export preserved.","queryResultCount":null,"canonical":false},
@@ -852,6 +855,7 @@
     "schema": "archive-map-state/1.0",
     "snapshotLabels": {"from":"1990 field sheet","to":"2020 field sheet"},
     "years": {"from":1990,"to":2020},
+    "acceptedYears": {"from":1990,"to":2020},
     "totalRecords": 24,
     "visibleRecordIds": ["WL-001","WL-002","WL-003","WL-004","WL-005","WL-006","WL-007","WL-008","WL-009","WL-010","WL-011","WL-012","WL-013","WL-014","WL-015","WL-016","WL-017","WL-018","WL-019","WL-020","WL-021","WL-022","WL-023","WL-024"],
     "visibleCount": 24,
@@ -886,7 +890,10 @@
       return (value >>> count) | (value << (32 - count));
     }
 
-    function sha256Ascii(text) {
+    function sha256Utf8(text) {
+      if (typeof text !== "string") {
+        throw new TypeError("SHA-256 input must be a string");
+      }
       const constants = [
         0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
         0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
@@ -897,12 +904,12 @@
         0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
         0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
       ];
-      const bytes = Array.from(text, (character) => character.charCodeAt(0));
-      const bitLength = bytes.length * 8;
+      const bytes = Array.from(new TextEncoder().encode(text));
+      const bitLength = BigInt(bytes.length) * 8n;
       bytes.push(0x80);
       while (bytes.length % 64 !== 56) bytes.push(0);
       for (let index = 7; index >= 0; index -= 1) {
-        bytes.push(index < 4 ? (bitLength >>> (index * 8)) & 0xff : 0);
+        bytes.push(Number((bitLength >> BigInt(index * 8)) & 0xffn));
       }
       const hash = [
         0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,
@@ -945,6 +952,14 @@
     }
 
     function changedIds(fromYear, toYear) {
+      if (
+        !Number.isSafeInteger(fromYear) ||
+        !Number.isSafeInteger(toYear) ||
+        !FIXTURE.availableYears.includes(fromYear) ||
+        !FIXTURE.availableYears.includes(toYear)
+      ) {
+        throw new RangeError("comparison years must name available archive sheets");
+      }
       return FIXTURE.records
         .filter((record) => record.snapshots[String(fromYear)] !== record.snapshots[String(toYear)])
         .map((record) => record.id)
@@ -952,14 +967,31 @@
     }
 
     function exportFor(ids, status) {
+      if (
+        !Array.isArray(ids) ||
+        ids.some((id) => typeof id !== "string" || !RECORDS.has(id)) ||
+        new Set(ids).size !== ids.length
+      ) {
+        throw new TypeError("export IDs must be unique synthetic record IDs");
+      }
+      if (!["ready", "exported", "preserved"].includes(status)) {
+        throw new RangeError("unsupported export status");
+      }
       const sorted = [...ids].sort();
       const text = `${JSON.stringify(sorted)}\n`;
       return {
         ids: sorted,
         text,
-        digest: sha256Ascii(text),
+        digest: sha256Utf8(text),
         status
       };
+    }
+
+    function parseYear(value) {
+      const text = String(value).trim();
+      if (!/^-?\d+$/.test(text)) return null;
+      const year = Number(text);
+      return Number.isSafeInteger(year) ? year : null;
     }
 
     function snapshotLabel(year) {
@@ -970,13 +1002,14 @@
       if (!state.focus) return null;
       const record = RECORDS.get(state.focus);
       if (!record) return null;
-      const canonicalChanged = record.snapshots["1990"] !== record.snapshots["2020"];
+      const fromYear = String(state.acceptedYears.from);
+      const toYear = String(state.acceptedYears.to);
       return {
         id: record.id,
         name: record.name,
-        from: record.snapshots["1990"],
-        to: record.snapshots["2020"],
-        changed: canonicalChanged,
+        from: record.snapshots[fromYear],
+        to: record.snapshots[toYear],
+        changed: state.changedIds.includes(record.id),
         coordinate: `E ${record.x} / N ${record.y}`
       };
     }
@@ -1001,6 +1034,10 @@
       });
       return Object.freeze({
         years: Object.freeze({ from: value.years.from, to: value.years.to }),
+        acceptedYears: Object.freeze({
+          from: value.acceptedYears.from,
+          to: value.acceptedYears.to
+        }),
         changedIds: changed,
         filter: value.filter,
         focus: value.focus,
@@ -1016,6 +1053,7 @@
       const changed = changedIds(1990, 2020);
       return freezeState({
         years: { from: 1990, to: 2020 },
+        acceptedYears: { from: 1990, to: 2020 },
         changedIds: changed,
         filter: "all",
         focus: null,
@@ -1035,12 +1073,34 @@
     function reduce(state, action) {
       switch (action.type) {
         case "COMPARE": {
-          const fromYear = Number(action.from);
-          const toYear = Number(action.to);
+          const fromYear = parseYear(action.from);
+          const toYear = parseYear(action.to);
+          if (fromYear === null || toYear === null) {
+            const message =
+              "Invalid query rejected: snapshot years must be whole numbers. Accepted archive state preserved.";
+            return freezeState({
+              ...state,
+              comparison: {
+                status: "rejected-invalid",
+                message,
+                queryResultCount: null,
+                canonical: false
+              },
+              export: { ...state.export, status: "preserved" },
+              message,
+              status: "failure"
+            });
+          }
           const available = FIXTURE.availableYears.includes(fromYear) &&
             FIXTURE.availableYears.includes(toYear);
           if (!available) {
-            const message = `Empty query rejected: no archive sheets exist for ${fromYear} → ${toYear}. Canonical export preserved.`;
+            const canonicalAccepted =
+              state.acceptedYears.from === 1990 && state.acceptedYears.to === 2020;
+            const preserved = canonicalAccepted
+              ? "Canonical export preserved."
+              : "Accepted export preserved.";
+            const message =
+              `Empty query rejected: no archive sheets exist for ${fromYear} → ${toYear}. ${preserved}`;
             return freezeState({
               ...state,
               years: { from: fromYear, to: toYear },
@@ -1060,6 +1120,7 @@
           return freezeState({
             ...state,
             years: { from: fromYear, to: toYear },
+            acceptedYears: { from: fromYear, to: toYear },
             changedIds: changed,
             focus: null,
             comparison: {
@@ -1087,7 +1148,12 @@
             message: "All 24 synthetic records are visible."
           });
         case "FOCUS_RECORD":
-          if (!RECORDS.has(action.id)) return state;
+          if (!RECORDS.has(action.id)) {
+            throw new RangeError(`unknown synthetic record: ${action.id}`);
+          }
+          if (!visibleIds(state).includes(action.id)) {
+            throw new RangeError(`record is not visible: ${action.id}`);
+          }
           return freezeState({
             ...state,
             focus: action.id,
@@ -1141,7 +1207,7 @@
         case "RESET":
           return initialState();
         default:
-          return state;
+          throw new RangeError(`unsupported archive action: ${action.type}`);
       }
     }
 
@@ -1154,6 +1220,10 @@
           to: snapshotLabel(value.years.to)
         },
         years: { from: value.years.from, to: value.years.to },
+        acceptedYears: {
+          from: value.acceptedYears.from,
+          to: value.acceptedYears.to
+        },
         totalRecords: FIXTURE.records.length,
         visibleRecordIds,
         visibleCount: visibleRecordIds.length,
@@ -1223,8 +1293,10 @@
       status.textContent = current.message;
       status.dataset.status = current.status;
       const queryError = document.querySelector("#query-error");
-      queryError.hidden = current.comparison.status !== "rejected-empty";
+      queryError.hidden = !current.comparison.status.startsWith("rejected-");
       queryError.textContent = current.comparison.message;
+      document.querySelector("#filter-changed-btn").textContent =
+        `Show ${current.changedCount} changed`;
 
       document.querySelector("#change-list").innerHTML = current.changedIds
         .map((id) => `<li>${id}</li>`)
@@ -1304,7 +1376,8 @@
       snapshot,
       changedIds,
       exportFor,
-      digestText: sha256Ascii
+      parseYear,
+      digestText: sha256Utf8
     });
     window.archiveWetlandMap = contract;
     window.tinySystem = contract;

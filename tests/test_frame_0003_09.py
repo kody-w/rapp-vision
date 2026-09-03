@@ -51,6 +51,27 @@ EXPECTED_EXPORT = (
 EXPECTED_EXPORT_DIGEST = (
     "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6"
 )
+UNICODE_DIGEST_TEXT = "wetland · marsh"
+UNICODE_DIGEST = (
+    "64ab66483871ac72d1c8f8ab01df762469d56247d8aad98fbb2100c49a58492e"
+)
+EXPECTED_SOURCE_ARTIFACTS = {
+    ".gitattributes",
+    "README.md",
+    "apps/explore-archive-map-contrast.html",
+    "channel.production.json",
+    "channel.json",
+    "evidence.json",
+    "exports/changed-record-ids.json",
+    "render.py",
+    "thumbs/explore-archive-map-contrast.svg",
+    "verify_dom.mjs",
+}
+EXPECTED_DELIVERY_ARTIFACTS = EXPECTED_SOURCE_ARTIFACTS | {
+    "masters/explore-archive-map-contrast.mkv",
+    "media/explore-archive-map-contrast.mp4",
+    "media/explore-archive-map-contrast.webm",
+}
 
 
 def load_json(path: Path):
@@ -133,6 +154,48 @@ def resolve_path(document, path: str):
         else:
             current = current[component]
     return current
+
+
+def delivery_errors(document) -> list[str]:
+    records = list(document.get("artifacts", {}).values())
+    records.extend(document.get("sourceArtifacts", []))
+    errors = []
+    observed = set()
+    for record in records:
+        relative = record.get("path")
+        if not isinstance(relative, str):
+            errors.append("delivery record has no string path")
+            continue
+        if relative in observed:
+            errors.append(f"duplicate delivery path: {relative}")
+            continue
+        observed.add(relative)
+        if "\\" in relative or relative.startswith("/") or ".." in Path(relative).parts:
+            errors.append(f"unsafe delivery path: {relative}")
+            continue
+        path = CANDIDATE / relative
+        if not path.is_file():
+            errors.append(f"missing delivery path: {relative}")
+            continue
+        if path.stat().st_size != record.get("bytes"):
+            errors.append(f"stale delivery size: {relative}")
+        if sha256(path) != record.get("sha256"):
+            errors.append(f"stale delivery hash: {relative}")
+    if observed != EXPECTED_DELIVERY_ARTIFACTS:
+        errors.append(
+            "delivery coverage mismatch: "
+            f"{sorted(observed ^ EXPECTED_DELIVERY_ARTIFACTS)}"
+        )
+    actual = {
+        path.relative_to(CANDIDATE).as_posix()
+        for path in CANDIDATE.rglob("*")
+        if path.is_file()
+        and path.name != "delivery.json"
+        and "__pycache__" not in path.parts
+    }
+    if actual != observed:
+        errors.append(f"unbound candidate files: {sorted(actual ^ observed)}")
+    return errors
 
 
 class AppIndex(HTMLParser):
@@ -287,6 +350,49 @@ class TestCommissionAndPairedManifest(unittest.TestCase):
             [action["text"] for action in actions if action["do"] == "type"],
             ["1880", "1885"],
         )
+        replay = self.evidence["manifestReplay"]
+        self.assertTrue(replay["exactTiming"])
+        self.assertTrue(replay["activationVisibilityRequired"])
+        self.assertTrue(replay["checkpointVisibilityRequired"])
+        self.assertTrue(
+            VALIDATOR.validate_action(
+                {"at": 0, "do": "drag"},
+                scene["dur"],
+                "probe",
+            )
+        )
+
+    def test_film_chapters_follow_renderer_and_live_story_order(self):
+        chapters = self.video["chapters"]
+        self.assertEqual(
+            [RENDERER.film_phase(chapter["t"]) for chapter in chapters],
+            ["opening", "compare", "inspect", "export", "failure", "reset"],
+        )
+        self.assertEqual(
+            [chapter["label"] for chapter in chapters],
+            [
+                "Twenty-four synthetic field records",
+                "1990 and 2020 reveal seven changes",
+                "Filter and inspect WL-016",
+                "Export the sorted canonical IDs",
+                "Reject the impossible date query",
+                "Restore the exact archive view",
+            ],
+        )
+        self.assertEqual(
+            [
+                chapter["label"]
+                for chapter in self.video["live"]["chapters"][:6]
+            ],
+            [
+                "Compare the archive sheets",
+                "Filter to seven changed records",
+                "Inspect, zoom, and pan",
+                "Export the sorted ID list",
+                "Supply impossible dates and reject",
+                "Restore the canonical view",
+            ],
+        )
 
 
 class TestFixtureEvidenceAndApp(unittest.TestCase):
@@ -314,6 +420,7 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
             self.assertEqual(set(record["snapshots"]), {"1990", "2020"})
         self.assertEqual(self.fixture["availableYears"], [1990, 2020])
         self.assertEqual(self.fixture["impossibleRange"], [1880, 1885])
+        self.assertTrue(self.fixture["synthetic"])
         self.assertTrue(self.evidence["fixture"]["synthetic"])
 
     def test_independent_comparison_yields_exactly_seven_sorted_ids(self):
@@ -337,14 +444,16 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
         self.assertEqual(self.evidence["objective"]["changedCount"], 7)
 
     def test_canonical_export_bytes_and_digest_are_exact(self):
-        normalized_export = normalized_text(EXPORT_PATH).encode("utf-8")
-        self.assertEqual(normalized_export, EXPECTED_EXPORT)
+        raw_export = EXPORT_PATH.read_bytes()
+        self.assertEqual(raw_export, EXPECTED_EXPORT)
+        self.assertTrue(raw_export.endswith(b"\n"))
+        self.assertFalse(raw_export.endswith(b"\r\n"))
         self.assertEqual(
             hashlib.sha256(EXPECTED_EXPORT).hexdigest(),
             EXPECTED_EXPORT_DIGEST,
         )
         self.assertEqual(
-            hashlib.sha256(normalized_export).hexdigest(),
+            hashlib.sha256(raw_export).hexdigest(),
             EXPECTED_EXPORT_DIGEST,
         )
         self.assertEqual(
@@ -382,13 +491,15 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
         positive = self.claims["positive"]["expectedState"]
         failure = self.claims["failure"]["expectedState"]
         reset = self.claims["reset"]["expectedState"]
+        self.assertEqual(positive["acceptedYears"], {"from": 1990, "to": 2020})
         self.assertEqual(positive["visibleRecordIds"], list(EXPECTED_CHANGED_IDS))
-        self.assertEqual(positive["focus"], "WL-012")
+        self.assertEqual(positive["focus"], "WL-016")
         self.assertEqual(positive["filter"], "changed")
         self.assertEqual(positive["view"], {"panX": 40, "panY": 0, "zoom": 1.25})
         self.assertEqual(positive["export"]["status"], "exported")
 
         self.assertEqual(failure["years"], {"from": 1880, "to": 1885})
+        self.assertEqual(failure["acceptedYears"], positive["acceptedYears"])
         self.assertEqual(failure["comparison"]["status"], "rejected-empty")
         self.assertIsNone(failure["comparison"]["queryResultCount"])
         self.assertNotEqual(failure["comparison"]["status"], "success")
@@ -403,6 +514,7 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
         self.assertEqual(reset["totalRecords"], 24)
         self.assertEqual(reset["visibleCount"], 24)
         self.assertEqual(reset["years"], {"from": 1990, "to": 2020})
+        self.assertEqual(reset["acceptedYears"], {"from": 1990, "to": 2020})
         self.assertEqual(reset["changedCount"], 7)
         self.assertEqual(reset["filter"], "all")
         self.assertIsNone(reset["focus"])
@@ -452,6 +564,21 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
                 {"name": "mobile-390", "width": 390, "height": 844},
             ],
         )
+        manifest_activations = [
+            {
+                key: value
+                for key, value in action.items()
+                if key != "at"
+            }
+            for action in actions
+            if action["do"] in replay["activationActions"]
+        ]
+        claimed_activations = [
+            action
+            for claim_id in ("positive", "failure", "reset")
+            for action in self.claims[claim_id]["actions"]
+        ]
+        self.assertEqual(manifest_activations, claimed_activations)
 
     def test_live_app_is_single_file_offline_and_explorable(self):
         index = AppIndex()
@@ -505,7 +632,8 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
             "function reduce(state, action)",
             "function snapshot(value = state)",
             "function changedIds(fromYear, toYear)",
-            "function sha256Ascii(text)",
+            "function sha256Utf8(text)",
+            "function parseYear(value)",
             'case "COMPARE":',
             'case "RESET":',
             "return initialState();",
@@ -513,6 +641,8 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
             "window.tinySystem = contract;",
             "queryResultCount: null",
             "Canonical export preserved.",
+            "rejected-invalid",
+            "new TextEncoder().encode(text)",
             'data-reset="exact"',
             "@media (max-width: 520px)",
             "overflow-x: clip",
@@ -539,6 +669,90 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
                     re.search(pattern, self.source, flags=re.IGNORECASE),
                     pattern,
                 )
+
+    def test_record_markers_bind_fixture_ids_coordinates_and_names(self):
+        index = AppIndex()
+        index.feed(self.source)
+        for record in self.fixture["records"]:
+            marker_id = f"record-{record['id'].lower()}"
+            tag, attributes = index.controls[marker_id]
+            self.assertEqual(tag, "button")
+            self.assertEqual(attributes["data-record-id"], record["id"])
+            self.assertEqual(
+                attributes["style"],
+                f"--x:{record['x']};--y:{record['y']}",
+            )
+            self.assertIn(record["id"], attributes["aria-label"])
+            self.assertIn(record["name"], attributes["aria-label"])
+
+    def test_utf8_digest_vector_and_invalid_query_contract_are_independent(self):
+        runtime = self.evidence["runtimeAudit"]
+        self.assertEqual(runtime["digestEncoding"], "UTF-8")
+        self.assertEqual(runtime["unicodeDigestVector"]["text"], UNICODE_DIGEST_TEXT)
+        self.assertEqual(runtime["unicodeDigestVector"]["sha256"], UNICODE_DIGEST)
+        self.assertEqual(
+            hashlib.sha256(UNICODE_DIGEST_TEXT.encode("utf-8")).hexdigest(),
+            UNICODE_DIGEST,
+        )
+        invalid = runtime["invalidQuery"]
+        self.assertEqual(invalid["status"], "rejected-invalid")
+        self.assertIsNone(invalid["queryResultCount"])
+        self.assertEqual(
+            invalid["preservesAcceptedYears"],
+            {"from": 1990, "to": 2020},
+        )
+        self.assertEqual(invalid["preservesChangedCount"], 7)
+        self.assertEqual(
+            invalid["preservesExportDigest"],
+            EXPECTED_EXPORT_DIGEST,
+        )
+        self.assertEqual(
+            runtime["network"]["blockedSchemes"],
+            ["http", "https", "ws", "wss"],
+        )
+        self.assertEqual(runtime["network"]["expectedExternalRequests"], 0)
+        self.assertTrue(runtime["cleanup"]["browserExitRequired"])
+        self.assertTrue(runtime["cleanup"]["profileRemovalRequired"])
+        self.assertTrue(runtime["cleanup"]["errorsAreFatal"])
+
+    def test_browser_verifier_observes_network_errors_visibility_and_cleanup(self):
+        source = normalized_text(VERIFY_DOM_PATH)
+        for fragment in (
+            'cdp.command("Network.enable")',
+            'cdp.command("Network.setBlockedURLs"',
+            'cdp.on("Network.requestWillBeSent"',
+            'cdp.on("Network.loadingFailed"',
+            'cdp.on("Runtime.exceptionThrown"',
+            'cdp.on("Runtime.consoleAPICalled"',
+            "await assertVisible(selector);",
+            "const cleanup = await cleanupBrowser();",
+            "profileRemoved: cleanup.profileRemoved",
+        ):
+            self.assertIn(fragment, source)
+        self.assertNotIn("catch {}", source)
+
+    def test_crlf_source_parsing_does_not_weaken_raw_export_contract(self):
+        crlf_source = self.source.replace("\n", "\r\n")
+        self.assertEqual(
+            embedded_json(crlf_source, "wetland-fixture"),
+            self.fixture,
+        )
+        self.assertEqual(EXPORT_PATH.read_bytes(), EXPECTED_EXPORT)
+
+    def test_scoped_text_has_no_secret_material(self):
+        secret_patterns = (
+            r"-----BEGIN [A-Z ]*PRIVATE KEY-----",
+            r"\bAKIA[0-9A-Z]{16}\b",
+            r"\bgh[pousr]_[A-Za-z0-9_]{20,}\b",
+            r"\bAIza[0-9A-Za-z_-]{30,}\b",
+        )
+        for path in CANDIDATE.rglob("*"):
+            if not path.is_file() or path.suffix in {".mkv", ".mp4", ".webm", ".pyc"}:
+                continue
+            source = normalized_text(path)
+            for pattern in secret_patterns:
+                with self.subTest(path=path.name, pattern=pattern):
+                    self.assertIsNone(re.search(pattern, source))
 
     def test_rights_privacy_and_secret_attestations_are_explicit(self):
         attestations = self.evidence["attestations"]
@@ -590,6 +804,61 @@ class TestRendererMediaAndDelivery(unittest.TestCase):
         self.assertEqual(RENDERER.SPEC.duration, 22)
         self.assertEqual(RENDERER.SPEC.frame_count, 264)
         self.assertEqual(RENDERER.SPEC.fps, 12)
+        fixture = embedded_json(normalized_text(APP_PATH), "wetland-fixture")
+        self.assertEqual(
+            RENDERER.RECORDS,
+            tuple(
+                (record["id"], record["x"], record["y"])
+                for record in fixture["records"]
+            ),
+        )
+        self.assertEqual(RENDERER.CHANGED_IDS, EXPECTED_CHANGED_IDS)
+        self.assertEqual(
+            RENDERER.POSITIVE_VIEW,
+            {"panX": 40, "panY": 0, "zoom": 1.25},
+        )
+        self.assertEqual(
+            RENDERER.FILM_TIMELINE,
+            (
+                ("opening", 0.0, 3.5),
+                ("compare", 3.5, 7.0),
+                ("inspect", 7.0, 10.5),
+                ("export", 10.5, 14.0),
+                ("failure", 14.0, 18.0),
+                ("reset", 18.0, 22.0),
+            ),
+        )
+        self.assertEqual(
+            self.delivery["render"]["positiveView"],
+            {"panX": 40, "panY": 0, "zoom": 1.25},
+        )
+        self.assertEqual(
+            self.delivery["render"]["timeline"],
+            [
+                {"phase": name, "start": start, "end": end}
+                for name, start, end in RENDERER.FILM_TIMELINE
+            ],
+        )
+        for name, start, end in RENDERER.FILM_TIMELINE:
+            self.assertEqual(RENDERER.film_phase(start), name)
+            self.assertEqual(
+                RENDERER.film_phase(end - 1 / RENDERER.SPEC.fps),
+                name,
+            )
+        inspect_frame = RENDERER.frame_rgb(90)
+        marker_x, marker_y = RENDERER._map_point(
+            1400,
+            2280,
+            zoom=1.25,
+            pan_x=40,
+        )
+        pixel_offset = (
+            marker_y * RENDERER.SPEC.width + marker_x
+        ) * 3
+        self.assertEqual(
+            tuple(inspect_frame[pixel_offset:pixel_offset + 3]),
+            RENDERER.RUST,
+        )
         self.assertEqual(
             len(RENDERER.frame_rgb(0)),
             RENDERER.SPEC.width * RENDERER.SPEC.height * 3,
@@ -633,25 +902,28 @@ class TestRendererMediaAndDelivery(unittest.TestCase):
             "candidate-frame-0003-09-archive-wetland-contrast",
         )
         self.assertEqual(self.delivery["publication"], PUBLICATION_ID)
-        records = list(self.delivery["artifacts"].values())
-        records.extend(self.delivery["sourceArtifacts"])
-        observed = set()
-        for record in records:
-            with self.subTest(artifact=record["path"]):
-                self.assertNotIn(record["path"], observed)
-                observed.add(record["path"])
-                path = CANDIDATE / record["path"]
-                self.assertTrue(path.is_file(), path)
-                self.assertEqual(path.stat().st_size, record["bytes"])
-                self.assertEqual(sha256(path), record["sha256"])
         self.assertEqual(
-            observed,
+            set(RENDERER.SOURCE_ARTIFACTS),
+            EXPECTED_SOURCE_ARTIFACTS,
+        )
+        self.assertEqual(delivery_errors(self.delivery), [])
+        self.assertEqual(
+            self.delivery["binding"],
             {
-                "masters/explore-archive-map-contrast.mkv",
-                "media/explore-archive-map-contrast.mp4",
-                "media/explore-archive-map-contrast.webm",
-                *RENDERER.SOURCE_ARTIFACTS,
+                "algorithm": "sha256",
+                "artifactCount": 13,
+                "pathStyle": "POSIX-relative",
+                "selfExcluded": "delivery.json",
             },
+        )
+
+    def test_stale_delivery_hash_is_rejected(self):
+        mutated = copy.deepcopy(self.delivery)
+        mutated["sourceArtifacts"][0]["sha256"] = "0" * 64
+        errors = delivery_errors(mutated)
+        self.assertTrue(
+            any(error.startswith("stale delivery hash:") for error in errors),
+            errors,
         )
 
     def test_recorded_codec_probes_are_release_grade(self):
@@ -696,6 +968,29 @@ class TestRendererMediaAndDelivery(unittest.TestCase):
                         }
                     },
                 )
+                completed = subprocess.run(
+                    [
+                        str(FFPROBE),
+                        "-v",
+                        "error",
+                        "-show_entries",
+                        "stream=codec_type,avg_frame_rate",
+                        "-of",
+                        "json",
+                        str(path),
+                    ],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    timeout=30,
+                )
+                streams = json.loads(completed.stdout)["streams"]
+                self.assertEqual(
+                    [stream["codec_type"] for stream in streams],
+                    ["video"],
+                )
+                self.assertEqual(streams[0]["avg_frame_rate"], "12/1")
         self.assertEqual(
             VALIDATOR.ffprobe_local_media(
                 load_json(CHANNEL_PATH),
@@ -714,7 +1009,20 @@ class TestRendererMediaAndDelivery(unittest.TestCase):
         shutil.rmtree(scratch, ignore_errors=True)
         self.addCleanup(lambda: shutil.rmtree(scratch, ignore_errors=True))
         scratch.mkdir(parents=True)
-        shutil.copy2(MANIFEST_PATH, scratch / "channel.production.json")
+        for relative in (
+            ".gitattributes",
+            "README.md",
+            "apps/explore-archive-map-contrast.html",
+            "channel.production.json",
+            "evidence.json",
+            "exports/changed-record-ids.json",
+            "render.py",
+            "verify_dom.mjs",
+        ):
+            source = CANDIDATE / relative
+            target = scratch / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, target)
 
         rebuilt_master, rebuilt_thumb = RENDERER.render(
             scratch,
@@ -741,6 +1049,27 @@ class TestRendererMediaAndDelivery(unittest.TestCase):
             with self.subTest(artifact=committed.name):
                 self.assertEqual(committed.read_bytes(), rebuilt.read_bytes())
                 self.assertEqual(sha256(committed), sha256(rebuilt))
+        self.assertEqual(
+            RENDERER.delivery_document(scratch, str(FFPROBE)),
+            self.delivery,
+        )
+
+    def test_tool_discovery_rejects_missing_and_accepts_quoted_explicit_path(self):
+        with self.assertRaises(RuntimeError):
+            RENDERER.discover_executable(
+                "ffmpeg",
+                str(CANDIDATE / "missing-ffmpeg"),
+            )
+        if FFMPEG:
+            self.assertEqual(
+                Path(
+                    RENDERER.discover_executable(
+                        "ffmpeg",
+                        f'"{FFMPEG}"',
+                    )
+                ),
+                FFMPEG.resolve(),
+            )
 
 
 class TestExecutableReleaseChecks(unittest.TestCase):
@@ -804,10 +1133,16 @@ class TestExecutableReleaseChecks(unittest.TestCase):
             )
         payload = json.loads(completed.stdout.strip().splitlines()[-1])
         self.assertRegex(payload.pop("browser"), r"(Chrome|Chromium|Edge|Edg)/")
+        timing_skew = payload.pop("maxTimingSkewMs")
+        self.assertGreaterEqual(timing_skew, 0)
+        self.assertLess(timing_skew, 1000)
         self.assertEqual(
             payload,
             {
                 "actionCount": 24,
+                "manifestActivationChecks": 12,
+                "checkpointVisibilityChecks": 6,
+                "exactTiming": True,
                 "viewports": ["desktop", "mobile-390"],
                 "recordCount": 24,
                 "changedCount": 7,
@@ -816,6 +1151,8 @@ class TestExecutableReleaseChecks(unittest.TestCase):
                 "failureStatus": "rejected-empty",
                 "failureResultCount": None,
                 "failureExportStatus": "preserved",
+                "failureAcceptedYears": {"from": 1990, "to": 2020},
+                "invalidStatus": "rejected-invalid",
                 "resetVisibleCount": 24,
                 "resetFocus": None,
                 "resetView": {"panX": 0, "panY": 0, "zoom": 1},
@@ -823,10 +1160,53 @@ class TestExecutableReleaseChecks(unittest.TestCase):
                     "focus": "WL-024",
                     "visibleCount": 24,
                     "view": {"panX": 0, "panY": -40, "zoom": 0.75},
+                    "transform": {
+                        "a": 0.75,
+                        "d": 0.75,
+                        "e": 0,
+                        "f": -40,
+                    },
                 },
+                "networkBlocked": True,
+                "externalNetworkRequests": 0,
+                "blockedExternalRequests": 0,
                 "browserErrors": 0,
+                "cleanup": {
+                    "browserExited": True,
+                    "profileRemoved": True,
+                },
             },
         )
+
+    @unittest.skipUnless(
+        NODE and BROWSER,
+        "Node/browser not found via RAPP_BROWSER or portable locations",
+    )
+    def test_browser_verifier_propagates_input_errors_and_cleans_up(self):
+        profile = CANDIDATE / ".frame-0003-09-browser-error"
+        shutil.rmtree(profile, ignore_errors=True)
+        self.addCleanup(lambda: shutil.rmtree(profile, ignore_errors=True))
+        completed = subprocess.run(
+            [
+                str(NODE),
+                str(VERIFY_DOM_PATH),
+                "--browser",
+                str(BROWSER),
+                "--evidence",
+                str(CANDIDATE / "missing-evidence.json"),
+                "--profile",
+                str(profile),
+            ],
+            cwd=CANDIDATE,
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=60,
+        )
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertIn("wetland browser verification failed", completed.stderr)
+        self.assertFalse(profile.exists())
 
 
 if __name__ == "__main__":
