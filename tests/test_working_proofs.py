@@ -105,6 +105,32 @@ EXPECTED_CHECKPOINTS = {
 EXPECTED_CAPTURE_COUNT = 2 * sum(
     len(checkpoints) for checkpoints in EXPECTED_CHECKPOINTS.values()
 )
+EXPECTED_VIEWPORT_GEOMETRY = {
+    "desktop": {
+        "pageWidth": 1387,
+        "pageHeight": 900,
+        "frameWidth": 960,
+        "frameHeight": 599.25,
+        "stageWidth": 962,
+        "stageHeight": 601.25,
+        "screenshotWidth": 962,
+        "screenshotHeight": 601,
+        "outerClientWidths": [1372, 1387],
+        "scrollbarWidths": [0, 15],
+    },
+    "390": {
+        "pageWidth": 435,
+        "pageHeight": 900,
+        "frameWidth": 390,
+        "frameHeight": 243,
+        "stageWidth": 392,
+        "stageHeight": 245,
+        "screenshotWidth": 392,
+        "screenshotHeight": 245,
+        "outerClientWidths": [420, 435],
+        "scrollbarWidths": [0, 15],
+    },
+}
 
 
 def load_json(path: Path):
@@ -244,6 +270,10 @@ class TestWorkingProofsBuild(unittest.TestCase):
 
     def test_player_semantic_actions_preserve_focus_and_clear_chrome(self):
         source = (ROOT / "index.html").read_text(encoding="utf-8")
+        self.assertIn(
+            "html{overflow-y:scroll;scrollbar-gutter:stable}",
+            source,
+        )
         self.assertIn("function keepLiveTargetAboveChrome(el)", source)
         self.assertIn('el.focus && el.focus({ preventScroll: true });', source)
         self.assertIn(
@@ -1026,10 +1056,35 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                     self.assertTrue(run["exactTiming"])
                     self.assertGreaterEqual(run["maxTimingSkewMs"], 0)
                     self.assertLess(run["maxTimingSkewMs"], 1000)
-                    self.assertAlmostEqual(
+                    geometry = EXPECTED_VIEWPORT_GEOMETRY[run["viewport"]]
+                    self.assertEqual(
+                        run["geometryChecks"],
+                        1
+                        + len(actions)
+                        + len(run["checkpoints"])
+                        + int(run["finalPromptChecked"]),
+                    )
+                    self.assertEqual(
+                        run["frameWidthsChecked"],
+                        [geometry["frameWidth"]],
+                    )
+                    self.assertEqual(
+                        run["stageWidthsChecked"],
+                        [geometry["stageWidth"]],
+                    )
+                    self.assertTrue(
+                        set(run["outerClientWidthsChecked"])
+                        <= set(geometry["outerClientWidths"]),
+                        run,
+                    )
+                    self.assertTrue(
+                        set(run["scrollbarWidthsChecked"])
+                        <= set(geometry["scrollbarWidths"]),
+                        run,
+                    )
+                    self.assertEqual(
                         run["frameWidth"],
-                        960 if run["viewport"] == "desktop" else 390,
-                        delta=1,
+                        geometry["frameWidth"],
                     )
                     self.assertTrue(
                         all(height > 0 for height in run["safeHeight"]),
@@ -1042,6 +1097,13 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                 "working-proofs-viewport-evidence/1.0",
             )
             self.assertEqual(generated_manifest["channel"], "working-proofs")
+            self.assertEqual(
+                generated_manifest["viewports"],
+                [
+                    {"id": name, **geometry}
+                    for name, geometry in EXPECTED_VIEWPORT_GEOMETRY.items()
+                ],
+            )
             self.assertEqual(
                 len(generated_manifest["captures"]),
                 EXPECTED_CAPTURE_COUNT,
@@ -1062,11 +1124,48 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                         capture["state"]["actualSha256"],
                         capture["state"]["expectedSha256"],
                     )
+                    geometry = EXPECTED_VIEWPORT_GEOMETRY[
+                        capture["viewport"]
+                    ]
+                    self.assertEqual(
+                        capture["metrics"]["frameWidth"],
+                        geometry["frameWidth"],
+                    )
+                    self.assertEqual(
+                        capture["metrics"]["frameHeight"],
+                        geometry["frameHeight"],
+                    )
+                    self.assertEqual(
+                        capture["metrics"]["stageWidth"],
+                        geometry["stageWidth"],
+                    )
+                    self.assertEqual(
+                        capture["metrics"]["stageHeight"],
+                        geometry["stageHeight"],
+                    )
+                    self.assertIn(
+                        capture["metrics"]["outerClientWidth"],
+                        geometry["outerClientWidths"],
+                    )
+                    self.assertIn(
+                        capture["metrics"]["outerScrollbarWidth"],
+                        geometry["scrollbarWidths"],
+                    )
                     self.assertEqual(
                         png_dimensions(screenshot),
                         (
+                            geometry["screenshotWidth"],
+                            geometry["screenshotHeight"],
+                        ),
+                    )
+                    self.assertEqual(
+                        (
                             capture["screenshot"]["width"],
                             capture["screenshot"]["height"],
+                        ),
+                        (
+                            geometry["screenshotWidth"],
+                            geometry["screenshotHeight"],
                         ),
                     )
 
@@ -1111,11 +1210,48 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                         capture["state"]["actualSha256"],
                         capture["state"]["expectedSha256"],
                     )
+                    geometry = EXPECTED_VIEWPORT_GEOMETRY[
+                        capture["viewport"]
+                    ]
+                    self.assertEqual(
+                        capture["metrics"]["frameWidth"],
+                        geometry["frameWidth"],
+                    )
+                    self.assertEqual(
+                        capture["metrics"]["frameHeight"],
+                        geometry["frameHeight"],
+                    )
+                    self.assertEqual(
+                        capture["metrics"]["stageWidth"],
+                        geometry["stageWidth"],
+                    )
+                    self.assertEqual(
+                        capture["metrics"]["stageHeight"],
+                        geometry["stageHeight"],
+                    )
+                    self.assertIn(
+                        capture["metrics"]["outerClientWidth"],
+                        geometry["outerClientWidths"],
+                    )
+                    self.assertIn(
+                        capture["metrics"]["outerScrollbarWidth"],
+                        geometry["scrollbarWidths"],
+                    )
                     self.assertEqual(
                         png_dimensions(screenshot),
                         (
+                            geometry["screenshotWidth"],
+                            geometry["screenshotHeight"],
+                        ),
+                    )
+                    self.assertEqual(
+                        (
                             capture["screenshot"]["width"],
                             capture["screenshot"]["height"],
+                        ),
+                        (
+                            geometry["screenshotWidth"],
+                            geometry["screenshotHeight"],
                         ),
                     )
         finally:

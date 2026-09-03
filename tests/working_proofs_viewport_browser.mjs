@@ -68,15 +68,27 @@ const VIEWPORTS = [
     id: "desktop",
     pageWidth: 1387,
     pageHeight: 900,
-    minFrameWidth: 958,
-    maxFrameWidth: 962,
+    frameWidth: 960,
+    frameHeight: 599.25,
+    stageWidth: 962,
+    stageHeight: 601.25,
+    screenshotWidth: 962,
+    screenshotHeight: 601,
+    outerClientWidths: [1372, 1387],
+    scrollbarWidths: [0, 15],
   },
   {
     id: "390",
     pageWidth: 435,
     pageHeight: 900,
-    minFrameWidth: 388,
-    maxFrameWidth: 392,
+    frameWidth: 390,
+    frameHeight: 243,
+    stageWidth: 392,
+    stageHeight: 245,
+    screenshotWidth: 392,
+    screenshotHeight: 245,
+    outerClientWidths: [420, 435],
+    scrollbarWidths: [0, 15],
   },
 ];
 
@@ -533,6 +545,16 @@ async function targetMetrics(selector = null, reveal = false) {
       frameHeight: frameRect.height,
       stageWidth: stageRect.width,
       stageHeight: stageRect.height,
+      outerViewportWidth: innerWidth,
+      outerClientWidth: document.documentElement.clientWidth,
+      outerScrollbarWidth:
+        innerWidth - document.documentElement.clientWidth,
+      outerScrollHeight: document.documentElement.scrollHeight,
+      outerClientHeight: document.documentElement.clientHeight,
+      htmlOverflowY: getComputedStyle(document.documentElement).overflowY,
+      bodyOverflowY: getComputedStyle(document.body).overflowY,
+      scrollbarGutter:
+        getComputedStyle(document.documentElement).scrollbarGutter,
       safeHeight,
       lowerThirdHeight: lowerRect ? lowerRect.height : 0
     };
@@ -545,6 +567,42 @@ function assertVisible(metrics, label) {
     true,
     `${label} is not visible above the live-player lower third: ` +
       JSON.stringify(metrics),
+  );
+}
+
+function assertViewportGeometry(metrics, viewport, label) {
+  const diagnostic = `${label}: ${JSON.stringify(metrics)}`;
+  assert.ok(
+    Math.abs(metrics.frameWidth - viewport.frameWidth) <= 0.5,
+    diagnostic,
+  );
+  assert.ok(
+    Math.abs(metrics.frameHeight - viewport.frameHeight) <= 0.5,
+    diagnostic,
+  );
+  assert.ok(
+    Math.abs(metrics.stageWidth - viewport.stageWidth) <= 0.5,
+    diagnostic,
+  );
+  assert.ok(
+    Math.abs(metrics.stageHeight - viewport.stageHeight) <= 0.5,
+    diagnostic,
+  );
+  assert.equal(metrics.outerViewportWidth, viewport.pageWidth, diagnostic);
+  assert.ok(
+    viewport.outerClientWidths.includes(metrics.outerClientWidth),
+    diagnostic,
+  );
+  assert.ok(
+    viewport.scrollbarWidths.includes(metrics.outerScrollbarWidth),
+    diagnostic,
+  );
+  assert.equal(metrics.htmlOverflowY, "scroll", diagnostic);
+  assert.equal(metrics.bodyOverflowY, "visible", diagnostic);
+  assert.match(metrics.scrollbarGutter, /^stable/, diagnostic);
+  assert.ok(
+    metrics.outerScrollHeight > metrics.outerClientHeight,
+    `real page scrolling was lost; ${diagnostic}`,
   );
 }
 
@@ -821,14 +879,17 @@ try {
         `${publicationId}/${viewport.id}/opening`,
       );
 
+      const geometrySamples = [];
+      const checkGeometry = (metrics, label) => {
+        assertViewportGeometry(metrics, viewport, label);
+        geometrySamples.push(metrics);
+      };
       const frame = await targetMetrics(
         aggregatePublication.live.scenes[0].ready.selector,
       );
-      assert.ok(
-        frame.frameWidth >= viewport.minFrameWidth &&
-          frame.frameWidth <= viewport.maxFrameWidth,
-        `${viewport.id} iframe width is outside the player-stage target: ` +
-          JSON.stringify(frame),
+      checkGeometry(
+        frame,
+        `${publicationId}/${viewport.id}/opening geometry`,
       );
 
       const activationVisibility = [];
@@ -857,6 +918,10 @@ try {
             metrics,
             `${publicationId}/${viewport.id} action ${actionIndex}`,
           );
+          checkGeometry(
+            metrics,
+            `${publicationId}/${viewport.id} action ${actionIndex} geometry`,
+          );
           assert.equal(
             metrics.disabled,
             false,
@@ -877,6 +942,11 @@ try {
             metrics,
             `${publicationId}/${viewport.id} framing action ${actionIndex}`,
           );
+          checkGeometry(
+            metrics,
+            `${publicationId}/${viewport.id} framing action ` +
+              `${actionIndex} geometry`,
+          );
           framingVisibility.push({
             actionIndex,
             selector: action.selector,
@@ -890,6 +960,10 @@ try {
           assertVisible(
             metrics,
             `${publicationId}/${viewport.id} final prompt`,
+          );
+          checkGeometry(
+            metrics,
+            `${publicationId}/${viewport.id} final prompt geometry`,
           );
           const promptText = await evaluate(`(() => {
             const frame = document.querySelector("#stage iframe");
@@ -921,9 +995,23 @@ try {
           metrics,
           `${publicationId}/${viewport.id}/${checkpoint.claim} result`,
         );
+        checkGeometry(
+          metrics,
+          `${publicationId}/${viewport.id}/${checkpoint.claim} geometry`,
+        );
         const filename =
           `${publicationId}-${viewport.id}-${checkpoint.claim}.png`;
         const screenshot = await captureStage(join(outputRoot, filename));
+        assert.equal(
+          screenshot.width,
+          viewport.screenshotWidth,
+          `${filename}: screenshot width drifted`,
+        );
+        assert.equal(
+          screenshot.height,
+          viewport.screenshotHeight,
+          `${filename}: screenshot height drifted`,
+        );
         const entry = {
           publication: publicationId,
           viewport: viewport.id,
@@ -956,6 +1044,13 @@ try {
         finalPromptChecked,
         Boolean(evidenceContract.finalPrompt),
       );
+      assert.equal(
+        geometrySamples.length,
+        1 +
+          actions.length +
+          evidenceContract.checkpoints.length +
+          (evidenceContract.finalPrompt ? 1 : 0),
+      );
       runs.push({
         publication: publicationId,
         viewport: viewport.id,
@@ -968,6 +1063,21 @@ try {
         finalPromptChecked,
         exactTiming: true,
         maxTimingSkewMs: Math.round(Math.max(...timingSkews)),
+        geometryChecks: geometrySamples.length,
+        frameWidthsChecked: [
+          ...new Set(geometrySamples.map(sample => sample.frameWidth)),
+        ],
+        stageWidthsChecked: [
+          ...new Set(geometrySamples.map(sample => sample.stageWidth)),
+        ],
+        outerClientWidthsChecked: [
+          ...new Set(geometrySamples.map(sample => sample.outerClientWidth)),
+        ],
+        scrollbarWidthsChecked: [
+          ...new Set(
+            geometrySamples.map(sample => sample.outerScrollbarWidth),
+          ),
+        ],
         checkpoints: checkpointResults.map((entry) => entry.checkpoint),
       });
     }
@@ -983,10 +1093,30 @@ try {
     schema: "working-proofs-viewport-evidence/1.0",
     browser: version.product,
     channel: channel.id,
-    viewports: VIEWPORTS.map(({ id, pageWidth, pageHeight }) => ({
+    viewports: VIEWPORTS.map(({
       id,
       pageWidth,
       pageHeight,
+      frameWidth,
+      frameHeight,
+      stageWidth,
+      stageHeight,
+      screenshotWidth,
+      screenshotHeight,
+      outerClientWidths,
+      scrollbarWidths,
+    }) => ({
+      id,
+      pageWidth,
+      pageHeight,
+      frameWidth,
+      frameHeight,
+      stageWidth,
+      stageHeight,
+      screenshotWidth,
+      screenshotHeight,
+      outerClientWidths,
+      scrollbarWidths,
     })),
     captures,
   };

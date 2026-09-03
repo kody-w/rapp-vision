@@ -7,6 +7,7 @@ import copy
 import hashlib
 import importlib.util
 import json
+import math
 import os
 import re
 import shutil
@@ -133,6 +134,52 @@ EXPECTED_DELIVERY_ARTIFACTS = EXPECTED_SOURCE_ARTIFACTS | {
     "media/explore-archive-map-contrast.mp4",
     "media/explore-archive-map-contrast.webm",
 }
+FILM_CONTENT_SAMPLES = {
+    "opening": (
+        1.0,
+        12,
+        "3a4db7663e001e76eb224f478d822fae2ef41594d1a8bdabcd8dcb879463f082",
+    ),
+    "compare": (
+        3.5,
+        42,
+        "6f7c76fd6366aefc0bff90b424bcee1eaaa653e1a22f4f317dafffc59cc18627",
+    ),
+    "export": (
+        10.0,
+        120,
+        "c5632471b9c9ffe9e802a90b09fb30fc6fd71f55dc71917ff18436bde4cbf4ce",
+    ),
+    "failure": (
+        14.0,
+        168,
+        "bb7de74d0fbd91c045d8600b05151dd18a45386c7856a9af7c7843dfb6dcaa29",
+    ),
+    "reset": (
+        17.5,
+        210,
+        "88cb8c577ffdbf083c40561cec5b14479f7643fa2b5c96abe6d8dd767f819270",
+    ),
+    "takeover": (
+        20.5,
+        246,
+        "b6179efc63bcc8421b9bf8370b8f837ec17cad320ccccee7794d2587e46986a1",
+    ),
+}
+LOSSY_FRAME_LIMITS = {
+    "mp4": {
+        "maximumMae": 2.25,
+        "minimumPsnr": 35.5,
+        "maximumOver16Fraction": 0.015,
+        "maximumChannelError": 96,
+    },
+    "webm": {
+        "maximumMae": 2.5,
+        "minimumPsnr": 34.5,
+        "maximumOver16Fraction": 0.0175,
+        "maximumChannelError": 96,
+    },
+}
 
 
 def load_json(path: Path):
@@ -193,6 +240,129 @@ NODE = shutil.which("node") or shutil.which("nodejs")
 FFMPEG = optional_media_tool("ffmpeg")
 FFPROBE = optional_media_tool("ffprobe")
 BROWSER = discover_browser()
+
+
+def read_exact(stream, size: int) -> bytes:
+    blocks = []
+    remaining = size
+    while remaining:
+        block = stream.read(remaining)
+        if not block:
+            break
+        blocks.append(block)
+        remaining -= len(block)
+    return b"".join(blocks)
+
+
+def decode_rgb_samples(path: Path, ffmpeg: Path) -> dict[int, bytes]:
+    frame_size = RENDERER.SPEC.width * RENDERER.SPEC.height * 3
+    sample_indexes = {
+        frame_index
+        for _timestamp, frame_index, _digest in FILM_CONTENT_SAMPLES.values()
+    }
+    process = subprocess.Popen(
+        [
+            str(ffmpeg),
+            "-v",
+            "error",
+            "-i",
+            str(path),
+            "-map",
+            "0:v:0",
+            "-f",
+            "rawvideo",
+            "-pix_fmt",
+            "rgb24",
+            "pipe:1",
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if process.stdout is None or process.stderr is None:
+        process.kill()
+        process.wait()
+        raise AssertionError(f"{path}: FFmpeg pipes were not created")
+
+    samples = {}
+    try:
+        for frame_index in range(RENDERER.SPEC.frame_count):
+            frame = read_exact(process.stdout, frame_size)
+            if len(frame) != frame_size:
+                process.kill()
+                error = process.stderr.read().decode(
+                    "utf-8",
+                    errors="replace",
+                ).strip()
+                process.wait()
+                raise AssertionError(
+                    f"{path}: decoded {frame_index} complete frames; "
+                    f"frame {frame_index} had {len(frame)} of {frame_size} "
+                    f"bytes; stderr={error!r}"
+                )
+            if frame_index in sample_indexes:
+                samples[frame_index] = frame
+
+        trailing = process.stdout.read(1)
+        if trailing:
+            process.kill()
+            process.wait()
+            raise AssertionError(
+                f"{path}: decoded more than "
+                f"{RENDERER.SPEC.frame_count} frames"
+            )
+        error = process.stderr.read().decode(
+            "utf-8",
+            errors="replace",
+        ).strip()
+        return_code = process.wait()
+        if return_code:
+            raise AssertionError(
+                f"{path}: FFmpeg decode exited {return_code}: {error}"
+            )
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.wait()
+        process.stdout.close()
+        process.stderr.close()
+
+    if set(samples) != sample_indexes:
+        raise AssertionError(
+            f"{path}: missing sampled frames "
+            f"{sorted(sample_indexes - set(samples))}"
+        )
+    return samples
+
+
+def rgb_fidelity(reference: bytes, encoded: bytes) -> dict[str, float | int]:
+    if len(reference) != len(encoded):
+        raise AssertionError(
+            f"RGB frame size mismatch: {len(reference)} != {len(encoded)}"
+        )
+    absolute_error = 0
+    squared_error = 0
+    over_16 = 0
+    maximum = 0
+    for expected, actual in zip(reference, encoded, strict=True):
+        difference = abs(expected - actual)
+        absolute_error += difference
+        squared_error += difference * difference
+        over_16 += difference > 16
+        maximum = max(maximum, difference)
+    count = len(reference)
+    mean_absolute_error = absolute_error / count
+    mean_squared_error = squared_error / count
+    psnr = (
+        99.0
+        if mean_squared_error == 0
+        else 10 * math.log10((255 * 255) / mean_squared_error)
+    )
+    return {
+        "mae": mean_absolute_error,
+        "psnr": psnr,
+        "over16Fraction": over_16 / count,
+        "maximumChannelError": maximum,
+    }
 
 
 def embedded_json(source: str, element_id: str):
@@ -1242,6 +1412,85 @@ class TestRendererMediaAndDelivery(unittest.TestCase):
             ),
             [],
         )
+
+    @unittest.skipUnless(
+        FFMPEG,
+        "ffmpeg not found via RAPP_FFMPEG or portable locations",
+    )
+    def test_committed_media_pixels_bind_the_renderer_story(self):
+        master_samples = decode_rgb_samples(MASTER_PATH, FFMPEG)
+        for phase, (
+            timestamp,
+            frame_index,
+            expected_digest,
+        ) in FILM_CONTENT_SAMPLES.items():
+            with self.subTest(master_phase=phase, frame=frame_index):
+                self.assertEqual(
+                    frame_index,
+                    round(timestamp * RENDERER.SPEC.fps),
+                )
+                self.assertEqual(RENDERER.film_phase(timestamp), phase)
+                rendered = RENDERER.frame_rgb(frame_index)
+                decoded = master_samples[frame_index]
+                rendered_digest = hashlib.sha256(rendered).hexdigest()
+                decoded_digest = hashlib.sha256(decoded).hexdigest()
+                self.assertEqual(rendered_digest, expected_digest)
+                self.assertEqual(decoded_digest, expected_digest)
+                if decoded != rendered:
+                    first_difference = next(
+                        index
+                        for index, (actual, expected) in enumerate(
+                            zip(decoded, rendered, strict=True)
+                        )
+                        if actual != expected
+                    )
+                    self.fail(
+                        f"{phase} frame {frame_index}: committed FFV1 "
+                        f"master differs from renderer at RGB byte "
+                        f"{first_difference}; decoded={decoded_digest}, "
+                        f"renderer={rendered_digest}"
+                    )
+
+        for kind, path in (("mp4", MP4_PATH), ("webm", WEBM_PATH)):
+            decoded_samples = decode_rgb_samples(path, FFMPEG)
+            limits = LOSSY_FRAME_LIMITS[kind]
+            for phase, (
+                _timestamp,
+                frame_index,
+                _expected_digest,
+            ) in FILM_CONTENT_SAMPLES.items():
+                metrics = rgb_fidelity(
+                    master_samples[frame_index],
+                    decoded_samples[frame_index],
+                )
+                diagnostic = (
+                    f"{kind}/{phase} frame {frame_index}: "
+                    f"MAE={metrics['mae']:.4f}, "
+                    f"PSNR={metrics['psnr']:.3f} dB, "
+                    f">16={metrics['over16Fraction']:.6%}, "
+                    f"max={metrics['maximumChannelError']}"
+                )
+                with self.subTest(kind=kind, phase=phase):
+                    self.assertLessEqual(
+                        metrics["mae"],
+                        limits["maximumMae"],
+                        diagnostic,
+                    )
+                    self.assertGreaterEqual(
+                        metrics["psnr"],
+                        limits["minimumPsnr"],
+                        diagnostic,
+                    )
+                    self.assertLessEqual(
+                        metrics["over16Fraction"],
+                        limits["maximumOver16Fraction"],
+                        diagnostic,
+                    )
+                    self.assertLessEqual(
+                        metrics["maximumChannelError"],
+                        limits["maximumChannelError"],
+                        diagnostic,
+                    )
 
     @unittest.skipUnless(
         FFMPEG and FFPROBE,
