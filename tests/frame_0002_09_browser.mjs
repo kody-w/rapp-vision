@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdir, rm } from "node:fs/promises";
-import readline from "node:readline";
+import { createServer } from "node:net";
 
 const [browserExecutable, appUrl, actionsBase64, profileDirectory] =
   process.argv.slice(2);
@@ -92,37 +92,22 @@ class CdpClient {
   }
 }
 
-function waitForDevTools(child) {
-  return new Promise((resolve, reject) => {
-    const lines = [];
-    const reader = readline.createInterface({ input: child.stderr });
-    const timeout = setTimeout(() => {
-      reader.close();
-      reject(
-        new Error(
-          `timed out waiting for DevTools endpoint: ${lines.join(" | ")}`,
-        ),
-      );
-    }, 20_000);
-    reader.on("line", (line) => {
-      lines.push(line);
-      const match = line.match(/DevTools listening on (ws:\/\/\S+)/);
-      if (match) {
-        clearTimeout(timeout);
-        reader.close();
-        resolve(match[1]);
+async function waitForDevTools(child, port, timeout = 20_000) {
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    if (child.exitCode !== null) {
+      throw new Error(`browser exited before DevTools was ready (${child.exitCode})`);
+    }
+    try {
+      const response = await fetch(`http://127.0.0.1:${port}/json/version`);
+      if (response.ok) {
+        const version = await response.json();
+        if (version.webSocketDebuggerUrl) return version.webSocketDebuggerUrl;
       }
-    });
-    child.once("exit", (code) => {
-      clearTimeout(timeout);
-      reader.close();
-      reject(
-        new Error(
-          `browser exited before DevTools was ready (${code}): ${lines.join(" | ")}`,
-        ),
-      );
-    });
-  });
+    } catch {}
+    await new Promise(resolveDelay => setTimeout(resolveDelay, 75));
+  }
+  throw new Error("timed out waiting for explicit browser DevTools port");
 }
 
 async function evaluate(client, sessionId, expression) {
@@ -301,6 +286,18 @@ function assertPositivePath(initial, steps) {
   };
 }
 
+const debugPort = await new Promise((resolvePort, rejectPort) => {
+  const server = createServer();
+  server.once("error", rejectPort);
+  server.listen(0, "127.0.0.1", () => {
+    const address = server.address();
+    server.close(error => {
+      if (error) rejectPort(error);
+      else resolvePort(address.port);
+    });
+  });
+});
+
 const browserArguments = [
   "--headless=new",
   "--disable-background-networking",
@@ -316,7 +313,7 @@ const browserArguments = [
   "--no-first-run",
   "--no-sandbox",
   "--remote-allow-origins=*",
-  "--remote-debugging-port=0",
+  `--remote-debugging-port=${debugPort}`,
   `--user-data-dir=${profileDirectory}`,
   "about:blank",
 ];
@@ -332,7 +329,7 @@ const browser = spawn(browserExecutable, browserArguments, {
 let client;
 let targetId;
 try {
-  const endpoint = await waitForDevTools(browser);
+  const endpoint = await waitForDevTools(browser, debugPort);
   client = await CdpClient.connect(endpoint);
   const version = await client.send("Browser.getVersion");
   ({ targetId } = await client.send("Target.createTarget", { url: appUrl }));

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { createServer } from "node:net";
 import { constants as fsConstants } from "node:fs";
 import { access, readFile, rm } from "node:fs/promises";
 import {
@@ -199,6 +200,18 @@ const manifestPath = resolve(options.manifest);
 const profilePath = resolve(options.profile);
 await rm(profilePath, { recursive: true, force: true });
 
+const debugPort = await new Promise((resolvePort, rejectPort) => {
+  const server = createServer();
+  server.once("error", rejectPort);
+  server.listen(0, "127.0.0.1", () => {
+    const address = server.address();
+    server.close(error => {
+      if (error) rejectPort(error);
+      else resolvePort(address.port);
+    });
+  });
+});
+
 let launchError = null;
 const browser = spawn(
   browserPath,
@@ -206,10 +219,13 @@ const browser = spawn(
     "--headless=new",
     "--disable-background-networking",
     "--disable-component-update",
+    "--disable-dev-shm-usage",
     "--disable-gpu",
+    "--no-sandbox",
     "--no-first-run",
     "--no-default-browser-check",
-    "--remote-debugging-port=0",
+    `--remote-debugging-port=${debugPort}`,
+    "--remote-allow-origins=*",
     `--user-data-dir=${profilePath}`,
     "about:blank",
   ],
@@ -223,7 +239,6 @@ const delay = milliseconds =>
   new Promise(resolveDelay => setTimeout(resolveDelay, milliseconds));
 
 async function activePort(timeout = 15000) {
-  const path = join(profilePath, "DevToolsActivePort");
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
     if (launchError) throw launchError;
@@ -231,8 +246,10 @@ async function activePort(timeout = 15000) {
       throw new Error(`browser exited before DevTools was ready: ${browser.exitCode}`);
     }
     try {
-      const [port] = (await readFile(path, "utf8")).trim().split(/\r?\n/);
-      if (port) return port;
+      const response = await fetch(
+        `http://127.0.0.1:${debugPort}/json/version`
+      );
+      if (response.ok) return String(debugPort);
     } catch {}
     await delay(75);
   }

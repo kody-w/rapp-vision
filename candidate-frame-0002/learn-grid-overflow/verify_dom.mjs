@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { readFile, rm } from "node:fs/promises";
-import { join } from "node:path";
+import { createServer } from "node:net";
 import { pathToFileURL } from "node:url";
 
 const [browserPath, appPath, evidencePath, profilePath] = process.argv.slice(2);
@@ -12,6 +12,17 @@ if (!browserPath || !appPath || !evidencePath || !profilePath) {
 }
 
 await rm(profilePath, { recursive: true, force: true });
+const debugPort = await new Promise((resolvePort, rejectPort) => {
+  const server = createServer();
+  server.once("error", rejectPort);
+  server.listen(0, "127.0.0.1", () => {
+    const address = server.address();
+    server.close(error => {
+      if (error) rejectPort(error);
+      else resolvePort(address.port);
+    });
+  });
+});
 const browser = spawn(browserPath, [
   "--headless=new",
   "--disable-gpu",
@@ -19,7 +30,8 @@ const browser = spawn(browserPath, [
   "--no-sandbox",
   "--no-first-run",
   "--no-default-browser-check",
-  "--remote-debugging-port=0",
+  `--remote-debugging-port=${debugPort}`,
+  "--remote-allow-origins=*",
   `--user-data-dir=${profilePath}`,
   "about:blank",
 ], { stdio: "ignore" });
@@ -27,16 +39,17 @@ const browser = spawn(browserPath, [
 const delay = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
 async function waitForActivePort(timeout = 15000) {
-  const activePortPath = join(profilePath, "DevToolsActivePort");
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
     try {
-      const [port, browserId] = (await readFile(activePortPath, "utf8")).trim().split(/\r?\n/);
-      if (port && browserId) return { port, browserId };
+      const response = await fetch(
+        `http://127.0.0.1:${debugPort}/json/version`
+      );
+      if (response.ok) return { port: String(debugPort) };
     } catch {}
     await delay(75);
   }
-  throw new Error("Edge did not publish DevToolsActivePort");
+  throw new Error("browser did not open its explicit DevTools port");
 }
 
 async function readJson(url, timeout = 15000) {
