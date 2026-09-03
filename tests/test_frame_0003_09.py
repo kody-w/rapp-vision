@@ -145,6 +145,11 @@ FILM_CONTENT_SAMPLES = {
         42,
         "6f7c76fd6366aefc0bff90b424bcee1eaaa653e1a22f4f317dafffc59cc18627",
     ),
+    "inspect": (
+        7.5,
+        90,
+        "7d5cb680b1005d7445fb7d6f3237a1f41055f46ca24d118fcee512ff9eff213c",
+    ),
     "export": (
         10.0,
         120,
@@ -269,6 +274,8 @@ def decode_rgb_samples(path: Path, ffmpeg: Path) -> dict[int, bytes]:
             str(path),
             "-map",
             "0:v:0",
+            "-sws_flags",
+            "accurate_rnd+full_chroma_int",
             "-f",
             "rawvideo",
             "-pix_fmt",
@@ -1359,6 +1366,31 @@ class TestRendererMediaAndDelivery(unittest.TestCase):
             self.assertEqual(record["colorTransfer"], "bt709")
             self.assertEqual(record["colorPrimaries"], "bt709")
             self.assertEqual(record["colorRange"], "tv")
+
+    def test_content_samples_cover_every_film_phase(self):
+        timeline = {
+            name: (start, end)
+            for name, start, end in RENDERER.FILM_TIMELINE
+        }
+        self.assertEqual(
+            tuple(FILM_CONTENT_SAMPLES),
+            tuple(timeline),
+        )
+        for phase, (
+            timestamp,
+            frame_index,
+            _digest,
+        ) in FILM_CONTENT_SAMPLES.items():
+            start, end = timeline[phase]
+            frame_timestamp = frame_index / RENDERER.SPEC.fps
+            with self.subTest(phase=phase, frame=frame_index):
+                self.assertEqual(timestamp, frame_timestamp)
+                self.assertGreaterEqual(frame_timestamp, start)
+                self.assertLess(frame_timestamp, end)
+                self.assertEqual(
+                    RENDERER.film_phase(frame_timestamp),
+                    phase,
+                )
 
     @unittest.skipUnless(FFPROBE, "ffprobe not found via RAPP_FFPROBE or portable locations")
     def test_actual_media_codec_probes_match_delivery(self):
