@@ -1,0 +1,488 @@
+{
+  "avatar": "✓",
+  "cadence": "recurring",
+  "creator": {
+    "identity": "machine-produced, artifact-reviewed",
+    "name": "RAPP Vision Working Proofs"
+  },
+  "id": "working-proofs",
+  "name": "Working Proofs",
+  "schema": "rapp-vision-channel/2.0",
+  "tagline": "Useful work, measurable results, controls included.",
+  "videos": [
+    {
+      "chapters": [
+        {
+          "label": "Measure 612 > 320",
+          "t": 0
+        },
+        {
+          "label": "Zero the item minimum",
+          "t": 4
+        },
+        {
+          "label": "Verify both target widths",
+          "t": 8
+        },
+        {
+          "label": "Restore the overflow",
+          "t": 11
+        },
+        {
+          "label": "Reset to x = 0",
+          "t": 14
+        }
+      ],
+      "description": "A measured CSS Grid lesson shows a 480 px intrinsic rail contributing through the grid item's default min-width: auto, producing scrollWidth 612 > clientWidth 320. The paired live proof changes only that declaration to min-width: 0, verifies equality at 320 and 1280 px, restores the automatic minimum and horizontal scroll, then performs the exact three-step reset to x = 0.",
+      "duration": 18,
+      "height": 540,
+      "id": "learn-grid-overflow",
+      "live": {
+        "chapters": [
+          {
+            "label": "Inspect the overflowing track",
+            "t": 0
+          },
+          {
+            "label": "Apply the one-line fix",
+            "t": 2.4
+          },
+          {
+            "label": "Verify 1280 px",
+            "t": 5.2
+          },
+          {
+            "label": "Restore broken CSS",
+            "t": 8.2
+          },
+          {
+            "label": "Reproduce horizontal scroll",
+            "t": 10
+          },
+          {
+            "label": "Exact reset",
+            "t": 13.8
+          }
+        ],
+        "duration": 18,
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "actions": [
+              {
+                "at": 0.8,
+                "do": "click",
+                "selector": "#inspect-btn"
+              },
+              {
+                "at": 2.6,
+                "do": "click",
+                "selector": "#apply-fix-btn"
+              },
+              {
+                "at": 5.4,
+                "do": "click",
+                "selector": "#viewport-1280-btn"
+              },
+              {
+                "at": 8.4,
+                "do": "click",
+                "selector": "#restore-broken-btn"
+              },
+              {
+                "at": 10,
+                "do": "click",
+                "selector": "#viewport-320-btn"
+              },
+              {
+                "at": 11.6,
+                "do": "click",
+                "selector": "#scroll-end-btn"
+              },
+              {
+                "at": 14,
+                "do": "click",
+                "selector": "#restore-broken-btn"
+              },
+              {
+                "at": 15.2,
+                "do": "click",
+                "selector": "#viewport-320-btn"
+              },
+              {
+                "at": 16.5,
+                "do": "click",
+                "selector": "#scroll-zero-btn"
+              }
+            ],
+            "app": "../candidate-frame-0002/learn-grid-overflow/apps/learn-grid-overflow.html",
+            "dur": 18,
+            "lower": {
+              "bench": "min-width: auto keeps a 480 px item minimum. min-width: 0 alone yields equality at 320 and 1280.",
+              "fix": "Pause, compare the one changed declaration, and inspect each real DOM snapshot.",
+              "title": "Why the Grid Overflows"
+            },
+            "ready": {
+              "selector": "#inspect-btn"
+            },
+            "t": 0
+          }
+        ]
+      },
+      "orientation": "landscape",
+      "published": "2026-09-02",
+      "sources": [
+        {
+          "src": "../candidate-frame-0002/learn-grid-overflow/media/learn-grid-overflow.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "../candidate-frame-0002/learn-grid-overflow/media/learn-grid-overflow.webm",
+          "type": "video/webm"
+        }
+      ],
+      "tags": [
+        "css-grid",
+        "automatic-minimum",
+        "intrinsic-sizing",
+        "overflow",
+        "deterministic",
+        "live-replay"
+      ],
+      "thumb": "../candidate-frame-0002/learn-grid-overflow/thumbs/learn-grid-overflow.svg",
+      "title": "Why the Grid Overflows",
+      "width": 960
+    },
+    {
+      "chapters": [
+        {
+          "label": "Fixture total 196.25",
+          "t": 0
+        },
+        {
+          "label": "Keyboard correction",
+          "t": 3
+        },
+        {
+          "label": "Export acceptedTotal 196.25",
+          "t": 6
+        },
+        {
+          "label": "Negative amount rejected",
+          "t": 9
+        },
+        {
+          "label": "Exact fixture restore",
+          "t": 14
+        }
+      ],
+      "description": "A synthetic three-invoice queue totals exactly 196.25. The guided film and live replay use only Tab, Shift-Tab, arrow keys, typing, and Enter to accept two invoices, correct the third, export acceptedTotal 196.25, reject a negative amount with export disabled and focus on the invalid field, then restore the exact pending fixture.",
+      "duration": 18,
+      "height": 540,
+      "id": "use-keyboard-invoice-triage",
+      "live": {
+        "chapters": [
+          {
+            "label": "Accept two invoices",
+            "t": 0
+          },
+          {
+            "label": "Correct the third with arrow keys",
+            "t": 2
+          },
+          {
+            "label": "Export 196.25",
+            "t": 5
+          },
+          {
+            "label": "Shift-Tab back and type a negative amount",
+            "t": 6
+          },
+          {
+            "label": "Tab to restore the exact fixture",
+            "t": 10
+          }
+        ],
+        "duration": 18,
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "actions": [
+              {
+                "at": 0.5,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 1.1,
+                "code": "ArrowDown",
+                "do": "key"
+              },
+              {
+                "at": 1.7,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 2.3,
+                "code": "ArrowDown",
+                "do": "key"
+              },
+              {
+                "at": 2.9,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 3.5,
+                "code": "ArrowDown",
+                "do": "key"
+              },
+              {
+                "at": 4.1,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 4.8,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 5.4,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 6.4,
+                "code": "ShiftLeft",
+                "do": "keydown"
+              },
+              {
+                "at": 6.7,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 7.0,
+                "code": "ShiftLeft",
+                "do": "keyup"
+              },
+              {
+                "at": 7.4,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 8.2,
+                "do": "type",
+                "text": "-1.00"
+              },
+              {
+                "at": 9.2,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 10.0,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 10.5,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 11.0,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 11.5,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 12.3,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 14.3,
+                "code": "Enter",
+                "do": "key"
+              }
+            ],
+            "app": "../candidate-frame-0002/use-keyboard-invoice-triage/apps/use-keyboard-invoice-triage.html",
+            "dur": 18,
+            "lower": {
+              "bench": "The synthetic fixture and exported acceptedTotal both equal 196.25.",
+              "fix": "Pause, follow the visible focus ring, and try another correction.",
+              "title": "Triage Invoices Without a Pointer"
+            },
+            "ready": {
+              "selector": "#invoice-syn-001"
+            },
+            "t": 0
+          }
+        ]
+      },
+      "orientation": "landscape",
+      "published": "2026-09-02",
+      "sources": [
+        {
+          "src": "../candidate-frame-0002/use-keyboard-invoice-triage/media/use-keyboard-invoice-triage.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "../candidate-frame-0002/use-keyboard-invoice-triage/media/use-keyboard-invoice-triage.webm",
+          "type": "video/webm"
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "keyboard",
+        "invoice-triage",
+        "deterministic",
+        "live-replay"
+      ],
+      "thumb": "../candidate-frame-0002/use-keyboard-invoice-triage/thumbs/use-keyboard-invoice-triage.svg",
+      "title": "Triage Invoices Without a Pointer",
+      "width": 960
+    },
+    {
+      "chapters": [
+        {
+          "label": "Immutable 2 px opening",
+          "t": 0
+        },
+        {
+          "label": "Six symbols regenerated at 1.5 px",
+          "t": 2
+        },
+        {
+          "label": "Returned to 2 px and exported",
+          "t": 5
+        },
+        {
+          "label": "Off-grid anchor rejected",
+          "t": 8
+        },
+        {
+          "label": "Exact 2 px reference restore",
+          "t": 11
+        }
+      ],
+      "description": "A tiny vector bench starts from an immutable 2 px raster reference, changes the shared stroke to 1.5 px and regenerates all six original 24 by 24 symbols with new geometry and sprite hashes, deliberately returns to 2 px to regenerate and export the passing reference, rejects an off-grid pulse anchor without mutating that export, then restores the exact opening state.",
+      "duration": 15,
+      "height": 540,
+      "id": "create-vector-icon-system",
+      "live": {
+        "chapters": [
+          {
+            "label": "Edit shared stroke from 2 to 1.5",
+            "t": 0
+          },
+          {
+            "label": "Regenerate all six at 1.5",
+            "t": 2
+          },
+          {
+            "label": "Return the shared token to 2",
+            "t": 4
+          },
+          {
+            "label": "Regenerate and export the passing reference",
+            "t": 6
+          },
+          {
+            "label": "Reject one off-grid anchor",
+            "t": 8
+          },
+          {
+            "label": "Restore immutable 2 px reference",
+            "t": 11
+          }
+        ],
+        "duration": 15,
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "actions": [
+              {
+                "at": 0.8,
+                "do": "click",
+                "selector": "#stroke-15-btn"
+              },
+              {
+                "at": 2.2,
+                "do": "click",
+                "selector": "#regenerate-btn"
+              },
+              {
+                "at": 4.1,
+                "do": "click",
+                "selector": "#stroke-2-btn"
+              },
+              {
+                "at": 5.5,
+                "do": "click",
+                "selector": "#regenerate-btn"
+              },
+              {
+                "at": 6.6,
+                "do": "click",
+                "selector": "#export-btn"
+              },
+              {
+                "at": 8.6,
+                "do": "click",
+                "selector": "#off-grid-btn"
+              },
+              {
+                "at": 11.8,
+                "do": "click",
+                "selector": "#restore-btn"
+              }
+            ],
+            "app": "../candidate-frame-0002/create-vector-icon-system/apps/create-vector-icon-system.html",
+            "dur": 15,
+            "lower": {
+              "bench": "The authored 2 → 1.5 → 2 path regenerates all six symbols; only the returned 2 px fixture passes at 0 pixels.",
+              "fix": "Pause to inspect the changed geometry and sprite hashes, off-grid rejection, and exact 2 px reset.",
+              "title": "Six Shapes, One Grid"
+            },
+            "ready": {
+              "selector": "#stroke-15-btn"
+            },
+            "t": 0
+          }
+        ]
+      },
+      "orientation": "landscape",
+      "published": "2026-09-02",
+      "sources": [
+        {
+          "src": "../candidate-frame-0002/create-vector-icon-system/media/create-vector-icon-system.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "../candidate-frame-0002/create-vector-icon-system/media/create-vector-icon-system.webm",
+          "type": "video/webm"
+        }
+      ],
+      "tags": [
+        "vector",
+        "svg",
+        "design-system",
+        "deterministic",
+        "live-replay"
+      ],
+      "thumb": "../candidate-frame-0002/create-vector-icon-system/thumbs/create-vector-icon-system.svg",
+      "title": "Six Shapes, One Grid",
+      "width": 960
+    }
+  ],
+  "visibility": "public"
+}

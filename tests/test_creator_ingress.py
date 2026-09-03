@@ -25,6 +25,27 @@ GATE_NAMES = {
     "rights_privacy",
     "review_quorum",
 }
+FULFILLED_COMMISSIONS = {
+    "use-keyboard-invoice-triage": {
+        "result_channel": "working-proofs",
+        "publication_id": "use-keyboard-invoice-triage",
+        "source_candidate": (
+            "candidate-frame-0002/use-keyboard-invoice-triage"
+        ),
+    },
+    "learn-grid-overflow": {
+        "result_channel": "working-proofs",
+        "publication_id": "learn-grid-overflow",
+        "source_candidate": "candidate-frame-0002/learn-grid-overflow",
+    },
+    "create-vector-icon-system": {
+        "result_channel": "working-proofs",
+        "publication_id": "create-vector-icon-system",
+        "source_candidate": (
+            "candidate-frame-0002/create-vector-icon-system"
+        ),
+    },
+}
 
 
 def load(relative_path):
@@ -247,7 +268,13 @@ class TestCreatorIngress(unittest.TestCase):
         id_pattern = self.commissions_schema["$defs"]["id"]["pattern"]
         for commission in slate:
             with self.subTest(commission=commission["id"]):
-                self.assertEqual(commission["status"], "open")
+                fulfillment = FULFILLED_COMMISSIONS.get(commission["id"])
+                if fulfillment:
+                    self.assertEqual(commission["status"], "closed")
+                    self.assertEqual(commission["fulfillment"], fulfillment)
+                else:
+                    self.assertEqual(commission["status"], "open")
+                    self.assertNotIn("fulfillment", commission)
                 self.assertIsNotNone(re.fullmatch(id_pattern, commission["id"]))
                 self.assertTrue(commission["brief"].strip())
                 gates = commission["gates"]
@@ -282,6 +309,24 @@ class TestCreatorIngress(unittest.TestCase):
                     {"technical", "curation"} <= set(quorum["required_roles"])
                 )
                 self.assertIs(quorum["independent_reviewers"], True)
+
+    def test_fulfilled_commissions_cannot_be_selected_again(self):
+        slate = self.commissions["commissions"]
+        selectable = {
+            commission["id"]
+            for commission in slate
+            if commission["status"] == "open"
+        }
+        self.assertEqual(len(selectable), 9)
+        self.assertTrue(set(FULFILLED_COMMISSIONS).isdisjoint(selectable))
+        self.assertEqual(
+            selectable,
+            {
+                commission["id"]
+                for commission in slate
+            }
+            - set(FULFILLED_COMMISSIONS),
+        )
 
     def test_claim_and_submitted_phases_are_distinct(self):
         self.assertEqual(

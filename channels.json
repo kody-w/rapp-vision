@@ -5,8 +5,8 @@
   "name": "RAPP Hive",
   "visibility": "public",
   "revision": {
-    "sequence": 5,
-    "updated": "2026-09-02T16:09:47Z"
+    "sequence": 6,
+    "updated": "2026-09-03T00:43:54Z"
   },
   "peers": [],
   "_note": "RAPP Hive is the most universal contribution layer: a parking lot of federated channel.json URLs. Channels stay in their own repos; anyone can run a registry or add a channel locally without asking permission. Open a PR only if you want default listing.",
@@ -217,6 +217,14 @@
       "repo": "https://github.com/kody-w/rapp-vision",
       "contract": "rapp-vision-channel/2.0",
       "_why": "Three deterministic micro-lessons with encoded orientation films and live proofs of acceptance, visible rejection, preserved state, and exact reset."
+    },
+    {
+      "id": "working-proofs",
+      "name": "Working Proofs",
+      "url": "working-proofs/channel.json",
+      "repo": "https://github.com/kody-w/rapp-vision",
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "A recurring public channel for reviewed work whose measurable result, visible failure, controls, and exact reset remain executable."
     }
   ]
 }
