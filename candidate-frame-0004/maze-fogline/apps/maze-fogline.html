@@ -187,6 +187,10 @@
       padding: clamp(12px, 2.4vw, 20px);
     }
 
+    .map-card {
+      position: relative;
+    }
+
     .map-heading {
       display: flex;
       align-items: baseline;
@@ -513,6 +517,46 @@
       scroll-margin-block: 20px 150px;
     }
 
+    .challenge-card {
+      display: grid;
+      gap: 9px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .challenge-card h3 {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      font-size: 18px;
+    }
+
+    .challenge-card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .challenge-controls {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 9px;
+    }
+
+    #challenge-link {
+      min-width: 0;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #071616;
+      color: var(--blue);
+      padding: 9px 11px;
+    }
+
+    #challenge-status {
+      color: var(--mint);
+      overflow-wrap: anywhere;
+    }
+
     #reset-proof {
       color: var(--muted);
       font-size: 13px;
@@ -520,12 +564,16 @@
     }
 
     .takeover {
-      margin-top: 18px;
-      margin-bottom: 140px;
+      position: absolute;
+      top: 58px;
+      left: 14px;
+      right: 14px;
+      z-index: 8;
+      margin: 0;
       border: 2px solid var(--amber);
       border-radius: 16px;
       background: #2a2617;
-      padding: clamp(16px, 4vw, 28px);
+      padding: 10px 12px;
       color: #fff2c9;
       scroll-margin-block: 20px 170px;
     }
@@ -535,12 +583,12 @@
       margin-bottom: 6px;
       color: var(--amber);
       font-family: system-ui, sans-serif;
-      font-size: clamp(23px, 6vw, 35px);
+      font-size: clamp(21px, 3vw, 27px);
     }
 
     .takeover p {
       margin: 0;
-      font-size: 15px;
+      font-size: 13px;
     }
 
     [hidden] {
@@ -573,42 +621,157 @@
     @media (max-width: 430px) {
       body {
         font-size: 14px;
+        padding-bottom: 64px;
       }
 
       .shell {
-        padding-inline: 9px;
+        padding: 8px 7px 0;
+      }
+
+      .hero {
+        gap: 5px;
+        margin-bottom: 8px;
+        padding-bottom: 8px;
+      }
+
+      .hero p {
+        display: none;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+
+      .hero-badge {
+        padding: 5px 9px;
+        font-size: 12px;
       }
 
       .proof-strip {
         gap: 7px;
+        margin-bottom: 8px;
       }
 
       .proof {
-        padding: 9px;
+        padding: 6px 7px;
+      }
+
+      .proof .label {
+        font-size: 10px;
+      }
+
+      .proof output {
+        font-size: 14px;
       }
 
       .map-card,
       .panel,
       .seed-card {
-        border-radius: 12px;
-        padding: 11px;
+        border-radius: 11px;
+        padding: 8px;
       }
 
-      .readout {
+      .layout {
         gap: 7px;
       }
 
+      .map-heading {
+        margin-bottom: 6px;
+      }
+
+      .map-heading h2 {
+        font-size: 18px;
+      }
+
+      #maze-board {
+        width: min(100%, 342px);
+        border-width: 4px;
+      }
+
+      .map-legend {
+        display: none;
+      }
+
+      .panel {
+        gap: 6px;
+      }
+
+      .readout {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 4px;
+      }
+
+      .metric {
+        padding: 5px 4px;
+      }
+
+      .metric span {
+        font-size: 9px;
+        letter-spacing: 0.03em;
+      }
+
       .metric output {
-        font-size: 16px;
+        font-size: 13px;
       }
 
       .compass-card {
-        grid-template-columns: 92px minmax(0, 1fr);
+        grid-template-columns: 58px minmax(0, 1fr);
+        gap: 9px;
+        padding: 6px 8px;
       }
 
-      .action-row,
-      .seed-controls {
+      .compass {
+        width: 56px;
+      }
+
+      #compass-needle {
+        top: 10px;
+        height: 18px;
+      }
+
+      .compass-copy strong {
+        font-size: 17px;
+      }
+
+      .compass-copy span {
+        font-size: 12px;
+      }
+
+      .notice {
+        padding: 7px 8px;
+        font-size: 12px;
+      }
+
+      .controls {
+        gap: 5px;
+      }
+
+      .action-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 5px;
+      }
+
+      .seed-controls,
+      .challenge-controls {
         grid-template-columns: minmax(0, 1fr);
+      }
+
+      #reset-proof {
+        font-size: 11px;
+      }
+
+      .seed-card {
+        margin-top: 8px;
+      }
+
+      .seed-card > p {
+        margin-bottom: 8px;
+        font-size: 12px;
+      }
+
+      .challenge-card {
+        margin-top: 9px;
+        padding-top: 9px;
       }
 
       #digest-value {
@@ -616,7 +779,20 @@
       }
 
       .takeover {
-        margin-bottom: 155px;
+        top: 43px;
+        left: 6px;
+        right: 6px;
+        margin-bottom: 7px;
+        padding: 9px 10px;
+      }
+
+      .takeover strong {
+        margin-bottom: 2px;
+        font-size: 21px;
+      }
+
+      .takeover p {
+        font-size: 12px;
       }
     }
   </style>
@@ -656,6 +832,13 @@
           <h2 id="map-heading">Revealed survey</h2>
           <span>6 × 6 · exit stays marked</span>
         </div>
+        <section id="takeover-prompt" class="takeover" tabindex="0" hidden>
+          <strong>YOUR TURN · FOG-7 READY</strong>
+          <p>
+            Fresh entrance, zero steps, empty trail, no assistance. Movement
+            is focused—use Arrow/WASD now, or export this offline challenge.
+          </p>
+        </section>
         <div
           id="maze-board"
           tabindex="0"
@@ -754,15 +937,27 @@
       <p id="seed-change-proof">
         Active topology: RAPP-42 · reference 18 · digest 126bf70440d3…
       </p>
-    </section>
-
-    <section id="takeover-prompt" class="takeover" tabindex="0">
-      <strong>YOUR TURN</strong>
-      <p>
-        Type another seed or keep this one. Focus the survey and move with
-        Arrow/WASD. After four accepted moves, explicitly spend the one-step
-        bearing—or finish unassisted.
-      </p>
+      <section class="challenge-card" aria-labelledby="challenge-heading">
+        <h3 id="challenge-heading">Offline challenge contract</h3>
+        <p>
+          Exports only the accepted seed, full topology digest, and reference
+          length in the URL fragment. Route and trail are never included.
+        </p>
+        <div class="challenge-controls">
+          <button id="copy-challenge-btn" type="button">Copy / export challenge</button>
+          <input
+            id="challenge-link"
+            type="text"
+            readonly
+            aria-label="Offline challenge fragment"
+            aria-describedby="challenge-status challenge-error"
+          >
+        </div>
+        <p id="challenge-status" role="status" aria-live="polite">
+          Three-field contract ready.
+        </p>
+        <p id="challenge-error" class="notice error" role="alert" hidden></p>
+      </section>
     </section>
   </main>
 
@@ -774,9 +969,13 @@
       const HEIGHT = 6;
       const ENTRANCE = Object.freeze([0, 0]);
       const EXIT = Object.freeze([5, 3]);
+      const HANDOFF_SEED = "FOG-7";
       const MAXIMUM_SEED_BYTES = 64;
       const INVALID_SEED_MESSAGE =
         "Seed must contain 1–64 UTF-8 bytes and no controls.";
+      const CHALLENGE_ERROR_MESSAGE =
+        "Challenge fragment must contain exactly seed, topologyDigest, and " +
+        "referenceLength matching the generated maze.";
       const DIRECTIONS = Object.freeze([
         Object.freeze(["N", 0, -1, "S"]),
         Object.freeze(["E", 1, 0, "W"]),
@@ -819,8 +1018,15 @@
         seedInput: document.querySelector("#seed-input"),
         seedButton: document.querySelector("#load-seed-btn"),
         seedError: document.querySelector("#seed-error"),
-        seedProof: document.querySelector("#seed-change-proof")
+        seedProof: document.querySelector("#seed-change-proof"),
+        takeover: document.querySelector("#takeover-prompt"),
+        challengeButton: document.querySelector("#copy-challenge-btn"),
+        challengeLink: document.querySelector("#challenge-link"),
+        challengeStatus: document.querySelector("#challenge-status"),
+        challengeError: document.querySelector("#challenge-error")
       });
+
+      class ChallengeContractError extends Error {}
 
       const keyOf = cell => `${cell[0]},${cell[1]}`;
       const copyCell = cell => [cell[0], cell[1]];
@@ -1128,6 +1334,97 @@
         };
       }
 
+      function challengeContract(sourceFixture) {
+        return {
+          seed: sourceFixture.seed,
+          topologyDigest: sourceFixture.topologyDigest,
+          referenceLength: sourceFixture.shortestRoute.length
+        };
+      }
+
+      function encodeBase64Url(value) {
+        const bytes = new TextEncoder().encode(value);
+        let binary = "";
+        for (const byte of bytes) binary += String.fromCharCode(byte);
+        return btoa(binary)
+          .replace(/\+/g, "-")
+          .replace(/\//g, "_")
+          .replace(/=+$/g, "");
+      }
+
+      function decodeBase64Url(value) {
+        if (!/^[A-Za-z0-9_-]+$/.test(value)) {
+          throw new ChallengeContractError(CHALLENGE_ERROR_MESSAGE);
+        }
+        const standard = value.replace(/-/g, "+").replace(/_/g, "/");
+        const padded = standard + "=".repeat((4 - standard.length % 4) % 4);
+        let binary;
+        try {
+          binary = atob(padded);
+        } catch (error) {
+          throw new ChallengeContractError(CHALLENGE_ERROR_MESSAGE);
+        }
+        const bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
+        try {
+          return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+        } catch (error) {
+          throw new ChallengeContractError(CHALLENGE_ERROR_MESSAGE);
+        }
+      }
+
+      function challengeFragment(sourceFixture) {
+        const payload = JSON.stringify(challengeContract(sourceFixture));
+        return `#challenge=${encodeBase64Url(payload)}`;
+      }
+
+      function challengeUrl(sourceFixture) {
+        return challengeFragment(sourceFixture);
+      }
+
+      function fixtureFromChallengeFragment(fragment) {
+        if (!fragment.startsWith("#challenge=")) {
+          throw new ChallengeContractError(CHALLENGE_ERROR_MESSAGE);
+        }
+        const encoded = fragment.slice("#challenge=".length);
+        let contract;
+        try {
+          contract = JSON.parse(decodeBase64Url(encoded));
+        } catch (error) {
+          if (error instanceof ChallengeContractError) throw error;
+          throw new ChallengeContractError(CHALLENGE_ERROR_MESSAGE);
+        }
+        if (
+          !contract ||
+          typeof contract !== "object" ||
+          Array.isArray(contract) ||
+          Object.keys(contract).sort().join(",") !==
+            "referenceLength,seed,topologyDigest" ||
+          typeof contract.seed !== "string" ||
+          typeof contract.topologyDigest !== "string" ||
+          !/^[0-9a-f]{64}$/.test(contract.topologyDigest) ||
+          !Number.isInteger(contract.referenceLength) ||
+          contract.referenceLength < 1
+        ) {
+          throw new ChallengeContractError(CHALLENGE_ERROR_MESSAGE);
+        }
+        try {
+          normalizeSeed(contract.seed);
+        } catch (error) {
+          if (error.message === INVALID_SEED_MESSAGE) {
+            throw new ChallengeContractError(CHALLENGE_ERROR_MESSAGE);
+          }
+          throw error;
+        }
+        const candidate = buildFixture(contract.seed);
+        if (
+          candidate.topologyDigest !== contract.topologyDigest ||
+          candidate.shortestRoute.length !== contract.referenceLength
+        ) {
+          throw new ChallengeContractError(CHALLENGE_ERROR_MESSAGE);
+        }
+        return candidate;
+      }
+
       function revealedFrom(fixture, cell) {
         const revealed = new Set([keyOf(cell)]);
         for (const direction of fixture.maze.get(keyOf(cell))) {
@@ -1181,7 +1478,8 @@
             status: "wall",
             message:
               `${NAMES[direction][0].toUpperCase()}${NAMES[direction].slice(1)} ` +
-              "is fogbound by a wall; accepted steps and trail are preserved.",
+              "is fogbound by a wall; accepted steps, hint charge, and trail " +
+              "are preserved.",
             lastAttempt: direction,
             lastRejected: direction
           };
@@ -1285,6 +1583,8 @@
       let fixture = buildFixture("RAPP-42");
       let state = initialState(fixture);
       let seedError = null;
+      let challengeError = null;
+      let challengeStatus = "Three-field contract ready.";
 
       if (
         fixture.topologyDigest !==
@@ -1407,6 +1707,16 @@
           `Active topology: ${fixture.seed} · reference ` +
           `${fixture.shortestRoute.length} · digest ` +
           `${fixture.topologyDigest.slice(0, 12)}…`;
+        elements.challengeLink.value = challengeUrl(fixture);
+        elements.challengeStatus.textContent = challengeStatus;
+        elements.challengeError.hidden = challengeError === null;
+        elements.challengeError.textContent = challengeError || "";
+        elements.takeover.hidden = !(
+          fixture.seed === HANDOFF_SEED &&
+          steps === 0 &&
+          state.trail.length === 0 &&
+          !state.assistanceUsed
+        );
       }
 
       function move(direction) {
@@ -1417,6 +1727,8 @@
       function restart() {
         state = initialState(fixture);
         seedError = null;
+        challengeError = null;
+        challengeStatus = "Three-field contract ready.";
         elements.seedInput.value = fixture.seed;
         render();
         elements.board.focus({ preventScroll: true });
@@ -1425,6 +1737,65 @@
       function requestHint() {
         state = requestHintState(fixture, state);
         render();
+      }
+
+      async function copyChallenge() {
+        const value = challengeUrl(fixture);
+        let copied = false;
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(value);
+            copied = true;
+          }
+        } catch (error) {
+          copied = false;
+        }
+        if (!copied) {
+          elements.challengeLink.value = value;
+          elements.challengeLink.focus({ preventScroll: true });
+          elements.challengeLink.select();
+          try {
+            copied = document.execCommand("copy");
+          } catch (error) {
+            copied = false;
+          }
+        }
+        challengeError = null;
+        challengeStatus = copied
+          ? "Challenge fragment copied. Contract has exactly three fields."
+          : "Challenge fragment ready and selected for copying.";
+        elements.challengeError.hidden = true;
+        elements.challengeError.textContent = "";
+        elements.challengeStatus.textContent = challengeStatus;
+      }
+
+      function loadChallengeFromFragment() {
+        if (!location.hash) {
+          challengeError = null;
+          challengeStatus = "Three-field contract ready.";
+          render();
+          return false;
+        }
+        let nextFixture;
+        try {
+          nextFixture = fixtureFromChallengeFragment(location.hash);
+        } catch (error) {
+          if (!(error instanceof ChallengeContractError)) throw error;
+          challengeError = CHALLENGE_ERROR_MESSAGE;
+          challengeStatus = "Challenge rejected; accepted game preserved.";
+          render();
+          return false;
+        }
+        fixture = nextFixture;
+        state = initialState(fixture);
+        seedError = null;
+        challengeError = null;
+        challengeStatus =
+          "Challenge loaded from fragment · zero steps · empty trail.";
+        elements.seedInput.value = fixture.seed;
+        render();
+        elements.board.focus({ preventScroll: true });
+        return true;
       }
 
       function loadSeed() {
@@ -1440,6 +1811,8 @@
         fixture = buildFixture(draft);
         state = initialState(fixture);
         seedError = null;
+        challengeError = null;
+        challengeStatus = "Three-field contract ready.";
         render();
       }
 
@@ -1455,9 +1828,11 @@
       elements.hintButton.addEventListener("click", requestHint);
       elements.restartButton.addEventListener("click", restart);
       elements.seedButton.addEventListener("click", loadSeed);
+      elements.challengeButton.addEventListener("click", copyChallenge);
       elements.seedInput.addEventListener("click", () => {
         elements.seedInput.select();
       });
+      window.addEventListener("hashchange", loadChallengeFromFragment);
 
       document.addEventListener("keydown", event => {
         if (
@@ -1483,6 +1858,7 @@
       });
 
       render();
+      if (location.hash) loadChallengeFromFragment();
       document.documentElement.dataset.ready = "true";
       elements.board.focus({ preventScroll: true });
     })();

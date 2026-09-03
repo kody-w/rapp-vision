@@ -16,71 +16,75 @@
     {
       "chapters": [
         {
-          "label": "RAPP-42 digest, fogline, and reference 18",
+          "label": "Three-field offline RAPP-42 challenge",
           "t": 0.0
         },
         {
-          "label": "Direct Arrow-key survey opens in 18",
+          "label": "Approach the marked knot",
           "t": 3.0
         },
         {
-          "label": "Unassisted optimal result",
-          "t": 7.0
+          "label": "Valid trap adds exactly two",
+          "t": 5.5
         },
         {
-          "label": "Earn and explicitly request one bearing",
-          "t": 8.5
+          "label": "Exact reset after the trap",
+          "t": 8.0
         },
         {
-          "label": "Marked west trap makes the final 20",
-          "t": 11.5
+          "label": "Unassisted direct survey in 18",
+          "t": 10.0
         },
         {
-          "label": "Exact return to entrance and north",
+          "label": "Optimal result: 18 equals reference",
           "t": 15.0
         },
         {
-          "label": "Invalid seed preserves accepted state",
-          "t": 17.5
+          "label": "Exact reset after optimal",
+          "t": 17.0
         },
         {
-          "label": "YOUR TURN with a second seed",
-          "t": 20.0
+          "label": "Untouched FOG-7 challenge",
+          "t": 19.0
+        },
+        {
+          "label": "YOUR TURN with movement focused",
+          "t": 21.0
         }
       ],
-      "description": "A top-down fogline survey keeps unexplored walls hidden while a compass, revealed trail, and marked exit remain legible. RAPP-42 binds the canonical SHA-256 topology and 18-step reference. Individual Arrow/WASD moves complete 18 directly, then an earned one-step hint is explicitly requested before the marked trap produces a valid 20-step finish. Restart restores entrance, north, zero, closed exit, and empty trail; invalid seed text preserves that accepted state before FOG-7 opens the multi-seed handoff.",
+      "description": "A top-down fogline survey keeps unexplored walls hidden while a compass, revealed trail, and marked exit remain legible. RAPP-42 binds the canonical SHA-256 topology and 18-step reference. A three-field offline challenge fragment contains only seed, digest, and reference length. The trap-first cut explicitly requests one bearing, proves the marked +2 knot in 20, resets exactly, then completes 18 unassisted. A second exact reset leaves untouched FOG-7 focused for immediate Arrow/WASD takeover.",
       "duration": 24,
       "height": 540,
       "id": "maze-fogline",
       "live": {
         "chapters": [
           {
-            "label": "Solve RAPP-42 directly in 18",
+            "label": "Export the offline challenge",
             "t": 0.0
           },
           {
-            "label": "Restart the exact opening",
-            "t": 6.0
+            "label": "Take the valid marked trap first",
+            "t": 1.1
           },
           {
-            "label": "Earn one bearing and choose the trap",
-            "t": 7.2
+            "label": "Reset the exact opening",
+            "t": 7.25
           },
           {
-            "label": "Finish the valid detour in 20",
-            "t": 11.95
+            "label": "Complete 18 unassisted",
+            "t": 8.15
           },
           {
-            "label": "Restore entrance, north, and zero",
-            "t": 14.55
+            "label": "Reset exactly again",
+            "t": 12.52
           },
           {
-            "label": "Reject invalid seed text safely",
-            "t": 15.35
+            "label": "Load untouched FOG-7",
+            "t": 13.1
           },
           {
-            "label": "Generate FOG-7 and hand over",
-            "t": 17.15
+            "label": "Focus movement for YOUR TURN",
+            "t": 15.0
           }
         ],
         "duration": 24,
@@ -93,402 +97,402 @@
                 "behavior": "auto",
                 "block": "center",
                 "do": "scroll",
-                "selector": "#maze-board"
+                "selector": "#copy-challenge-btn"
               },
               {
                 "at": 0.45,
                 "do": "click",
+                "selector": "#copy-challenge-btn"
+              },
+              {
+                "at": 0.7,
+                "behavior": "auto",
+                "block": "center",
+                "do": "scroll",
                 "selector": "#maze-board"
               },
               {
-                "at": 0.75,
+                "at": 0.9,
+                "do": "click",
+                "selector": "#maze-board"
+              },
+              {
+                "at": 1.1,
                 "code": "ArrowDown",
                 "do": "key"
               },
               {
-                "at": 1.02,
-                "code": "ArrowRight",
-                "do": "key"
-              },
-              {
-                "at": 1.29,
+                "at": 1.33,
                 "code": "ArrowRight",
                 "do": "key"
               },
               {
                 "at": 1.56,
+                "code": "ArrowRight",
+                "do": "key"
+              },
+              {
+                "at": 1.79,
                 "code": "ArrowDown",
                 "do": "key"
               },
               {
-                "at": 1.83,
+                "at": 2.02,
                 "code": "ArrowDown",
                 "do": "key"
               },
               {
-                "at": 2.1,
+                "at": 2.25,
                 "code": "ArrowLeft",
                 "do": "key"
               },
               {
-                "at": 2.37,
+                "at": 2.48,
                 "code": "ArrowLeft",
                 "do": "key"
               },
               {
-                "at": 2.64,
+                "at": 2.71,
                 "code": "ArrowDown",
                 "do": "key"
               },
               {
-                "at": 2.91,
+                "at": 2.94,
                 "code": "ArrowDown",
                 "do": "key"
               },
               {
-                "at": 3.18,
+                "at": 3.17,
                 "code": "ArrowRight",
                 "do": "key"
               },
               {
-                "at": 3.45,
+                "at": 3.4,
                 "code": "ArrowUp",
                 "do": "key"
               },
               {
-                "at": 3.72,
+                "at": 3.63,
                 "code": "ArrowRight",
                 "do": "key"
               },
               {
-                "at": 3.99,
+                "at": 3.86,
                 "code": "ArrowRight",
                 "do": "key"
               },
               {
-                "at": 4.26,
+                "at": 4.09,
                 "code": "ArrowDown",
                 "do": "key"
               },
               {
-                "at": 4.53,
-                "code": "ArrowRight",
-                "do": "key"
-              },
-              {
-                "at": 4.8,
-                "code": "ArrowUp",
-                "do": "key"
-              },
-              {
-                "at": 5.07,
-                "code": "ArrowUp",
-                "do": "key"
-              },
-              {
-                "at": 5.34,
-                "code": "ArrowRight",
-                "do": "key"
-              },
-              {
-                "at": 5.65,
-                "behavior": "auto",
-                "block": "center",
-                "do": "scroll",
-                "selector": "#success-panel"
-              },
-              {
-                "at": 6.0,
-                "behavior": "auto",
-                "block": "center",
-                "do": "scroll",
-                "selector": "#restart-btn"
-              },
-              {
-                "at": 6.25,
-                "do": "click",
-                "selector": "#restart-btn"
-              },
-              {
-                "at": 6.5,
-                "behavior": "auto",
-                "block": "center",
-                "do": "scroll",
-                "selector": "#reset-proof"
-              },
-              {
-                "at": 6.75,
-                "behavior": "auto",
-                "block": "center",
-                "do": "scroll",
-                "selector": "#maze-board"
-              },
-              {
-                "at": 6.95,
-                "do": "click",
-                "selector": "#maze-board"
-              },
-              {
-                "at": 7.2,
-                "code": "ArrowDown",
-                "do": "key"
-              },
-              {
-                "at": 7.45,
-                "code": "ArrowRight",
-                "do": "key"
-              },
-              {
-                "at": 7.7,
-                "code": "ArrowRight",
-                "do": "key"
-              },
-              {
-                "at": 7.95,
-                "code": "ArrowDown",
-                "do": "key"
-              },
-              {
-                "at": 8.2,
-                "code": "ArrowDown",
-                "do": "key"
-              },
-              {
-                "at": 8.45,
-                "code": "ArrowLeft",
-                "do": "key"
-              },
-              {
-                "at": 8.7,
-                "code": "ArrowLeft",
-                "do": "key"
-              },
-              {
-                "at": 8.95,
-                "code": "ArrowDown",
-                "do": "key"
-              },
-              {
-                "at": 9.2,
-                "code": "ArrowDown",
-                "do": "key"
-              },
-              {
-                "at": 9.45,
-                "code": "ArrowRight",
-                "do": "key"
-              },
-              {
-                "at": 9.7,
-                "code": "ArrowUp",
-                "do": "key"
-              },
-              {
-                "at": 9.95,
-                "code": "ArrowRight",
-                "do": "key"
-              },
-              {
-                "at": 10.2,
-                "code": "ArrowRight",
-                "do": "key"
-              },
-              {
-                "at": 10.45,
-                "code": "ArrowDown",
-                "do": "key"
-              },
-              {
-                "at": 10.75,
+                "at": 4.32,
                 "behavior": "auto",
                 "block": "center",
                 "do": "scroll",
                 "selector": "#hint-btn"
               },
               {
-                "at": 11.0,
+                "at": 4.52,
                 "do": "click",
                 "selector": "#hint-btn"
               },
               {
-                "at": 11.25,
+                "at": 4.66,
                 "behavior": "auto",
                 "block": "center",
                 "do": "scroll",
                 "selector": "#hint-panel"
               },
               {
-                "at": 11.5,
+                "at": 4.82,
                 "behavior": "auto",
                 "block": "center",
                 "do": "scroll",
                 "selector": "#maze-board"
               },
               {
-                "at": 11.7,
+                "at": 4.98,
                 "do": "click",
                 "selector": "#maze-board"
               },
               {
-                "at": 11.95,
+                "at": 5.18,
                 "code": "ArrowLeft",
                 "do": "key"
               },
               {
-                "at": 12.25,
+                "at": 5.38,
                 "behavior": "auto",
                 "block": "center",
                 "do": "scroll",
                 "selector": "#trap-panel"
               },
               {
-                "at": 12.5,
+                "at": 5.58,
                 "behavior": "auto",
                 "block": "center",
                 "do": "scroll",
                 "selector": "#maze-board"
               },
               {
-                "at": 12.7,
+                "at": 5.74,
                 "do": "click",
                 "selector": "#maze-board"
               },
               {
-                "at": 12.95,
+                "at": 5.92,
                 "code": "ArrowRight",
                 "do": "key"
               },
               {
-                "at": 13.2,
+                "at": 6.14,
                 "code": "ArrowRight",
                 "do": "key"
               },
               {
-                "at": 13.45,
+                "at": 6.36,
                 "code": "ArrowUp",
                 "do": "key"
               },
               {
-                "at": 13.7,
+                "at": 6.58,
                 "code": "ArrowUp",
                 "do": "key"
               },
               {
-                "at": 13.95,
+                "at": 6.8,
                 "code": "ArrowRight",
                 "do": "key"
               },
               {
-                "at": 14.25,
+                "at": 7.02,
                 "behavior": "auto",
                 "block": "center",
                 "do": "scroll",
                 "selector": "#success-panel"
               },
               {
-                "at": 14.55,
+                "at": 7.25,
                 "behavior": "auto",
                 "block": "center",
                 "do": "scroll",
                 "selector": "#restart-btn"
               },
               {
-                "at": 14.8,
+                "at": 7.45,
                 "do": "click",
                 "selector": "#restart-btn"
               },
               {
-                "at": 15.05,
+                "at": 7.62,
                 "behavior": "auto",
                 "block": "center",
                 "do": "scroll",
                 "selector": "#reset-proof"
               },
               {
-                "at": 15.35,
+                "at": 7.8,
+                "behavior": "auto",
+                "block": "center",
+                "do": "scroll",
+                "selector": "#maze-board"
+              },
+              {
+                "at": 7.95,
+                "do": "click",
+                "selector": "#maze-board"
+              },
+              {
+                "at": 8.15,
+                "code": "ArrowDown",
+                "do": "key"
+              },
+              {
+                "at": 8.38,
+                "code": "ArrowRight",
+                "do": "key"
+              },
+              {
+                "at": 8.61,
+                "code": "ArrowRight",
+                "do": "key"
+              },
+              {
+                "at": 8.84,
+                "code": "ArrowDown",
+                "do": "key"
+              },
+              {
+                "at": 9.07,
+                "code": "ArrowDown",
+                "do": "key"
+              },
+              {
+                "at": 9.3,
+                "code": "ArrowLeft",
+                "do": "key"
+              },
+              {
+                "at": 9.53,
+                "code": "ArrowLeft",
+                "do": "key"
+              },
+              {
+                "at": 9.76,
+                "code": "ArrowDown",
+                "do": "key"
+              },
+              {
+                "at": 9.99,
+                "code": "ArrowDown",
+                "do": "key"
+              },
+              {
+                "at": 10.22,
+                "code": "ArrowRight",
+                "do": "key"
+              },
+              {
+                "at": 10.45,
+                "code": "ArrowUp",
+                "do": "key"
+              },
+              {
+                "at": 10.68,
+                "code": "ArrowRight",
+                "do": "key"
+              },
+              {
+                "at": 10.91,
+                "code": "ArrowRight",
+                "do": "key"
+              },
+              {
+                "at": 11.14,
+                "code": "ArrowDown",
+                "do": "key"
+              },
+              {
+                "at": 11.37,
+                "code": "ArrowRight",
+                "do": "key"
+              },
+              {
+                "at": 11.6,
+                "code": "ArrowUp",
+                "do": "key"
+              },
+              {
+                "at": 11.83,
+                "code": "ArrowUp",
+                "do": "key"
+              },
+              {
+                "at": 12.06,
+                "code": "ArrowRight",
+                "do": "key"
+              },
+              {
+                "at": 12.28,
+                "behavior": "auto",
+                "block": "center",
+                "do": "scroll",
+                "selector": "#success-panel"
+              },
+              {
+                "at": 12.52,
+                "behavior": "auto",
+                "block": "center",
+                "do": "scroll",
+                "selector": "#restart-btn"
+              },
+              {
+                "at": 12.72,
+                "do": "click",
+                "selector": "#restart-btn"
+              },
+              {
+                "at": 12.9,
+                "behavior": "auto",
+                "block": "center",
+                "do": "scroll",
+                "selector": "#reset-proof"
+              },
+              {
+                "at": 13.1,
                 "behavior": "auto",
                 "block": "center",
                 "do": "scroll",
                 "selector": "#seed-input"
               },
               {
-                "at": 15.55,
+                "at": 13.28,
                 "do": "click",
                 "selector": "#seed-input"
               },
               {
-                "at": 15.8,
-                "do": "type",
-                "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-              },
-              {
-                "at": 16.3,
-                "behavior": "auto",
-                "block": "center",
-                "do": "scroll",
-                "selector": "#load-seed-btn"
-              },
-              {
-                "at": 16.5,
-                "do": "click",
-                "selector": "#load-seed-btn"
-              },
-              {
-                "at": 16.75,
-                "behavior": "auto",
-                "block": "center",
-                "do": "scroll",
-                "selector": "#seed-error"
-              },
-              {
-                "at": 17.15,
-                "behavior": "auto",
-                "block": "center",
-                "do": "scroll",
-                "selector": "#seed-input"
-              },
-              {
-                "at": 17.35,
-                "do": "click",
-                "selector": "#seed-input"
-              },
-              {
-                "at": 17.6,
+                "at": 13.45,
                 "do": "type",
                 "text": "FOG-7"
               },
               {
-                "at": 18.05,
+                "at": 13.7,
                 "behavior": "auto",
                 "block": "center",
                 "do": "scroll",
                 "selector": "#load-seed-btn"
               },
               {
-                "at": 18.25,
+                "at": 13.88,
                 "do": "click",
                 "selector": "#load-seed-btn"
               },
               {
-                "at": 18.5,
-                "behavior": "auto",
-                "block": "center",
-                "do": "scroll",
-                "selector": "#seed-change-proof"
-              },
-              {
-                "at": 19.0,
+                "at": 14.1,
                 "behavior": "auto",
                 "block": "center",
                 "do": "scroll",
                 "selector": "#takeover-prompt"
+              },
+              {
+                "at": 14.35,
+                "behavior": "auto",
+                "block": "center",
+                "do": "scroll",
+                "selector": "#copy-challenge-btn"
+              },
+              {
+                "at": 14.55,
+                "do": "click",
+                "selector": "#copy-challenge-btn"
+              },
+              {
+                "at": 14.8,
+                "behavior": "auto",
+                "block": "center",
+                "do": "scroll",
+                "selector": "#takeover-prompt"
+              },
+              {
+                "at": 15.0,
+                "behavior": "auto",
+                "block": "center",
+                "do": "scroll",
+                "selector": "#maze-board"
+              },
+              {
+                "at": 15.2,
+                "do": "click",
+                "selector": "#maze-board"
               }
             ],
             "app": "apps/maze-fogline.html",
             "dur": 24,
             "lower": {
-              "bench": "RAPP-42 · SHA-256 126bf70440d3… · reference 18 · marked trap finish 20.",
-              "fix": "YOUR TURN — type any valid seed, use Arrow/WASD, and spend one earned bearing.",
+              "bench": "RAPP-42 · SHA-256 126bf70440d3… · reference 18 · KNOT/TRAP +2 · best 20.",
+              "fix": "YOUR TURN — FOG-7 starts untouched at zero; Arrow/WASD movement is focused.",
               "title": "Fogline Survey"
             },
             "ready": {
@@ -512,7 +516,8 @@
         "deterministic",
         "one-step-hint",
         "exact-reset",
-        "multi-seed"
+        "multi-seed",
+        "offline-challenge"
       ],
       "thumb": "thumbs/maze-fogline.svg",
       "title": "Fogline Survey",

@@ -30,6 +30,9 @@ const CANONICAL_DIGEST =
 const ALTERNATE_SEEDS = Object.freeze(["FOG-7", "MIST-Δ", "A|B;C"]);
 const INVALID_SEED_MESSAGE =
   "Seed must contain 1–64 UTF-8 bytes and no controls.";
+const CHALLENGE_ERROR_MESSAGE =
+  "Challenge fragment must contain exactly seed, topologyDigest, and " +
+  "referenceLength matching the generated maze.";
 const DIRECTIONS = Object.freeze([
   Object.freeze(["N", 0, -1, "S"]),
   Object.freeze(["E", 1, 0, "W"]),
@@ -485,6 +488,32 @@ function auditIndependentFixture(seed) {
   return fixture;
 }
 
+function challengeContract(fixture) {
+  return {
+    seed: fixture.seed,
+    topologyDigest: fixture.digest,
+    referenceLength: fixture.route.length,
+  };
+}
+
+function challengeFragment(fixture) {
+  const payload = JSON.stringify(challengeContract(fixture));
+  return `#challenge=${Buffer.from(payload, "utf8").toString("base64url")}`;
+}
+
+function decodeChallengeUrl(value) {
+  assert.match(value, /^#challenge=[A-Za-z0-9_-]+$/);
+  const encoded = value.slice("#challenge=".length);
+  const contract = JSON.parse(Buffer.from(encoded, "base64url").toString("utf8"));
+  assert.deepEqual(
+    Object.keys(contract).sort(),
+    ["referenceLength", "seed", "topologyDigest"]
+  );
+  assert.equal("route" in contract, false);
+  assert.equal("trail" in contract, false);
+  return { fragment: value, contract };
+}
+
 function revealedFrom(fixture, cell) {
   const revealed = new Set([keyOf(cell)]);
   for (const direction of fixture.maze.get(keyOf(cell))) {
@@ -544,7 +573,7 @@ function moveState(fixture, current, direction) {
       status: "wall",
       message:
         `${directionName} is fogbound by a wall; ` +
-        "accepted steps and trail are preserved.",
+        "accepted steps, hint charge, and trail are preserved.",
       lastAttempt: direction,
       lastRejected: direction,
     };
@@ -902,6 +931,61 @@ async function geometry(cdp, selector) {
   );
 }
 
+async function criticalPlayGeometry(cdp) {
+  return await evaluate(
+    cdp,
+    `(() => {
+      const selectors = [
+        "#maze-board",
+        ".controls",
+        "#hint-btn",
+        "#restart-btn",
+        "#step-value",
+        "#projection-value",
+        "#exit-value"
+      ];
+      const records = selectors.map(selector => {
+        const element = document.querySelector(selector);
+        const rect = element.getBoundingClientRect();
+        return {
+          selector,
+          top: rect.top + scrollY,
+          bottom: rect.bottom + scrollY,
+          left: rect.left,
+          right: rect.right,
+          width: rect.width,
+          height: rect.height
+        };
+      });
+      return {
+        records,
+        span:
+          Math.max(...records.map(record => record.bottom)) -
+          Math.min(...records.map(record => record.top)),
+        documentHeight: document.scrollingElement.scrollHeight,
+        viewport: { width: innerWidth, height: innerHeight }
+      };
+    })()`
+  );
+}
+
+function isVisibleGeometry(record) {
+  return (
+    record.exists &&
+    !record.hidden &&
+    record.display !== "none" &&
+    record.visibility !== "hidden" &&
+    record.opacity > 0 &&
+    record.rect.width > 0 &&
+    record.rect.height > 0 &&
+    record.rect.left >= -1 &&
+    record.rect.right <= record.viewport.width + 1 &&
+    record.rect.top >= -1 &&
+    record.rect.bottom <= record.viewport.height + 1 &&
+    record.scrollWidth <= record.clientWidth + 1
+  );
+}
+
 function assertVisibleGeometry(record, label) {
   assert(record.exists, `${label}: missing ${record.selector}`);
   assert.equal(record.hidden, false, `${label}: hidden ${record.selector}`);
@@ -910,15 +994,8 @@ function assertVisibleGeometry(record, label) {
   assert(record.opacity > 0, `${label}: transparent`);
   assert(record.rect.width > 0 && record.rect.height > 0, `${label}: empty rect`);
   assert(
-    record.rect.left >= -1 &&
-      record.rect.right <= record.viewport.width + 1 &&
-      record.rect.top >= -1 &&
-      record.rect.bottom <= record.viewport.height + 1,
+    isVisibleGeometry(record),
     `${label}: ${record.selector} outside viewport ${JSON.stringify(record.rect)}`
-  );
-  assert(
-    record.scrollWidth <= record.clientWidth + 1,
-    `${label}: horizontal overflow ${record.scrollWidth}/${record.clientWidth}`
   );
 }
 
@@ -1149,6 +1226,20 @@ async function observeDom(cdp) {
         },
         seedProof:
           document.querySelector("#seed-change-proof").textContent.trim(),
+        challenge: {
+          link: document.querySelector("#challenge-link").value,
+          selectionStart:
+            document.querySelector("#challenge-link").selectionStart,
+          selectionEnd:
+            document.querySelector("#challenge-link").selectionEnd,
+          status: document.querySelector("#challenge-status").textContent.trim(),
+          errorHidden: document.querySelector("#challenge-error").hidden,
+          error: document.querySelector("#challenge-error").textContent.trim()
+        },
+        takeover: {
+          hidden: document.querySelector("#takeover-prompt").hidden,
+          text: document.querySelector("#takeover-prompt").textContent.trim()
+        },
         boardLabel: document.querySelector("#maze-board").getAttribute("aria-label"),
         exitBeaconPresent: !!document.querySelector("#exit-beacon"),
         cells: [...document.querySelectorAll("#maze-board > .cell")].map(cell => ({
@@ -1189,7 +1280,8 @@ async function observeDom(cdp) {
       activeId: document.activeElement ? document.activeElement.id : "",
       width: {
         scroll: document.scrollingElement.scrollWidth,
-        client: document.scrollingElement.clientWidth
+        client: document.scrollingElement.clientWidth,
+        height: document.scrollingElement.scrollHeight
       }
     };
     })()`
@@ -1203,6 +1295,8 @@ function assertDomMatchesExpected(
   {
     seedInput = fixture.seed,
     seedError = null,
+    challengeError = null,
+    challengeStatus = null,
     label = fixture.seed,
   } = {}
 ) {
@@ -1320,6 +1414,46 @@ function assertDomMatchesExpected(
       `digest ${fixture.digest.slice(0, 12)}…`,
     `${label}: seed proof`
   );
+  const exported = decodeChallengeUrl(dom.challenge.link);
+  assert.deepEqual(
+    exported.contract,
+    challengeContract(fixture),
+    `${label}: challenge contract`
+  );
+  assert.equal(
+    dom.challenge.errorHidden,
+    challengeError === null,
+    `${label}: challenge error visibility`
+  );
+  assert.equal(
+    dom.challenge.error,
+    challengeError || "",
+    `${label}: challenge error`
+  );
+  if (challengeStatus !== null) {
+    assert.equal(
+      dom.challenge.status,
+      challengeStatus,
+      `${label}: challenge status`
+    );
+  } else {
+    assert(dom.challenge.status.length > 0, `${label}: challenge status empty`);
+  }
+  const handoffReady =
+    fixture.seed === "FOG-7" &&
+    state.acceptedMoves.length === 0 &&
+    state.trail.length === 0 &&
+    !state.assistanceUsed;
+  assert.equal(
+    dom.takeover.hidden,
+    !handoffReady,
+    `${label}: takeover visibility`
+  );
+  if (handoffReady) {
+    assert.match(dom.takeover.text, /YOUR TURN · FOG-7 READY/);
+    assert.match(dom.takeover.text, /zero steps/i);
+    assert.match(dom.takeover.text, /Movement\s+is focused/i);
+  }
   assert.equal(
     dom.boardLabel,
     `Fogline maze, seed ${fixture.seed}. Position ` +
@@ -1494,6 +1628,7 @@ function expectedSummary(fixture, state) {
   return {
     seed: fixture.seed,
     digest: fixture.digest,
+    topologyDigest: fixture.digest,
     referenceLength: fixture.route.length,
     position: [...state.position],
     facing: state.facing,
@@ -1502,11 +1637,21 @@ function expectedSummary(fixture, state) {
     status: state.status,
     completed: state.completed,
     matchedOptimal: state.matchedOptimal,
+    exitState: state.exitOpen ? "open" : "closed",
+    trailLength: state.trail.length,
     assistanceUsed: state.assistanceUsed,
+    hintAvailable: state.hintAvailable,
     hintRequests: state.hintRequests,
     hintDirection: state.hintDirection,
     trapMarked: state.revealed.has(keyOf(fixture.trap.cell)),
   };
+}
+
+function stateGateMatches(summary, gate) {
+  return Object.entries(gate).every(
+    ([key, expected]) =>
+      JSON.stringify(summary[key]) === JSON.stringify(expected)
+  );
 }
 
 function applyExpectedAction(context, action) {
@@ -1685,6 +1830,169 @@ async function rejectSeedThroughUi(cdp, context, seed, label) {
   assert.deepEqual(expectedSummary(context.fixture, context.state), before);
 }
 
+async function exerciseChallengeContract(cdp, appUrl) {
+  await cdp.command("Page.navigate", { url: appUrl });
+  await waitForReady(cdp);
+  await settle(cdp);
+  const context = {
+    fixture: auditIndependentFixture("RAPP-42"),
+    state: null,
+    seedInput: "RAPP-42",
+    seedError: null,
+  };
+  context.state = initialState(context.fixture);
+  await loadSeedThroughUi(cdp, context, "MIST-Δ", "contract alternate");
+  await driveDirections(
+    cdp,
+    context,
+    context.fixture.route.slice(0, 2),
+    "contract nontrivial trail",
+    "wasd"
+  );
+  assert.equal(context.state.trail.length, 2);
+
+  await clickControl(
+    cdp,
+    "#copy-challenge-btn",
+    "contract copy export"
+  );
+  const exportedObservation = await observeDom(cdp);
+  assertDomMatchesExpected(
+    exportedObservation,
+    context.fixture,
+    context.state,
+    { label: "contract export state" }
+  );
+  const exported = decodeChallengeUrl(exportedObservation.dom.challenge.link);
+  assert.deepEqual(exported.contract, challengeContract(context.fixture));
+  assert.match(
+    exportedObservation.dom.challenge.status,
+    /^Challenge fragment (copied|ready)/
+  );
+  if (exportedObservation.dom.challenge.status.startsWith("Challenge fragment ready")) {
+    assert.equal(exportedObservation.dom.challenge.selectionStart, 0);
+    assert.equal(
+      exportedObservation.dom.challenge.selectionEnd,
+      exportedObservation.dom.challenge.link.length
+    );
+  }
+  assert.equal(JSON.stringify(exported.contract).includes("route"), false);
+  assert.equal(JSON.stringify(exported.contract).includes("trail"), false);
+
+  const exportedUrl = new URL(appUrl);
+  exportedUrl.hash = exported.fragment;
+  await cdp.command("Page.navigate", {
+    url: exportedUrl.href,
+  });
+  await waitForReady(cdp);
+  await settle(cdp);
+  context.state = initialState(context.fixture);
+  context.seedInput = context.fixture.seed;
+  let loaded = await observeDom(cdp);
+  assertDomMatchesExpected(loaded, context.fixture, context.state, {
+    seedInput: context.seedInput,
+    challengeStatus:
+      "Challenge loaded from fragment · zero steps · empty trail.",
+    label: "contract fragment round trip",
+  });
+  assert.equal(loaded.activeId, "maze-board");
+  await auditOpeningPrivacy(cdp, context.fixture, "contract round trip");
+
+  await driveDirections(
+    cdp,
+    context,
+    context.fixture.route.slice(0, 1),
+    "contract preservation setup"
+  );
+  const preserved = expectedSummary(context.fixture, context.state);
+  const invalidContract = {
+    ...challengeContract(context.fixture),
+    route: "forbidden",
+  };
+  const invalidUrl = new URL(appUrl);
+  invalidUrl.hash =
+    "#challenge=" +
+    Buffer.from(JSON.stringify(invalidContract), "utf8").toString("base64url");
+  await cdp.command("Page.navigate", { url: invalidUrl.href });
+  await settle(cdp);
+  let rejected = await observeDom(cdp);
+  assertDomMatchesExpected(rejected, context.fixture, context.state, {
+    seedInput: context.seedInput,
+    challengeError: CHALLENGE_ERROR_MESSAGE,
+    challengeStatus: "Challenge rejected; accepted game preserved.",
+    label: "contract extra-field rejection",
+  });
+  assert.deepEqual(expectedSummary(context.fixture, context.state), preserved);
+
+  const mismatch = {
+    ...challengeContract(context.fixture),
+    topologyDigest: "0".repeat(64),
+  };
+  const mismatchUrl = new URL(appUrl);
+  mismatchUrl.hash =
+    "#challenge=" +
+    Buffer.from(JSON.stringify(mismatch), "utf8").toString("base64url");
+  await cdp.command("Page.navigate", { url: mismatchUrl.href });
+  await settle(cdp);
+  rejected = await observeDom(cdp);
+  assertDomMatchesExpected(rejected, context.fixture, context.state, {
+    seedInput: context.seedInput,
+    challengeError: CHALLENGE_ERROR_MESSAGE,
+    challengeStatus: "Challenge rejected; accepted game preserved.",
+    label: "contract digest rejection",
+  });
+  assert.deepEqual(expectedSummary(context.fixture, context.state), preserved);
+
+  const lengthMismatch = {
+    ...challengeContract(context.fixture),
+    referenceLength: context.fixture.route.length + 1,
+  };
+  const lengthMismatchUrl = new URL(appUrl);
+  lengthMismatchUrl.hash =
+    "#challenge=" +
+    Buffer.from(JSON.stringify(lengthMismatch), "utf8").toString("base64url");
+  await cdp.command("Page.navigate", { url: lengthMismatchUrl.href });
+  await settle(cdp);
+  rejected = await observeDom(cdp);
+  assertDomMatchesExpected(rejected, context.fixture, context.state, {
+    seedInput: context.seedInput,
+    challengeError: CHALLENGE_ERROR_MESSAGE,
+    challengeStatus: "Challenge rejected; accepted game preserved.",
+    label: "contract length rejection",
+  });
+  assert.deepEqual(expectedSummary(context.fixture, context.state), preserved);
+
+  const canonical = auditIndependentFixture("RAPP-42");
+  const canonicalUrl = new URL(appUrl);
+  canonicalUrl.hash = challengeFragment(canonical);
+  await cdp.command("Page.navigate", { url: canonicalUrl.href });
+  await settle(cdp);
+  context.fixture = canonical;
+  context.state = initialState(canonical);
+  context.seedInput = canonical.seed;
+  loaded = await observeDom(cdp);
+  assertDomMatchesExpected(loaded, context.fixture, context.state, {
+    seedInput: context.seedInput,
+    challengeStatus:
+      "Challenge loaded from fragment · zero steps · empty trail.",
+    label: "contract canonical load",
+  });
+  assert.equal(loaded.activeId, "maze-board");
+  return {
+    keys: Object.keys(exported.contract).sort(),
+    seed: exported.contract.seed,
+    digest: exported.contract.topologyDigest,
+    referenceLength: exported.contract.referenceLength,
+    routeExcluded: true,
+    trailExcluded: true,
+    fragmentOnly: exported.fragment.startsWith("#challenge="),
+    roundTripReset: true,
+    invalidExtraFieldPreserved: true,
+    mismatchedDigestPreserved: true,
+    mismatchedLengthPreserved: true,
+  };
+}
+
 async function exerciseHintGate(cdp, appUrl) {
   await cdp.command("Page.navigate", { url: appUrl });
   await waitForReady(cdp);
@@ -1707,6 +2015,16 @@ async function exerciseHintGate(cdp, appUrl) {
     context.fixture,
     "hint gate opening"
   );
+
+  await driveDirections(
+    cdp,
+    context,
+    ["N"],
+    "hint gate rejected opening wall"
+  );
+  assert.equal(context.state.acceptedMoves.length, 0);
+  assert.equal(context.state.hintAvailable, false);
+  assert.equal(context.state.hintDirection, null);
 
   await scrollTo(cdp, "#hint-btn");
   const disabled = await geometry(cdp, "#hint-btn");
@@ -1749,6 +2067,14 @@ async function exerciseHintGate(cdp, appUrl) {
     { label: "hint gate requested" }
   );
   const direction = context.state.hintDirection;
+  await driveDirections(
+    cdp,
+    context,
+    ["E"],
+    "hint gate rejected wall after request"
+  );
+  assert.equal(context.state.hintDirection, direction);
+  assert.equal(context.state.hintRequests, 1);
   await scrollTo(cdp, "#hint-btn");
   await dispatchMouseClick(
     cdp,
@@ -1776,6 +2102,8 @@ async function exerciseHintGate(cdp, appUrl) {
     privacy,
     disabledBeforeFour: true,
     enabledAtFour: true,
+    rejectedWallDoesNotEarnHint: true,
+    rejectedWallDoesNotConsumeGuidance: true,
     oneRequestOnly: true,
     clearedAfterOneMove: true,
     assistancePersisted: true,
@@ -1925,6 +2253,19 @@ async function replayViewport(
     canonical,
     `${viewport.name} opening`
   );
+  const playGeometry = await criticalPlayGeometry(cdp);
+  if (viewport.width === 390) {
+    assert(
+      playGeometry.span <=
+        evidence.browserRuntime.geometry.mobileCriticalSpanMaximumPixels,
+      `mobile critical controls span ${playGeometry.span}px`
+    );
+    assert(
+      playGeometry.documentHeight <=
+        evidence.browserRuntime.geometry.mobileDocumentHeightMaximumPixels,
+      `mobile document height ${playGeometry.documentHeight}px`
+    );
+  }
   assert.deepEqual(canonical.route, CANONICAL_ROUTE);
   assert.equal(canonical.digest, CANONICAL_DIGEST);
   assert.deepEqual(canonical.trap.cell, [2, 5]);
@@ -1944,16 +2285,15 @@ async function replayViewport(
     canonical.detour
   );
 
-  const checkpoints = new Map();
-  for (const checkpoint of replay.checkpoints) {
-    const records = checkpoints.get(checkpoint.afterAction) || [];
-    records.push(checkpoint);
-    checkpoints.set(checkpoint.afterAction, records);
-  }
-
   const actionReports = [];
   const checkpointReports = [];
   const privacyReports = [{ claim: "opening", report: openingPrivacy }];
+  const pendingCheckpoints = replay.checkpoints.map(checkpoint => ({
+    ...checkpoint,
+    resolved: false,
+  }));
+  let checkpointIndex = 0;
+  const maxLateness = replay.maxActionLatenessSeconds;
   const started = process.hrtime.bigint();
   for (let index = 0; index < actions.length; index += 1) {
     const action = actions[index];
@@ -1961,10 +2301,10 @@ async function replayViewport(
     const executedAt =
       Number(process.hrtime.bigint() - started) / 1_000_000_000;
     assert(
-      executedAt - action.at < 0.45,
+      executedAt - action.at <= maxLateness,
       `${viewport.name} action ${index + 1} missed timing by ${
         executedAt - action.at
-      }s`
+      }s (bound ${maxLateness}s)`
     );
     const report = await executeAction(
       cdp,
@@ -1995,89 +2335,77 @@ async function replayViewport(
       );
     }
 
-    for (const checkpoint of checkpoints.get(index + 1) || []) {
-      const visible = await assertVisible(
-        cdp,
-        checkpoint.selector,
+    while (checkpointIndex < pendingCheckpoints.length) {
+      const checkpoint = pendingCheckpoints[checkpointIndex];
+      const observedAt =
+        Number(process.hrtime.bigint() - started) / 1_000_000_000;
+      if (
+        observedAt >
+        checkpoint.timeWindow.end + maxLateness
+      ) {
+        throw new Error(
+          `${viewport.name} checkpoint ${checkpoint.claim} missed bounded ` +
+          `window ${JSON.stringify(checkpoint.timeWindow)} at ${observedAt}`
+        );
+      }
+      if (observedAt < checkpoint.timeWindow.start) break;
+      const summary = expectedSummary(context.fixture, context.state);
+      if (!stateGateMatches(summary, checkpoint.stateGate)) break;
+      const visible = await geometry(cdp, checkpoint.selector);
+      if (!isVisibleGeometry(visible)) break;
+      assert.deepEqual(
+        Object.fromEntries(
+          Object.keys(checkpoint.stateGate).map(key => [key, summary[key]])
+        ),
+        checkpoint.stateGate,
         `${viewport.name} checkpoint ${checkpoint.claim}`
       );
-      if (checkpoint.claim === "optimal") {
-        assert.equal(context.state.completed, true);
-        assert.equal(context.state.matchedOptimal, true);
-        assert.equal(context.state.assistanceUsed, false);
-        assert.equal(context.state.acceptedMoves.length, canonical.route.length);
-      } else if (checkpoint.claim === "hint") {
-        assert.equal(context.state.hintRequests, 1);
-        assert.equal(context.state.assistanceUsed, true);
-        assert.match(context.state.hintDirection, /^[NESW]$/);
+      if (checkpoint.claim === "hint") {
         assertNoRouteLeak(actual.dom.hint.text, canonical, "hint panel");
-      } else if (checkpoint.claim === "trap") {
-        assert.equal(context.state.status, "trap");
-        assert.equal(context.state.projectedTotal, 20);
-        assert.equal(context.state.exitOpen, false);
-        assert.equal(actual.dom.exitBeaconPresent, true);
-      } else if (checkpoint.claim === "detour") {
-        assert.equal(context.state.completed, true);
-        assert.equal(context.state.matchedOptimal, false);
-        assert.equal(context.state.assistanceUsed, true);
-        assert.equal(context.state.acceptedMoves.length, 20);
-      } else if (checkpoint.claim === "reset") {
-        assert.deepEqual(expectedSummary(context.fixture, context.state), {
-          seed: "RAPP-42",
-          digest: CANONICAL_DIGEST,
-          referenceLength: 18,
-          position: [0, 0],
-          facing: "N",
-          steps: 0,
-          projectedTotal: 18,
-          status: "ready",
-          completed: false,
-          matchedOptimal: null,
-          assistanceUsed: false,
-          hintRequests: 0,
-          hintDirection: null,
-          trapMarked: false,
-        });
-        privacyReports.push({
-          claim: "reset",
-          report: await auditOpeningPrivacy(
-            cdp,
-            context.fixture,
-            `${viewport.name} reset`
-          ),
-        });
-      } else if (checkpoint.claim === "invalidSeedPreserved") {
-        assert.equal(context.fixture.seed, "RAPP-42");
-        assert.equal(context.seedInput, "X".repeat(65));
-        assert.equal(context.seedError, INVALID_SEED_MESSAGE);
-        assert.equal(context.state.acceptedMoves.length, 0);
-      } else if (checkpoint.claim === "handoff") {
-        assert.equal(context.fixture.seed, "FOG-7");
-        assert.equal(context.state.acceptedMoves.length, 0);
-        assert.equal(context.state.assistanceUsed, false);
-        privacyReports.push({
-          claim: "handoff",
-          report: await auditOpeningPrivacy(
-            cdp,
-            context.fixture,
-            `${viewport.name} handoff`
-          ),
-        });
-      } else {
-        throw new Error(`unknown checkpoint claim ${checkpoint.claim}`);
       }
+      if (checkpoint.claim === "trap") {
+        assert.equal(actual.dom.exitBeaconPresent, true);
+      }
+      if (
+        checkpoint.claim === "resetAfterTrap" ||
+        checkpoint.claim === "resetAfterOptimal" ||
+        checkpoint.claim === "handoff"
+      ) {
+        privacyReports.push({
+          claim: checkpoint.claim,
+          report: await auditOpeningPrivacy(
+            cdp,
+            context.fixture,
+            `${viewport.name} ${checkpoint.claim}`
+          ),
+        });
+      }
+      checkpoint.resolved = true;
       checkpointReports.push({
-        afterAction: index + 1,
+        resolvedAfterAction: index + 1,
+        resolvedAt: observedAt,
         claim: checkpoint.claim,
         selector: checkpoint.selector,
         geometry: visible,
-        expected: expectedSummary(context.fixture, context.state),
+        stateGate: checkpoint.stateGate,
       });
+      checkpointIndex += 1;
     }
   }
 
+  assert.equal(
+    checkpointIndex,
+    pendingCheckpoints.length,
+    `${viewport.name}: unresolved state-gated checkpoints`
+  );
   await waitUntil(started, scene.dur);
   await settle(cdp);
+  const sceneElapsed =
+    Number(process.hrtime.bigint() - started) / 1_000_000_000;
+  assert(
+    sceneElapsed <= scene.dur + replay.maxSceneOverrunSeconds,
+    `${viewport.name}: scene overrun ${sceneElapsed - scene.dur}s`
+  );
   const authoredFinal = await observeDom(cdp);
   assertDomMatchesExpected(authoredFinal, context.fixture, context.state, {
     seedInput: context.seedInput,
@@ -2088,6 +2416,12 @@ async function replayViewport(
   assert.equal(context.fixture.digest, handoff.digest);
   assert.notEqual(handoff.digest, canonical.digest);
   assert.notEqual(handoff.route.length, canonical.route.length);
+  assert.equal(context.state.acceptedMoves.length, 0);
+  assert.equal(context.state.trail.length, 0);
+  assert.equal(context.state.assistanceUsed, false);
+  assert.equal(context.state.hintRequests, 0);
+  assert.equal(authoredFinal.activeId, "maze-board");
+  assert.equal(authoredFinal.dom.takeover.hidden, false);
   await assertVisible(
     cdp,
     "#takeover-prompt",
@@ -2142,6 +2476,9 @@ async function replayViewport(
     "#assist-value",
     "#seed-input",
     "#load-seed-btn",
+    "#copy-challenge-btn",
+    "#challenge-link",
+    "#challenge-status",
     "#takeover-prompt",
   ]) {
     const fontSize = await evaluate(
@@ -2167,7 +2504,14 @@ async function replayViewport(
     actionReports,
     checkpointReports,
     privacyReports,
+    playGeometry,
+    maximumActionLateness: Math.max(
+      ...actionReports.map(report => report.lateness)
+    ),
+    sceneElapsed,
     authoredFinal: expectedSummary(handoff, initialState(handoff)),
+    authoredFinalFocus: authoredFinal.activeId,
+    authoredFinalTakeoverVisible: !authoredFinal.dom.takeover.hidden,
     takeover: {
       firstDirection: handoff.route[0],
       movedSteps: 1,
@@ -2212,6 +2556,20 @@ async function main() {
   assert.equal(manifest.videos.length, 1);
   assert.equal(manifest.videos[0].live.kind, "rapp-vision-live/1.0");
   assert.equal(evidence.manifestReplay.exactTiming, true);
+  assert.equal(
+    evidence.manifestReplay.checkpointMode,
+    "state-gated within bounded time windows"
+  );
+  assert(evidence.manifestReplay.maxActionLatenessSeconds >= 0.61);
+  assert.deepEqual(
+    evidence.challengeContract.keys,
+    ["seed", "topologyDigest", "referenceLength"]
+  );
+  assert(
+    evidence.claims.every(
+      claim => claim.stateGate && !("expectedState" in claim)
+    )
+  );
   assert.equal(appSource.includes("window.foglineSurvey"), false);
   assert.equal(appSource.includes("MIST-Δ"), false);
   assert.equal(appSource.includes("A|B;C"), false);
@@ -2316,6 +2674,10 @@ async function main() {
       deviceScaleFactor: 1,
       mobile: false,
     });
+    const challengeContractReport = await exerciseChallengeContract(
+      cdp,
+      appUrl
+    );
     const hintGate = await exerciseHintGate(cdp, appUrl);
     const reports = [];
     for (const viewport of evidence.browserRuntime.viewports) {
@@ -2353,21 +2715,27 @@ async function main() {
         startupWithin45Seconds: true,
         earlyChildExitObserved: true,
         exactManifestTiming: true,
+        boundedTimingUnderContention: true,
+        stateGatedCheckpoints: true,
         individualSemanticKeys: true,
         independentGeneratorDigestBfs: true,
         independentStateAndDom: true,
         actualCdpMouseAndKeyboard: true,
+        challengeContractRoundTrip: true,
         hintGatingAndOneStepOnly: true,
         openingDomAndAccessibilityPrivacy: true,
         alternateSeedRecomputation: true,
         unmaskedSeedInput: true,
         desktopGeometry: true,
         mobile390Geometry: true,
+        compactMobilePlayCluster: true,
         keyboardFocus: true,
+        freshFocusedHandoff: true,
         invalidInputPreservation: true,
         noNetworkOrScriptErrors: true,
       },
       viewports: reports,
+      challengeContract: challengeContractReport,
       hintGate,
       alternateSeeds,
       globalErrors: {

@@ -20,6 +20,8 @@
       "horizontalOverflowAllowedPixels": 1,
       "lowerThirdCriticalContent": false,
       "minimumVisibleFontPixels": 12,
+      "mobileCriticalSpanMaximumPixels": 800,
+      "mobileDocumentHeightMaximumPixels": 1800,
       "perAction": true,
       "perCheckpoint": true
     },
@@ -48,1158 +50,248 @@
       }
     ]
   },
+  "challengeContract": {
+    "example": {
+      "referenceLength": 18,
+      "seed": "RAPP-42",
+      "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda"
+    },
+    "fragment": "#challenge=eyJzZWVkIjoiUkFQUC00MiIsInRvcG9sb2d5RGlnZXN0IjoiMTI2YmY3MDQ0MGQzZWY1NDJjOGRjOTcyNTE3MjY5OTRlMGYyMzQyMjY3NWU4MzFmOTMzMDkyMzVhZTA4NWVkYSIsInJlZmVyZW5jZUxlbmd0aCI6MTh9",
+    "fragmentOnly": true,
+    "invalidPreservesAcceptedState": true,
+    "keys": [
+      "seed",
+      "topologyDigest",
+      "referenceLength"
+    ],
+    "routeIncluded": false,
+    "trailIncluded": false
+  },
   "channel": "candidate-frame-0004-01-maze-fogline",
   "claims": [
     {
-      "expectedState": {
-        "acceptedMoves": [
-          "S",
-          "E",
-          "E",
-          "S",
-          "S",
-          "W",
-          "W",
-          "S",
-          "S",
-          "E",
-          "N",
-          "E",
-          "E",
-          "S",
-          "E",
-          "N",
-          "N",
-          "E"
-        ],
-        "assistance": {
-          "available": true,
-          "earned": true,
-          "hintDirection": null,
-          "requests": 0,
-          "scope": "one next move only",
-          "used": false
-        },
-        "completed": true,
-        "exit": {
-          "marked": true,
-          "state": "open",
-          "x": 5,
-          "y": 3
-        },
-        "facing": "E",
-        "grid": {
-          "height": 6,
-          "width": 6
-        },
-        "lastAttempt": "E",
-        "lastRejected": null,
-        "matchedOptimal": true,
-        "message": "Exit open in 18. Direct survey matched the reference.",
-        "position": {
-          "x": 5,
-          "y": 3
-        },
-        "projectedTotal": 18,
-        "referenceLength": 18,
-        "revealed": [
-          [
-            0,
-            0
-          ],
-          [
-            0,
-            1
-          ],
-          [
-            1,
-            1
-          ],
-          [
-            2,
-            1
-          ],
-          [
-            0,
-            2
-          ],
-          [
-            2,
-            2
-          ],
-          [
-            5,
-            2
-          ],
-          [
-            0,
-            3
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            2,
-            3
-          ],
-          [
-            4,
-            3
-          ],
-          [
-            5,
-            3
-          ],
-          [
-            0,
-            4
-          ],
-          [
-            1,
-            4
-          ],
-          [
-            2,
-            4
-          ],
-          [
-            3,
-            4
-          ],
-          [
-            4,
-            4
-          ],
-          [
-            5,
-            4
-          ],
-          [
-            0,
-            5
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            2,
-            5
-          ],
-          [
-            3,
-            5
-          ],
-          [
-            4,
-            5
-          ]
-        ],
-        "schema": "fogline-survey-state/1.0",
-        "seed": "RAPP-42",
-        "seedChangeCount": 0,
-        "seedError": null,
-        "seedInput": "RAPP-42",
-        "status": "complete-optimal",
-        "steps": 18,
-        "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
-        "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
-        "trail": [
-          [
-            0,
-            1
-          ],
-          [
-            1,
-            1
-          ],
-          [
-            2,
-            1
-          ],
-          [
-            2,
-            2
-          ],
-          [
-            2,
-            3
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            0,
-            3
-          ],
-          [
-            0,
-            4
-          ],
-          [
-            0,
-            5
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            1,
-            4
-          ],
-          [
-            2,
-            4
-          ],
-          [
-            3,
-            4
-          ],
-          [
-            3,
-            5
-          ],
-          [
-            4,
-            5
-          ],
-          [
-            4,
-            4
-          ],
-          [
-            4,
-            3
-          ],
-          [
-            5,
-            3
-          ]
-        ],
-        "trap": {
-          "approachStep": 14,
-          "entered": false,
-          "enteredStep": 15,
-          "marked": true,
-          "turn": "W",
-          "x": 2,
-          "y": 5
-        }
-      },
-      "id": "optimal"
-    },
-    {
-      "expectedState": {
-        "acceptedMoves": [
-          "S",
-          "E",
-          "E",
-          "S",
-          "S",
-          "W",
-          "W",
-          "S",
-          "S",
-          "E",
-          "N",
-          "E",
-          "E",
-          "S"
-        ],
-        "assistance": {
-          "available": false,
-          "earned": true,
-          "hintDirection": "E",
-          "requests": 1,
-          "scope": "one next move only",
-          "used": true
-        },
+      "id": "hint",
+      "stateGate": {
+        "assistanceUsed": true,
         "completed": false,
-        "exit": {
-          "marked": true,
-          "state": "closed",
-          "x": 5,
-          "y": 3
-        },
+        "exitState": "closed",
         "facing": "S",
-        "grid": {
-          "height": 6,
-          "width": 6
-        },
-        "lastAttempt": "S",
-        "lastRejected": null,
+        "hintAvailable": false,
+        "hintDirection": "E",
+        "hintRequests": 1,
         "matchedOptimal": null,
-        "message": "One-step survey: E. Assistance is recorded; no later moves are revealed.",
-        "position": {
-          "x": 3,
-          "y": 5
-        },
-        "projectedTotal": 18,
-        "referenceLength": 18,
-        "revealed": [
-          [
-            0,
-            0
-          ],
-          [
-            0,
-            1
-          ],
-          [
-            1,
-            1
-          ],
-          [
-            2,
-            1
-          ],
-          [
-            0,
-            2
-          ],
-          [
-            2,
-            2
-          ],
-          [
-            0,
-            3
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            2,
-            3
-          ],
-          [
-            0,
-            4
-          ],
-          [
-            1,
-            4
-          ],
-          [
-            2,
-            4
-          ],
-          [
-            3,
-            4
-          ],
-          [
-            0,
-            5
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            2,
-            5
-          ],
-          [
-            3,
-            5
-          ],
-          [
-            4,
-            5
-          ]
+        "position": [
+          3,
+          5
         ],
-        "schema": "fogline-survey-state/1.0",
+        "projectedTotal": 18,
         "seed": "RAPP-42",
-        "seedChangeCount": 0,
-        "seedError": null,
-        "seedInput": "RAPP-42",
         "status": "hint",
         "steps": 14,
         "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
-        "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
-        "trail": [
-          [
-            0,
-            1
-          ],
-          [
-            1,
-            1
-          ],
-          [
-            2,
-            1
-          ],
-          [
-            2,
-            2
-          ],
-          [
-            2,
-            3
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            0,
-            3
-          ],
-          [
-            0,
-            4
-          ],
-          [
-            0,
-            5
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            1,
-            4
-          ],
-          [
-            2,
-            4
-          ],
-          [
-            3,
-            4
-          ],
-          [
-            3,
-            5
-          ]
-        ],
-        "trap": {
-          "approachStep": 14,
-          "entered": false,
-          "enteredStep": 15,
-          "marked": true,
-          "turn": "W",
-          "x": 2,
-          "y": 5
-        }
-      },
-      "id": "hint"
+        "trailLength": 14
+      }
     },
     {
-      "expectedState": {
-        "acceptedMoves": [
-          "S",
-          "E",
-          "E",
-          "S",
-          "S",
-          "W",
-          "W",
-          "S",
-          "S",
-          "E",
-          "N",
-          "E",
-          "E",
-          "S",
-          "W"
-        ],
-        "assistance": {
-          "available": false,
-          "earned": true,
-          "hintDirection": null,
-          "requests": 1,
-          "scope": "one next move only",
-          "used": true
-        },
+      "id": "trap",
+      "stateGate": {
+        "assistanceUsed": true,
         "completed": false,
-        "exit": {
-          "marked": true,
-          "state": "closed",
-          "x": 5,
-          "y": 3
-        },
+        "exitState": "closed",
         "facing": "W",
-        "grid": {
-          "height": 6,
-          "width": 6
-        },
-        "lastAttempt": "W",
-        "lastRejected": null,
+        "hintAvailable": false,
+        "hintDirection": null,
+        "hintRequests": 1,
         "matchedOptimal": null,
-        "message": "Marked trap entered. Best finish is now 20 (+2); exit beacon remains marked.",
-        "position": {
-          "x": 2,
-          "y": 5
-        },
-        "projectedTotal": 20,
-        "referenceLength": 18,
-        "revealed": [
-          [
-            0,
-            0
-          ],
-          [
-            0,
-            1
-          ],
-          [
-            1,
-            1
-          ],
-          [
-            2,
-            1
-          ],
-          [
-            0,
-            2
-          ],
-          [
-            2,
-            2
-          ],
-          [
-            0,
-            3
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            2,
-            3
-          ],
-          [
-            0,
-            4
-          ],
-          [
-            1,
-            4
-          ],
-          [
-            2,
-            4
-          ],
-          [
-            3,
-            4
-          ],
-          [
-            0,
-            5
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            2,
-            5
-          ],
-          [
-            3,
-            5
-          ],
-          [
-            4,
-            5
-          ]
+        "position": [
+          2,
+          5
         ],
-        "schema": "fogline-survey-state/1.0",
+        "projectedTotal": 20,
         "seed": "RAPP-42",
-        "seedChangeCount": 0,
-        "seedError": null,
-        "seedInput": "RAPP-42",
         "status": "trap",
         "steps": 15,
         "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
-        "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
-        "trail": [
-          [
-            0,
-            1
-          ],
-          [
-            1,
-            1
-          ],
-          [
-            2,
-            1
-          ],
-          [
-            2,
-            2
-          ],
-          [
-            2,
-            3
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            0,
-            3
-          ],
-          [
-            0,
-            4
-          ],
-          [
-            0,
-            5
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            1,
-            4
-          ],
-          [
-            2,
-            4
-          ],
-          [
-            3,
-            4
-          ],
-          [
-            3,
-            5
-          ],
-          [
-            2,
-            5
-          ]
-        ],
-        "trap": {
-          "approachStep": 14,
-          "entered": true,
-          "enteredStep": 15,
-          "marked": true,
-          "turn": "W",
-          "x": 2,
-          "y": 5
-        }
-      },
-      "id": "trap"
+        "trailLength": 15
+      }
     },
     {
-      "expectedState": {
-        "acceptedMoves": [
-          "S",
-          "E",
-          "E",
-          "S",
-          "S",
-          "W",
-          "W",
-          "S",
-          "S",
-          "E",
-          "N",
-          "E",
-          "E",
-          "S",
-          "W",
-          "E",
-          "E",
-          "N",
-          "N",
-          "E"
-        ],
-        "assistance": {
-          "available": false,
-          "earned": true,
-          "hintDirection": null,
-          "requests": 1,
-          "scope": "one next move only",
-          "used": true
-        },
+      "id": "detour",
+      "stateGate": {
+        "assistanceUsed": true,
         "completed": true,
-        "exit": {
-          "marked": true,
-          "state": "open",
-          "x": 5,
-          "y": 3
-        },
+        "exitState": "open",
         "facing": "E",
-        "grid": {
-          "height": 6,
-          "width": 6
-        },
-        "lastAttempt": "E",
-        "lastRejected": null,
+        "hintAvailable": false,
+        "hintDirection": null,
+        "hintRequests": 1,
         "matchedOptimal": false,
-        "message": "Exit open in 20: +2 over reference 18.",
-        "position": {
-          "x": 5,
-          "y": 3
-        },
-        "projectedTotal": 20,
-        "referenceLength": 18,
-        "revealed": [
-          [
-            0,
-            0
-          ],
-          [
-            0,
-            1
-          ],
-          [
-            1,
-            1
-          ],
-          [
-            2,
-            1
-          ],
-          [
-            0,
-            2
-          ],
-          [
-            2,
-            2
-          ],
-          [
-            5,
-            2
-          ],
-          [
-            0,
-            3
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            2,
-            3
-          ],
-          [
-            4,
-            3
-          ],
-          [
-            5,
-            3
-          ],
-          [
-            0,
-            4
-          ],
-          [
-            1,
-            4
-          ],
-          [
-            2,
-            4
-          ],
-          [
-            3,
-            4
-          ],
-          [
-            4,
-            4
-          ],
-          [
-            5,
-            4
-          ],
-          [
-            0,
-            5
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            2,
-            5
-          ],
-          [
-            3,
-            5
-          ],
-          [
-            4,
-            5
-          ]
+        "position": [
+          5,
+          3
         ],
-        "schema": "fogline-survey-state/1.0",
+        "projectedTotal": 20,
         "seed": "RAPP-42",
-        "seedChangeCount": 0,
-        "seedError": null,
-        "seedInput": "RAPP-42",
         "status": "complete-detour",
         "steps": 20,
         "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
-        "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
-        "trail": [
-          [
-            0,
-            1
-          ],
-          [
-            1,
-            1
-          ],
-          [
-            2,
-            1
-          ],
-          [
-            2,
-            2
-          ],
-          [
-            2,
-            3
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            0,
-            3
-          ],
-          [
-            0,
-            4
-          ],
-          [
-            0,
-            5
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            1,
-            4
-          ],
-          [
-            2,
-            4
-          ],
-          [
-            3,
-            4
-          ],
-          [
-            3,
-            5
-          ],
-          [
-            2,
-            5
-          ],
-          [
-            3,
-            5
-          ],
-          [
-            4,
-            5
-          ],
-          [
-            4,
-            4
-          ],
-          [
-            4,
-            3
-          ],
-          [
-            5,
-            3
-          ]
-        ],
-        "trap": {
-          "approachStep": 14,
-          "entered": true,
-          "enteredStep": 15,
-          "marked": true,
-          "turn": "W",
-          "x": 2,
-          "y": 5
-        }
-      },
-      "id": "detour"
+        "trailLength": 20
+      }
     },
     {
-      "expectedState": {
-        "acceptedMoves": [],
-        "assistance": {
-          "available": false,
-          "earned": false,
-          "hintDirection": null,
-          "requests": 0,
-          "scope": "one next move only",
-          "used": false
-        },
+      "id": "resetAfterTrap",
+      "stateGate": {
+        "assistanceUsed": false,
         "completed": false,
-        "exit": {
-          "marked": true,
-          "state": "closed",
-          "x": 5,
-          "y": 3
-        },
+        "exitState": "closed",
         "facing": "N",
-        "grid": {
-          "height": 6,
-          "width": 6
-        },
-        "lastAttempt": null,
-        "lastRejected": null,
+        "hintAvailable": false,
+        "hintDirection": null,
+        "hintRequests": 0,
         "matchedOptimal": null,
-        "message": "Seed RAPP-42 ready. Find the marked exit; reference length 18.",
-        "position": {
-          "x": 0,
-          "y": 0
-        },
-        "projectedTotal": 18,
-        "referenceLength": 18,
-        "revealed": [
-          [
-            0,
-            0
-          ],
-          [
-            0,
-            1
-          ]
+        "position": [
+          0,
+          0
         ],
-        "schema": "fogline-survey-state/1.0",
+        "projectedTotal": 18,
         "seed": "RAPP-42",
-        "seedChangeCount": 0,
-        "seedError": null,
-        "seedInput": "RAPP-42",
         "status": "ready",
         "steps": 0,
         "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
-        "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
-        "trail": [],
-        "trap": {
-          "approachStep": 14,
-          "entered": false,
-          "enteredStep": 15,
-          "marked": false,
-          "turn": "W",
-          "x": 2,
-          "y": 5
-        }
-      },
-      "id": "reset"
+        "trailLength": 0
+      }
     },
     {
-      "expectedState": {
-        "acceptedMoves": [],
-        "assistance": {
-          "available": false,
-          "earned": false,
-          "hintDirection": null,
-          "requests": 0,
-          "scope": "one next move only",
-          "used": false
-        },
-        "completed": false,
-        "exit": {
-          "marked": true,
-          "state": "closed",
-          "x": 5,
-          "y": 3
-        },
-        "facing": "N",
-        "grid": {
-          "height": 6,
-          "width": 6
-        },
-        "lastAttempt": null,
-        "lastRejected": null,
-        "matchedOptimal": null,
-        "message": "Seed RAPP-42 ready. Find the marked exit; reference length 18.",
-        "position": {
-          "x": 0,
-          "y": 0
-        },
-        "projectedTotal": 18,
-        "referenceLength": 18,
-        "revealed": [
-          [
-            0,
-            0
-          ],
-          [
-            0,
-            1
-          ]
+      "id": "optimal",
+      "stateGate": {
+        "assistanceUsed": false,
+        "completed": true,
+        "exitState": "open",
+        "facing": "E",
+        "hintAvailable": true,
+        "hintDirection": null,
+        "hintRequests": 0,
+        "matchedOptimal": true,
+        "position": [
+          5,
+          3
         ],
-        "schema": "fogline-survey-state/1.0",
+        "projectedTotal": 18,
         "seed": "RAPP-42",
-        "seedChangeCount": 0,
-        "seedError": "Seed must contain 1–64 UTF-8 bytes and no controls.",
-        "seedInput": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "status": "complete-optimal",
+        "steps": 18,
+        "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+        "trailLength": 18
+      }
+    },
+    {
+      "id": "resetAfterOptimal",
+      "stateGate": {
+        "assistanceUsed": false,
+        "completed": false,
+        "exitState": "closed",
+        "facing": "N",
+        "hintAvailable": false,
+        "hintDirection": null,
+        "hintRequests": 0,
+        "matchedOptimal": null,
+        "position": [
+          0,
+          0
+        ],
+        "projectedTotal": 18,
+        "seed": "RAPP-42",
         "status": "ready",
         "steps": 0,
         "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
-        "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
-        "trail": [],
-        "trap": {
-          "approachStep": 14,
-          "entered": false,
-          "enteredStep": 15,
-          "marked": false,
-          "turn": "W",
-          "x": 2,
-          "y": 5
-        }
-      },
-      "id": "invalidSeedPreserved"
+        "trailLength": 0
+      }
     },
     {
-      "expectedState": {
-        "acceptedMoves": [],
-        "assistance": {
-          "available": false,
-          "earned": false,
-          "hintDirection": null,
-          "requests": 0,
-          "scope": "one next move only",
-          "used": false
-        },
+      "id": "handoff",
+      "stateGate": {
+        "assistanceUsed": false,
         "completed": false,
-        "exit": {
-          "marked": true,
-          "state": "closed",
-          "x": 5,
-          "y": 3
-        },
+        "exitState": "closed",
         "facing": "N",
-        "grid": {
-          "height": 6,
-          "width": 6
-        },
-        "lastAttempt": null,
-        "lastRejected": null,
+        "hintAvailable": false,
+        "hintDirection": null,
+        "hintRequests": 0,
         "matchedOptimal": null,
-        "message": "Seed FOG-7 ready. Find the marked exit; reference length 10.",
-        "position": {
-          "x": 0,
-          "y": 0
-        },
+        "position": [
+          0,
+          0
+        ],
         "projectedTotal": 10,
-        "referenceLength": 10,
-        "revealed": [
-          [
-            0,
-            0
-          ],
-          [
-            1,
-            0
-          ]
-        ],
-        "schema": "fogline-survey-state/1.0",
         "seed": "FOG-7",
-        "seedChangeCount": 1,
-        "seedError": null,
-        "seedInput": "FOG-7",
         "status": "ready",
         "steps": 0,
         "topologyDigest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
-        "topologySignature": "FOG-7|6x6|0,0:E;1,0:EW;2,0:SW;3,0:ES;4,0:SW;5,0:S;0,1:ES;1,1:W;2,1:NE;3,1:NW;4,1:NE;5,1:NSW;0,2:NES;1,2:EW;2,2:EW;3,2:ESW;4,2:SW;5,2:NS;0,3:NS;1,3:S;2,3:ES;3,3:NW;4,3:N;5,3:NS;0,4:NE;1,4:NSW;2,4:NS;3,4:ES;4,4:EW;5,4:NW;0,5:E;1,5:NW;2,5:NE;3,5:NEW;4,5:EW;5,5:W",
-        "trail": [],
-        "trap": {
-          "approachStep": 8,
-          "entered": false,
-          "enteredStep": 9,
-          "marked": false,
-          "turn": "N",
-          "x": 5,
-          "y": 0
-        }
-      },
-      "id": "handoff"
+        "trailLength": 0
+      }
     }
   ],
   "commission": {
     "criterion": "Seed RAPP-42 always generates the same topology digest and an 18-step shortest route from the marked entrance to the exit.",
     "exactReset": "Restart same seed restores RAPP-42, its digest, entrance (0,0), north, zero steps, closed exit, empty trail, and no assistance.",
     "id": "play-seeded-maze-return",
+    "offlineChallenge": "A portable fragment exports exactly seed, full topology digest, and reference length; validation failure preserves the accepted game.",
     "pairedDelivery": {
       "live": true,
       "mp4": true,
       "samePublication": true,
       "webm": true
     },
-    "positivePath": "Individual semantic key events complete the computed RAPP-42 shortest route in exactly 18 without assistance.",
+    "positivePath": "The trap-first replay proves the valid +2 knot, resets, then individual semantic keys complete RAPP-42 in exactly 18 without assistance.",
     "statusAtBuild": "open",
     "visibleFailure": "After an explicitly requested one-step E hint, the valid W turn enters the marked trap, raises the projected and final length to 20, and never hides the exit beacon."
   },
   "film": {
     "contentSamples": {
-      "hint-earned": {
-        "frame": 126,
-        "sha256": "748ab1f7afd804bbb8d673ad8601149e005932c4644efa340d01600146d5a60b",
-        "timestamp": 10.5
+      "alternate-fresh": {
+        "frame": 240,
+        "sha256": "04a5df7188bdb6b1652fd7ca1fe41757b76a548c01e74ac522dd5e9c5e3bf864",
+        "timestamp": 20.0
       },
-      "invalid-seed": {
-        "frame": 225,
-        "sha256": "62c1225050b4cf71e118c13a8b966550354f6fe52835997080d7e3713c8e970a",
-        "timestamp": 18.75
-      },
-      "opening": {
+      "challenge": {
         "frame": 18,
-        "sha256": "e9b21a87d8460638d34327ca49f6bf54de46b478be3b40507b22dabbf8d11a77",
+        "sha256": "84d626dcdbb594cd69a1742c21e06ca38eac34e2e1714b647bcdbf85e3c40846",
         "timestamp": 1.5
       },
-      "optimal": {
-        "frame": 60,
-        "sha256": "296a2a834f7ee8cf8ab11acc7268710f92b2c9e8cf44a787b08054f31a9656df",
-        "timestamp": 5.0
+      "optimal-18": {
+        "frame": 150,
+        "sha256": "f8aafe6ccfce1fca49000a3d9ddc5a6dca650d65114e1d9c8361e55ae016bd89",
+        "timestamp": 12.5
       },
       "optimal-complete": {
-        "frame": 93,
-        "sha256": "6ea2d8d29dbaa347b489f14de0e54104c1c5d11640ac359501add95d0e055427",
-        "timestamp": 7.75
+        "frame": 192,
+        "sha256": "13583d42c0a10ecbeaca113447872a33a4d364c86d9f472e6b5bdcc5bc11e441",
+        "timestamp": 16.0
       },
-      "reset": {
-        "frame": 195,
-        "sha256": "8741bb3970c92d4d0e8cea3b127de853f729ee32ffde32bb4c1b46b75829b668",
-        "timestamp": 16.25
+      "reset-after-optimal": {
+        "frame": 216,
+        "sha256": "448aec9c48c896724b518663ad563747980a8babd3f779875ceef4c6dbfc8ff3",
+        "timestamp": 18.0
+      },
+      "reset-after-trap": {
+        "frame": 108,
+        "sha256": "563894e464f89e33fe542e1b5ee2396571150dc844523691554fa84c43119e60",
+        "timestamp": 9.0
       },
       "takeover": {
-        "frame": 264,
-        "sha256": "33ed19e1738c166cad149cdf186ac9b82af19469c3add5116b04dc9a38192e48",
-        "timestamp": 22.0
+        "frame": 270,
+        "sha256": "20e944db13cb114a4c6b81e16e5ad5b1521107d4aeacf95cf387ba39d6b2ab49",
+        "timestamp": 22.5
       },
-      "trap-detour": {
-        "frame": 174,
-        "sha256": "5213497f9e3a1cf9d442ee42bf4792d6f919a2517cd6846fa6ad2052c07c52d4",
-        "timestamp": 14.5
+      "trap-approach": {
+        "frame": 54,
+        "sha256": "a1780f7522aa692dfb732fba9e1f254471e384b4b5f1ba5584fe63bed1c1a69f",
+        "timestamp": 4.5
+      },
+      "trap-plus-two": {
+        "frame": 72,
+        "sha256": "5177f4fca2cec7babc16ccb7a931382b2970246ffb4f307f70fe62658a7c1e8a",
+        "timestamp": 6.0
       }
     },
     "duration": 24,
@@ -1208,48 +300,70 @@
     "frames": 288,
     "height": 540,
     "routePrintedBeforeAttempt": false,
+    "sequence": [
+      "challenge",
+      "trap-approach",
+      "trap-plus-two",
+      "reset-after-trap",
+      "optimal-18",
+      "optimal-complete",
+      "reset-after-optimal",
+      "alternate-fresh",
+      "takeover"
+    ],
     "timeline": [
       {
         "end": 3.0,
-        "phase": "opening",
+        "phase": "challenge",
         "start": 0.0
       },
       {
-        "end": 7.0,
-        "phase": "optimal",
+        "end": 5.5,
+        "phase": "trap-approach",
         "start": 3.0
       },
       {
-        "end": 8.5,
-        "phase": "optimal-complete",
-        "start": 7.0
+        "end": 8.0,
+        "phase": "trap-plus-two",
+        "start": 5.5
       },
       {
-        "end": 11.5,
-        "phase": "hint-earned",
-        "start": 8.5
+        "end": 10.0,
+        "phase": "reset-after-trap",
+        "start": 8.0
       },
       {
         "end": 15.0,
-        "phase": "trap-detour",
-        "start": 11.5
+        "phase": "optimal-18",
+        "start": 10.0
       },
       {
-        "end": 17.5,
-        "phase": "reset",
+        "end": 17.0,
+        "phase": "optimal-complete",
         "start": 15.0
       },
       {
-        "end": 20.0,
-        "phase": "invalid-seed",
-        "start": 17.5
+        "end": 19.0,
+        "phase": "reset-after-optimal",
+        "start": 17.0
+      },
+      {
+        "end": 21.0,
+        "phase": "alternate-fresh",
+        "start": 19.0
       },
       {
         "end": 24.0,
         "phase": "takeover",
-        "start": 20.0
+        "start": 21.0
       }
     ],
+    "typography": {
+      "criticalTextSourcePixels": 28,
+      "fullDigestCharacters": 64,
+      "fullDigestSourcePixels": 28,
+      "liveHierarchyMatched": true
+    },
     "width": 960
   },
   "fixtures": {
@@ -2593,57 +1707,211 @@
       "type"
     ],
     "autoSolveApi": false,
+    "checkpointMode": "state-gated within bounded time windows",
     "checkpointVisibilityRequired": true,
     "checkpoints": [
       {
-        "afterAction": 21,
-        "claim": "optimal",
-        "selector": "#success-panel"
-      },
-      {
-        "afterAction": 24,
-        "claim": "reset",
-        "selector": "#reset-proof"
-      },
-      {
-        "afterAction": 43,
         "claim": "hint",
-        "selector": "#hint-panel"
+        "selector": "#hint-panel",
+        "stateGate": {
+          "assistanceUsed": true,
+          "completed": false,
+          "exitState": "closed",
+          "facing": "S",
+          "hintAvailable": false,
+          "hintDirection": "E",
+          "hintRequests": 1,
+          "matchedOptimal": null,
+          "position": [
+            3,
+            5
+          ],
+          "projectedTotal": 18,
+          "seed": "RAPP-42",
+          "status": "hint",
+          "steps": 14,
+          "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+          "trailLength": 14
+        },
+        "timeWindow": {
+          "end": 5.77,
+          "start": 4.52
+        }
       },
       {
-        "afterAction": 47,
         "claim": "trap",
-        "selector": "#trap-panel"
+        "selector": "#trap-panel",
+        "stateGate": {
+          "assistanceUsed": true,
+          "completed": false,
+          "exitState": "closed",
+          "facing": "W",
+          "hintAvailable": false,
+          "hintDirection": null,
+          "hintRequests": 1,
+          "matchedOptimal": null,
+          "position": [
+            2,
+            5
+          ],
+          "projectedTotal": 20,
+          "seed": "RAPP-42",
+          "status": "trap",
+          "steps": 15,
+          "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+          "trailLength": 15
+        },
+        "timeWindow": {
+          "end": 6.63,
+          "start": 5.38
+        }
       },
       {
-        "afterAction": 55,
         "claim": "detour",
-        "selector": "#success-panel"
+        "selector": "#success-panel",
+        "stateGate": {
+          "assistanceUsed": true,
+          "completed": true,
+          "exitState": "open",
+          "facing": "E",
+          "hintAvailable": false,
+          "hintDirection": null,
+          "hintRequests": 1,
+          "matchedOptimal": false,
+          "position": [
+            5,
+            3
+          ],
+          "projectedTotal": 20,
+          "seed": "RAPP-42",
+          "status": "complete-detour",
+          "steps": 20,
+          "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+          "trailLength": 20
+        },
+        "timeWindow": {
+          "end": 8.27,
+          "start": 7.02
+        }
       },
       {
-        "afterAction": 58,
-        "claim": "reset",
-        "selector": "#reset-proof"
+        "claim": "resetAfterTrap",
+        "selector": "#reset-proof",
+        "stateGate": {
+          "assistanceUsed": false,
+          "completed": false,
+          "exitState": "closed",
+          "facing": "N",
+          "hintAvailable": false,
+          "hintDirection": null,
+          "hintRequests": 0,
+          "matchedOptimal": null,
+          "position": [
+            0,
+            0
+          ],
+          "projectedTotal": 18,
+          "seed": "RAPP-42",
+          "status": "ready",
+          "steps": 0,
+          "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+          "trailLength": 0
+        },
+        "timeWindow": {
+          "end": 8.87,
+          "start": 7.62
+        }
       },
       {
-        "afterAction": 64,
-        "claim": "invalidSeedPreserved",
-        "selector": "#seed-error"
+        "claim": "optimal",
+        "selector": "#success-panel",
+        "stateGate": {
+          "assistanceUsed": false,
+          "completed": true,
+          "exitState": "open",
+          "facing": "E",
+          "hintAvailable": true,
+          "hintDirection": null,
+          "hintRequests": 0,
+          "matchedOptimal": true,
+          "position": [
+            5,
+            3
+          ],
+          "projectedTotal": 18,
+          "seed": "RAPP-42",
+          "status": "complete-optimal",
+          "steps": 18,
+          "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+          "trailLength": 18
+        },
+        "timeWindow": {
+          "end": 13.53,
+          "start": 12.28
+        }
       },
       {
-        "afterAction": 70,
+        "claim": "resetAfterOptimal",
+        "selector": "#reset-proof",
+        "stateGate": {
+          "assistanceUsed": false,
+          "completed": false,
+          "exitState": "closed",
+          "facing": "N",
+          "hintAvailable": false,
+          "hintDirection": null,
+          "hintRequests": 0,
+          "matchedOptimal": null,
+          "position": [
+            0,
+            0
+          ],
+          "projectedTotal": 18,
+          "seed": "RAPP-42",
+          "status": "ready",
+          "steps": 0,
+          "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+          "trailLength": 0
+        },
+        "timeWindow": {
+          "end": 14.15,
+          "start": 12.9
+        }
+      },
+      {
         "claim": "handoff",
-        "selector": "#seed-change-proof"
-      },
-      {
-        "afterAction": 71,
-        "claim": "handoff",
-        "selector": "#takeover-prompt"
+        "selector": "#takeover-prompt",
+        "stateGate": {
+          "assistanceUsed": false,
+          "completed": false,
+          "exitState": "closed",
+          "facing": "N",
+          "hintAvailable": false,
+          "hintDirection": null,
+          "hintRequests": 0,
+          "matchedOptimal": null,
+          "position": [
+            0,
+            0
+          ],
+          "projectedTotal": 10,
+          "seed": "FOG-7",
+          "status": "ready",
+          "steps": 0,
+          "topologyDigest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
+          "trailLength": 0
+        },
+        "timeWindow": {
+          "end": 15.35,
+          "start": 14.1
+        }
       }
     ],
     "exactTiming": true,
     "individualSemanticKeyEvents": true,
     "manifest": "channel.production.json",
+    "maxActionLatenessSeconds": 0.8,
+    "maxSceneOverrunSeconds": 1.0,
     "publicFixtureApi": false,
     "scene": 0,
     "segments": {
@@ -2671,9 +1939,9 @@
           "N",
           "E"
         ],
-        "firstAction": 27,
+        "firstAction": 5,
         "hintRequestedAfterAcceptedStep": 14,
-        "lastAction": 54
+        "lastAction": 32
       },
       "optimal": {
         "assistance": false,
@@ -2697,10 +1965,11 @@
           "N",
           "E"
         ],
-        "firstAction": 3,
-        "lastAction": 20
+        "firstAction": 39,
+        "lastAction": 56
       }
-    }
+    },
+    "timingMode": "scheduled actions with bounded lateness"
   },
   "publication": "maze-fogline",
   "schema": "fogline-survey-evidence/1.0",
@@ -2711,29 +1980,29 @@
       "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
     },
     {
-      "bytes": 7980,
+      "bytes": 8762,
       "path": "README.md",
-      "sha256": "a4dfa9326514643e3807f33d15eee1f85df47f78644421a030d5d6f36994aa28"
+      "sha256": "9d74d8f7293e24aafbdca333d7dedf40b4368898683257d048a4594df00186e6"
     },
     {
-      "bytes": 45777,
+      "bytes": 56437,
       "path": "apps/maze-fogline.html",
-      "sha256": "77e998d55e4126b72e772dd808a820757873ab12ad94cd76873af290afe0f4ff"
+      "sha256": "71dd029553c9f02a8c4977d7567abfb5daf859f0e0ebb438205b3ef223009b33"
     },
     {
-      "bytes": 14506,
+      "bytes": 14509,
       "path": "channel.production.json",
-      "sha256": "96ce81595920b152994473f811c9e6f9a2d4359a5f4cfca6d4193e80385918cd"
+      "sha256": "49d05d2b0025e4e065fcbd40c2788cce73e25317cafafc235cb56276be073875"
     },
     {
-      "bytes": 79421,
+      "bytes": 84048,
       "path": "render.py",
-      "sha256": "1c850c6ffbf9ffb2d62e3c5a261200100fec43728c560d8f59f39f9760f6bcd1"
+      "sha256": "da037e95c49b22b5456c2eb3ba8f3c6095333edb2169629cc8b43a6c4025696f"
     },
     {
-      "bytes": 18507,
+      "bytes": 20059,
       "path": "snapshots/canonical-states.json",
-      "sha256": "9669b57f1011796cffdf0b17635b547b242252ee1e593565a32cbf71fdefddca"
+      "sha256": "805b4e5b69224d11d88cc3e904034aa358299314d496cd69f986d14b9b05bfca"
     },
     {
       "bytes": 5563,
@@ -2741,9 +2010,9 @@
       "sha256": "03a7dc5b3b7cec1c58c0f5802e97a3a8b10ae5399c531aa2ae63463f74dbc51e"
     },
     {
-      "bytes": 73808,
+      "bytes": 85661,
       "path": "verify_dom.mjs",
-      "sha256": "6ec2974e5432c04a28ed7c52ffa0f4a213bbb190c40d7453162267a09f8d67b6"
+      "sha256": "0d003d4b7a854f25ee7e963f21afe13cdea35f58bc1e6a8488a218c53dd1a8df"
     }
   ]
 }

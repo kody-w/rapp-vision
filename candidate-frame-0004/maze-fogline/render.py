@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import hashlib
 import json
 import os
@@ -44,6 +45,7 @@ COMMISSION_CRITERION = (
 )
 INVALID_SEED = "X" * (MAXIMUM_SEED_BYTES + 1)
 INVALID_SEED_MESSAGE = "Seed must contain 1–64 UTF-8 bytes and no controls."
+CHALLENGE_FRAGMENT_PREFIX = "#challenge="
 
 MANIFEST_PATH = ROOT / "channel.production.json"
 CHANNEL_PATH = ROOT / "channel.json"
@@ -87,25 +89,29 @@ KEY_CODE = {
 }
 
 FILM_TIMELINE = (
-    ("opening", 0.0, 3.0),
-    ("optimal", 3.0, 7.0),
-    ("optimal-complete", 7.0, 8.5),
-    ("hint-earned", 8.5, 11.5),
-    ("trap-detour", 11.5, 15.0),
-    ("reset", 15.0, 17.5),
-    ("invalid-seed", 17.5, 20.0),
-    ("takeover", 20.0, 24.0),
+    ("challenge", 0.0, 3.0),
+    ("trap-approach", 3.0, 5.5),
+    ("trap-plus-two", 5.5, 8.0),
+    ("reset-after-trap", 8.0, 10.0),
+    ("optimal-18", 10.0, 15.0),
+    ("optimal-complete", 15.0, 17.0),
+    ("reset-after-optimal", 17.0, 19.0),
+    ("alternate-fresh", 19.0, 21.0),
+    ("takeover", 21.0, 24.0),
 )
 FILM_SAMPLE_TIMES = {
-    "opening": 1.5,
-    "optimal": 5.0,
-    "optimal-complete": 7.75,
-    "hint-earned": 10.5,
-    "trap-detour": 14.5,
-    "reset": 16.25,
-    "invalid-seed": 18.75,
-    "takeover": 22.0,
+    "challenge": 1.5,
+    "trap-approach": 4.5,
+    "trap-plus-two": 6.0,
+    "reset-after-trap": 9.0,
+    "optimal-18": 12.5,
+    "optimal-complete": 16.0,
+    "reset-after-optimal": 18.0,
+    "alternate-fresh": 20.0,
+    "takeover": 22.5,
 }
+FILM_CRITICAL_TEXT_SCALE = 4
+FILM_CRITICAL_TEXT_PIXELS = 7 * FILM_CRITICAL_TEXT_SCALE
 
 
 @dataclass(frozen=True)
@@ -402,6 +408,24 @@ def build_fixture(seed: str) -> MazeFixture:
     )
 
 
+def challenge_contract(fixture: MazeFixture) -> dict[str, object]:
+    return {
+        "seed": fixture.seed,
+        "topologyDigest": fixture.topology_digest,
+        "referenceLength": len(fixture.shortest_route),
+    }
+
+
+def challenge_fragment(fixture: MazeFixture) -> str:
+    payload = json.dumps(
+        challenge_contract(fixture),
+        ensure_ascii=False,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    encoded = base64.urlsafe_b64encode(payload).decode("ascii").rstrip("=")
+    return CHALLENGE_FRAGMENT_PREFIX + encoded
+
+
 CANONICAL = build_fixture(CANONICAL_SEED)
 HANDOFF = build_fixture(HANDOFF_SEED)
 
@@ -477,7 +501,7 @@ def move_state(
             status="wall",
             message=(
                 f"{DIRECTION_NAME[direction].title()} is fogbound by a wall; "
-                "accepted steps and trail are preserved."
+                "accepted steps, hint charge, and trail are preserved."
             ),
             last_attempt=direction,
             last_rejected=direction,
@@ -683,6 +707,7 @@ def session_snapshot(
 
 def canonical_states_document() -> dict[str, object]:
     opening_state = initial_state(CANONICAL)
+    wall_rejected = move_state(CANONICAL, opening_state, "N")
     optimal_state = state_after(CANONICAL, CANONICAL.shortest_route)
     approach_state = state_after(
         CANONICAL,
@@ -695,6 +720,7 @@ def canonical_states_document() -> dict[str, object]:
     return {
         "schema": "fogline-survey-snapshots/1.0",
         "opening": session_snapshot(CANONICAL, opening_state),
+        "wallRejected": session_snapshot(CANONICAL, wall_rejected),
         "optimal": session_snapshot(CANONICAL, optimal_state),
         "hint": session_snapshot(CANONICAL, hint_state),
         "trap": session_snapshot(CANONICAL, trap_state),
@@ -718,6 +744,48 @@ def _action(at: float, operation: str, **fields: object) -> dict[str, object]:
     return {"at": at, "do": operation, **fields}
 
 
+def checkpoint_state_gates() -> dict[str, dict[str, object]]:
+    approach = state_after(
+        CANONICAL,
+        CANONICAL.shortest_route[: CANONICAL.trap.approach_index],
+    )
+    hinted = request_hint(CANONICAL, approach)
+    trap = move_state(CANONICAL, hinted, CANONICAL.trap.turn)
+    detour = detour_state(CANONICAL)
+    optimal = state_after(CANONICAL, CANONICAL.shortest_route)
+    opening = initial_state(CANONICAL)
+    handoff = initial_state(HANDOFF)
+
+    def gate(fixture: MazeFixture, state: MazeState) -> dict[str, object]:
+        return {
+            "seed": fixture.seed,
+            "topologyDigest": fixture.topology_digest,
+            "position": list(state.position),
+            "facing": state.facing,
+            "steps": len(state.accepted_moves),
+            "projectedTotal": state.projected_total,
+            "status": state.status,
+            "completed": state.completed,
+            "matchedOptimal": state.matched_optimal,
+            "exitState": "open" if state.exit_open else "closed",
+            "trailLength": len(state.trail),
+            "assistanceUsed": state.assistance_used,
+            "hintAvailable": state.hint_available,
+            "hintRequests": state.hint_requests,
+            "hintDirection": state.hint_direction,
+        }
+
+    return {
+        "hint": gate(CANONICAL, hinted),
+        "trap": gate(CANONICAL, trap),
+        "detour": gate(CANONICAL, detour),
+        "resetAfterTrap": gate(CANONICAL, opening),
+        "optimal": gate(CANONICAL, optimal),
+        "resetAfterOptimal": gate(CANONICAL, opening),
+        "handoff": gate(HANDOFF, handoff),
+    }
+
+
 def production_actions() -> tuple[list[dict[str, object]], dict[str, object]]:
     actions: list[dict[str, object]] = []
     checkpoints: list[dict[str, object]] = []
@@ -727,96 +795,67 @@ def production_actions() -> tuple[list[dict[str, object]], dict[str, object]]:
         actions.append(_action(at, operation, **fields))
 
     def checkpoint(claim: str, selector: str) -> None:
+        start = float(actions[-1]["at"])
         checkpoints.append(
             {
-                "afterAction": len(actions),
                 "claim": claim,
                 "selector": selector,
+                "stateGate": checkpoint_state_gates()[claim],
+                "timeWindow": {
+                    "start": start,
+                    "end": round(start + 1.25, 2),
+                },
             }
         )
 
     add(
         0.20,
         "scroll",
-        selector="#maze-board",
+        selector="#copy-challenge-btn",
         block="center",
         behavior="auto",
     )
-    add(0.45, "click", selector="#maze-board")
-    optimal_start = len(actions) + 1
-    for index, direction in enumerate(CANONICAL.shortest_route):
-        add(round(0.75 + index * 0.27, 2), "key", code=KEY_CODE[direction])
-    optimal_end = len(actions)
-    segments["optimal"] = {
-        "firstAction": optimal_start,
-        "lastAction": optimal_end,
-        "directions": list(CANONICAL.shortest_route),
-        "assistance": False,
-    }
+    add(0.45, "click", selector="#copy-challenge-btn")
     add(
-        5.65,
-        "scroll",
-        selector="#success-panel",
-        block="center",
-        behavior="auto",
-    )
-    checkpoint("optimal", "#success-panel")
-    add(
-        6.00,
-        "scroll",
-        selector="#restart-btn",
-        block="center",
-        behavior="auto",
-    )
-    add(6.25, "click", selector="#restart-btn")
-    add(
-        6.50,
-        "scroll",
-        selector="#reset-proof",
-        block="center",
-        behavior="auto",
-    )
-    checkpoint("reset", "#reset-proof")
-    add(
-        6.75,
+        0.70,
         "scroll",
         selector="#maze-board",
         block="center",
         behavior="auto",
     )
-    add(6.95, "click", selector="#maze-board")
+    add(0.90, "click", selector="#maze-board")
     detour_start = len(actions) + 1
     for index, direction in enumerate(
         CANONICAL.shortest_route[: CANONICAL.trap.approach_index]
     ):
-        add(round(7.20 + index * 0.25, 2), "key", code=KEY_CODE[direction])
+        add(round(1.10 + index * 0.23, 2), "key", code=KEY_CODE[direction])
     add(
-        10.75,
+        4.32,
         "scroll",
         selector="#hint-btn",
         block="center",
         behavior="auto",
     )
-    add(11.00, "click", selector="#hint-btn")
+    add(4.52, "click", selector="#hint-btn")
+    checkpoint("hint", "#hint-panel")
     add(
-        11.25,
+        4.66,
         "scroll",
         selector="#hint-panel",
         block="center",
         behavior="auto",
     )
-    checkpoint("hint", "#hint-panel")
     add(
-        11.50,
+        4.82,
         "scroll",
         selector="#maze-board",
         block="center",
         behavior="auto",
     )
-    add(11.70, "click", selector="#maze-board")
-    add(11.95, "key", code=KEY_CODE[CANONICAL.trap.turn])
+    add(4.98, "click", selector="#maze-board")
+    add(5.18, "key", code=KEY_CODE[CANONICAL.trap.turn])
     add(
-        12.25,
+        5.38,
         "scroll",
         selector="#trap-panel",
         block="center",
@@ -824,18 +863,18 @@ def production_actions() -> tuple[list[dict[str, object]], dict[str, object]]:
     )
     checkpoint("trap", "#trap-panel")
     add(
-        12.50,
+        5.58,
         "scroll",
         selector="#maze-board",
         block="center",
         behavior="auto",
     )
-    add(12.70, "click", selector="#maze-board")
+    add(5.74, "click", selector="#maze-board")
     tail = (
         CANONICAL.trap.return_direction,
     ) + CANONICAL.shortest_route[CANONICAL.trap.approach_index :]
     for index, direction in enumerate(tail):
-        add(round(12.95 + index * 0.25, 2), "key", code=KEY_CODE[direction])
+        add(round(5.92 + index * 0.22, 2), "key", code=KEY_CODE[direction])
     detour_end = len(actions)
     segments["detour"] = {
         "firstAction": detour_start,
@@ -845,7 +884,7 @@ def production_actions() -> tuple[list[dict[str, object]], dict[str, object]]:
         "assistance": True,
     }
     add(
-        14.25,
+        7.02,
         "scroll",
         selector="#success-panel",
         block="center",
@@ -853,79 +892,111 @@ def production_actions() -> tuple[list[dict[str, object]], dict[str, object]]:
     )
     checkpoint("detour", "#success-panel")
     add(
-        14.55,
+        7.25,
         "scroll",
         selector="#restart-btn",
         block="center",
         behavior="auto",
     )
-    add(14.80, "click", selector="#restart-btn")
+    add(7.45, "click", selector="#restart-btn")
     add(
-        15.05,
+        7.62,
         "scroll",
         selector="#reset-proof",
         block="center",
         behavior="auto",
     )
-    checkpoint("reset", "#reset-proof")
+    checkpoint("resetAfterTrap", "#reset-proof")
     add(
-        15.35,
+        7.80,
+        "scroll",
+        selector="#maze-board",
+        block="center",
+        behavior="auto",
+    )
+    add(7.95, "click", selector="#maze-board")
+    optimal_start = len(actions) + 1
+    for index, direction in enumerate(CANONICAL.shortest_route):
+        add(round(8.15 + index * 0.23, 2), "key", code=KEY_CODE[direction])
+    optimal_end = len(actions)
+    segments["optimal"] = {
+        "firstAction": optimal_start,
+        "lastAction": optimal_end,
+        "directions": list(CANONICAL.shortest_route),
+        "assistance": False,
+    }
+    add(
+        12.28,
+        "scroll",
+        selector="#success-panel",
+        block="center",
+        behavior="auto",
+    )
+    checkpoint("optimal", "#success-panel")
+    add(
+        12.52,
+        "scroll",
+        selector="#restart-btn",
+        block="center",
+        behavior="auto",
+    )
+    add(12.72, "click", selector="#restart-btn")
+    add(
+        12.90,
+        "scroll",
+        selector="#reset-proof",
+        block="center",
+        behavior="auto",
+    )
+    checkpoint("resetAfterOptimal", "#reset-proof")
+    add(
+        13.10,
         "scroll",
         selector="#seed-input",
         block="center",
         behavior="auto",
     )
-    add(15.55, "click", selector="#seed-input")
-    add(15.80, "type", text=INVALID_SEED)
+    add(13.28, "click", selector="#seed-input")
+    add(13.45, "type", text=HANDOFF_SEED)
     add(
-        16.30,
+        13.70,
         "scroll",
         selector="#load-seed-btn",
         block="center",
         behavior="auto",
     )
-    add(16.50, "click", selector="#load-seed-btn")
+    add(13.88, "click", selector="#load-seed-btn")
     add(
-        16.75,
-        "scroll",
-        selector="#seed-error",
-        block="center",
-        behavior="auto",
-    )
-    checkpoint("invalidSeedPreserved", "#seed-error")
-    add(
-        17.15,
-        "scroll",
-        selector="#seed-input",
-        block="center",
-        behavior="auto",
-    )
-    add(17.35, "click", selector="#seed-input")
-    add(17.60, "type", text=HANDOFF_SEED)
-    add(
-        18.05,
-        "scroll",
-        selector="#load-seed-btn",
-        block="center",
-        behavior="auto",
-    )
-    add(18.25, "click", selector="#load-seed-btn")
-    add(
-        18.50,
-        "scroll",
-        selector="#seed-change-proof",
-        block="center",
-        behavior="auto",
-    )
-    checkpoint("handoff", "#seed-change-proof")
-    add(
-        19.00,
+        14.10,
         "scroll",
         selector="#takeover-prompt",
         block="center",
         behavior="auto",
     )
     checkpoint("handoff", "#takeover-prompt")
+    add(
+        14.35,
+        "scroll",
+        selector="#copy-challenge-btn",
+        block="center",
+        behavior="auto",
+    )
+    add(14.55, "click", selector="#copy-challenge-btn")
+    add(
+        14.80,
+        "scroll",
+        selector="#takeover-prompt",
+        block="center",
+        behavior="auto",
+    )
+    add(
+        15.00,
+        "scroll",
+        selector="#maze-board",
+        block="center",
+        behavior="auto",
+    )
+    add(15.20, "click", selector="#maze-board")
 
     if [action["at"] for action in actions] != sorted(
         action["at"] for action in actions
@@ -964,12 +1035,13 @@ def production_document() -> dict[str, object]:
                     "A top-down fogline survey keeps unexplored walls hidden "
                     "while a compass, revealed trail, and marked exit remain "
                     "legible. RAPP-42 binds the canonical SHA-256 topology and "
-                    "18-step reference. Individual Arrow/WASD moves complete "
-                    "18 directly, then an earned one-step hint is explicitly "
-                    "requested before the marked trap produces a valid 20-step "
-                    "finish. Restart restores entrance, north, zero, closed "
-                    "exit, and empty trail; invalid seed text preserves that "
-                    "accepted state before FOG-7 opens the multi-seed handoff."
+                    "18-step reference. A three-field offline challenge "
+                    "fragment "
+                    "contains only seed, digest, and reference length. The "
+                    "trap-first cut explicitly requests one bearing, proves "
+                    "the marked +2 knot in 20, resets exactly, then completes "
+                    "18 unassisted. A second exact reset leaves untouched "
+                    "FOG-7 focused for immediate Arrow/WASD takeover."
                 ),
                 "published": "2026-09-03",
                 "duration": SPEC.duration,
@@ -985,6 +1057,7 @@ def production_document() -> dict[str, object]:
                     "one-step-hint",
                     "exact-reset",
                     "multi-seed",
+                    "offline-challenge",
                 ],
                 "thumb": SPEC.thumbnail_relative.as_posix(),
                 "production": {
@@ -994,33 +1067,34 @@ def production_document() -> dict[str, object]:
                     {"t": start, "label": label}
                     for label, start, _end in (
                         (
-                            "RAPP-42 digest, fogline, and reference 18",
+                            "Three-field offline RAPP-42 challenge",
                             0.0,
                             3.0,
                         ),
-                        ("Direct Arrow-key survey opens in 18", 3.0, 7.0),
-                        ("Unassisted optimal result", 7.0, 8.5),
-                        ("Earn and explicitly request one bearing", 8.5, 11.5),
-                        ("Marked west trap makes the final 20", 11.5, 15.0),
-                        ("Exact return to entrance and north", 15.0, 17.5),
-                        ("Invalid seed preserves accepted state", 17.5, 20.0),
-                        ("YOUR TURN with a second seed", 20.0, 24.0),
+                        ("Approach the marked knot", 3.0, 5.5),
+                        ("Valid trap adds exactly two", 5.5, 8.0),
+                        ("Exact reset after the trap", 8.0, 10.0),
+                        ("Unassisted direct survey in 18", 10.0, 15.0),
+                        ("Optimal result: 18 equals reference", 15.0, 17.0),
+                        ("Exact reset after optimal", 17.0, 19.0),
+                        ("Untouched FOG-7 challenge", 19.0, 21.0),
+                        ("YOUR TURN with movement focused", 21.0, 24.0),
                     )
                 ],
                 "live": {
                     "kind": "rapp-vision-live/1.0",
                     "duration": SPEC.duration,
                     "chapters": [
-                        {"t": 0.0, "label": "Solve RAPP-42 directly in 18"},
-                        {"t": 6.0, "label": "Restart the exact opening"},
+                        {"t": 0.0, "label": "Export the offline challenge"},
                         {
-                            "t": 7.2,
-                            "label": "Earn one bearing and choose the trap",
+                            "t": 1.1,
+                            "label": "Take the valid marked trap first",
                         },
-                        {"t": 11.95, "label": "Finish the valid detour in 20"},
-                        {"t": 14.55, "label": "Restore entrance, north, and zero"},
-                        {"t": 15.35, "label": "Reject invalid seed text safely"},
-                        {"t": 17.15, "label": "Generate FOG-7 and hand over"},
+                        {"t": 7.25, "label": "Reset the exact opening"},
+                        {"t": 8.15, "label": "Complete 18 unassisted"},
+                        {"t": 12.52, "label": "Reset exactly again"},
+                        {"t": 13.10, "label": "Load untouched FOG-7"},
+                        {"t": 15.0, "label": "Focus movement for YOUR TURN"},
                     ],
                     "scenes": [
                         {
@@ -1035,11 +1109,11 @@ def production_document() -> dict[str, object]:
                                 "title": TITLE,
                                 "bench": (
                                     "RAPP-42 · SHA-256 126bf70440d3… · "
-                                    "reference 18 · marked trap finish 20."
+                                    "reference 18 · KNOT/TRAP +2 · best 20."
                                 ),
                                 "fix": (
-                                    "YOUR TURN — type any valid seed, use "
-                                    "Arrow/WASD, and spend one earned bearing."
+                                    "YOUR TURN — FOG-7 starts untouched at "
+                                    "zero; Arrow/WASD movement is focused."
                                 ),
                             },
                             "actions": actions,
@@ -1167,24 +1241,20 @@ def _binding(path: Path, root: Path) -> dict[str, object]:
 
 
 def evidence_document(root: Path = ROOT) -> dict[str, object]:
-    states = canonical_states_document()
     _actions, replay = production_actions()
-    claims = []
-    for claim_id in (
-        "optimal",
-        "hint",
-        "trap",
-        "detour",
-        "reset",
-        "invalidSeedPreserved",
-        "handoff",
-    ):
-        claims.append(
-            {
-                "id": claim_id,
-                "expectedState": states[claim_id],
-            }
+    gates = checkpoint_state_gates()
+    claims = [
+        {"id": claim_id, "stateGate": gates[claim_id]}
+        for claim_id in (
+            "hint",
+            "trap",
+            "detour",
+            "resetAfterTrap",
+            "optimal",
+            "resetAfterOptimal",
+            "handoff",
         )
+    ]
     return {
         "schema": "fogline-survey-evidence/1.0",
         "channel": CHANNEL_ID,
@@ -1200,8 +1270,9 @@ def evidence_document(root: Path = ROOT) -> dict[str, object]:
                 "samePublication": True,
             },
             "positivePath": (
-                "Individual semantic key events complete the computed "
-                "RAPP-42 shortest route in exactly 18 without assistance."
+                "The trap-first replay proves the valid +2 knot, resets, then "
+                "individual semantic keys complete RAPP-42 in exactly 18 "
+                "without assistance."
             ),
             "visibleFailure": (
                 "After an explicitly requested one-step E hint, the valid W "
@@ -1213,6 +1284,11 @@ def evidence_document(root: Path = ROOT) -> dict[str, object]:
                 "(0,0), north, zero steps, closed exit, empty trail, and no "
                 "assistance."
             ),
+            "offlineChallenge": (
+                "A portable fragment exports exactly seed, full topology "
+                "digest, and reference length; validation failure preserves "
+                "the accepted game."
+            ),
         },
         "fixtures": {
             "canonical": fixture_document(CANONICAL),
@@ -1221,6 +1297,15 @@ def evidence_document(root: Path = ROOT) -> dict[str, object]:
                 fixture_document(build_fixture(seed))
                 for seed in ALTERNATE_AUDIT_SEEDS
             ],
+        },
+        "challengeContract": {
+            "keys": ["seed", "topologyDigest", "referenceLength"],
+            "example": challenge_contract(CANONICAL),
+            "fragment": challenge_fragment(CANONICAL),
+            "routeIncluded": False,
+            "trailIncluded": False,
+            "fragmentOnly": True,
+            "invalidPreservesAcceptedState": True,
         },
         "claims": claims,
         "manifestReplay": {
@@ -1233,6 +1318,10 @@ def evidence_document(root: Path = ROOT) -> dict[str, object]:
             "publicFixtureApi": False,
             "actualInputVerification": "CDP mouse and keyboard events",
             "exactTiming": True,
+            "timingMode": "scheduled actions with bounded lateness",
+            "maxActionLatenessSeconds": 0.8,
+            "maxSceneOverrunSeconds": 1.0,
+            "checkpointMode": "state-gated within bounded time windows",
             "activationVisibilityRequired": True,
             "checkpointVisibilityRequired": True,
             "checkpoints": replay["checkpoints"],
@@ -1263,6 +1352,8 @@ def evidence_document(root: Path = ROOT) -> dict[str, object]:
                 "horizontalOverflowAllowedPixels": 1,
                 "minimumVisibleFontPixels": 12,
                 "lowerThirdCriticalContent": False,
+                "mobileCriticalSpanMaximumPixels": 800,
+                "mobileDocumentHeightMaximumPixels": 1800,
             },
             "cleanup": {
                 "browserExitRequired": True,
@@ -1281,6 +1372,15 @@ def evidence_document(root: Path = ROOT) -> dict[str, object]:
                 for name, start, end in FILM_TIMELINE
             ],
             "contentSamples": film_content_samples(),
+            "sequence": [
+                phase for phase, _start, _end in FILM_TIMELINE
+            ],
+            "typography": {
+                "criticalTextSourcePixels": FILM_CRITICAL_TEXT_PIXELS,
+                "fullDigestSourcePixels": FILM_CRITICAL_TEXT_PIXELS,
+                "fullDigestCharacters": 64,
+                "liveHierarchyMatched": True,
+            },
             "routePrintedBeforeAttempt": False,
             "exitBeaconAlwaysMarked": True,
         },
@@ -1605,20 +1705,68 @@ def _film_scene(
     time_seconds: float,
 ) -> tuple[MazeFixture, MazeState, str, str, str | None]:
     phase = film_phase(time_seconds)
-    if phase == "opening":
+    if phase == "challenge":
         return (
             CANONICAL,
             initial_state(CANONICAL),
             phase,
-            "FOG HIDES THE MAP. THE EXIT BEACON DOES NOT.",
-            None,
+            "COPY / SHARE / OPEN OFFLINE",
+            "SEED + DIGEST + REFERENCE ONLY",
         )
-    if phase == "optimal":
+    if phase == "trap-approach":
+        progress = min(
+            CANONICAL.trap.approach_index,
+            int(
+                (time_seconds - 3.0)
+                / (5.5 - 3.0)
+                * (CANONICAL.trap.approach_index + 1)
+            ),
+        )
+        return (
+            CANONICAL,
+            state_after(CANONICAL, CANONICAL.shortest_route[:progress]),
+            phase,
+            "TRAP FIRST / EXIT STAYS MARKED",
+            "APPROACH THE KNOT",
+        )
+    if phase == "trap-plus-two":
+        approach = state_after(
+            CANONICAL,
+            CANONICAL.shortest_route[: CANONICAL.trap.approach_index],
+        )
+        trap = move_state(CANONICAL, approach, CANONICAL.trap.turn)
+        if time_seconds < 6.5:
+            state = trap
+        else:
+            tail = (
+                CANONICAL.trap.return_direction,
+            ) + CANONICAL.shortest_route[CANONICAL.trap.approach_index :]
+            progress = min(
+                len(tail),
+                max(0, int((time_seconds - 6.5) / 1.5 * (len(tail) + 1))),
+            )
+            state = state_after(CANONICAL, tail[:progress], state=trap)
+        return (
+            CANONICAL,
+            state,
+            phase,
+            "KNOT / TRAP +2 / EXIT VISIBLE",
+            "BEST FINISH 20",
+        )
+    if phase == "reset-after-trap":
+        return (
+            CANONICAL,
+            initial_state(CANONICAL),
+            phase,
+            "EXACT RESET / NORTH / ZERO",
+            "CLOSED EXIT / EMPTY TRAIL",
+        )
+    if phase == "optimal-18":
         progress = min(
             len(CANONICAL.shortest_route),
             int(
-                (time_seconds - 3.0)
-                / (7.0 - 3.0)
+                (time_seconds - 10.0)
+                / (15.0 - 10.0)
                 * (len(CANONICAL.shortest_route) + 1)
             ),
         )
@@ -1626,82 +1774,39 @@ def _film_scene(
             CANONICAL,
             state_after(CANONICAL, CANONICAL.shortest_route[:progress]),
             phase,
-            "INDIVIDUAL ARROW KEYS. NO ROUTE PRINTED.",
-            None,
+            "UNASSISTED / DIRECT / 18",
+            "INDIVIDUAL ARROW KEYS",
         )
     if phase == "optimal-complete":
         return (
             CANONICAL,
             state_after(CANONICAL, CANONICAL.shortest_route),
             phase,
-            "EXIT OPEN / 18 OF 18 / UNASSISTED",
-            None,
+            "EXIT OPEN / 18 = REFERENCE",
+            "UNASSISTED OPTIMAL",
         )
-    if phase == "hint-earned":
-        approach_count = min(
-            CANONICAL.trap.approach_index,
-            int(
-                (time_seconds - 8.5)
-                / 1.3
-                * (CANONICAL.trap.approach_index + 1)
-            ),
-        )
-        approach = state_after(
-            CANONICAL,
-            CANONICAL.shortest_route[:approach_count],
-        )
-        if time_seconds >= 9.85:
-            approach = request_hint(CANONICAL, approach)
-        return (
-            CANONICAL,
-            approach,
-            phase,
-            "EARNED SURVEY: EXPLICIT REQUEST REVEALS ONE MOVE",
-            None,
-        )
-    if phase == "trap-detour":
-        approach = state_after(
-            CANONICAL,
-            CANONICAL.shortest_route[: CANONICAL.trap.approach_index],
-        )
-        assisted = request_hint(CANONICAL, approach)
-        tail = (
-            CANONICAL.trap.turn,
-            CANONICAL.trap.return_direction,
-        ) + CANONICAL.shortest_route[CANONICAL.trap.approach_index :]
-        progress = min(
-            len(tail),
-            max(1, int((time_seconds - 11.5) / 2.4 * len(tail)) + 1),
-        )
-        return (
-            CANONICAL,
-            state_after(CANONICAL, tail[:progress], state=assisted),
-            phase,
-            "VALID WEST TRAP / PROJECTED AND FINAL 20",
-            None,
-        )
-    if phase == "reset":
+    if phase == "reset-after-optimal":
         return (
             CANONICAL,
             initial_state(CANONICAL),
             phase,
-            "EXACT RESTART / ENTRANCE / NORTH / 0 / CLOSED",
-            None,
+            "EXACT RESET / PROOF REPEATS",
+            "NORTH / ZERO / EMPTY TRAIL",
         )
-    if phase == "invalid-seed":
+    if phase == "alternate-fresh":
         return (
-            CANONICAL,
-            initial_state(CANONICAL),
+            HANDOFF,
+            initial_state(HANDOFF),
             phase,
-            "INVALID INPUT / ACCEPTED RAPP-42 STATE PRESERVED",
-            INVALID_SEED_MESSAGE,
+            "FOG-7 / UNTOUCHED CHALLENGE",
+            "ZERO STEPS / NO ASSISTANCE",
         )
     return (
         HANDOFF,
         initial_state(HANDOFF),
         phase,
-        "YOUR TURN / TYPE ANY VALID SEED / ARROW OR WASD",
-        f"SECOND SEED: {HANDOFF.seed} / REF {len(HANDOFF.shortest_route)}",
+        "YOUR TURN / MOVEMENT FOCUSED",
+        "FOG-7 / ARROWS OR WASD NOW",
     )
 
 
@@ -1715,24 +1820,31 @@ def frame_rgb(
     fixture, state, phase, banner, extra = _film_scene(time_seconds)
     canvas = Canvas(spec.width, spec.height, BG)
     canvas.rect(0, 0, spec.width, 64, HEADER)
-    canvas.text(28, 18, "FOGLINE SURVEY", INK, 3)
-    canvas.text(334, 22, phase.replace("-", " / "), MINT, 2)
-    canvas.text(28, 70, "REVEALED GROUND", MUTED, 1)
+    canvas.text(24, 14, "FOGLINE SURVEY", INK, 5)
+    canvas.text(500, 21, phase.replace("-", " / "), MINT, 3)
+    canvas.text(38, 68, "REVEALED SURVEY", MUTED, 2)
     _draw_maze(canvas, fixture, state)
 
     panel_x = 462
     canvas.rect(panel_x, 82, 470, 382, PANEL)
     canvas.border(panel_x, 82, 470, 382, FOG_LINE, 2)
-    canvas.text(panel_x + 20, 102, f"SEED  {fixture.seed}", INK, 2)
-    canvas.text(panel_x + 20, 126, "SHA-256 TOPOLOGY", MUTED, 1)
-    canvas.text(panel_x + 20, 141, fixture.topology_digest[:32], BLUE, 1)
-    canvas.text(panel_x + 20, 154, fixture.topology_digest[32:], BLUE, 1)
+    canvas.text(panel_x + 20, 96, f"SEED {fixture.seed}", INK, 3)
+    canvas.text(panel_x + 20, 120, "FULL TOPOLOGY DIGEST", MUTED, 2)
+    for index in range(4):
+        start = index * 16
+        canvas.text(
+            panel_x + 20,
+            140 + index * 29,
+            fixture.topology_digest[start : start + 16],
+            BLUE,
+            FILM_CRITICAL_TEXT_SCALE,
+        )
     canvas.text(
         panel_x + 20,
-        184,
+        262,
         f"STEPS {len(state.accepted_moves)} / REF {len(fixture.shortest_route)}",
         INK,
-        2,
+        3,
     )
     projection_color = (
         RED
@@ -1741,83 +1853,80 @@ def frame_rgb(
     )
     canvas.text(
         panel_x + 20,
-        210,
+        288,
         f"BEST FINISH {state.projected_total}",
         projection_color,
-        2,
+        FILM_CRITICAL_TEXT_SCALE,
     )
     canvas.text(
         panel_x + 20,
-        240,
-        f"POS ({state.position[0]},{state.position[1]}) / FACE {state.facing}",
-        MUTED,
-        1,
+        322,
+        f"EXIT {'OPEN' if state.exit_open else 'CLOSED'} / MARKED",
+        PURPLE,
+        3,
     )
-    _draw_compass(canvas, state)
 
     assist_color = AMBER if state.assistance_used else MUTED
     assist = (
-        "ASSISTED / 1 BEARING"
+        f"FACE {state.facing} / ASSISTED"
         if state.assistance_used
-        else (
-            "SURVEY READY / 1 BEARING"
-            if state.hint_available
-            else "SURVEY LOCKED / EARN AT 4"
-        )
+        else f"FACE {state.facing} / UNASSISTED"
     )
-    canvas.text(panel_x + 20, 286, assist, assist_color, 1)
-    if state.hint_direction:
-        canvas.rect(panel_x + 18, 307, 276, 50, (45, 55, 31))
-        canvas.border(panel_x + 18, 307, 276, 50, AMBER, 2)
-        canvas.text(
-            panel_x + 32,
-            323,
-            f"ONE STEP ONLY: {state.hint_direction}",
-            AMBER,
-            2,
-        )
-    elif state.status == "trap":
-        canvas.rect(panel_x + 18, 307, 302, 50, (61, 26, 28))
-        canvas.border(panel_x + 18, 307, 302, 50, RED, 2)
-        canvas.text(panel_x + 32, 323, "TRAP VALID / +2", RED, 2)
-    elif state.completed:
-        color = MINT if state.matched_optimal else RED
-        canvas.rect(panel_x + 18, 307, 302, 50, (18, 51, 42))
-        canvas.border(panel_x + 18, 307, 302, 50, color, 2)
-        canvas.text(
-            panel_x + 32,
-            323,
-            f"EXIT OPEN / {len(state.accepted_moves)}",
-            color,
-            2,
-        )
-
-    canvas.text(panel_x + 20, 374, "EXIT BEACON: MARKED", PURPLE, 1)
+    canvas.text(panel_x + 20, 350, assist, assist_color, 3)
     canvas.text(
         panel_x + 20,
-        393,
-        "TRAIL: " + ("EMPTY" if not state.trail else "REVEALED"),
+        374,
+        "TRAIL " + ("EMPTY" if not state.trail else "REVEALED"),
         MINT,
-        1,
+        2,
     )
-    if extra:
-        color = RED if phase == "invalid-seed" else AMBER
-        canvas.text(panel_x + 20, 423, extra[:38], color, 1)
-        if len(extra) > 38:
-            canvas.text(panel_x + 20, 437, extra[38:76], color, 1)
 
-    banner_color = RED if phase in {"trap-detour", "invalid-seed"} else MINT
+    if state.status == "trap" or phase == "trap-plus-two":
+        notice = "KNOT / TRAP +2"
+        notice_color = RED
+        notice_fill = (61, 26, 28)
+    elif state.completed and state.matched_optimal:
+        notice = "OPTIMAL / 18"
+        notice_color = MINT
+        notice_fill = (18, 51, 42)
+    elif phase in {"reset-after-trap", "reset-after-optimal"}:
+        notice = "EXACT RESET"
+        notice_color = MINT
+        notice_fill = (18, 51, 42)
+    elif phase == "challenge":
+        notice = "OFFLINE / 3 FIELDS"
+        notice_color = BLUE
+        notice_fill = (12, 42, 48)
+    elif phase in {"alternate-fresh", "takeover"}:
+        notice = "FRESH / ZERO STEPS"
+        notice_color = AMBER
+        notice_fill = (45, 39, 20)
+    else:
+        notice = "DIRECT PLAY"
+        notice_color = MINT
+        notice_fill = (18, 51, 42)
+    canvas.rect(panel_x + 18, 396, 430, 56, notice_fill)
+    canvas.border(panel_x + 18, 396, 430, 56, notice_color, 2)
+    canvas.text(
+        panel_x + 30,
+        409,
+        notice,
+        notice_color,
+        FILM_CRITICAL_TEXT_SCALE,
+    )
+
+    banner_color = RED if phase == "trap-plus-two" else MINT
     if phase == "takeover":
         banner_color = AMBER
-    canvas.rect(0, 480, spec.width, 60, HEADER)
-    canvas.text(24, 495, banner, banner_color, 2)
+    canvas.rect(0, 470, spec.width, 70, HEADER)
     canvas.text(
-        24,
-        520,
-        "DIRECT PLAY: ARROWS / WASD     HINT: EXPLICIT     RESTART: EXACT",
-        MUTED,
-        1,
+        20,
+        478,
+        banner,
+        banner_color,
+        FILM_CRITICAL_TEXT_SCALE,
     )
+    canvas.text(20, 513, extra or "ARROWS / WASD / EXACT RESET", MUTED, 3)
     return bytes(canvas.pixels)
 
 
@@ -2188,6 +2297,8 @@ def delivery_document(
             "handoffSeed": HANDOFF.seed,
             "handoffDigest": HANDOFF.topology_digest,
             "handoffReferenceLength": len(HANDOFF.shortest_route),
+            "challengeContract": challenge_contract(CANONICAL),
+            "challengeFragment": challenge_fragment(CANONICAL),
             "alternateSeeds": [
                 {
                     "seed": fixture.seed,
@@ -2215,6 +2326,15 @@ def delivery_document(
                 for name, start, end in FILM_TIMELINE
             ],
             "contentSamples": film_content_samples(),
+            "sequence": [
+                phase for phase, _start, _end in FILM_TIMELINE
+            ],
+            "typography": {
+                "criticalTextSourcePixels": FILM_CRITICAL_TEXT_PIXELS,
+                "fullDigestSourcePixels": FILM_CRITICAL_TEXT_PIXELS,
+                "fullDigestCharacters": 64,
+                "liveHierarchyMatched": True,
+            },
         },
     }
 

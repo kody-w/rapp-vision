@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import base64
 import copy
 import hashlib
 import importlib.util
@@ -587,6 +588,31 @@ class TestCommissionFixtureAndState(unittest.TestCase):
         self.assertEqual(RENDERER.build_fixture(" ").seed, " ")
         self.assertEqual(RENDERER.build_fixture("Δ").seed, "Δ")
 
+    def test_offline_challenge_contract_has_exactly_three_safe_fields(self):
+        for seed in ("RAPP-42", "MIST-Δ"):
+            fixture = RENDERER.build_fixture(seed)
+            contract = RENDERER.challenge_contract(fixture)
+            self.assertEqual(
+                list(contract),
+                ["seed", "topologyDigest", "referenceLength"],
+            )
+            self.assertEqual(contract["seed"], seed)
+            self.assertEqual(contract["topologyDigest"], fixture.topology_digest)
+            self.assertEqual(
+                contract["referenceLength"],
+                len(fixture.shortest_route),
+            )
+            self.assertNotIn("route", contract)
+            self.assertNotIn("trail", contract)
+            fragment = RENDERER.challenge_fragment(fixture)
+            self.assertTrue(fragment.startswith("#challenge="))
+            encoded = fragment.removeprefix("#challenge=")
+            padding = "=" * ((4 - len(encoded) % 4) % 4)
+            decoded = json.loads(
+                base64.urlsafe_b64decode(encoded + padding).decode("utf-8")
+            )
+            self.assertEqual(decoded, contract)
+
     def test_hint_trap_optimal_detour_and_exact_reset_states(self):
         states = RENDERER.canonical_states_document()
         self.assertEqual(load_json(SNAPSHOT_PATH), states)
@@ -601,6 +627,14 @@ class TestCommissionFixtureAndState(unittest.TestCase):
         self.assertEqual(opening["trail"], [])
         self.assertFalse(opening["assistance"]["used"])
         self.assertEqual(states["reset"], opening)
+        wall = states["wallRejected"]
+        self.assertEqual(wall["steps"], 0)
+        self.assertEqual(wall["trail"], [])
+        self.assertFalse(wall["assistance"]["earned"])
+        self.assertFalse(wall["assistance"]["available"])
+        self.assertIsNone(wall["assistance"]["hintDirection"])
+        self.assertEqual(wall["lastRejected"], "N")
+        self.assertIn("hint charge", wall["message"])
 
         optimal = states["optimal"]
         self.assertEqual(optimal["steps"], 18)
@@ -733,6 +767,10 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
         )
         self.assertTrue(replay["individualSemanticKeyEvents"])
         self.assertFalse(replay["autoSolveApi"])
+        self.assertLess(
+            replay["segments"]["detour"]["firstAction"],
+            replay["segments"]["optimal"]["firstAction"],
+        )
         self.assertEqual(
             route_from_actions(actions, replay["segments"]["optimal"]),
             EXPECTED_ROUTE,
@@ -763,7 +801,32 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
                 self.assertNotIn("selector", action)
         self.assertEqual(
             [action["text"] for action in actions if action["do"] == "type"],
-            ["X" * 65, "FOG-7"],
+            ["FOG-7"],
+        )
+        self.assertEqual(
+            [checkpoint["claim"] for checkpoint in replay["checkpoints"]],
+            [
+                "hint",
+                "trap",
+                "detour",
+                "resetAfterTrap",
+                "optimal",
+                "resetAfterOptimal",
+                "handoff",
+            ],
+        )
+        for checkpoint in replay["checkpoints"]:
+            self.assertNotIn("afterAction", checkpoint)
+            self.assertIn("stateGate", checkpoint)
+            self.assertIn("timeWindow", checkpoint)
+            self.assertLess(
+                checkpoint["timeWindow"]["start"],
+                checkpoint["timeWindow"]["end"],
+            )
+        self.assertEqual(replay["maxActionLatenessSeconds"], 0.8)
+        self.assertEqual(
+            replay["checkpointMode"],
+            "state-gated within bounded time windows",
         )
 
     def test_evidence_is_renderer_exact_and_binds_every_replay_checkpoint(self):
@@ -799,24 +862,46 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
             )
             self.assertEqual(tuple(fixture["detourRoute"]), expected["detour"])
         claims = {
-            claim["id"]: claim["expectedState"]
+            claim["id"]: claim["stateGate"]
             for claim in self.evidence["claims"]
         }
         self.assertEqual(
             set(claims),
             {
-                "optimal",
                 "hint",
                 "trap",
                 "detour",
-                "reset",
-                "invalidSeedPreserved",
+                "resetAfterTrap",
+                "optimal",
+                "resetAfterOptimal",
                 "handoff",
             },
         )
+        self.assertTrue(
+            all("expectedState" not in claim for claim in self.evidence["claims"])
+        )
         for checkpoint in self.evidence["manifestReplay"]["checkpoints"]:
             self.assertIn(checkpoint["claim"], claims)
+            self.assertEqual(
+                checkpoint["stateGate"],
+                claims[checkpoint["claim"]],
+            )
             self.assertRegex(checkpoint["selector"], r"^#[A-Za-z][\w-]*$")
+        contract = self.evidence["challengeContract"]
+        self.assertEqual(
+            contract["keys"],
+            ["seed", "topologyDigest", "referenceLength"],
+        )
+        self.assertEqual(
+            contract["example"],
+            RENDERER.challenge_contract(RENDERER.CANONICAL),
+        )
+        self.assertEqual(
+            contract["fragment"],
+            RENDERER.challenge_fragment(RENDERER.CANONICAL),
+        )
+        self.assertFalse(contract["routeIncluded"])
+        self.assertFalse(contract["trailIncluded"])
         self.assertEqual(
             self.evidence["browserRuntime"]["viewports"],
             [
@@ -834,6 +919,18 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
             self.evidence["browserRuntime"]["geometry"][
                 "lowerThirdCriticalContent"
             ]
+        )
+        self.assertEqual(
+            self.evidence["browserRuntime"]["geometry"][
+                "mobileCriticalSpanMaximumPixels"
+            ],
+            800,
+        )
+        self.assertEqual(
+            self.evidence["browserRuntime"]["geometry"][
+                "mobileDocumentHeightMaximumPixels"
+            ],
+            1800,
         )
         self.assertEqual(
             self.evidence["manifestReplay"]["actualInputVerification"],
@@ -888,6 +985,10 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
             "load-seed-btn",
             "seed-error",
             "seed-change-proof",
+            "copy-challenge-btn",
+            "challenge-link",
+            "challenge-status",
+            "challenge-error",
             "takeover-prompt",
             "move-north",
             "move-east",
@@ -917,6 +1018,10 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
             "function canonicalTopology(",
             "function shortestRoute(",
             "function selectTrap(",
+            "function challengeContract(",
+            "function fixtureFromChallengeFragment(",
+            'window.addEventListener("hashchange"',
+            "Route and trail are never included.",
             'elements.seedInput.addEventListener("click"',
             "if (error.message !== INVALID_SEED_MESSAGE) throw error;",
         ):
@@ -929,6 +1034,16 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
         )
         for uncanned in ("MIST-Δ", "A|B;C"):
             self.assertNotIn(uncanned, self.app_source)
+        contract_body = re.search(
+            r"function challengeContract\(sourceFixture\) \{(.*?)\n      \}",
+            self.app_source,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(contract_body)
+        self.assertIn("seed:", contract_body.group(1))
+        self.assertIn("topologyDigest:", contract_body.group(1))
+        self.assertIn("referenceLength:", contract_body.group(1))
+        self.assertNotRegex(contract_body.group(1), r"\b(route|trail)\s*:")
         for code in (
             "ArrowUp",
             "ArrowRight",
@@ -1090,6 +1205,7 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
             <= {
                 "__future__",
                 "argparse",
+                "base64",
                 "collections",
                 "dataclasses",
                 "hashlib",
@@ -1118,6 +1234,39 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
             tuple(item["phase"] for item in self.delivery["render"]["timeline"]),
             tuple(phase[0] for phase in RENDERER.FILM_TIMELINE),
         )
+        self.assertEqual(
+            tuple(phase[0] for phase in RENDERER.FILM_TIMELINE),
+            (
+                "challenge",
+                "trap-approach",
+                "trap-plus-two",
+                "reset-after-trap",
+                "optimal-18",
+                "optimal-complete",
+                "reset-after-optimal",
+                "alternate-fresh",
+                "takeover",
+            ),
+        )
+        self.assertGreaterEqual(RENDERER.FILM_CRITICAL_TEXT_PIXELS, 22)
+        self.assertEqual(
+            self.delivery["render"]["typography"][
+                "criticalTextSourcePixels"
+            ],
+            RENDERER.FILM_CRITICAL_TEXT_PIXELS,
+        )
+        self.assertEqual(
+            self.delivery["render"]["typography"]["fullDigestCharacters"],
+            64,
+        )
+        renderer_source = normalized_text(RENDERER_PATH)
+        for text in (
+            "KNOT / TRAP +2",
+            "BEST FINISH",
+            "FULL TOPOLOGY DIGEST",
+            "YOUR TURN / MOVEMENT FOCUSED",
+        ):
+            self.assertIn(text, renderer_source)
         samples = self.delivery["render"]["contentSamples"]
         self.assertEqual(set(samples), {phase[0] for phase in RENDERER.FILM_TIMELINE})
         for phase, sample in samples.items():
@@ -1142,8 +1291,21 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
                 self.assertEqual(fixture.detour_route, expected["detour"])
                 self.assertEqual(
                     fixture.seed,
-                    "FOG-7" if phase == "takeover" else "RAPP-42",
+                    (
+                        "FOG-7"
+                        if phase in {"alternate-fresh", "takeover"}
+                        else "RAPP-42"
+                    ),
                 )
+                if phase == "trap-plus-two":
+                    self.assertEqual(_state.status, "trap")
+                    self.assertEqual(_state.projected_total, 20)
+                    self.assertFalse(_state.exit_open)
+                    self.assertEqual(fixture.exit, (5, 3))
+                if phase in {"alternate-fresh", "takeover"}:
+                    self.assertEqual(_state.accepted_moves, ())
+                    self.assertEqual(_state.trail, ())
+                    self.assertFalse(_state.assistance_used)
                 self.assertEqual(
                     RENDERER.frame_digest(frame),
                     sample["sha256"],
@@ -1184,6 +1346,48 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
                 self.assertNotIn("data:", value.lower())
                 self.assertNotIn("url(", value.lower())
 
+    def test_film_critical_typography_and_trap_exit_regions_are_rendered(self):
+        def count_color(frame, bounds, color):
+            left, top, right, bottom = bounds
+            count = 0
+            for y in range(top, bottom):
+                for x in range(left, right):
+                    offset = (y * 960 + x) * 3
+                    if tuple(frame[offset : offset + 3]) == color:
+                        count += 1
+            return count
+
+        samples = self.delivery["render"]["contentSamples"]
+        challenge = RENDERER.frame_rgb(samples["challenge"]["frame"])
+        for top in (140, 169, 198, 227):
+            self.assertGreater(
+                count_color(
+                    challenge,
+                    (480, top, 880, top + 28),
+                    RENDERER.BLUE,
+                ),
+                500,
+            )
+
+        trap = RENDERER.frame_rgb(samples["trap-plus-two"]["frame"])
+        self.assertGreater(
+            count_color(trap, (480, 286, 910, 320), RENDERER.RED),
+            500,
+        )
+        self.assertGreater(
+            count_color(trap, (480, 396, 920, 452), RENDERER.RED),
+            500,
+        )
+        exit_x, exit_y = RENDERER._cell_center(RENDERER.CANONICAL.exit)
+        self.assertGreater(
+            count_color(
+                trap,
+                (exit_x - 22, exit_y - 22, exit_x + 23, exit_y + 23),
+                RENDERER.PURPLE,
+            ),
+            50,
+        )
+
     def test_committed_delivery_hashes_are_complete_and_current(self):
         self.assertEqual(
             self.delivery["schema"],
@@ -1205,6 +1409,14 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
             set(RENDERER.DELIVERY_SOURCE_PATHS),
         )
         alternate_objective = self.delivery["objective"]["alternateSeeds"]
+        self.assertEqual(
+            self.delivery["objective"]["challengeContract"],
+            RENDERER.challenge_contract(RENDERER.CANONICAL),
+        )
+        self.assertEqual(
+            self.delivery["objective"]["challengeFragment"],
+            RENDERER.challenge_fragment(RENDERER.CANONICAL),
+        )
         self.assertEqual(
             [item["seed"] for item in alternate_objective],
             list(ALTERNATE_SEEDS),
@@ -1507,7 +1719,11 @@ class TestExecutableReleaseChecks(unittest.TestCase):
             "assertVisibleGeometry",
             "independentFixture",
             "exerciseAlternateSeeds",
+            "exerciseChallengeContract",
             "auditOpeningPrivacy",
+            "criticalPlayGeometry",
+            "stateGateMatches",
+            "executedAt - action.at <= maxLateness",
             "await removeProfile(profilePath)",
         ):
             self.assertIn(fragment, source)
@@ -1515,6 +1731,7 @@ class TestExecutableReleaseChecks(unittest.TestCase):
         self.assertNotIn("window.foglineSurvey.snapshot", source)
         self.assertNotIn("window.foglineSurvey.fixture", source)
         self.assertNotIn("target.click()", source)
+        self.assertNotIn("executedAt - action.at < 0.45", source)
 
     @unittest.skipUnless(
         NODE and BROWSER,
@@ -1602,6 +1819,22 @@ class TestExecutableReleaseChecks(unittest.TestCase):
         self.assertFalse(Path(report["cleanup"]["profilePath"]).exists())
         self.assertTrue(all(report["hintGate"].values()))
         self.assertEqual(
+            report["challengeContract"]["keys"],
+            ["referenceLength", "seed", "topologyDigest"],
+        )
+        self.assertTrue(report["challengeContract"]["routeExcluded"])
+        self.assertTrue(report["challengeContract"]["trailExcluded"])
+        self.assertTrue(report["challengeContract"]["roundTripReset"])
+        self.assertTrue(
+            report["challengeContract"]["invalidExtraFieldPreserved"]
+        )
+        self.assertTrue(
+            report["challengeContract"]["mismatchedDigestPreserved"]
+        )
+        self.assertTrue(
+            report["challengeContract"]["mismatchedLengthPreserved"]
+        )
+        self.assertEqual(
             [item["seed"] for item in report["alternateSeeds"]],
             list(ALTERNATE_SEEDS),
         )
@@ -1641,7 +1874,27 @@ class TestExecutableReleaseChecks(unittest.TestCase):
                 )
                 self.assertEqual(viewport["fixture"]["detourLength"], 20)
                 self.assertEqual(len(viewport["actionReports"]), 71)
-                self.assertGreaterEqual(len(viewport["checkpointReports"]), 9)
+                self.assertEqual(len(viewport["checkpointReports"]), 7)
+                self.assertLessEqual(
+                    viewport["maximumActionLateness"],
+                    0.8,
+                )
+                self.assertLessEqual(viewport["sceneElapsed"], 25.0)
+                self.assertEqual(
+                    [
+                        checkpoint["claim"]
+                        for checkpoint in viewport["checkpointReports"]
+                    ],
+                    [
+                        "hint",
+                        "trap",
+                        "detour",
+                        "resetAfterTrap",
+                        "optimal",
+                        "resetAfterOptimal",
+                        "handoff",
+                    ],
+                )
                 self.assertTrue(
                     all(
                         item["inputMethod"]
@@ -1671,6 +1924,32 @@ class TestExecutableReleaseChecks(unittest.TestCase):
                     viewport["authoredFinal"]["seed"],
                     "FOG-7",
                 )
+                self.assertEqual(viewport["authoredFinal"]["steps"], 0)
+                self.assertEqual(
+                    viewport["authoredFinal"]["trailLength"],
+                    0,
+                )
+                self.assertFalse(
+                    viewport["authoredFinal"]["assistanceUsed"]
+                )
+                self.assertEqual(
+                    viewport["authoredFinal"]["hintRequests"],
+                    0,
+                )
+                self.assertEqual(
+                    viewport["authoredFinalFocus"],
+                    "maze-board",
+                )
+                self.assertTrue(viewport["authoredFinalTakeoverVisible"])
+                if viewport["viewport"]["width"] == 390:
+                    self.assertLessEqual(
+                        viewport["playGeometry"]["span"],
+                        800,
+                    )
+                    self.assertLessEqual(
+                        viewport["playGeometry"]["documentHeight"],
+                        1800,
+                    )
                 self.assertEqual(
                     viewport["takeover"]["movedSteps"],
                     1,

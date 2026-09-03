@@ -10,6 +10,13 @@ The primary interaction is direct Arrow/WASD play. The authored live replay
 sends each move as an individual semantic key event. It contains no replay,
 auto-solve, or route-injection action.
 
+**Copy / export challenge** creates a portable offline fragment. Its decoded
+JSON has exactly three keys: `seed`, `topologyDigest`, and `referenceLength`.
+It contains no route, trail, position, or assistance history. Opening a valid
+fragment regenerates and validates all three values, then starts at zero.
+Malformed, extra-field, or mismatched fragments preserve the accepted game
+and surface a visible error.
+
 ## Canonical fixture
 
 - Seed: `RAPP-42`
@@ -48,6 +55,9 @@ only the next BFS move from the current cell, records `assistance.used: true`,
 increments the request count once, and is then spent. Any following accepted
 move clears the displayed bearing.
 
+A rejected wall changes facing only. It does not increment accepted steps,
+earn a charge, consume a displayed one-step bearing, or alter the trail.
+
 The canonical detour demonstration reaches route step 14, explicitly requests
 the one-step `E` bearing, then deliberately takes the valid marked `W` branch.
 At entry, the best projected finish becomes 20 while the exit remains marked.
@@ -63,8 +73,7 @@ The seed field accepts any text containing 1–64 UTF-8 bytes and no control
 characters. A valid value recomputes maze, digest, BFS length, and trap. The
 authored handoff loads `FOG-7`, whose digest and reference length differ from
 RAPP-42. Invalid text remains editable while the last accepted fixture and
-all game fields are preserved. This rejection is demonstrated before the
-multi-seed **YOUR TURN** handoff.
+all game fields are preserved.
 
 The independent browser audit additionally generates `FOG-7`, `MIST-Δ`, and
 `A|B;C`, checks each recomputed digest and shortest length, completes each
@@ -73,27 +82,29 @@ using CDP-delivered Arrow and WASD input.
 
 ## Editorial sequence
 
-1. Establish RAPP-42, its complete digest, fogline, compass, marked exit, and
-   reference length 18.
-2. Complete the computed shortest route with 18 individual Arrow-key events,
-   unassisted.
-3. Restart exactly.
-4. Walk to the surveyed branch, earn and explicitly request one bearing.
-5. Take the real west trap and complete with projected and final length 20.
-6. Restart to entrance, north, zero, closed exit, and empty trail.
-7. Reject a 65-byte seed while preserving the accepted RAPP-42 state.
-8. Generate `FOG-7` and hold a clear multi-seed **YOUR TURN** invitation.
+1. Establish and export the three-field RAPP-42 offline challenge.
+2. Walk to the knot first, explicitly request one bearing, enter the marked
+   west trap, and finish at the real `+2` total of 20 with the exit visible.
+3. Reset exactly to entrance, north, zero, closed exit, and empty trail.
+4. Complete the computed 18-step route unassisted.
+5. Reset exactly again.
+6. Generate untouched `FOG-7`, export it, show a strong **YOUR TURN**, and
+   finish the authored replay with the board focused for movement.
 
-The film uses the same phases and facts. Critical live content has generous
-bottom scroll clearance, so the player lower third does not obstruct actions
-or checkpoints. The assembled page has no minimum-width clipping and is
-checked throughout at desktop and exactly 390 CSS pixels.
+The film follows the same trap-first hierarchy. Its full 64-character digest,
+`KNOT / TRAP +2`, `BEST FINISH 20`, and final handoff use at least 28 source
+pixels. Live checkpoints are partial state gates inside 1.25-second windows,
+while actions retain scheduled timing with a 0.8-second lateness ceiling.
+
+At exactly 390 CSS pixels, the board, four state readouts, D-pad, hint, and
+restart occupy a bounded 800-pixel play cluster instead of being distributed
+through a 2473-pixel page. The complete document is bounded to 1800 pixels.
 
 ## Bundle
 
 | Path | Purpose |
 | --- | --- |
-| `apps/maze-fogline.html` | Offline single-file maze, private generator/reducer, responsive fog renderer, and keyboard-first controls |
+| `apps/maze-fogline.html` | Offline maze, private generator/reducer, three-field fragment export/import, responsive fog renderer, and keyboard-first controls |
 | `render.py` | Standard-library deterministic model, RGB24 renderer, FFV1 writer, thumbnail/evidence/delivery generator, and release checker |
 | `masters/maze-fogline.mkv` | 24-second, 12 fps, lossless FFV1 `bgr0` master |
 | `media/maze-fogline.mp4` | Compiler-produced H.264 `yuv420p` BT.709 delivery |
@@ -101,7 +112,7 @@ checked throughout at desktop and exactly 390 CSS pixels.
 | `channel.production.json` | Production source and `rapp-vision-live/1.0` semantic replay |
 | `channel.json` | Exact compiler transformation with paired sources |
 | `thumbs/maze-fogline.svg` | Original self-contained fogline thumbnail |
-| `snapshots/canonical-states.json` | Opening, optimal, hint, trap, detour, reset, invalid-preserved, and handoff states |
+| `snapshots/canonical-states.json` | Opening, rejected-wall, optimal, hint, trap, detour, reset, invalid-preserved, and handoff states |
 | `evidence.json` | Commission, fixture, replay, browser, film, rights/privacy, and source SHA-256 evidence |
 | `delivery.json` | Source/media SHA-256 bindings plus fresh codec, color, frame-rate, size, and duration probes |
 | `verify_dom.mjs` | Dependency-free real-Chromium CDP-input, accessibility, timed replay, alternate-seed, and responsive geometry verifier |
@@ -146,10 +157,10 @@ LF contracts strict. It independently regenerates topology and BFS results,
 accepts either the exact open commission or its future exact fulfillment,
 binds committed delivery hashes separately from two same-toolchain rebuilds,
 decodes one committed frame from every declared film phase, compares the
-lossy deliveries, verifies `RAPP_BROWSER` precedence, runs
-compiler/validator/release checks, and executes both desktop and 390 px
-real-browser replays with actual CDP mouse/keyboard input when the declared
-tools are available.
+lossy deliveries, verifies `RAPP_BROWSER` precedence, round-trips and rejects
+challenge fragments, checks state-gated replay timing and compact mobile
+geometry, runs compiler/validator/release checks, and executes both desktop
+and 390 px real-browser replays with actual CDP mouse/keyboard input.
 
 ## Rights and privacy
 

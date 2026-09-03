@@ -3,7 +3,7 @@
     "master": {
       "audioStreamCount": 0,
       "averageFrameRate": "12/1",
-      "bytes": 11043552,
+      "bytes": 10489834,
       "codec": "ffv1",
       "colorRange": "pc",
       "colorSpace": "gbr",
@@ -11,14 +11,14 @@
       "height": 540,
       "path": "masters/maze-fogline.mkv",
       "pixelFormat": "bgr0",
-      "sha256": "31c332fe911e2112102bf395df9fdc39040b6361ba44f1b17b1e01e5876af51d",
+      "sha256": "7b6425073dc7aa900b9f4a833f3106962b8c729a10d81e35abde870357798e54",
       "streamCount": 1,
       "width": 960
     },
     "mp4": {
       "audioStreamCount": 0,
       "averageFrameRate": "12/1",
-      "bytes": 302202,
+      "bytes": 381597,
       "codec": "h264",
       "colorPrimaries": "bt709",
       "colorRange": "tv",
@@ -28,14 +28,14 @@
       "height": 540,
       "path": "media/maze-fogline.mp4",
       "pixelFormat": "yuv420p",
-      "sha256": "78f752b4f4ccf9e1fb33d87a3256dfde05873ee224f2324012733cb437aa9409",
+      "sha256": "5ac2745e3d68d87de7ee625e82a682b69d5ef47901c2666f08ee8645fae78634",
       "streamCount": 1,
       "width": 960
     },
     "webm": {
       "audioStreamCount": 0,
       "averageFrameRate": "12/1",
-      "bytes": 192641,
+      "bytes": 247962,
       "codec": "vp9",
       "colorPrimaries": "bt709",
       "colorRange": "tv",
@@ -45,7 +45,7 @@
       "height": 540,
       "path": "media/maze-fogline.webm",
       "pixelFormat": "yuv420p",
-      "sha256": "ed087943a87d070cfcdc0c5447f94309e20e3900a992476422aca9567df96e7d",
+      "sha256": "a228a3727c1a7a17534d00a173ff2d6a3c7eaf5d775e77ea3b06671ecd721243",
       "streamCount": 1,
       "width": 960
     }
@@ -90,6 +90,12 @@
         ]
       }
     ],
+    "challengeContract": {
+      "referenceLength": 18,
+      "seed": "RAPP-42",
+      "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda"
+    },
+    "challengeFragment": "#challenge=eyJzZWVkIjoiUkFQUC00MiIsInRvcG9sb2d5RGlnZXN0IjoiMTI2YmY3MDQ0MGQzZWY1NDJjOGRjOTcyNTE3MjY5OTRlMGYyMzQyMjY3NWU4MzFmOTMzMDkyMzVhZTA4NWVkYSIsInJlZmVyZW5jZUxlbmd0aCI6MTh9",
     "detourLength": 20,
     "handoffDigest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
     "handoffReferenceLength": 10,
@@ -102,45 +108,50 @@
   "render": {
     "audio": false,
     "contentSamples": {
-      "hint-earned": {
-        "frame": 126,
-        "sha256": "748ab1f7afd804bbb8d673ad8601149e005932c4644efa340d01600146d5a60b",
-        "timestamp": 10.5
+      "alternate-fresh": {
+        "frame": 240,
+        "sha256": "04a5df7188bdb6b1652fd7ca1fe41757b76a548c01e74ac522dd5e9c5e3bf864",
+        "timestamp": 20.0
       },
-      "invalid-seed": {
-        "frame": 225,
-        "sha256": "62c1225050b4cf71e118c13a8b966550354f6fe52835997080d7e3713c8e970a",
-        "timestamp": 18.75
-      },
-      "opening": {
+      "challenge": {
         "frame": 18,
-        "sha256": "e9b21a87d8460638d34327ca49f6bf54de46b478be3b40507b22dabbf8d11a77",
+        "sha256": "84d626dcdbb594cd69a1742c21e06ca38eac34e2e1714b647bcdbf85e3c40846",
         "timestamp": 1.5
       },
-      "optimal": {
-        "frame": 60,
-        "sha256": "296a2a834f7ee8cf8ab11acc7268710f92b2c9e8cf44a787b08054f31a9656df",
-        "timestamp": 5.0
+      "optimal-18": {
+        "frame": 150,
+        "sha256": "f8aafe6ccfce1fca49000a3d9ddc5a6dca650d65114e1d9c8361e55ae016bd89",
+        "timestamp": 12.5
       },
       "optimal-complete": {
-        "frame": 93,
-        "sha256": "6ea2d8d29dbaa347b489f14de0e54104c1c5d11640ac359501add95d0e055427",
-        "timestamp": 7.75
+        "frame": 192,
+        "sha256": "13583d42c0a10ecbeaca113447872a33a4d364c86d9f472e6b5bdcc5bc11e441",
+        "timestamp": 16.0
       },
-      "reset": {
-        "frame": 195,
-        "sha256": "8741bb3970c92d4d0e8cea3b127de853f729ee32ffde32bb4c1b46b75829b668",
-        "timestamp": 16.25
+      "reset-after-optimal": {
+        "frame": 216,
+        "sha256": "448aec9c48c896724b518663ad563747980a8babd3f779875ceef4c6dbfc8ff3",
+        "timestamp": 18.0
+      },
+      "reset-after-trap": {
+        "frame": 108,
+        "sha256": "563894e464f89e33fe542e1b5ee2396571150dc844523691554fa84c43119e60",
+        "timestamp": 9.0
       },
       "takeover": {
-        "frame": 264,
-        "sha256": "33ed19e1738c166cad149cdf186ac9b82af19469c3add5116b04dc9a38192e48",
-        "timestamp": 22.0
+        "frame": 270,
+        "sha256": "20e944db13cb114a4c6b81e16e5ad5b1521107d4aeacf95cf387ba39d6b2ab49",
+        "timestamp": 22.5
       },
-      "trap-detour": {
-        "frame": 174,
-        "sha256": "5213497f9e3a1cf9d442ee42bf4792d6f919a2517cd6846fa6ad2052c07c52d4",
-        "timestamp": 14.5
+      "trap-approach": {
+        "frame": 54,
+        "sha256": "a1780f7522aa692dfb732fba9e1f254471e384b4b5f1ba5584fe63bed1c1a69f",
+        "timestamp": 4.5
+      },
+      "trap-plus-two": {
+        "frame": 72,
+        "sha256": "5177f4fca2cec7babc16ccb7a931382b2970246ffb4f307f70fe62658a7c1e8a",
+        "timestamp": 6.0
       }
     },
     "duration": 24,
@@ -148,48 +159,70 @@
     "frames": 288,
     "height": 540,
     "masterCodec": "ffv1",
+    "sequence": [
+      "challenge",
+      "trap-approach",
+      "trap-plus-two",
+      "reset-after-trap",
+      "optimal-18",
+      "optimal-complete",
+      "reset-after-optimal",
+      "alternate-fresh",
+      "takeover"
+    ],
     "timeline": [
       {
         "end": 3.0,
-        "phase": "opening",
+        "phase": "challenge",
         "start": 0.0
       },
       {
-        "end": 7.0,
-        "phase": "optimal",
+        "end": 5.5,
+        "phase": "trap-approach",
         "start": 3.0
       },
       {
-        "end": 8.5,
-        "phase": "optimal-complete",
-        "start": 7.0
+        "end": 8.0,
+        "phase": "trap-plus-two",
+        "start": 5.5
       },
       {
-        "end": 11.5,
-        "phase": "hint-earned",
-        "start": 8.5
+        "end": 10.0,
+        "phase": "reset-after-trap",
+        "start": 8.0
       },
       {
         "end": 15.0,
-        "phase": "trap-detour",
-        "start": 11.5
+        "phase": "optimal-18",
+        "start": 10.0
       },
       {
-        "end": 17.5,
-        "phase": "reset",
+        "end": 17.0,
+        "phase": "optimal-complete",
         "start": 15.0
       },
       {
-        "end": 20.0,
-        "phase": "invalid-seed",
-        "start": 17.5
+        "end": 19.0,
+        "phase": "reset-after-optimal",
+        "start": 17.0
+      },
+      {
+        "end": 21.0,
+        "phase": "alternate-fresh",
+        "start": 19.0
       },
       {
         "end": 24.0,
         "phase": "takeover",
-        "start": 20.0
+        "start": 21.0
       }
     ],
+    "typography": {
+      "criticalTextSourcePixels": 28,
+      "fullDigestCharacters": 64,
+      "fullDigestSourcePixels": 28,
+      "liveHierarchyMatched": true
+    },
     "width": 960
   },
   "schema": "fogline-survey-delivery/1.0",
@@ -200,39 +233,39 @@
       "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
     },
     {
-      "bytes": 7980,
+      "bytes": 8762,
       "path": "README.md",
-      "sha256": "a4dfa9326514643e3807f33d15eee1f85df47f78644421a030d5d6f36994aa28"
+      "sha256": "9d74d8f7293e24aafbdca333d7dedf40b4368898683257d048a4594df00186e6"
     },
     {
-      "bytes": 45777,
+      "bytes": 56437,
       "path": "apps/maze-fogline.html",
-      "sha256": "77e998d55e4126b72e772dd808a820757873ab12ad94cd76873af290afe0f4ff"
+      "sha256": "71dd029553c9f02a8c4977d7567abfb5daf859f0e0ebb438205b3ef223009b33"
     },
     {
-      "bytes": 14506,
+      "bytes": 14509,
       "path": "channel.production.json",
-      "sha256": "96ce81595920b152994473f811c9e6f9a2d4359a5f4cfca6d4193e80385918cd"
+      "sha256": "49d05d2b0025e4e065fcbd40c2788cce73e25317cafafc235cb56276be073875"
     },
     {
-      "bytes": 14644,
+      "bytes": 14647,
       "path": "channel.json",
-      "sha256": "62599f2b0e81b36581cc735b263c131cf9ab79415819f46a75f2c8bc113978d3"
+      "sha256": "bcfa513f9b1773a42e686c01c3d9ff322b5c4dd4ead19441acb231b7bc0bf5aa"
     },
     {
-      "bytes": 55770,
+      "bytes": 44477,
       "path": "evidence.json",
-      "sha256": "eff8894ab9002d3fee504d2b7e301f1b8489d6ef167f9790f3a6e35e0d5f79e2"
+      "sha256": "fe8f4b11665399e5d4cf06e236f0e2e2accf9394782971bb9fb8f04387c412e5"
     },
     {
-      "bytes": 79421,
+      "bytes": 84048,
       "path": "render.py",
-      "sha256": "1c850c6ffbf9ffb2d62e3c5a261200100fec43728c560d8f59f39f9760f6bcd1"
+      "sha256": "da037e95c49b22b5456c2eb3ba8f3c6095333edb2169629cc8b43a6c4025696f"
     },
     {
-      "bytes": 18507,
+      "bytes": 20059,
       "path": "snapshots/canonical-states.json",
-      "sha256": "9669b57f1011796cffdf0b17635b547b242252ee1e593565a32cbf71fdefddca"
+      "sha256": "805b4e5b69224d11d88cc3e904034aa358299314d496cd69f986d14b9b05bfca"
     },
     {
       "bytes": 5563,
@@ -240,9 +273,9 @@
       "sha256": "03a7dc5b3b7cec1c58c0f5802e97a3a8b10ae5399c531aa2ae63463f74dbc51e"
     },
     {
-      "bytes": 73808,
+      "bytes": 85661,
       "path": "verify_dom.mjs",
-      "sha256": "6ec2974e5432c04a28ed7c52ffa0f4a213bbb190c40d7453162267a09f8d67b6"
+      "sha256": "0d003d4b7a854f25ee7e963f21afe13cdea35f58bc1e6a8488a218c53dd1a8df"
     }
   ]
 }
