@@ -1,0 +1,129 @@
+{
+  "artifacts": {
+    "master": {
+      "bytes": 9481624,
+      "codec": "ffv1",
+      "colorRange": "pc",
+      "colorSpace": "gbr",
+      "duration": 22.0,
+      "height": 540,
+      "path": "masters/explore-archive-map-contrast.mkv",
+      "pixelFormat": "bgr0",
+      "sha256": "36cfe70324605eb29459ceb37beaa468bce10f958a1a6e7371e0b7f424abbf6b",
+      "width": 960
+    },
+    "mp4": {
+      "bytes": 207384,
+      "codec": "h264",
+      "colorPrimaries": "bt709",
+      "colorRange": "tv",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "duration": 22.0,
+      "height": 540,
+      "path": "media/explore-archive-map-contrast.mp4",
+      "pixelFormat": "yuv420p",
+      "sha256": "1e2a2ccd9bb9c116c2b6bc9e1fe5bef565215e79d00c8d13b712ff934e9c54ae",
+      "width": 960
+    },
+    "webm": {
+      "bytes": 191151,
+      "codec": "vp9",
+      "colorPrimaries": "bt709",
+      "colorRange": "tv",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "duration": 22.0,
+      "height": 540,
+      "path": "media/explore-archive-map-contrast.webm",
+      "pixelFormat": "yuv420p",
+      "sha256": "bd7a05681b78a1f853bdb7f97c9bec403951319227ac8271983ad7a9b62fa10d",
+      "width": 960
+    }
+  },
+  "channel": "candidate-frame-0003-09-archive-wetland-contrast",
+  "objective": {
+    "changedIds": [
+      "WL-002",
+      "WL-005",
+      "WL-009",
+      "WL-012",
+      "WL-016",
+      "WL-020",
+      "WL-023"
+    ],
+    "exportSha256": "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6",
+    "records": 24
+  },
+  "publication": "explore-archive-map-contrast",
+  "render": {
+    "audio": false,
+    "duration": 22.0,
+    "fps": 12,
+    "frameSamples": {
+      "0": "87768fef3e32141ebf1547a90d4e9e14e2030b73def9ecd6c29ba8144e8bf966",
+      "138": "c40c5e2b890e32bf89452433e4cff1baaf5b82ca1e246f50103fab90b744fb3e",
+      "186": "d59fd08a5d8a0c81d6610c9b29f57130d52089e619c2c347a299d5344d809e28",
+      "263": "200852e11ddf4919a856007a0b503315ee8d35e0d48036aeb6eecea2d391c5d8",
+      "42": "99dbf0ab94007c4eaa00332e3d530a41eea9d0c0da81af3831b23bcb84979f5b",
+      "90": "5d8cdf2732743fa330223d4ed4d21e18a80e289f485279edcd725a93c066d931"
+    },
+    "frames": 264,
+    "height": 540,
+    "masterCodec": "ffv1",
+    "width": 960
+  },
+  "schema": "archive-wetland-contrast-delivery/1.0",
+  "sourceArtifacts": [
+    {
+      "bytes": 175,
+      "path": ".gitattributes",
+      "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
+    },
+    {
+      "bytes": 4186,
+      "path": "README.md",
+      "sha256": "ec2e7f656b976c9583b8b9e6c0f30515900734cd6a3e39a8bb9e643231f81394"
+    },
+    {
+      "bytes": 48390,
+      "path": "apps/explore-archive-map-contrast.html",
+      "sha256": "df5afdbe98d0bf15620af03d6709ebbea80bd98900fe1efe98437b5fc55b5560"
+    },
+    {
+      "bytes": 7480,
+      "path": "channel.production.json",
+      "sha256": "a35971cbd5cf81d26e784aa76452951a6041435346d79476af18890cd53bc897"
+    },
+    {
+      "bytes": 7634,
+      "path": "channel.json",
+      "sha256": "3a8ce32cbcad7a54f9605a07e02c3c15e457e54245d5f2b12ea9762f032f196a"
+    },
+    {
+      "bytes": 13970,
+      "path": "evidence.json",
+      "sha256": "7c50b6f844184e233ee9683700b32a3d1d6db39581469f7c126bb32ca032f1b6"
+    },
+    {
+      "bytes": 65,
+      "path": "exports/changed-record-ids.json",
+      "sha256": "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6"
+    },
+    {
+      "bytes": 38783,
+      "path": "render.py",
+      "sha256": "e44e589247aecd0f32cf84c80f222cf13e0375a1c8cf31fd40e454380ce4a7c6"
+    },
+    {
+      "bytes": 4857,
+      "path": "thumbs/explore-archive-map-contrast.svg",
+      "sha256": "207e2e2e253cf8381b34d7e7e51d5d8859f5ee8a8a050e8d593181272c96471b"
+    },
+    {
+      "bytes": 22610,
+      "path": "verify_dom.mjs",
+      "sha256": "76772733b8753885e74fe6a0452eb94cc56ca77c86cf8e5a2672bad1393e5432"
+    }
+  ]
+}

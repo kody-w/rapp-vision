@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Read the Wetland Twice</title>
+  <desc id="desc">An original synthetic wetland field map with 24 stations and seven rust-colored changed plots.</desc>
+  <rect width="960" height="540" fill="#f3ecd8"/>
+  <path d="M0 24H960M0 48H960M0 72H960M0 96H960M0 120H960M0 144H960M0 168H960M0 192H960M0 216H960M0 240H960M0 264H960M0 288H960M0 312H960M0 336H960M0 360H960M0 384H960M0 408H960M0 432H960M0 456H960M0 480H960M0 504H960" stroke="#e2dac3"/>
+  <rect width="960" height="84" fill="#f3ecd8"/>
+  <rect width="960" height="5" fill="#a64c32"/>
+  <text x="32" y="31" fill="#a64c32" font-family="monospace" font-size="13" font-weight="800">SYNTHETIC FIELD ARCHIVE · 1990 / 2020</text>
+  <text x="32" y="68" fill="#0f2422" font-family="Georgia,serif" font-size="36" font-weight="800">READ THE WETLAND TWICE</text>
+  <rect x="724" y="17" width="204" height="48" fill="#e2d7b8" stroke="#a64c32" stroke-width="2"/>
+  <text x="826" y="47" text-anchor="middle" fill="#a64c32" font-family="monospace" font-size="18" font-weight="800">24 PLOTS / 7 CHANGED</text>
+  <rect x="36" y="101" width="600" height="386" fill="#726b58"/>
+  <rect x="30" y="94" width="600" height="386" fill="#f3ecd8" stroke="#173c38" stroke-width="2"/>
+  <rect x="52" y="118" width="568" height="338" fill="#efe6ce" stroke="#173c38" stroke-width="2"/>
+  <path d="M30 187 C120 130 177 214 259 176 S392 105 472 165 S568 228 640 176" fill="none" stroke="#8fbcc0" stroke-width="44" opacity=".82"/>
+  <path d="M30 187 C120 130 177 214 259 176 S392 105 472 165 S568 228 640 176" fill="none" stroke="#2d6e72" stroke-width="3"/>
+  <path d="M70 418 C154 350 219 428 306 376 S468 342 600 410" fill="none" stroke="#8fbcc0" stroke-width="25" opacity=".7"/>
+  <ellipse cx="184" cy="292" rx="65" ry="46" fill="#b6aa62" opacity=".62" stroke="#637a53" stroke-width="2"/>
+  <ellipse cx="432" cy="302" rx="72" ry="51" fill="#b6aa62" opacity=".58" stroke="#637a53" stroke-width="2"/>
+  <g>
+    <circle cx="117" cy="396" r="5" fill="#173c38"/>
+    <circle cx="208" cy="408" r="7" fill="#a64c32"/>
+    <circle cx="309" cy="384" r="5" fill="#173c38"/>
+    <circle cx="418" cy="404" r="5" fill="#173c38"/>
+    <circle cx="528" cy="376" r="7" fill="#a64c32"/>
+    <circle cx="592" cy="412" r="5" fill="#173c38"/>
+    <circle cx="99" cy="308" r="5" fill="#173c38"/>
+    <circle cx="199" cy="324" r="5" fill="#173c38"/>
+    <circle cx="299" cy="296" r="7" fill="#a64c32"/>
+    <circle cx="409" cy="316" r="5" fill="#173c38"/>
+    <circle cx="510" cy="336" r="5" fill="#173c38"/>
+    <circle cx="601" cy="300" r="7" fill="#a64c32"/>
+    <circle cx="112" cy="220" r="5" fill="#173c38"/>
+    <circle cx="222" cy="244" r="5" fill="#173c38"/>
+    <circle cx="322" cy="204" r="5" fill="#173c38"/>
+    <circle cx="427" cy="228" r="7" fill="#a64c32"/>
+    <circle cx="523" cy="192" r="5" fill="#173c38"/>
+    <circle cx="596" cy="236" r="5" fill="#173c38"/>
+    <circle cx="94" cy="148" r="5" fill="#173c38"/>
+    <circle cx="208" cy="164" r="7" fill="#a64c32"/>
+    <circle cx="318" cy="140" r="5" fill="#173c38"/>
+    <circle cx="418" cy="172" r="5" fill="#173c38"/>
+    <circle cx="519" cy="144" r="7" fill="#a64c32"/>
+    <circle cx="605" cy="180" r="5" fill="#173c38"/>
+  </g>
+  <rect x="662" y="94" width="268" height="386" fill="#726b58"/>
+  <rect x="656" y="87" width="268" height="386" fill="#f3ecd8" stroke="#173c38" stroke-width="2"/>
+  <text x="678" y="122" fill="#5d6353" font-family="monospace" font-size="13">COMPARISON</text>
+  <text x="678" y="154" fill="#637a53" font-family="monospace" font-size="25" font-weight="800">SUCCESS</text>
+  <text x="678" y="198" fill="#5d6353" font-family="monospace" font-size="13">CHANGED IDS</text>
+  <text x="678" y="231" fill="#a64c32" font-family="monospace" font-size="18" font-weight="800">WL-002 · WL-005</text>
+  <text x="678" y="259" fill="#a64c32" font-family="monospace" font-size="18" font-weight="800">WL-009 · WL-012</text>
+  <text x="678" y="287" fill="#a64c32" font-family="monospace" font-size="18" font-weight="800">WL-016 · WL-020</text>
+  <text x="678" y="315" fill="#a64c32" font-family="monospace" font-size="18" font-weight="800">WL-023</text>
+  <rect x="676" y="350" width="228" height="78" fill="#173c38"/>
+  <text x="692" y="377" fill="#f3ecd8" font-family="monospace" font-size="13">SORTED EXPORT</text>
+  <text x="692" y="405" fill="#e0aa45" font-family="monospace" font-size="17" font-weight="800">SHA-256 BOUND</text>
+  <text x="678" y="451" fill="#2d6e72" font-family="monospace" font-size="12">SYN E 1000–1600 / N 2000–2400</text>
+  <text x="480" y="519" text-anchor="middle" fill="#173c38" font-family="monospace" font-size="15" font-weight="800">FILTER · INSPECT · EXPORT · REJECT EMPTY · EXACT RESTORE</text>
+</svg>

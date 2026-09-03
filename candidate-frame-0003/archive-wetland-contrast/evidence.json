@@ -1,0 +1,288 @@
+{
+  "schema": "archive-wetland-contrast-evidence/1.0",
+  "commission": {
+    "id": "explore-archive-map-contrast",
+    "criterion": "Comparing the fixture's 1990 and 2020 snapshots yields exactly seven changed record ids, and the exported sorted id list matches the embedded expected list.",
+    "reset": [
+      "Activate Restore archive view.",
+      "Set snapshots to 1990 and 2020.",
+      "Reset filters, selection, pan, and zoom."
+    ]
+  },
+  "channel": "candidate-frame-0003-09-archive-wetland-contrast",
+  "publication": "explore-archive-map-contrast",
+  "app": "apps/explore-archive-map-contrast.html",
+  "fixture": {
+    "schema": "synthetic-wetland-archive/1.0",
+    "synthetic": true,
+    "snapshotLabels": {
+      "1990": "1990 field sheet",
+      "2020": "2020 field sheet"
+    },
+    "availableYears": [
+      1990,
+      2020
+    ],
+    "impossibleRange": [
+      1880,
+      1885
+    ],
+    "extent": {
+      "minX": 1000,
+      "maxX": 1600,
+      "minY": 2000,
+      "maxY": 2400,
+      "label": "SYN E 1000–1600 / N 2000–2400"
+    },
+    "records": [
+      {"id":"WL-001","name":"Alder Pool","x":1060,"y":2070,"snapshots":{"1990":"open-water","2020":"open-water"}},
+      {"id":"WL-002","name":"Bittern Bend","x":1160,"y":2055,"snapshots":{"1990":"sedge-meadow","2020":"mudflat"}},
+      {"id":"WL-003","name":"Copper Reed","x":1270,"y":2085,"snapshots":{"1990":"reed-bed","2020":"reed-bed"}},
+      {"id":"WL-004","name":"Drift Willow","x":1390,"y":2060,"snapshots":{"1990":"willow-edge","2020":"willow-edge"}},
+      {"id":"WL-005","name":"Egret Pocket","x":1510,"y":2095,"snapshots":{"1990":"shallow-pool","2020":"reed-bed"}},
+      {"id":"WL-006","name":"Fen Mirror","x":1580,"y":2050,"snapshots":{"1990":"mudflat","2020":"mudflat"}},
+      {"id":"WL-007","name":"Glass Rush","x":1040,"y":2180,"snapshots":{"1990":"reed-bed","2020":"reed-bed"}},
+      {"id":"WL-008","name":"Heron Shelf","x":1150,"y":2160,"snapshots":{"1990":"sedge-meadow","2020":"sedge-meadow"}},
+      {"id":"WL-009","name":"Indigo Flat","x":1260,"y":2195,"snapshots":{"1990":"mudflat","2020":"open-water"}},
+      {"id":"WL-010","name":"Juniper Pool","x":1380,"y":2170,"snapshots":{"1990":"open-water","2020":"open-water"}},
+      {"id":"WL-011","name":"Kestrel Edge","x":1490,"y":2145,"snapshots":{"1990":"willow-edge","2020":"willow-edge"}},
+      {"id":"WL-012","name":"Marsh Lantern","x":1590,"y":2190,"snapshots":{"1990":"sedge-meadow","2020":"reed-bed"}},
+      {"id":"WL-013","name":"Needle Willow","x":1055,"y":2290,"snapshots":{"1990":"willow-edge","2020":"willow-edge"}},
+      {"id":"WL-014","name":"Otter Glass","x":1175,"y":2260,"snapshots":{"1990":"shallow-pool","2020":"shallow-pool"}},
+      {"id":"WL-015","name":"Pickerel Flat","x":1285,"y":2310,"snapshots":{"1990":"mudflat","2020":"mudflat"}},
+      {"id":"WL-016","name":"Quartz Reed","x":1400,"y":2280,"snapshots":{"1990":"reed-bed","2020":"willow-edge"}},
+      {"id":"WL-017","name":"Rill Sedge","x":1505,"y":2325,"snapshots":{"1990":"sedge-meadow","2020":"sedge-meadow"}},
+      {"id":"WL-018","name":"Silt Mirror","x":1585,"y":2270,"snapshots":{"1990":"open-water","2020":"open-water"}},
+      {"id":"WL-019","name":"Tern Pocket","x":1035,"y":2380,"snapshots":{"1990":"shallow-pool","2020":"shallow-pool"}},
+      {"id":"WL-020","name":"Umbra Flat","x":1160,"y":2360,"snapshots":{"1990":"mudflat","2020":"sedge-meadow"}},
+      {"id":"WL-021","name":"Vesper Willow","x":1280,"y":2390,"snapshots":{"1990":"willow-edge","2020":"willow-edge"}},
+      {"id":"WL-022","name":"Wren Reed","x":1390,"y":2350,"snapshots":{"1990":"reed-bed","2020":"reed-bed"}},
+      {"id":"WL-023","name":"Yellow Pool","x":1500,"y":2385,"snapshots":{"1990":"open-water","2020":"shallow-pool"}},
+      {"id":"WL-024","name":"Zephyr Sedge","x":1595,"y":2340,"snapshots":{"1990":"sedge-meadow","2020":"sedge-meadow"}}
+    ],
+    "expectedChangedIds": [
+      "WL-002",
+      "WL-005",
+      "WL-009",
+      "WL-012",
+      "WL-016",
+      "WL-020",
+      "WL-023"
+    ],
+    "export": {
+      "path": "exports/changed-record-ids.json",
+      "encoding": "UTF-8",
+      "lineEnding": "LF",
+      "text": "[\"WL-002\",\"WL-005\",\"WL-009\",\"WL-012\",\"WL-016\",\"WL-020\",\"WL-023\"]\n",
+      "sha256": "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6"
+    }
+  },
+  "claims": [
+    {
+      "id": "positive",
+      "claim": "The 1990 and 2020 sheets compare to seven changed IDs; the changed-only filter leaves those seven visible, WL-012 can be inspected after a semantic zoom and pan, and export emits the exact sorted canonical bytes and digest.",
+      "actions": [
+        {"do":"click","selector":"#compare-btn"},
+        {"do":"click","selector":"#filter-changed-btn"},
+        {"do":"click","selector":"#record-wl-012"},
+        {"do":"click","selector":"#zoom-in-btn"},
+        {"do":"click","selector":"#pan-east-btn"},
+        {"do":"click","selector":"#export-btn"}
+      ],
+      "assertions": [
+        {"path":"totalRecords","equals":24},
+        {"path":"changedCount","equals":7},
+        {"path":"visibleCount","equals":7},
+        {"path":"focus","equals":"WL-012"},
+        {"path":"filter","equals":"changed"},
+        {"path":"view.panX","equals":40},
+        {"path":"view.zoom","equals":1.25},
+        {"path":"export.digest","equals":"fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6"},
+        {"path":"export.status","equals":"exported"}
+      ],
+      "expectedState": {
+        "schema": "archive-map-state/1.0",
+        "snapshotLabels": {"from":"1990 field sheet","to":"2020 field sheet"},
+        "years": {"from":1990,"to":2020},
+        "totalRecords": 24,
+        "visibleRecordIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
+        "visibleCount": 7,
+        "changedIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
+        "changedCount": 7,
+        "filter": "changed",
+        "focus": "WL-012",
+        "focusedRecord": {"id":"WL-012","name":"Marsh Lantern","from":"sedge-meadow","to":"reed-bed","changed":true,"coordinate":"E 1590 / N 2190"},
+        "view": {"panX":40,"panY":0,"zoom":1.25},
+        "extent": {"minX":1000,"maxX":1600,"minY":2000,"maxY":2400,"label":"SYN E 1000–1600 / N 2000–2400"},
+        "comparison": {"status":"success","message":"1990 → 2020: 7 changed records across 24 synthetic stations.","queryResultCount":7,"canonical":true},
+        "export": {"ids":["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],"text":"[\"WL-002\",\"WL-005\",\"WL-009\",\"WL-012\",\"WL-016\",\"WL-020\",\"WL-023\"]\n","digest":"fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6","status":"exported"},
+        "message": "Exported 7 sorted IDs. SHA-256 fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6.",
+        "status": "success"
+      }
+    },
+    {
+      "id": "failure",
+      "after": "positive",
+      "preserves": "positive.export",
+      "claim": "Typing the supplied impossible years 1880 and 1885 produces a distinct rejected-empty state with no numeric zero-change result, while the canonical seven-ID export and digest remain intact.",
+      "actions": [
+        {"do":"click","selector":"#from-year"},
+        {"do":"type","text":"1880"},
+        {"do":"click","selector":"#to-year"},
+        {"do":"type","text":"1885"},
+        {"do":"click","selector":"#compare-btn"}
+      ],
+      "assertions": [
+        {"path":"years.from","equals":1880},
+        {"path":"years.to","equals":1885},
+        {"path":"comparison.status","equals":"rejected-empty"},
+        {"path":"comparison.queryResultCount","equals":null},
+        {"path":"changedCount","equals":7},
+        {"path":"export.status","equals":"preserved"},
+        {"path":"export.digest","equals":"fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6"},
+        {"path":"status","equals":"failure"}
+      ],
+      "expectedState": {
+        "schema": "archive-map-state/1.0",
+        "snapshotLabels": {"from":"1880 (no sheet)","to":"1885 (no sheet)"},
+        "years": {"from":1880,"to":1885},
+        "totalRecords": 24,
+        "visibleRecordIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
+        "visibleCount": 7,
+        "changedIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
+        "changedCount": 7,
+        "filter": "changed",
+        "focus": "WL-012",
+        "focusedRecord": {"id":"WL-012","name":"Marsh Lantern","from":"sedge-meadow","to":"reed-bed","changed":true,"coordinate":"E 1590 / N 2190"},
+        "view": {"panX":40,"panY":0,"zoom":1.25},
+        "extent": {"minX":1000,"maxX":1600,"minY":2000,"maxY":2400,"label":"SYN E 1000–1600 / N 2000–2400"},
+        "comparison": {"status":"rejected-empty","message":"Empty query rejected: no archive sheets exist for 1880 → 1885. Canonical export preserved.","queryResultCount":null,"canonical":false},
+        "export": {"ids":["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],"text":"[\"WL-002\",\"WL-005\",\"WL-009\",\"WL-012\",\"WL-016\",\"WL-020\",\"WL-023\"]\n","digest":"fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6","status":"preserved"},
+        "message": "Empty query rejected: no archive sheets exist for 1880 → 1885. Canonical export preserved.",
+        "status": "failure"
+      }
+    },
+    {
+      "id": "reset",
+      "after": "failure",
+      "claim": "Restore archive view exactly returns all 24 records, 1990 and 2020, the seven-change result, no focused record, all-record filtering, pan 0,0, zoom 1.00, and the expected canonical export digest.",
+      "actions": [
+        {"do":"click","selector":"#restore-btn"}
+      ],
+      "assertions": [
+        {"path":"years.from","equals":1990},
+        {"path":"years.to","equals":2020},
+        {"path":"totalRecords","equals":24},
+        {"path":"visibleCount","equals":24},
+        {"path":"changedCount","equals":7},
+        {"path":"filter","equals":"all"},
+        {"path":"focus","equals":null},
+        {"path":"view.panX","equals":0},
+        {"path":"view.panY","equals":0},
+        {"path":"view.zoom","equals":1},
+        {"path":"export.digest","equals":"fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6"}
+      ],
+      "expectedState": {
+        "schema": "archive-map-state/1.0",
+        "snapshotLabels": {"from":"1990 field sheet","to":"2020 field sheet"},
+        "years": {"from":1990,"to":2020},
+        "totalRecords": 24,
+        "visibleRecordIds": ["WL-001","WL-002","WL-003","WL-004","WL-005","WL-006","WL-007","WL-008","WL-009","WL-010","WL-011","WL-012","WL-013","WL-014","WL-015","WL-016","WL-017","WL-018","WL-019","WL-020","WL-021","WL-022","WL-023","WL-024"],
+        "visibleCount": 24,
+        "changedIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
+        "changedCount": 7,
+        "filter": "all",
+        "focus": null,
+        "focusedRecord": null,
+        "view": {"panX":0,"panY":0,"zoom":1},
+        "extent": {"minX":1000,"maxX":1600,"minY":2000,"maxY":2400,"label":"SYN E 1000–1600 / N 2000–2400"},
+        "comparison": {"status":"success","message":"1990 → 2020: 7 changed records across 24 synthetic stations.","queryResultCount":7,"canonical":true},
+        "export": {"ids":["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],"text":"[\"WL-002\",\"WL-005\",\"WL-009\",\"WL-012\",\"WL-016\",\"WL-020\",\"WL-023\"]\n","digest":"fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6","status":"ready"},
+        "message": "Canonical archive view: 24 records, 7 changes, original extent.",
+        "status": "success"
+      }
+    }
+  ],
+  "manifestReplay": {
+    "manifest": "channel.production.json",
+    "scene": 0,
+    "actionCount": 24,
+    "allowedActions": [
+      "click",
+      "scroll",
+      "type"
+    ],
+    "activationActions": [
+      "click",
+      "type"
+    ],
+    "framingAction": "scroll",
+    "coordinateFree": true,
+    "scrollSelectors": [
+      "#compare-btn",
+      "#filter-changed-btn",
+      "#record-wl-012",
+      "#zoom-in-btn",
+      "#export-btn",
+      "#export-output",
+      "#from-year",
+      "#to-year",
+      "#compare-btn",
+      "#query-error",
+      "#restore-btn",
+      "#status-message"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 11,
+        "claim": "positive",
+        "selector": "#export-output"
+      },
+      {
+        "afterAction": 20,
+        "claim": "failure",
+        "selector": "#query-error"
+      },
+      {
+        "afterAction": 23,
+        "claim": "reset",
+        "selector": "#status-message"
+      }
+    ],
+    "viewports": [
+      {
+        "name": "desktop",
+        "width": 1120,
+        "height": 900
+      },
+      {
+        "name": "mobile-390",
+        "width": 390,
+        "height": 844
+      }
+    ]
+  },
+  "objective": {
+    "method": "For each of the 24 records, compare the exact categorical value stored under snapshots.1990 with snapshots.2020, retain unequal records, sort their IDs lexically, serialize the compact JSON array plus one LF, and compute SHA-256 over those UTF-8 bytes.",
+    "recordCount": 24,
+    "changedCount": 7,
+    "changedIds": [
+      "WL-002",
+      "WL-005",
+      "WL-009",
+      "WL-012",
+      "WL-016",
+      "WL-020",
+      "WL-023"
+    ],
+    "exportSha256": "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6"
+  },
+  "attestations": {
+    "rights": "All records, names, coordinates, categorical observations, interface code, renderer code, vector drawing, and rendered frames were created for this candidate and may be redistributed with the repository.",
+    "privacy": "The archive is wholly synthetic. It contains no people, parcel addresses, field-owner data, device identifiers, precise real-world locations, or customer information.",
+    "noSecrets": true,
+    "externalRuntimeResources": false,
+    "networkRequests": false,
+    "copiedImagery": false
+  }
+}

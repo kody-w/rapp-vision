@@ -1,0 +1,258 @@
+{
+  "schema": "rapp-vision-production/1.0",
+  "id": "candidate-frame-0003-09-archive-wetland-contrast",
+  "name": "Archive Wetland Contrast",
+  "tagline": "Twenty-four synthetic wetland records, seven measured changes, one exact return.",
+  "avatar": "⌖",
+  "creator": {
+    "name": "RAPP Vision autonomous studio",
+    "identity": "machine-produced, artifact-reviewed"
+  },
+  "videos": [
+    {
+      "id": "explore-archive-map-contrast",
+      "title": "Read the Wetland Twice",
+      "description": "A tactile synthetic field map compares the 1990 and 2020 archive sheets across exactly 24 records. The guided film and live replay isolate seven changed IDs, inspect WL-012, export the deterministic sorted list with SHA-256 fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6, distinctly reject the supplied impossible 1880 to 1885 query while preserving that export, and restore all 24 records, canonical years, no focus, and the original pan and zoom.",
+      "published": "2026-09-03",
+      "duration": 22,
+      "width": 960,
+      "height": 540,
+      "orientation": "landscape",
+      "tags": [
+        "archive",
+        "wetland",
+        "map",
+        "comparison",
+        "synthetic-data",
+        "deterministic",
+        "live-replay"
+      ],
+      "thumb": "thumbs/explore-archive-map-contrast.svg",
+      "production": {
+        "master": "masters/explore-archive-map-contrast.mkv"
+      },
+      "chapters": [
+        {
+          "t": 0,
+          "label": "Twenty-four synthetic field records"
+        },
+        {
+          "t": 4,
+          "label": "1990 and 2020 reveal seven changes"
+        },
+        {
+          "t": 8,
+          "label": "Filter and inspect WL-012"
+        },
+        {
+          "t": 12,
+          "label": "Export the sorted canonical IDs"
+        },
+        {
+          "t": 16,
+          "label": "Reject the impossible date query"
+        },
+        {
+          "t": 19,
+          "label": "Restore the exact archive view"
+        }
+      ],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "duration": 22,
+        "chapters": [
+          {
+            "t": 0,
+            "label": "Compare the archive sheets"
+          },
+          {
+            "t": 1.4,
+            "label": "Filter to seven changed records"
+          },
+          {
+            "t": 2.6,
+            "label": "Inspect, zoom, and pan"
+          },
+          {
+            "t": 5.5,
+            "label": "Export the sorted ID list"
+          },
+          {
+            "t": 8,
+            "label": "Supply impossible dates and reject"
+          },
+          {
+            "t": 14.2,
+            "label": "Restore the canonical view"
+          },
+          {
+            "t": 16,
+            "label": "Take over the field map"
+          }
+        ],
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 22,
+            "app": "apps/explore-archive-map-contrast.html",
+            "ready": {
+              "selector": "#compare-btn",
+              "enabled": true
+            },
+            "lower": {
+              "title": "Read the Wetland Twice",
+              "bench": "The 1990 and 2020 synthetic sheets yield exactly seven sorted changed IDs.",
+              "fix": "Pause, inspect any station, move the paper, or try another available snapshot pair."
+            },
+            "actions": [
+              {
+                "at": 0.3,
+                "do": "scroll",
+                "selector": "#compare-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 0.7,
+                "do": "click",
+                "selector": "#compare-btn"
+              },
+              {
+                "at": 1.4,
+                "do": "scroll",
+                "selector": "#filter-changed-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 1.8,
+                "do": "click",
+                "selector": "#filter-changed-btn"
+              },
+              {
+                "at": 2.6,
+                "do": "scroll",
+                "selector": "#record-wl-012",
+                "block": "center",
+                "behavior": "auto"
+              },
+              {
+                "at": 3,
+                "do": "click",
+                "selector": "#record-wl-012"
+              },
+              {
+                "at": 3.8,
+                "do": "scroll",
+                "selector": "#zoom-in-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 4.2,
+                "do": "click",
+                "selector": "#zoom-in-btn"
+              },
+              {
+                "at": 4.7,
+                "do": "click",
+                "selector": "#pan-east-btn"
+              },
+              {
+                "at": 5.5,
+                "do": "scroll",
+                "selector": "#export-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 5.9,
+                "do": "click",
+                "selector": "#export-btn"
+              },
+              {
+                "at": 6.3,
+                "do": "scroll",
+                "selector": "#export-output",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 8,
+                "do": "scroll",
+                "selector": "#from-year",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 8.4,
+                "do": "click",
+                "selector": "#from-year"
+              },
+              {
+                "at": 8.8,
+                "do": "type",
+                "text": "1880"
+              },
+              {
+                "at": 9.7,
+                "do": "scroll",
+                "selector": "#to-year",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 10.1,
+                "do": "click",
+                "selector": "#to-year"
+              },
+              {
+                "at": 10.5,
+                "do": "type",
+                "text": "1885"
+              },
+              {
+                "at": 11.4,
+                "do": "scroll",
+                "selector": "#compare-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 11.8,
+                "do": "click",
+                "selector": "#compare-btn"
+              },
+              {
+                "at": 12.2,
+                "do": "scroll",
+                "selector": "#query-error",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 14.2,
+                "do": "scroll",
+                "selector": "#restore-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 14.7,
+                "do": "click",
+                "selector": "#restore-btn"
+              },
+              {
+                "at": 15.1,
+                "do": "scroll",
+                "selector": "#status-message",
+                "block": "start",
+                "behavior": "auto"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
