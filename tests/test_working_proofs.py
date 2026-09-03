@@ -15,6 +15,7 @@ import unittest
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
+from unittest import mock
 from urllib.parse import urljoin, urlsplit
 
 
@@ -169,6 +170,7 @@ def resolve_reference(base_file: Path, reference: str) -> Path:
 
 def resolve_browser() -> str | None:
     for environment_name in (
+        "RAPP_BROWSER",
         "BROWSER",
         "CHROME_PATH",
         "CHROMIUM_PATH",
@@ -219,7 +221,12 @@ def resolve_browser() -> str | None:
 
 
 def resolve_ffprobe() -> str | None:
-    for environment_name in ("FFPROBE", "FFPROBE_PATH", "FRAME_FFPROBE"):
+    for environment_name in (
+        "RAPP_FFPROBE",
+        "FFPROBE",
+        "FFPROBE_PATH",
+        "FRAME_FFPROBE",
+    ):
         value = os.environ.get(environment_name)
         if value and Path(value).is_file():
             return str(Path(value).resolve())
@@ -267,6 +274,39 @@ class TestWorkingProofsBuild(unittest.TestCase):
                 )
                 self.assertIn("RAPP_FFMPEG: /usr/bin/ffmpeg", source)
                 self.assertIn("RAPP_FFPROBE: /usr/bin/ffprobe", source)
+
+    def test_release_tool_environment_precedes_path_shims(self):
+        environment = {
+            "RAPP_BROWSER": str(CHANNEL_PATH),
+            "BROWSER": "",
+            "CHROME_PATH": "",
+            "CHROMIUM_PATH": "",
+            "EDGE_PATH": "",
+            "FRAME_BROWSER": "",
+        }
+        with (
+            mock.patch.dict(os.environ, environment, clear=False),
+            mock.patch.object(shutil, "which", return_value="/usr/bin/chromium"),
+        ):
+            self.assertEqual(resolve_browser(), str(CHANNEL_PATH.resolve()))
+
+        with (
+            mock.patch.dict(
+                os.environ,
+                {
+                    "RAPP_FFPROBE": str(EVIDENCE_INDEX_PATH),
+                    "FFPROBE": "",
+                    "FFPROBE_PATH": "",
+                    "FRAME_FFPROBE": "",
+                },
+                clear=False,
+            ),
+            mock.patch.object(shutil, "which", return_value="/usr/bin/ffprobe"),
+        ):
+            self.assertEqual(
+                resolve_ffprobe(),
+                str(EVIDENCE_INDEX_PATH.resolve()),
+            )
 
     def test_player_semantic_actions_preserve_focus_and_clear_chrome(self):
         source = (ROOT / "index.html").read_text(encoding="utf-8")
