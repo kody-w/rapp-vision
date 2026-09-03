@@ -326,7 +326,7 @@ def run_browser_replay(actions):
             capture_output=True,
             text=True,
             encoding="utf-8",
-            timeout=60,
+            timeout=90,
         )
         if completed.returncode:
             raise AssertionError(

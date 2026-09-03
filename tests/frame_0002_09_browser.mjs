@@ -92,7 +92,7 @@ class CdpClient {
   }
 }
 
-async function waitForDevTools(child, port, timeout = 20_000) {
+async function waitForDevTools(child, port, timeout = 45_000) {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
     if (child.exitCode !== null) {

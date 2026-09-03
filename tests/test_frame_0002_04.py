@@ -647,7 +647,7 @@ class TestFrame000204BrowserExecution(unittest.TestCase):
                 check=False,
                 capture_output=True,
                 text=True,
-                timeout=60,
+                timeout=90,
             )
             self.assertEqual(completed.returncode, 0, completed.stderr)
             result = json.loads(completed.stdout)

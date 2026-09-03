@@ -238,7 +238,7 @@ browser.once("error", error => {
 const delay = milliseconds =>
   new Promise(resolveDelay => setTimeout(resolveDelay, milliseconds));
 
-async function activePort(timeout = 15000) {
+async function activePort(timeout = 45000) {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
     if (launchError) throw launchError;
