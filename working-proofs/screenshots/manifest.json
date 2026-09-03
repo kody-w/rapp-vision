@@ -23,6 +23,9 @@
       "resultSelector": "#status-message",
       "metrics": {
         "id": "status-message",
+        "tag": "P",
+        "disabled": false,
+        "rendered": true,
         "left": 518.296875,
         "top": 288.0625,
         "right": 938.984375,
@@ -41,10 +44,14 @@
         "safeHeight": 508.453125,
         "lowerThirdHeight": 90.796875
       },
+      "state": {
+        "actualSha256": "6355da53d804cf52289b7f0d57eaf6cf5726ffeeb46c1b5630eeb306f2690791",
+        "expectedSha256": "6355da53d804cf52289b7f0d57eaf6cf5726ffeeb46c1b5630eeb306f2690791"
+      },
       "screenshot": {
         "path": "learn-grid-overflow-desktop-positive.png",
-        "bytes": 72689,
-        "sha256": "b7845879cdb39a461d6e0763986d76af058a3c92d9d04c651eba612c115023f1",
+        "bytes": 72960,
+        "sha256": "b45205d6a8fe17e810f14008c7b759a5a77d4e207fd92be5e5b2c8597fe419ac",
         "width": 962,
         "height": 601
       }
@@ -57,6 +64,9 @@
       "resultSelector": "#status-message",
       "metrics": {
         "id": "status-message",
+        "tag": "P",
+        "disabled": false,
+        "rendered": true,
         "left": 526.171875,
         "top": 288.515625,
         "right": 953.984375,
@@ -75,10 +85,14 @@
         "safeHeight": 517.828125,
         "lowerThirdHeight": 90.796875
       },
+      "state": {
+        "actualSha256": "9ef0dd3d802759d6633fb1464dc5b640f17c66e5abeb181a5a54df5167300ca1",
+        "expectedSha256": "9ef0dd3d802759d6633fb1464dc5b640f17c66e5abeb181a5a54df5167300ca1"
+      },
       "screenshot": {
         "path": "learn-grid-overflow-desktop-failure.png",
-        "bytes": 75522,
-        "sha256": "3ab5ca3a7fe108fbb1f4dba2d8759a124b64ad02e1bc83656eca06069699fb9e",
+        "bytes": 75034,
+        "sha256": "a56a0df37e0209100c44de9f346fd82442dd7626f2fd412f23fb1fbe5f22f3f1",
         "width": 977,
         "height": 610
       }
@@ -91,6 +105,9 @@
       "resultSelector": "#status-message",
       "metrics": {
         "id": "status-message",
+        "tag": "P",
+        "disabled": false,
+        "rendered": true,
         "left": 526.171875,
         "top": 288.515625,
         "right": 953.984375,
@@ -109,10 +126,14 @@
         "safeHeight": 517.828125,
         "lowerThirdHeight": 90.796875
       },
+      "state": {
+        "actualSha256": "7759bac87a6d46337725c32ea269bafec430e57f812221b52383db2310b41370",
+        "expectedSha256": "7759bac87a6d46337725c32ea269bafec430e57f812221b52383db2310b41370"
+      },
       "screenshot": {
         "path": "learn-grid-overflow-desktop-reset.png",
-        "bytes": 77491,
-        "sha256": "10fd7300c34467ff8f6060a2fdcdeea3dbe5fd6db807c2bbfb1fdc9781399d72",
+        "bytes": 77528,
+        "sha256": "8dcbae8de0ff82825494db4453c4f5b4565914d91db719e26cae04d4006a5d85",
         "width": 977,
         "height": 610
       }
@@ -125,6 +146,9 @@
       "resultSelector": "#export-output",
       "metrics": {
         "id": "export-output",
+        "tag": "SECTION",
+        "disabled": false,
+        "rendered": true,
         "left": 624.46875,
         "top": 207,
         "right": 940,
@@ -143,6 +167,10 @@
         "safeHeight": 508.453125,
         "lowerThirdHeight": 90.796875
       },
+      "state": {
+        "actualSha256": "8a9cf504e3333573182d833f95694648d1f5768985204021f94d16390087bb82",
+        "expectedSha256": "8a9cf504e3333573182d833f95694648d1f5768985204021f94d16390087bb82"
+      },
       "screenshot": {
         "path": "use-keyboard-invoice-triage-desktop-positive.png",
         "bytes": 92578,
@@ -159,6 +187,9 @@
       "resultSelector": "#validation-error",
       "metrics": {
         "id": "validation-error",
+        "tag": "P",
+        "disabled": false,
+        "rendered": true,
         "left": 634.078125,
         "top": 221,
         "right": 954.984375,
@@ -177,6 +208,10 @@
         "safeHeight": 517.828125,
         "lowerThirdHeight": 90.796875
       },
+      "state": {
+        "actualSha256": "526215705ef65344e79e62f762e8e3e18f989533e8133d9a039ce44cfbda36d3",
+        "expectedSha256": "526215705ef65344e79e62f762e8e3e18f989533e8133d9a039ce44cfbda36d3"
+      },
       "screenshot": {
         "path": "use-keyboard-invoice-triage-desktop-rejected.png",
         "bytes": 112560,
@@ -193,30 +228,37 @@
       "resultSelector": "#status-message",
       "metrics": {
         "id": "status-message",
-        "left": 634.078125,
+        "tag": "P",
+        "disabled": false,
+        "rendered": true,
+        "left": 624.46875,
         "top": 172,
-        "right": 954.984375,
+        "right": 940,
         "bottom": 200,
-        "width": 320.90625,
+        "width": 315.53125,
         "height": 28,
-        "visibleWidth": 320.90625,
+        "visibleWidth": 315.53125,
         "visibleHeight": 28,
         "requiredWidth": 32,
         "requiredHeight": 14,
         "visible": true,
-        "frameWidth": 975,
-        "frameHeight": 608.625,
-        "stageWidth": 977,
-        "stageHeight": 610.625,
-        "safeHeight": 517.828125,
+        "frameWidth": 960,
+        "frameHeight": 599.25,
+        "stageWidth": 962,
+        "stageHeight": 601.25,
+        "safeHeight": 508.453125,
         "lowerThirdHeight": 90.796875
+      },
+      "state": {
+        "actualSha256": "f566e73ffbce17a82b7b718d930cbeaba3054c2b2f466fd56fe51503a03ae157",
+        "expectedSha256": "f566e73ffbce17a82b7b718d930cbeaba3054c2b2f466fd56fe51503a03ae157"
       },
       "screenshot": {
         "path": "use-keyboard-invoice-triage-desktop-reset.png",
-        "bytes": 84879,
-        "sha256": "e012a304a542fb59a58c264ab5938f8bbae8efb50a536b1e1f2490dc0c19c95b",
-        "width": 977,
-        "height": 610
+        "bytes": 82864,
+        "sha256": "2c4e6b32978cc8dac20f18ace10b35cd5b25fabc3794d74315e42d1b8ea3f699",
+        "width": 962,
+        "height": 601
       }
     },
     {
@@ -227,6 +269,9 @@
       "resultSelector": "#status-panel",
       "metrics": {
         "id": "status-panel",
+        "tag": "SECTION",
+        "disabled": false,
+        "rendered": true,
         "left": 10,
         "top": 412.3125,
         "right": 950,
@@ -245,10 +290,14 @@
         "safeHeight": 508.453125,
         "lowerThirdHeight": 90.796875
       },
+      "state": {
+        "actualSha256": "92736687452789e4a657f962e2ef235e2e7587358b6a60f4b939259f1826aa99",
+        "expectedSha256": "92736687452789e4a657f962e2ef235e2e7587358b6a60f4b939259f1826aa99"
+      },
       "screenshot": {
         "path": "create-vector-icon-system-desktop-positive.png",
-        "bytes": 122133,
-        "sha256": "fae16539043329a20580c7e071f47d13f9720a7c7c7c99b09fab6d7255b957fc",
+        "bytes": 123180,
+        "sha256": "ff4e0ac227d795acd0450ad5e084dc0369797a195716bc464b767fbbcc61f084",
         "width": 962,
         "height": 601
       }
@@ -261,6 +310,9 @@
       "resultSelector": "#status-panel",
       "metrics": {
         "id": "status-panel",
+        "tag": "SECTION",
+        "disabled": false,
+        "rendered": true,
         "left": 10,
         "top": 441.328125,
         "right": 965,
@@ -279,10 +331,14 @@
         "safeHeight": 517.828125,
         "lowerThirdHeight": 90.796875
       },
+      "state": {
+        "actualSha256": "152331dd13b5efa4a055318af9155ad85214bb5de531e181e9d0051fe3b9864f",
+        "expectedSha256": "152331dd13b5efa4a055318af9155ad85214bb5de531e181e9d0051fe3b9864f"
+      },
       "screenshot": {
         "path": "create-vector-icon-system-desktop-rejected.png",
-        "bytes": 128554,
-        "sha256": "a6b5482e3344dc25152718a3f33319faf54e4834cf4a244d82c2b74b49fa7abe",
+        "bytes": 129599,
+        "sha256": "eb9701e437b01cfb352dce22e79004c8a38b2bf5e28b23e103d9eac394bb27a4",
         "width": 977,
         "height": 610
       }
@@ -295,6 +351,9 @@
       "resultSelector": "#status-panel",
       "metrics": {
         "id": "status-panel",
+        "tag": "SECTION",
+        "disabled": false,
+        "rendered": true,
         "left": 10,
         "top": 391.765625,
         "right": 965,
@@ -313,10 +372,342 @@
         "safeHeight": 517.828125,
         "lowerThirdHeight": 90.796875
       },
+      "state": {
+        "actualSha256": "550b7144cdcbcf5306c0e695ba2154571d941f98cd9d2659262703462878e37e",
+        "expectedSha256": "550b7144cdcbcf5306c0e695ba2154571d941f98cd9d2659262703462878e37e"
+      },
       "screenshot": {
         "path": "create-vector-icon-system-desktop-reset.png",
-        "bytes": 124099,
-        "sha256": "af807ae54d7adc566ca004b3aa263d0b13cfd2cdb60053669b8c2e4a3c77522d",
+        "bytes": 125198,
+        "sha256": "853ed1be879c031378c14ed26f75149b9e8e6201f607975d26b0af70b77c31fe",
+        "width": 977,
+        "height": 610
+      }
+    },
+    {
+      "publication": "ecosystem-island-threshold",
+      "viewport": "desktop",
+      "checkpoint": "stable",
+      "actionIndex": 6,
+      "resultSelector": "#stable-result",
+      "metrics": {
+        "id": "stable-result",
+        "tag": "DIV",
+        "disabled": false,
+        "rendered": true,
+        "left": 335.90625,
+        "top": 7.515625,
+        "right": 916,
+        "bottom": 111.109375,
+        "width": 580.09375,
+        "height": 103.59375,
+        "visibleWidth": 580.09375,
+        "visibleHeight": 103.59375,
+        "requiredWidth": 32,
+        "requiredHeight": 24,
+        "visible": true,
+        "frameWidth": 960,
+        "frameHeight": 599.25,
+        "stageWidth": 962,
+        "stageHeight": 601.25,
+        "safeHeight": 508.453125,
+        "lowerThirdHeight": 90.796875
+      },
+      "state": {
+        "actualSha256": "a5aac4256648f14b86e9fda56f72ebe69a2922b79a3c573ce7c5b6df58a02ef2",
+        "expectedSha256": "a5aac4256648f14b86e9fda56f72ebe69a2922b79a3c573ce7c5b6df58a02ef2"
+      },
+      "screenshot": {
+        "path": "ecosystem-island-threshold-desktop-stable.png",
+        "bytes": 91930,
+        "sha256": "751032f0d2d8a2064cdfa4a483b66541259a229688a7f49f17d2596ca5f63803",
+        "width": 962,
+        "height": 601
+      }
+    },
+    {
+      "publication": "ecosystem-island-threshold",
+      "viewport": "desktop",
+      "checkpoint": "collapse",
+      "actionIndex": 15,
+      "resultSelector": "#collapse-result",
+      "metrics": {
+        "id": "collapse-result",
+        "tag": "DIV",
+        "disabled": false,
+        "rendered": true,
+        "left": 340.78125,
+        "top": 202.28125,
+        "right": 931,
+        "bottom": 305.875,
+        "width": 590.21875,
+        "height": 103.59375,
+        "visibleWidth": 590.21875,
+        "visibleHeight": 103.59375,
+        "requiredWidth": 32,
+        "requiredHeight": 24,
+        "visible": true,
+        "frameWidth": 975,
+        "frameHeight": 608.625,
+        "stageWidth": 977,
+        "stageHeight": 610.625,
+        "safeHeight": 517.828125,
+        "lowerThirdHeight": 90.796875
+      },
+      "state": {
+        "actualSha256": "459ee627c94e2d3e9aa16840718f4489f3af545bd2a1dc4c04327919e1668c65",
+        "expectedSha256": "459ee627c94e2d3e9aa16840718f4489f3af545bd2a1dc4c04327919e1668c65"
+      },
+      "screenshot": {
+        "path": "ecosystem-island-threshold-desktop-collapse.png",
+        "bytes": 116562,
+        "sha256": "0ff025612f83c8fa8c74b29c95cbaffc0b734ce0d3c037244db9845dfe3c2c1d",
+        "width": 977,
+        "height": 610
+      }
+    },
+    {
+      "publication": "ecosystem-island-threshold",
+      "viewport": "desktop",
+      "checkpoint": "export",
+      "actionIndex": 18,
+      "resultSelector": "#series-export",
+      "metrics": {
+        "id": "series-export",
+        "tag": "TEXTAREA",
+        "disabled": false,
+        "rendered": true,
+        "left": 340.78125,
+        "top": 101.625,
+        "right": 931,
+        "bottom": 251.625,
+        "width": 590.21875,
+        "height": 150,
+        "visibleWidth": 590.21875,
+        "visibleHeight": 150,
+        "requiredWidth": 32,
+        "requiredHeight": 24,
+        "visible": true,
+        "frameWidth": 975,
+        "frameHeight": 608.625,
+        "stageWidth": 977,
+        "stageHeight": 610.625,
+        "safeHeight": 517.828125,
+        "lowerThirdHeight": 90.796875
+      },
+      "state": {
+        "actualSha256": "aa7ba71d5bf010d117d9204ee60d34b60a39eae38163cb2e9086bfa5d7c708ab",
+        "expectedSha256": "aa7ba71d5bf010d117d9204ee60d34b60a39eae38163cb2e9086bfa5d7c708ab"
+      },
+      "screenshot": {
+        "path": "ecosystem-island-threshold-desktop-export.png",
+        "bytes": 102597,
+        "sha256": "e009919ece939043ac37e76c7844a43e05010b42f18828c9dd8ca3ebc13dc2e9",
+        "width": 977,
+        "height": 610
+      }
+    },
+    {
+      "publication": "ecosystem-island-threshold",
+      "viewport": "desktop",
+      "checkpoint": "reset",
+      "actionIndex": 21,
+      "resultSelector": "#reset-proof",
+      "metrics": {
+        "id": "reset-proof",
+        "tag": "DIV",
+        "disabled": false,
+        "rendered": true,
+        "left": 29,
+        "top": 340.609375,
+        "right": 298.78125,
+        "bottom": 510.296875,
+        "width": 269.78125,
+        "height": 169.6875,
+        "visibleWidth": 269.78125,
+        "visibleHeight": 169.6875,
+        "requiredWidth": 32,
+        "requiredHeight": 24,
+        "visible": true,
+        "frameWidth": 975,
+        "frameHeight": 608.625,
+        "stageWidth": 977,
+        "stageHeight": 610.625,
+        "safeHeight": 517.828125,
+        "lowerThirdHeight": 90.796875
+      },
+      "state": {
+        "actualSha256": "b0443e4cee980fac0751dc7d7ec8610cae87eb58ecb6ea1dfb82964c2a9c441e",
+        "expectedSha256": "b0443e4cee980fac0751dc7d7ec8610cae87eb58ecb6ea1dfb82964c2a9c441e"
+      },
+      "screenshot": {
+        "path": "ecosystem-island-threshold-desktop-reset.png",
+        "bytes": 93249,
+        "sha256": "292fa3fdf684079d3150541432923ecf240d2eb6a8a467ddf454dbf12b605885",
+        "width": 977,
+        "height": 610
+      }
+    },
+    {
+      "publication": "ecosystem-island-threshold",
+      "viewport": "desktop",
+      "checkpoint": "your-turn",
+      "actionIndex": 22,
+      "resultSelector": "#your-turn",
+      "metrics": {
+        "id": "your-turn",
+        "tag": "SECTION",
+        "disabled": false,
+        "rendered": true,
+        "left": 345.640625,
+        "top": 120.484375,
+        "right": 946,
+        "bottom": 237.671875,
+        "width": 600.359375,
+        "height": 117.1875,
+        "visibleWidth": 600.359375,
+        "visibleHeight": 117.1875,
+        "requiredWidth": 32,
+        "requiredHeight": 24,
+        "visible": true,
+        "frameWidth": 975,
+        "frameHeight": 608.625,
+        "stageWidth": 977,
+        "stageHeight": 610.625,
+        "safeHeight": 517.828125,
+        "lowerThirdHeight": 90.796875
+      },
+      "state": {
+        "actualSha256": "b0443e4cee980fac0751dc7d7ec8610cae87eb58ecb6ea1dfb82964c2a9c441e",
+        "expectedSha256": "b0443e4cee980fac0751dc7d7ec8610cae87eb58ecb6ea1dfb82964c2a9c441e"
+      },
+      "screenshot": {
+        "path": "ecosystem-island-threshold-desktop-your-turn.png",
+        "bytes": 91655,
+        "sha256": "c1fdce10477853d5adb84be885f82269fc560664d19601a95d4f75a109f2dded",
+        "width": 977,
+        "height": 610
+      }
+    },
+    {
+      "publication": "explore-archive-map-contrast",
+      "viewport": "desktop",
+      "checkpoint": "positive",
+      "actionIndex": 11,
+      "resultSelector": "#export-output",
+      "metrics": {
+        "id": "export-output",
+        "tag": "SECTION",
+        "disabled": false,
+        "rendered": true,
+        "left": 640.015625,
+        "top": 352.5625,
+        "right": 929,
+        "bottom": 500.328125,
+        "width": 288.984375,
+        "height": 147.765625,
+        "visibleWidth": 288.984375,
+        "visibleHeight": 147.765625,
+        "requiredWidth": 32,
+        "requiredHeight": 24,
+        "visible": true,
+        "frameWidth": 960,
+        "frameHeight": 599.25,
+        "stageWidth": 962,
+        "stageHeight": 601.25,
+        "safeHeight": 508.453125,
+        "lowerThirdHeight": 90.796875
+      },
+      "state": {
+        "actualSha256": "19553cf826a02303e91782c7705c48419be2d649a8ce7e996704f681d829faca",
+        "expectedSha256": "19553cf826a02303e91782c7705c48419be2d649a8ce7e996704f681d829faca"
+      },
+      "screenshot": {
+        "path": "explore-archive-map-contrast-desktop-positive.png",
+        "bytes": 97902,
+        "sha256": "e4cc8965dd9e668e0b4729a69a86c1f28728f7144504383b31b29a1b411643b4",
+        "width": 962,
+        "height": 601
+      }
+    },
+    {
+      "publication": "explore-archive-map-contrast",
+      "viewport": "desktop",
+      "checkpoint": "failure",
+      "actionIndex": 20,
+      "resultSelector": "#query-error",
+      "metrics": {
+        "id": "query-error",
+        "tag": "SECTION",
+        "disabled": false,
+        "rendered": true,
+        "left": 7,
+        "top": 7.71875,
+        "right": 953,
+        "bottom": 69.03125,
+        "width": 946,
+        "height": 61.3125,
+        "visibleWidth": 946,
+        "visibleHeight": 61.3125,
+        "requiredWidth": 32,
+        "requiredHeight": 24,
+        "visible": true,
+        "frameWidth": 975,
+        "frameHeight": 608.625,
+        "stageWidth": 977,
+        "stageHeight": 610.625,
+        "safeHeight": 517.828125,
+        "lowerThirdHeight": 90.796875
+      },
+      "state": {
+        "actualSha256": "594bb961558e4da8c5abba15120d9916aad465d04d682347e6aab37572777b7e",
+        "expectedSha256": "594bb961558e4da8c5abba15120d9916aad465d04d682347e6aab37572777b7e"
+      },
+      "screenshot": {
+        "path": "explore-archive-map-contrast-desktop-failure.png",
+        "bytes": 119724,
+        "sha256": "f9d5f2977b10745c52890d5ce24f8c97cf90f9f67637be3ea15a4654abe8878b",
+        "width": 977,
+        "height": 610
+      }
+    },
+    {
+      "publication": "explore-archive-map-contrast",
+      "viewport": "desktop",
+      "checkpoint": "reset",
+      "actionIndex": 23,
+      "resultSelector": "#status-message",
+      "metrics": {
+        "id": "status-message",
+        "tag": "P",
+        "disabled": false,
+        "rendered": true,
+        "left": 650,
+        "top": 175.125,
+        "right": 944,
+        "bottom": 222.5625,
+        "width": 294,
+        "height": 47.4375,
+        "visibleWidth": 294,
+        "visibleHeight": 47.4375,
+        "requiredWidth": 32,
+        "requiredHeight": 23.71875,
+        "visible": true,
+        "frameWidth": 975,
+        "frameHeight": 608.625,
+        "stageWidth": 977,
+        "stageHeight": 610.625,
+        "safeHeight": 517.828125,
+        "lowerThirdHeight": 90.796875
+      },
+      "state": {
+        "actualSha256": "9d4c64ca3f6b4529877cd99528d86642f916bf506d465847389c5b991ef227b1",
+        "expectedSha256": "9d4c64ca3f6b4529877cd99528d86642f916bf506d465847389c5b991ef227b1"
+      },
+      "screenshot": {
+        "path": "explore-archive-map-contrast-desktop-reset.png",
+        "bytes": 103202,
+        "sha256": "024e4506eb7fca199b7b9e762d7310c9f2add632727eca2411d4267791c0297d",
         "width": 977,
         "height": 610
       }
@@ -329,10 +720,13 @@
       "resultSelector": "#status-message",
       "metrics": {
         "id": "status-message",
+        "tag": "P",
+        "disabled": false,
+        "rendered": true,
         "left": 9,
-        "top": 2.59375,
+        "top": 7.59375,
         "right": 366,
-        "bottom": 24.65625,
+        "bottom": 29.65625,
         "width": 357,
         "height": 22.0625,
         "visibleWidth": 357,
@@ -347,10 +741,14 @@
         "safeHeight": 97,
         "lowerThirdHeight": 146
       },
+      "state": {
+        "actualSha256": "6355da53d804cf52289b7f0d57eaf6cf5726ffeeb46c1b5630eeb306f2690791",
+        "expectedSha256": "6355da53d804cf52289b7f0d57eaf6cf5726ffeeb46c1b5630eeb306f2690791"
+      },
       "screenshot": {
         "path": "learn-grid-overflow-390-positive.png",
-        "bytes": 31614,
-        "sha256": "1d03551744ee18b6e1e7a0404006504c9f88b56b5528b9f0b44020fdc97bc95d",
+        "bytes": 32327,
+        "sha256": "dd77bd5edc4c4b7176155ccd9e88a32be2c6bf8759c6771d1160224558738c4e",
         "width": 392,
         "height": 245
       }
@@ -363,10 +761,13 @@
       "resultSelector": "#status-message",
       "metrics": {
         "id": "status-message",
+        "tag": "P",
+        "disabled": false,
+        "rendered": true,
         "left": 9,
-        "top": 2.59375,
+        "top": 7.59375,
         "right": 381,
-        "bottom": 36.71875,
+        "bottom": 41.71875,
         "width": 372,
         "height": 34.125,
         "visibleWidth": 372,
@@ -381,10 +782,14 @@
         "safeHeight": 106.375,
         "lowerThirdHeight": 146
       },
+      "state": {
+        "actualSha256": "9ef0dd3d802759d6633fb1464dc5b640f17c66e5abeb181a5a54df5167300ca1",
+        "expectedSha256": "9ef0dd3d802759d6633fb1464dc5b640f17c66e5abeb181a5a54df5167300ca1"
+      },
       "screenshot": {
         "path": "learn-grid-overflow-390-failure.png",
-        "bytes": 37197,
-        "sha256": "8989d7f70dae14c47f0a7c27bff474cc4c7d7c5fd3d141159f46a096b52404b8",
+        "bytes": 36040,
+        "sha256": "8b00d758d31d5612225287b2e142ed2c53374eac2a410fc3ecedf56e94a606d6",
         "width": 407,
         "height": 254
       }
@@ -397,10 +802,13 @@
       "resultSelector": "#status-message",
       "metrics": {
         "id": "status-message",
+        "tag": "P",
+        "disabled": false,
+        "rendered": true,
         "left": 9,
-        "top": 2.59375,
+        "top": 7.59375,
         "right": 381,
-        "bottom": 36.71875,
+        "bottom": 41.71875,
         "width": 372,
         "height": 34.125,
         "visibleWidth": 372,
@@ -415,10 +823,14 @@
         "safeHeight": 106.375,
         "lowerThirdHeight": 146
       },
+      "state": {
+        "actualSha256": "7759bac87a6d46337725c32ea269bafec430e57f812221b52383db2310b41370",
+        "expectedSha256": "7759bac87a6d46337725c32ea269bafec430e57f812221b52383db2310b41370"
+      },
       "screenshot": {
         "path": "learn-grid-overflow-390-reset.png",
-        "bytes": 39789,
-        "sha256": "4f658658cfca348a453769391cbae4ba94bb022da2bcb9e9e15f25004d8b06ee",
+        "bytes": 40387,
+        "sha256": "7aef8740e53e00abf239b34b5e3f8d458fe8f2a564a8e6f6870446cc39fa1a80",
         "width": 407,
         "height": 254
       }
@@ -431,10 +843,13 @@
       "resultSelector": "#export-output",
       "metrics": {
         "id": "export-output",
+        "tag": "SECTION",
+        "disabled": false,
+        "rendered": true,
         "left": 9,
-        "top": 2.6875,
+        "top": 7.6875,
         "right": 366,
-        "bottom": 50.3125,
+        "bottom": 55.3125,
         "width": 357,
         "height": 47.625,
         "visibleWidth": 357,
@@ -449,10 +864,14 @@
         "safeHeight": 121,
         "lowerThirdHeight": 122
       },
+      "state": {
+        "actualSha256": "8a9cf504e3333573182d833f95694648d1f5768985204021f94d16390087bb82",
+        "expectedSha256": "8a9cf504e3333573182d833f95694648d1f5768985204021f94d16390087bb82"
+      },
       "screenshot": {
         "path": "use-keyboard-invoice-triage-390-positive.png",
-        "bytes": 38824,
-        "sha256": "189d0a8e478f4e24e0b707235a6c2c49e910327c48620bcc843640d3e04903f4",
+        "bytes": 38632,
+        "sha256": "aa080b7b8d141732ecc96fc253d4288ad157ea13721a90dda2b5325dcdc43ba5",
         "width": 392,
         "height": 245
       }
@@ -465,10 +884,13 @@
       "resultSelector": "#validation-error",
       "metrics": {
         "id": "validation-error",
+        "tag": "P",
+        "disabled": false,
+        "rendered": true,
         "left": 9,
-        "top": 2.6875,
+        "top": 7.6875,
         "right": 381,
-        "bottom": 28.375,
+        "bottom": 33.375,
         "width": 372,
         "height": 25.6875,
         "visibleWidth": 372,
@@ -483,10 +905,14 @@
         "safeHeight": 130.375,
         "lowerThirdHeight": 122
       },
+      "state": {
+        "actualSha256": "526215705ef65344e79e62f762e8e3e18f989533e8133d9a039ce44cfbda36d3",
+        "expectedSha256": "526215705ef65344e79e62f762e8e3e18f989533e8133d9a039ce44cfbda36d3"
+      },
       "screenshot": {
         "path": "use-keyboard-invoice-triage-390-rejected.png",
-        "bytes": 41488,
-        "sha256": "68d8615c73efae88001307daa112ab6dba058caa18a6ec003058c5bd0ed4697b",
+        "bytes": 41654,
+        "sha256": "60b28a11eaab87583bad3db2c923be27da43c230861973bb3a678bbce3ad17eb",
         "width": 407,
         "height": 254
       }
@@ -499,10 +925,13 @@
       "resultSelector": "#status-message",
       "metrics": {
         "id": "status-message",
+        "tag": "P",
+        "disabled": false,
+        "rendered": true,
         "left": 9,
-        "top": 3,
+        "top": 8,
         "right": 381,
-        "bottom": 24.6875,
+        "bottom": 29.6875,
         "width": 372,
         "height": 21.6875,
         "visibleWidth": 372,
@@ -517,10 +946,14 @@
         "safeHeight": 130.375,
         "lowerThirdHeight": 122
       },
+      "state": {
+        "actualSha256": "f566e73ffbce17a82b7b718d930cbeaba3054c2b2f466fd56fe51503a03ae157",
+        "expectedSha256": "f566e73ffbce17a82b7b718d930cbeaba3054c2b2f466fd56fe51503a03ae157"
+      },
       "screenshot": {
         "path": "use-keyboard-invoice-triage-390-reset.png",
-        "bytes": 41046,
-        "sha256": "2049c46df4759a10bb6a05f0cf5407d72cb9788693295a1efa64614ca60ed8e2",
+        "bytes": 41271,
+        "sha256": "da44cec22d8a70e1c87045e479bc68ffa25e98a6dc6b21daec0236e6337e6bd7",
         "width": 407,
         "height": 254
       }
@@ -533,10 +966,13 @@
       "resultSelector": "#status-panel",
       "metrics": {
         "id": "status-panel",
+        "tag": "SECTION",
+        "disabled": false,
+        "rendered": true,
         "left": 4,
-        "top": 0,
+        "top": 3.59375,
         "right": 371,
-        "bottom": 42,
+        "bottom": 45.59375,
         "width": 367,
         "height": 42,
         "visibleWidth": 367,
@@ -551,10 +987,14 @@
         "safeHeight": 97,
         "lowerThirdHeight": 146
       },
+      "state": {
+        "actualSha256": "92736687452789e4a657f962e2ef235e2e7587358b6a60f4b939259f1826aa99",
+        "expectedSha256": "92736687452789e4a657f962e2ef235e2e7587358b6a60f4b939259f1826aa99"
+      },
       "screenshot": {
         "path": "create-vector-icon-system-390-positive.png",
-        "bytes": 38048,
-        "sha256": "c2de9db713354c08c07d078a59818d092dc11c1a518255c1163b2cce597e7f10",
+        "bytes": 37980,
+        "sha256": "453e628ca514343842acc48cc6c5ad689f1fb4fd35082121e35834b221cf944b",
         "width": 392,
         "height": 245
       }
@@ -567,10 +1007,13 @@
       "resultSelector": "#status-panel",
       "metrics": {
         "id": "status-panel",
+        "tag": "SECTION",
+        "disabled": false,
+        "rendered": true,
         "left": 4,
-        "top": 0,
+        "top": 3.59375,
         "right": 386,
-        "bottom": 45.296875,
+        "bottom": 48.890625,
         "width": 382,
         "height": 45.296875,
         "visibleWidth": 382,
@@ -585,10 +1028,14 @@
         "safeHeight": 106.375,
         "lowerThirdHeight": 146
       },
+      "state": {
+        "actualSha256": "152331dd13b5efa4a055318af9155ad85214bb5de531e181e9d0051fe3b9864f",
+        "expectedSha256": "152331dd13b5efa4a055318af9155ad85214bb5de531e181e9d0051fe3b9864f"
+      },
       "screenshot": {
         "path": "create-vector-icon-system-390-rejected.png",
-        "bytes": 41564,
-        "sha256": "b8d2bc82a70406602740eb78a51ea2e7c7dbf1fffdea46836225a206c68c1485",
+        "bytes": 41578,
+        "sha256": "0ca15a4a88ec6e4036215fe3f07e4b50bca3081da87064c57debde2b9d12fd8c",
         "width": 407,
         "height": 254
       }
@@ -601,10 +1048,13 @@
       "resultSelector": "#status-panel",
       "metrics": {
         "id": "status-panel",
+        "tag": "SECTION",
+        "disabled": false,
+        "rendered": true,
         "left": 4,
-        "top": 0,
+        "top": 6.59375,
         "right": 386,
-        "bottom": 42,
+        "bottom": 48.59375,
         "width": 382,
         "height": 42,
         "visibleWidth": 382,
@@ -619,10 +1069,342 @@
         "safeHeight": 106.375,
         "lowerThirdHeight": 146
       },
+      "state": {
+        "actualSha256": "550b7144cdcbcf5306c0e695ba2154571d941f98cd9d2659262703462878e37e",
+        "expectedSha256": "550b7144cdcbcf5306c0e695ba2154571d941f98cd9d2659262703462878e37e"
+      },
       "screenshot": {
         "path": "create-vector-icon-system-390-reset.png",
-        "bytes": 40207,
-        "sha256": "94892481bfa4eb637e70392dfb6b087658c4165c4ffcebc46c9d8a9d45fad412",
+        "bytes": 39779,
+        "sha256": "633ea08c6c435f92e477071be3bf6429d2656d408b3772171bcd0b6a57adf59c",
+        "width": 407,
+        "height": 254
+      }
+    },
+    {
+      "publication": "ecosystem-island-threshold",
+      "viewport": "390",
+      "checkpoint": "stable",
+      "actionIndex": 6,
+      "resultSelector": "#stable-result",
+      "metrics": {
+        "id": "stable-result",
+        "tag": "DIV",
+        "disabled": false,
+        "rendered": true,
+        "left": 24.1875,
+        "top": -29.65625,
+        "right": 350.8125,
+        "bottom": 92.5,
+        "width": 326.625,
+        "height": 122.15625,
+        "visibleWidth": 326.625,
+        "visibleHeight": 92.5,
+        "requiredWidth": 32,
+        "requiredHeight": 24,
+        "visible": true,
+        "frameWidth": 390,
+        "frameHeight": 243,
+        "stageWidth": 392,
+        "stageHeight": 245,
+        "safeHeight": 101,
+        "lowerThirdHeight": 142
+      },
+      "state": {
+        "actualSha256": "a5aac4256648f14b86e9fda56f72ebe69a2922b79a3c573ce7c5b6df58a02ef2",
+        "expectedSha256": "a5aac4256648f14b86e9fda56f72ebe69a2922b79a3c573ce7c5b6df58a02ef2"
+      },
+      "screenshot": {
+        "path": "ecosystem-island-threshold-390-stable.png",
+        "bytes": 36256,
+        "sha256": "83a5eeb8e68c5197f66ce8f3afca01f241bf1c7fd7707bb9651ab1e7cfd4ebd8",
+        "width": 392,
+        "height": 245
+      }
+    },
+    {
+      "publication": "ecosystem-island-threshold",
+      "viewport": "390",
+      "checkpoint": "collapse",
+      "actionIndex": 15,
+      "resultSelector": "#collapse-result",
+      "metrics": {
+        "id": "collapse-result",
+        "tag": "DIV",
+        "disabled": false,
+        "rendered": true,
+        "left": 24.1875,
+        "top": -20.109375,
+        "right": 365.8125,
+        "bottom": 102.046875,
+        "width": 341.625,
+        "height": 122.15625,
+        "visibleWidth": 341.625,
+        "visibleHeight": 102.046875,
+        "requiredWidth": 32,
+        "requiredHeight": 24,
+        "visible": true,
+        "frameWidth": 405,
+        "frameHeight": 252.375,
+        "stageWidth": 407,
+        "stageHeight": 254.375,
+        "safeHeight": 110.375,
+        "lowerThirdHeight": 142
+      },
+      "state": {
+        "actualSha256": "459ee627c94e2d3e9aa16840718f4489f3af545bd2a1dc4c04327919e1668c65",
+        "expectedSha256": "459ee627c94e2d3e9aa16840718f4489f3af545bd2a1dc4c04327919e1668c65"
+      },
+      "screenshot": {
+        "path": "ecosystem-island-threshold-390-collapse.png",
+        "bytes": 33699,
+        "sha256": "fb3749bddb74354f028576db61469f2cdae4ba23128b3e32a1365e4f22be22b3",
+        "width": 407,
+        "height": 254
+      }
+    },
+    {
+      "publication": "ecosystem-island-threshold",
+      "viewport": "390",
+      "checkpoint": "export",
+      "actionIndex": 18,
+      "resultSelector": "#series-export",
+      "metrics": {
+        "id": "series-export",
+        "tag": "TEXTAREA",
+        "disabled": false,
+        "rendered": true,
+        "left": 24.1875,
+        "top": -47.234375,
+        "right": 365.8125,
+        "bottom": 102.765625,
+        "width": 341.625,
+        "height": 150,
+        "visibleWidth": 341.625,
+        "visibleHeight": 102.765625,
+        "requiredWidth": 32,
+        "requiredHeight": 24,
+        "visible": true,
+        "frameWidth": 405,
+        "frameHeight": 252.375,
+        "stageWidth": 407,
+        "stageHeight": 254.375,
+        "safeHeight": 110.375,
+        "lowerThirdHeight": 142
+      },
+      "state": {
+        "actualSha256": "aa7ba71d5bf010d117d9204ee60d34b60a39eae38163cb2e9086bfa5d7c708ab",
+        "expectedSha256": "aa7ba71d5bf010d117d9204ee60d34b60a39eae38163cb2e9086bfa5d7c708ab"
+      },
+      "screenshot": {
+        "path": "ecosystem-island-threshold-390-export.png",
+        "bytes": 34466,
+        "sha256": "762fd47bda50f482bf67f1d245124cde854a94ddc8b6dedb0a2a15b28852daca",
+        "width": 407,
+        "height": 254
+      }
+    },
+    {
+      "publication": "ecosystem-island-threshold",
+      "viewport": "390",
+      "checkpoint": "reset",
+      "actionIndex": 21,
+      "resultSelector": "#reset-proof",
+      "metrics": {
+        "id": "reset-proof",
+        "tag": "DIV",
+        "disabled": false,
+        "rendered": true,
+        "left": 24.1875,
+        "top": -40.34375,
+        "right": 365.8125,
+        "bottom": 102.6875,
+        "width": 341.625,
+        "height": 143.03125,
+        "visibleWidth": 341.625,
+        "visibleHeight": 102.6875,
+        "requiredWidth": 32,
+        "requiredHeight": 24,
+        "visible": true,
+        "frameWidth": 405,
+        "frameHeight": 252.375,
+        "stageWidth": 407,
+        "stageHeight": 254.375,
+        "safeHeight": 110.375,
+        "lowerThirdHeight": 142
+      },
+      "state": {
+        "actualSha256": "b0443e4cee980fac0751dc7d7ec8610cae87eb58ecb6ea1dfb82964c2a9c441e",
+        "expectedSha256": "b0443e4cee980fac0751dc7d7ec8610cae87eb58ecb6ea1dfb82964c2a9c441e"
+      },
+      "screenshot": {
+        "path": "ecosystem-island-threshold-390-reset.png",
+        "bytes": 33140,
+        "sha256": "78d6706366bd516975665cf2bd1e008ba312880d8f17fc7835a48f8c5484e7b2",
+        "width": 407,
+        "height": 254
+      }
+    },
+    {
+      "publication": "ecosystem-island-threshold",
+      "viewport": "390",
+      "checkpoint": "your-turn",
+      "actionIndex": 22,
+      "resultSelector": "#your-turn",
+      "metrics": {
+        "id": "your-turn",
+        "tag": "SECTION",
+        "disabled": false,
+        "rendered": true,
+        "left": 24.1875,
+        "top": -63.078125,
+        "right": 380.8125,
+        "bottom": 102.109375,
+        "width": 356.625,
+        "height": 165.1875,
+        "visibleWidth": 356.625,
+        "visibleHeight": 102.109375,
+        "requiredWidth": 32,
+        "requiredHeight": 24,
+        "visible": true,
+        "frameWidth": 405,
+        "frameHeight": 252.375,
+        "stageWidth": 407,
+        "stageHeight": 254.375,
+        "safeHeight": 110.375,
+        "lowerThirdHeight": 142
+      },
+      "state": {
+        "actualSha256": "b0443e4cee980fac0751dc7d7ec8610cae87eb58ecb6ea1dfb82964c2a9c441e",
+        "expectedSha256": "b0443e4cee980fac0751dc7d7ec8610cae87eb58ecb6ea1dfb82964c2a9c441e"
+      },
+      "screenshot": {
+        "path": "ecosystem-island-threshold-390-your-turn.png",
+        "bytes": 24616,
+        "sha256": "d5a9655669018c300a7fa572c32769650553f6a3f36ece12fe5ecc613317ce72",
+        "width": 407,
+        "height": 254
+      }
+    },
+    {
+      "publication": "explore-archive-map-contrast",
+      "viewport": "390",
+      "checkpoint": "positive",
+      "actionIndex": 11,
+      "resultSelector": "#export-output",
+      "metrics": {
+        "id": "export-output",
+        "tag": "SECTION",
+        "disabled": false,
+        "rendered": true,
+        "left": 16,
+        "top": -54.53125,
+        "right": 359,
+        "bottom": 112.671875,
+        "width": 343,
+        "height": 167.203125,
+        "visibleWidth": 343,
+        "visibleHeight": 112.671875,
+        "requiredWidth": 32,
+        "requiredHeight": 24,
+        "visible": true,
+        "frameWidth": 390,
+        "frameHeight": 243,
+        "stageWidth": 392,
+        "stageHeight": 245,
+        "safeHeight": 121,
+        "lowerThirdHeight": 122
+      },
+      "state": {
+        "actualSha256": "19553cf826a02303e91782c7705c48419be2d649a8ce7e996704f681d829faca",
+        "expectedSha256": "19553cf826a02303e91782c7705c48419be2d649a8ce7e996704f681d829faca"
+      },
+      "screenshot": {
+        "path": "explore-archive-map-contrast-390-positive.png",
+        "bytes": 28584,
+        "sha256": "fc806b6b5624c32368acc1f5bf2e862a27631348bf3458db0cd7d8adb6e60ca5",
+        "width": 392,
+        "height": 245
+      }
+    },
+    {
+      "publication": "explore-archive-map-contrast",
+      "viewport": "390",
+      "checkpoint": "failure",
+      "actionIndex": 20,
+      "resultSelector": "#query-error",
+      "metrics": {
+        "id": "query-error",
+        "tag": "SECTION",
+        "disabled": false,
+        "rendered": true,
+        "left": 6,
+        "top": 7.796875,
+        "right": 384,
+        "bottom": 114.421875,
+        "width": 378,
+        "height": 106.625,
+        "visibleWidth": 378,
+        "visibleHeight": 106.625,
+        "requiredWidth": 32,
+        "requiredHeight": 24,
+        "visible": true,
+        "frameWidth": 405,
+        "frameHeight": 252.375,
+        "stageWidth": 407,
+        "stageHeight": 254.375,
+        "safeHeight": 130.375,
+        "lowerThirdHeight": 122
+      },
+      "state": {
+        "actualSha256": "594bb961558e4da8c5abba15120d9916aad465d04d682347e6aab37572777b7e",
+        "expectedSha256": "594bb961558e4da8c5abba15120d9916aad465d04d682347e6aab37572777b7e"
+      },
+      "screenshot": {
+        "path": "explore-archive-map-contrast-390-failure.png",
+        "bytes": 29981,
+        "sha256": "4dca98ccc7485ce8185ec478b2e109c9b2c832519fec10a6aa41e11f988299e6",
+        "width": 407,
+        "height": 254
+      }
+    },
+    {
+      "publication": "explore-archive-map-contrast",
+      "viewport": "390",
+      "checkpoint": "reset",
+      "actionIndex": 23,
+      "resultSelector": "#status-message",
+      "metrics": {
+        "id": "status-message",
+        "tag": "P",
+        "disabled": false,
+        "rendered": true,
+        "left": 16,
+        "top": 8.4375,
+        "right": 374,
+        "bottom": 44.15625,
+        "width": 358,
+        "height": 35.71875,
+        "visibleWidth": 358,
+        "visibleHeight": 35.71875,
+        "requiredWidth": 32,
+        "requiredHeight": 17.859375,
+        "visible": true,
+        "frameWidth": 405,
+        "frameHeight": 252.375,
+        "stageWidth": 407,
+        "stageHeight": 254.375,
+        "safeHeight": 130.375,
+        "lowerThirdHeight": 122
+      },
+      "state": {
+        "actualSha256": "9d4c64ca3f6b4529877cd99528d86642f916bf506d465847389c5b991ef227b1",
+        "expectedSha256": "9d4c64ca3f6b4529877cd99528d86642f916bf506d465847389c5b991ef227b1"
+      },
+      "screenshot": {
+        "path": "explore-archive-map-contrast-390-reset.png",
+        "bytes": 39084,
+        "sha256": "59e3051cce37655909b7f0203e3e7124df73b66f2f082291d40bf3adc014b845",
         "width": 407,
         "height": 254
       }
