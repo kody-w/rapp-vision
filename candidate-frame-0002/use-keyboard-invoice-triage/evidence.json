@@ -1,0 +1,255 @@
+{
+  "schema": "keyboard-invoice-triage-evidence/1.0",
+  "commission": "use-keyboard-invoice-triage",
+  "channel": "use-keyboard-invoice-triage",
+  "publication": "use-keyboard-invoice-triage",
+  "app": "apps/use-keyboard-invoice-triage.html",
+  "fixture": {
+    "synthetic": true,
+    "expectedTotalCents": 19625,
+    "expectedTotal": "196.25",
+    "invoices": [
+      {
+        "id": "SYN-001",
+        "vendor": "Paper Kite Supplies",
+        "amountCents": 6475,
+        "amount": "64.75",
+        "category": "Office"
+      },
+      {
+        "id": "SYN-002",
+        "vendor": "Metro Moth Transit",
+        "amountCents": 8250,
+        "amount": "82.50",
+        "category": "Transit"
+      },
+      {
+        "id": "SYN-003",
+        "vendor": "Copper Comet Repairs",
+        "amountCents": 4900,
+        "amount": "49.00",
+        "category": "Uncoded",
+        "requiredCorrection": "Facilities"
+      }
+    ]
+  },
+  "claims": [
+    {
+      "id": "positive",
+      "claim": "Enter accepts SYN-001 and SYN-002, arrow navigation corrects SYN-003 to Facilities, Tab reaches export, and Enter produces acceptedTotal 196.25 without pointer input.",
+      "actions": [
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "ArrowDown"},
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "ArrowDown"},
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "ArrowDown"},
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "Tab"},
+        {"do": "key", "code": "Enter"}
+      ],
+      "expectedState": {
+        "invoices": [
+          {"id": "SYN-001", "vendor": "Paper Kite Supplies", "amount": "64.75", "code": "Office", "status": "accepted"},
+          {"id": "SYN-002", "vendor": "Metro Moth Transit", "amount": "82.50", "code": "Transit", "status": "accepted"},
+          {"id": "SYN-003", "vendor": "Copper Comet Repairs", "amount": "49.00", "code": "Facilities", "status": "accepted"}
+        ],
+        "fixtureTotal": "196.25",
+        "acceptedTotal": "196.25",
+        "canExport": true,
+        "editor": null,
+        "exported": {
+          "acceptedTotal": "196.25",
+          "invoiceCount": 3,
+          "invoiceIds": ["SYN-001", "SYN-002", "SYN-003"]
+        },
+        "status": "exported",
+        "message": "Export complete: acceptedTotal is 196.25.",
+        "error": null,
+        "restorePending": false,
+        "focus": "export-button"
+      },
+      "assertions": [
+        {"path": "fixtureTotal", "equals": "196.25"},
+        {"path": "acceptedTotal", "equals": "196.25"},
+        {"path": "exported.acceptedTotal", "equals": "196.25"},
+        {"path": "invoices.2.code", "equals": "Facilities"},
+        {"path": "focus", "equals": "export-button"}
+      ]
+    },
+    {
+      "id": "rejected",
+      "claim": "After a valid export, Shift-Tab returns to SYN-003, Enter opens its amount field, and typing -1.00 rejects the edit, preserves the accepted and exported 196.25 values, disables export, and keeps focus on the invalid field.",
+      "preserves": "positive",
+      "actions": [
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "ArrowDown"},
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "ArrowDown"},
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "ArrowDown"},
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "Tab"},
+        {"do": "key", "code": "Enter"},
+        {"do": "keydown", "code": "ShiftLeft"},
+        {"do": "key", "code": "Tab"},
+        {"do": "keyup", "code": "ShiftLeft"},
+        {"do": "key", "code": "Enter"},
+        {"do": "type", "text": "-1.00"},
+        {"do": "key", "code": "Enter"}
+      ],
+      "expectedState": {
+        "invoices": [
+          {"id": "SYN-001", "vendor": "Paper Kite Supplies", "amount": "64.75", "code": "Office", "status": "accepted"},
+          {"id": "SYN-002", "vendor": "Metro Moth Transit", "amount": "82.50", "code": "Transit", "status": "accepted"},
+          {"id": "SYN-003", "vendor": "Copper Comet Repairs", "amount": "49.00", "code": "Facilities", "status": "accepted"}
+        ],
+        "fixtureTotal": "196.25",
+        "acceptedTotal": "196.25",
+        "canExport": false,
+        "editor": {
+          "invoiceId": "SYN-003",
+          "amountText": "-1.00",
+          "code": "Facilities"
+        },
+        "exported": {
+          "acceptedTotal": "196.25",
+          "invoiceCount": 3,
+          "invoiceIds": ["SYN-001", "SYN-002", "SYN-003"]
+        },
+        "status": "invalid",
+        "message": "Negative amounts are not allowed. Export is disabled.",
+        "error": "Amount must be zero or greater.",
+        "restorePending": false,
+        "focus": "amount-input"
+      },
+      "assertions": [
+        {"path": "canExport", "equals": false},
+        {"path": "error", "equals": "Amount must be zero or greater."},
+        {"path": "focus", "equals": "amount-input"},
+        {"path": "acceptedTotal", "equals": "196.25"},
+        {"path": "exported.acceptedTotal", "equals": "196.25"}
+      ]
+    },
+    {
+      "id": "reset",
+      "claim": "Four forward Tabs reach Restore invoice fixture from the invalid amount field; two Enter presses confirm replacement and return the exact opening snapshot with three pending invoices, total 196.25, no error, and focus on SYN-001.",
+      "after": "rejected",
+      "actions": [
+        {"do": "key", "code": "Tab"},
+        {"do": "key", "code": "Tab"},
+        {"do": "key", "code": "Tab"},
+        {"do": "key", "code": "Tab"},
+        {"do": "key", "code": "Enter"},
+        {"do": "key", "code": "Enter"}
+      ],
+      "expectedState": {
+        "invoices": [
+          {"id": "SYN-001", "vendor": "Paper Kite Supplies", "amount": "64.75", "code": "Office", "status": "pending"},
+          {"id": "SYN-002", "vendor": "Metro Moth Transit", "amount": "82.50", "code": "Transit", "status": "pending"},
+          {"id": "SYN-003", "vendor": "Copper Comet Repairs", "amount": "49.00", "code": "Uncoded", "status": "pending"}
+        ],
+        "fixtureTotal": "196.25",
+        "acceptedTotal": "0.00",
+        "canExport": false,
+        "editor": null,
+        "exported": null,
+        "status": "ready",
+        "message": "Three pending invoices total $196.25.",
+        "error": null,
+        "restorePending": false,
+        "focus": "invoice-syn-001"
+      },
+      "assertions": [
+        {"path": "fixtureTotal", "equals": "196.25"},
+        {"path": "invoices.0.status", "equals": "pending"},
+        {"path": "invoices.1.status", "equals": "pending"},
+        {"path": "invoices.2.status", "equals": "pending"},
+        {"path": "error", "equals": null},
+        {"path": "focus", "equals": "invoice-syn-001"}
+      ]
+    }
+  ],
+  "manifestReplay": {
+    "manifest": "channel.production.json",
+    "scene": 0,
+    "actionCount": 33,
+    "allowedActions": ["key", "keydown", "keyup", "type", "scroll"],
+    "activationActions": ["key", "keydown", "keyup", "type"],
+    "framingAction": "scroll",
+    "coordinateFree": true,
+    "scrollSelectors": [
+      "#invoice-syn-001",
+      "#invoice-syn-002",
+      "#invoice-syn-003",
+      "#code-select",
+      "#export-button",
+      "#export-output",
+      "#invoice-syn-003",
+      "#amount-input",
+      "#validation-error",
+      "#restore-button",
+      "#confirm-restore-btn",
+      "#status-message"
+    ],
+    "declaredFocusOrder": [
+      "invoice-syn-001",
+      "invoice-syn-002",
+      "invoice-syn-003",
+      "amount-input",
+      "code-select",
+      "save-editor-btn",
+      "cancel-editor-btn",
+      "export-button",
+      "restore-button",
+      "confirm-restore-btn",
+      "cancel-restore-btn"
+    ],
+    "focusAfterEachAction": [
+      "invoice-syn-001",
+      "invoice-syn-001",
+      "invoice-syn-002",
+      "invoice-syn-002",
+      "invoice-syn-002",
+      "invoice-syn-003",
+      "invoice-syn-003",
+      "code-select",
+      "code-select",
+      "code-select",
+      "invoice-syn-003",
+      "export-button",
+      "export-button",
+      "export-button",
+      "export-button",
+      "export-button",
+      "invoice-syn-003",
+      "invoice-syn-003",
+      "invoice-syn-003",
+      "amount-input",
+      "amount-input",
+      "amount-input",
+      "amount-input",
+      "amount-input",
+      "code-select",
+      "save-editor-btn",
+      "cancel-editor-btn",
+      "restore-button",
+      "restore-button",
+      "confirm-restore-btn",
+      "confirm-restore-btn",
+      "invoice-syn-001",
+      "invoice-syn-001"
+    ],
+    "checkpoints": [
+      {"afterAction": 14, "claim": "positive", "selector": "#export-output"},
+      {"afterAction": 23, "claim": "rejected", "selector": "#validation-error"},
+      {"afterAction": 32, "claim": "reset", "selector": "#status-message"}
+    ]
+  },
+  "attestations": {
+    "rights": "All HTML, reducer code, vector art, and rendered frames are original for this candidate.",
+    "privacy": "Vendors, invoice identifiers, categories, and amounts are synthetic and contain no personal or customer data.",
+    "noSecrets": true,
+    "externalRuntimeResources": false
+  }
+}

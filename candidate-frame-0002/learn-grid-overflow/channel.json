@@ -1,0 +1,240 @@
+{
+  "avatar": "↔",
+  "creator": {
+    "identity": "machine-produced, artifact-reviewed",
+    "name": "RAPP Vision candidate frame studio"
+  },
+  "id": "candidate-frame-0002-04",
+  "name": "Candidate Frame 0002 · Grid Overflow",
+  "schema": "rapp-vision-channel/2.0",
+  "tagline": "Measure the automatic minimum, change one declaration, then undo it exactly.",
+  "videos": [
+    {
+      "chapters": [
+        {
+          "label": "Measure 612 > 320",
+          "t": 0
+        },
+        {
+          "label": "Zero the item minimum",
+          "t": 4
+        },
+        {
+          "label": "Verify both target widths",
+          "t": 8
+        },
+        {
+          "label": "Restore the overflow",
+          "t": 11
+        },
+        {
+          "label": "Reset to x = 0",
+          "t": 14
+        }
+      ],
+      "description": "A measured CSS Grid lesson shows a 480 px intrinsic rail contributing through the grid item's default min-width: auto, producing scrollWidth 612 > clientWidth 320. The paired live proof changes only that declaration to min-width: 0, verifies equality at 320 and 1280 px, restores the automatic minimum and horizontal scroll, then performs the exact three-step reset to x = 0.",
+      "duration": 18,
+      "height": 540,
+      "id": "learn-grid-overflow",
+      "live": {
+        "chapters": [
+          {
+            "label": "Inspect the overflowing track",
+            "t": 0
+          },
+          {
+            "label": "Apply the one-line fix",
+            "t": 2.4
+          },
+          {
+            "label": "Verify 1280 px",
+            "t": 5.2
+          },
+          {
+            "label": "Restore broken CSS",
+            "t": 8.2
+          },
+          {
+            "label": "Reproduce horizontal scroll",
+            "t": 10
+          },
+          {
+            "label": "Exact reset",
+            "t": 13.8
+          }
+        ],
+        "duration": 18,
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "actions": [
+              {
+                "at": 0.3,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#inspect-btn"
+              },
+              {
+                "at": 0.8,
+                "do": "click",
+                "selector": "#inspect-btn"
+              },
+              {
+                "at": 2.1,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#apply-fix-btn"
+              },
+              {
+                "at": 2.6,
+                "do": "click",
+                "selector": "#apply-fix-btn"
+              },
+              {
+                "at": 4.9,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#viewport-1280-btn"
+              },
+              {
+                "at": 5.4,
+                "do": "click",
+                "selector": "#viewport-1280-btn"
+              },
+              {
+                "at": 5.7,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#status-message"
+              },
+              {
+                "at": 8.0,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#restore-broken-btn"
+              },
+              {
+                "at": 8.4,
+                "do": "click",
+                "selector": "#restore-broken-btn"
+              },
+              {
+                "at": 9.6,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#viewport-320-btn"
+              },
+              {
+                "at": 10,
+                "do": "click",
+                "selector": "#viewport-320-btn"
+              },
+              {
+                "at": 11.2,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#scroll-end-btn"
+              },
+              {
+                "at": 11.6,
+                "do": "click",
+                "selector": "#scroll-end-btn"
+              },
+              {
+                "at": 11.9,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#status-message"
+              },
+              {
+                "at": 13.6,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#restore-broken-btn"
+              },
+              {
+                "at": 14,
+                "do": "click",
+                "selector": "#restore-broken-btn"
+              },
+              {
+                "at": 14.8,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#viewport-320-btn"
+              },
+              {
+                "at": 15.2,
+                "do": "click",
+                "selector": "#viewport-320-btn"
+              },
+              {
+                "at": 16.1,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#scroll-zero-btn"
+              },
+              {
+                "at": 16.5,
+                "do": "click",
+                "selector": "#scroll-zero-btn"
+              },
+              {
+                "at": 16.8,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#status-message"
+              }
+            ],
+            "app": "apps/learn-grid-overflow.html",
+            "dur": 18,
+            "lower": {
+              "bench": "min-width: auto keeps a 480 px item minimum. min-width: 0 alone yields equality at 320 and 1280.",
+              "fix": "Pause, compare the one changed declaration, and inspect each real DOM snapshot.",
+              "title": "Why the Grid Overflows"
+            },
+            "ready": {
+              "selector": "#inspect-btn"
+            },
+            "t": 0
+          }
+        ]
+      },
+      "orientation": "landscape",
+      "published": "2026-09-02",
+      "sources": [
+        {
+          "src": "media/learn-grid-overflow.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "media/learn-grid-overflow.webm",
+          "type": "video/webm"
+        }
+      ],
+      "tags": [
+        "css-grid",
+        "automatic-minimum",
+        "intrinsic-sizing",
+        "overflow",
+        "deterministic",
+        "live-replay"
+      ],
+      "thumb": "thumbs/learn-grid-overflow.svg",
+      "title": "Why the Grid Overflows",
+      "width": 960
+    }
+  ]
+}

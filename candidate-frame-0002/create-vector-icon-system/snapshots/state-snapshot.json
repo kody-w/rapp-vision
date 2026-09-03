@@ -1,0 +1,414 @@
+{
+  "positive": {
+    "accepted": {
+      "fixture": "reference-stroke-2",
+      "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+      "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+      "rules": {
+        "grid": 2,
+        "linecap": "round",
+        "linejoin": "round",
+        "stroke": 2,
+        "viewBox": "0 0 24 24"
+      },
+      "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+      "symbols": [
+        "bloom",
+        "cairn",
+        "hinge",
+        "orbit",
+        "pulse",
+        "weave"
+      ]
+    },
+    "comparison": {
+      "differingPercent": 0,
+      "differingPixels": 0,
+      "overlay": [],
+      "status": "pass",
+      "totalPixels": 3456
+    },
+    "draftStroke": 2,
+    "invalidEdit": null,
+    "lastExport": {
+      "bytes": 2234,
+      "path": "exports/six-shapes.svg",
+      "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+      "symbolCount": 6
+    },
+    "message": "Exported 6 named 24 × 24 symbols; raster difference 0.0000% passes the 0.50% gate.",
+    "selection": "bloom",
+    "status": "accepted",
+    "zoom": 800
+  },
+  "positiveEdit": {
+    "accepted": {
+      "fixture": "shared-stroke-1.5",
+      "generatedGeometrySha256": "623ba0ea4f9357fc04e406edbf48d301aa26b4a943db98364e4ee9fc09d858bc",
+      "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+      "rules": {
+        "grid": 2,
+        "linecap": "round",
+        "linejoin": "round",
+        "stroke": 1.5,
+        "viewBox": "0 0 24 24"
+      },
+      "spriteSha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+      "symbols": [
+        "bloom",
+        "cairn",
+        "hinge",
+        "orbit",
+        "pulse",
+        "weave"
+      ]
+    },
+    "comparison": {
+      "differingPercent": 24.3345,
+      "differingPixels": 841,
+      "overlay": [],
+      "status": "fail",
+      "totalPixels": 3456
+    },
+    "draftStroke": 1.5,
+    "invalidEdit": null,
+    "lastExport": null,
+    "message": "Regenerated all 6 symbols with shared stroke 1.5 px; 841 pixels differ (24.3345%), so export remains blocked.",
+    "selection": "bloom",
+    "status": "rejected",
+    "zoom": 800
+  },
+  "positiveReturn": {
+    "accepted": {
+      "fixture": "reference-stroke-2",
+      "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+      "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+      "rules": {
+        "grid": 2,
+        "linecap": "round",
+        "linejoin": "round",
+        "stroke": 2,
+        "viewBox": "0 0 24 24"
+      },
+      "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+      "symbols": [
+        "bloom",
+        "cairn",
+        "hinge",
+        "orbit",
+        "pulse",
+        "weave"
+      ]
+    },
+    "comparison": {
+      "differingPercent": 0,
+      "differingPixels": 0,
+      "overlay": [],
+      "status": "pass",
+      "totalPixels": 3456
+    },
+    "draftStroke": 2,
+    "invalidEdit": null,
+    "lastExport": null,
+    "message": "Regenerated all 6 symbols with shared stroke 2 px; immutable reference difference is 0.0000%.",
+    "selection": "bloom",
+    "status": "accepted",
+    "zoom": 800
+  },
+  "rejected": {
+    "accepted": {
+      "fixture": "reference-stroke-2",
+      "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+      "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+      "rules": {
+        "grid": 2,
+        "linecap": "round",
+        "linejoin": "round",
+        "stroke": 2,
+        "viewBox": "0 0 24 24"
+      },
+      "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+      "symbols": [
+        "bloom",
+        "cairn",
+        "hinge",
+        "orbit",
+        "pulse",
+        "weave"
+      ]
+    },
+    "comparison": {
+      "differingPercent": 1.4757,
+      "differingPixels": 51,
+      "overlay": [
+        [
+          9,
+          6
+        ],
+        [
+          9,
+          7
+        ],
+        [
+          14,
+          7
+        ],
+        [
+          8,
+          8
+        ],
+        [
+          9,
+          8
+        ],
+        [
+          10,
+          8
+        ],
+        [
+          14,
+          8
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          10,
+          9
+        ],
+        [
+          13,
+          9
+        ],
+        [
+          15,
+          9
+        ],
+        [
+          8,
+          10
+        ],
+        [
+          10,
+          10
+        ],
+        [
+          11,
+          10
+        ],
+        [
+          13,
+          10
+        ],
+        [
+          15,
+          10
+        ],
+        [
+          8,
+          11
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          11,
+          11
+        ],
+        [
+          13,
+          11
+        ],
+        [
+          15,
+          11
+        ],
+        [
+          9,
+          12
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          12,
+          12
+        ],
+        [
+          13,
+          12
+        ],
+        [
+          14,
+          12
+        ],
+        [
+          15,
+          12
+        ],
+        [
+          9,
+          13
+        ],
+        [
+          10,
+          13
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          14,
+          13
+        ],
+        [
+          9,
+          14
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          11,
+          14
+        ],
+        [
+          12,
+          14
+        ],
+        [
+          14,
+          14
+        ],
+        [
+          10,
+          15
+        ],
+        [
+          11,
+          15
+        ],
+        [
+          13,
+          15
+        ],
+        [
+          14,
+          15
+        ],
+        [
+          10,
+          16
+        ],
+        [
+          11,
+          16
+        ],
+        [
+          13,
+          16
+        ],
+        [
+          14,
+          16
+        ],
+        [
+          10,
+          17
+        ],
+        [
+          11,
+          17
+        ],
+        [
+          12,
+          17
+        ],
+        [
+          13,
+          17
+        ],
+        [
+          11,
+          18
+        ],
+        [
+          12,
+          18
+        ]
+      ],
+      "status": "fail",
+      "totalPixels": 3456
+    },
+    "draftStroke": 2,
+    "invalidEdit": {
+      "anchorIndex": 3,
+      "from": [
+        12,
+        18
+      ],
+      "icon": "pulse",
+      "reason": "13,17 is off the shared 2 px grid.",
+      "to": [
+        13,
+        17
+      ]
+    },
+    "lastExport": {
+      "bytes": 2234,
+      "path": "exports/six-shapes.svg",
+      "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+      "symbolCount": 6
+    },
+    "message": "Rejected Pulse anchor 13,17: 51 pixels differ (1.4757%). The accepted 6-symbol export is unchanged.",
+    "selection": "pulse",
+    "status": "rejected",
+    "zoom": 800
+  },
+  "reset": {
+    "accepted": {
+      "fixture": "reference-stroke-2",
+      "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+      "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+      "rules": {
+        "grid": 2,
+        "linecap": "round",
+        "linejoin": "round",
+        "stroke": 2,
+        "viewBox": "0 0 24 24"
+      },
+      "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+      "symbols": [
+        "bloom",
+        "cairn",
+        "hinge",
+        "orbit",
+        "pulse",
+        "weave"
+      ]
+    },
+    "comparison": {
+      "differingPercent": 0,
+      "differingPixels": 0,
+      "overlay": [],
+      "status": "pass",
+      "totalPixels": 3456
+    },
+    "draftStroke": 2,
+    "invalidEdit": null,
+    "lastExport": null,
+    "message": "Immutable 2 px reference fixture restored: six paths are on the 2 px grid at 800% zoom.",
+    "selection": "bloom",
+    "status": "reset",
+    "zoom": 800
+  }
+}

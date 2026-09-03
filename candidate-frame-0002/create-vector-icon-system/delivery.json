@@ -1,0 +1,103 @@
+{
+  "artifacts": {
+    "app": {
+      "bytes": 45128,
+      "path": "apps/create-vector-icon-system.html",
+      "sha256": "fbe8b11a4294ef8fa557e1b87192f846cacf95b65358bcc8acb23f78c5dd9569"
+    },
+    "channel": {
+      "bytes": 6297,
+      "path": "channel.json",
+      "sha256": "966c85f43ce482e98e2abd1bce64a3d3c80d59f646b4d1413bcea8b3d4329f5e"
+    },
+    "documentation": {
+      "bytes": 6897,
+      "path": "README.md",
+      "sha256": "9f5844ae39a5952b84879c7b99821af85cad63bec498dc375435d02071c1471d"
+    },
+    "evidence": {
+      "bytes": 23254,
+      "path": "evidence.json",
+      "sha256": "6becaa4f9c5595b4081d8d479e6b610ac0c88e78091452e2b9289950ff7c0da2"
+    },
+    "master": {
+      "bytes": 4879229,
+      "codec": "ffv1",
+      "color_primaries": null,
+      "color_range": "pc",
+      "color_space": "gbr",
+      "color_transfer": null,
+      "duration": 15.0,
+      "height": 540,
+      "path": "masters/create-vector-icon-system.mkv",
+      "pixel_format": "bgr0",
+      "sha256": "90e6e2706b9cc382c1bc0972041206781c7b9dd29c7ad2b4759a05d6e0a9c7f9",
+      "width": 960
+    },
+    "mp4": {
+      "bytes": 93218,
+      "codec": "h264",
+      "color_primaries": "bt709",
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": "bt709",
+      "duration": 15.0,
+      "height": 540,
+      "path": "media/create-vector-icon-system.mp4",
+      "pixel_format": "yuv420p",
+      "sha256": "e6086067880176285333d47b5e08a4f7038a1bfd69e27c19cf5e74aa32b47dfb",
+      "width": 960
+    },
+    "production": {
+      "bytes": 6146,
+      "path": "channel.production.json",
+      "sha256": "7a17ce44a42a3b6b8490192e748c0eab997f7fff2ab66fba70aa2766755c4b70"
+    },
+    "reference": {
+      "bytes": 6116,
+      "path": "reference/reference-raster.json",
+      "sha256": "61744b14a3c1e4f360d77207712e12f33e626259e1ff9eaca7cd46dd5ebd2d46"
+    },
+    "renderer": {
+      "bytes": 60100,
+      "path": "render.py",
+      "sha256": "97e1213a9e3dc873779af469a90bbe79290265a51e6a4f8b025346781c40a8aa"
+    },
+    "snapshot": {
+      "bytes": 3468,
+      "path": "snapshots/create-vector-icon-system.svg",
+      "sha256": "5b94104e6fb858731a5ecf5bf0b75340a73bf79ae85d2b934c4c587e95c16039"
+    },
+    "sprite": {
+      "bytes": 2234,
+      "path": "exports/six-shapes.svg",
+      "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2"
+    },
+    "stateSnapshot": {
+      "bytes": 8276,
+      "path": "snapshots/state-snapshot.json",
+      "sha256": "92854d2c28970528da67cf5c383470a292a95a22fc1ad610ae9b1f6329a1e1cf"
+    },
+    "thumbnail": {
+      "bytes": 4399,
+      "path": "thumbs/create-vector-icon-system.svg",
+      "sha256": "728f35b2dd6f8d48bfc8497eadba4359e121c01daf47865d7b6d403efff045c3"
+    },
+    "webm": {
+      "bytes": 84470,
+      "codec": "vp9",
+      "color_primaries": "bt709",
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": "bt709",
+      "duration": 15.0,
+      "height": 540,
+      "path": "media/create-vector-icon-system.webm",
+      "pixel_format": "yuv420p",
+      "sha256": "c046ad76e489d68d4663c57f08fa8e095604880d808447269ec44eb298399124",
+      "width": 960
+    }
+  },
+  "publication": "create-vector-icon-system",
+  "schema": "candidate-frame-0002-delivery/1.0"
+}

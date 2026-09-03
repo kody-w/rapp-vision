@@ -1,0 +1,112 @@
+{
+  "artifacts": {
+    ".gitattributes": {
+      "bytes": 54,
+      "path": ".gitattributes",
+      "sha256": "cf302113fe57517bb72baa467c14d4f9bbdec8e8f0bab9f4b5dd1f2ffe4470d6"
+    },
+    "README.md": {
+      "bytes": 3203,
+      "path": "README.md",
+      "sha256": "70863b3229895b7ec7142bbefa09ffbaf7705e71dcd353b278cf31d1db7129ce"
+    },
+    "apps/learn-grid-overflow.html": {
+      "bytes": 32189,
+      "path": "apps/learn-grid-overflow.html",
+      "sha256": "858e223fdc0adba54f7e54b890fb2e9ad346b4851d6cf6e0f189474c9137a82f"
+    },
+    "build_delivery.py": {
+      "bytes": 7073,
+      "path": "build_delivery.py",
+      "sha256": "67152ab6ad84f65c2542c7a1ef507ea51911138cd192ce7941838acf399cc438"
+    },
+    "channel.json": {
+      "bytes": 6886,
+      "path": "channel.json",
+      "sha256": "410582bd2d6088ffa70aabceb4f8a2fcdd02f2015333725cdd43d30ab116b8c9"
+    },
+    "channel.production.json": {
+      "bytes": 6741,
+      "path": "channel.production.json",
+      "sha256": "c8c1031f37d08c15554bbac14f4c870be65144fbd604f0be4d6d673d8209622e"
+    },
+    "evidence.json": {
+      "bytes": 12138,
+      "path": "evidence.json",
+      "sha256": "500b6674104c2b359ba77e85197d83657e602893d9628ffedf4498dbf0c7dae4"
+    },
+    "masters/learn-grid-overflow.mkv": {
+      "bytes": 4538228,
+      "path": "masters/learn-grid-overflow.mkv",
+      "sha256": "10b61ec2864b02c5d7af70350034c30a8e26b8ed36144bc63607c0f5d4997f00"
+    },
+    "media/learn-grid-overflow.mp4": {
+      "bytes": 167659,
+      "path": "media/learn-grid-overflow.mp4",
+      "sha256": "2632e58ab8cf809f25e6d049494203d31628f3329b6e7a49a91a9a9359cb7584"
+    },
+    "media/learn-grid-overflow.webm": {
+      "bytes": 122995,
+      "path": "media/learn-grid-overflow.webm",
+      "sha256": "c900e0673843887473a46624f88d653e97e0f70296071172a72116018b621400"
+    },
+    "render.py": {
+      "bytes": 24868,
+      "path": "render.py",
+      "sha256": "f1a647bf2883a83111ab73df9cee72a68f9cab0e169fa5f93c19c457ecb07e82"
+    },
+    "thumbs/learn-grid-overflow.svg": {
+      "bytes": 2039,
+      "path": "thumbs/learn-grid-overflow.svg",
+      "sha256": "265c77f2306324e89b0439e2715b7daa77eb575fa34aa18996b324b8e0961c4c"
+    },
+    "verify_dom.mjs": {
+      "bytes": 11515,
+      "path": "verify_dom.mjs",
+      "sha256": "6607d78231646eef357805d2d5e6446589be2fe3ffcba6a015b78d108333f6b6"
+    }
+  },
+  "channel": "candidate-frame-0002-04",
+  "media": {
+    "master": {
+      "bytes": 4538228,
+      "codec": "ffv1",
+      "duration": 18,
+      "height": 540,
+      "path": "masters/learn-grid-overflow.mkv",
+      "pixelFormat": "bgr0",
+      "sha256": "10b61ec2864b02c5d7af70350034c30a8e26b8ed36144bc63607c0f5d4997f00",
+      "width": 960
+    },
+    "mp4": {
+      "bytes": 167659,
+      "codec": "h264",
+      "colorPrimaries": "bt709",
+      "colorRange": "tv",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "duration": 18,
+      "height": 540,
+      "path": "media/learn-grid-overflow.mp4",
+      "pixelFormat": "yuv420p",
+      "sha256": "2632e58ab8cf809f25e6d049494203d31628f3329b6e7a49a91a9a9359cb7584",
+      "width": 960
+    },
+    "webm": {
+      "bytes": 122995,
+      "codec": "vp9",
+      "colorPrimaries": "bt709",
+      "colorRange": "tv",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "duration": 18,
+      "height": 540,
+      "path": "media/learn-grid-overflow.webm",
+      "pixelFormat": "yuv420p",
+      "sha256": "c900e0673843887473a46624f88d653e97e0f70296071172a72116018b621400",
+      "width": 960
+    }
+  },
+  "publication": "learn-grid-overflow",
+  "schema": "candidate-frame-delivery/1.0"
+}

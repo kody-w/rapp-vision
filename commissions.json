@@ -70,7 +70,12 @@
       "id": "use-keyboard-invoice-triage",
       "title": "Triage invoices without a pointer",
       "category": "use",
-      "status": "open",
+      "status": "closed",
+      "fulfillment": {
+        "result_channel": "working-proofs",
+        "publication_id": "use-keyboard-invoice-triage",
+        "source_candidate": "candidate-frame-0002/use-keyboard-invoice-triage"
+      },
       "brief": "Demonstrate a small invoice queue that can be reviewed, corrected, and exported using only a keyboard and a visible focus path.",
       "gates": {
         "paired_delivery": {
@@ -172,7 +177,12 @@
       "id": "learn-grid-overflow",
       "title": "Explain why a grid overflows",
       "category": "learn",
-      "status": "open",
+      "status": "closed",
+      "fulfillment": {
+        "result_channel": "working-proofs",
+        "publication_id": "learn-grid-overflow",
+        "source_candidate": "candidate-frame-0002/learn-grid-overflow"
+      },
       "brief": "Turn one common CSS Grid overflow bug into an inspectable lesson with a before state, a measured diagnosis, and a fix the viewer can undo.",
       "gates": {
         "paired_delivery": {
@@ -427,7 +437,12 @@
       "id": "create-vector-icon-system",
       "title": "Create a six-icon vector system",
       "category": "create",
-      "status": "open",
+      "status": "closed",
+      "fulfillment": {
+        "result_channel": "working-proofs",
+        "publication_id": "create-vector-icon-system",
+        "source_candidate": "candidate-frame-0002/create-vector-icon-system"
+      },
       "brief": "Show a tiny vector tool producing six related icons from shared geometric rules, then deliberately break and restore one rule.",
       "gates": {
         "paired_delivery": {

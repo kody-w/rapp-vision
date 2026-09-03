@@ -1,0 +1,295 @@
+{
+  "avatar": "⌨",
+  "creator": {
+    "identity": "machine-produced, artifact-reviewed",
+    "name": "RAPP Vision autonomous studio"
+  },
+  "id": "use-keyboard-invoice-triage",
+  "name": "Keyboard Invoice Triage",
+  "schema": "rapp-vision-channel/2.0",
+  "tagline": "Three synthetic invoices, one visible keyboard path, and an exact restore.",
+  "videos": [
+    {
+      "chapters": [
+        {
+          "label": "Fixture total 196.25",
+          "t": 0
+        },
+        {
+          "label": "Keyboard correction",
+          "t": 3
+        },
+        {
+          "label": "Export acceptedTotal 196.25",
+          "t": 6
+        },
+        {
+          "label": "Negative amount rejected",
+          "t": 9
+        },
+        {
+          "label": "Exact fixture restore",
+          "t": 14
+        }
+      ],
+      "description": "A synthetic three-invoice queue totals exactly 196.25. The guided film and live replay use only Tab, Shift-Tab, arrow keys, typing, and Enter to accept two invoices, correct the third, export acceptedTotal 196.25, reject a negative amount with export disabled and focus on the invalid field, then restore the exact pending fixture.",
+      "duration": 18,
+      "height": 540,
+      "id": "use-keyboard-invoice-triage",
+      "live": {
+        "chapters": [
+          {
+            "label": "Accept two invoices",
+            "t": 0
+          },
+          {
+            "label": "Correct the third with arrow keys",
+            "t": 2
+          },
+          {
+            "label": "Export 196.25",
+            "t": 5
+          },
+          {
+            "label": "Shift-Tab back and type a negative amount",
+            "t": 6
+          },
+          {
+            "label": "Tab to restore the exact fixture",
+            "t": 10
+          }
+        ],
+        "duration": 18,
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "actions": [
+              {
+                "at": 0.2,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#invoice-syn-001"
+              },
+              {
+                "at": 0.5,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 1.1,
+                "code": "ArrowDown",
+                "do": "key"
+              },
+              {
+                "at": 1.3,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#invoice-syn-002"
+              },
+              {
+                "at": 1.7,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 2.3,
+                "code": "ArrowDown",
+                "do": "key"
+              },
+              {
+                "at": 2.5,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#invoice-syn-003"
+              },
+              {
+                "at": 2.9,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 3.1,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#code-select"
+              },
+              {
+                "at": 3.5,
+                "code": "ArrowDown",
+                "do": "key"
+              },
+              {
+                "at": 4.1,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 4.8,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 5.0,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#export-button"
+              },
+              {
+                "at": 5.4,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 5.7,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#export-output"
+              },
+              {
+                "at": 6.4,
+                "code": "ShiftLeft",
+                "do": "keydown"
+              },
+              {
+                "at": 6.7,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 7.0,
+                "code": "ShiftLeft",
+                "do": "keyup"
+              },
+              {
+                "at": 7.2,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#invoice-syn-003"
+              },
+              {
+                "at": 7.4,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 7.7,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#amount-input"
+              },
+              {
+                "at": 8.2,
+                "do": "type",
+                "text": "-1.00"
+              },
+              {
+                "at": 9.2,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 9.5,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#validation-error"
+              },
+              {
+                "at": 10.0,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 10.5,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 11.0,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 11.5,
+                "code": "Tab",
+                "do": "key"
+              },
+              {
+                "at": 11.8,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#restore-button"
+              },
+              {
+                "at": 12.3,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 12.6,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#confirm-restore-btn"
+              },
+              {
+                "at": 14.3,
+                "code": "Enter",
+                "do": "key"
+              },
+              {
+                "at": 14.6,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#status-message"
+              }
+            ],
+            "app": "apps/use-keyboard-invoice-triage.html",
+            "dur": 18,
+            "lower": {
+              "bench": "The synthetic fixture and exported acceptedTotal both equal 196.25.",
+              "fix": "Pause, follow the visible focus ring, and try another correction.",
+              "title": "Triage Invoices Without a Pointer"
+            },
+            "ready": {
+              "selector": "#invoice-syn-001"
+            },
+            "t": 0
+          }
+        ]
+      },
+      "orientation": "landscape",
+      "published": "2026-09-02",
+      "sources": [
+        {
+          "src": "media/use-keyboard-invoice-triage.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "media/use-keyboard-invoice-triage.webm",
+          "type": "video/webm"
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "keyboard",
+        "invoice-triage",
+        "deterministic",
+        "live-replay"
+      ],
+      "thumb": "thumbs/use-keyboard-invoice-triage.svg",
+      "title": "Triage Invoices Without a Pointer",
+      "width": 960
+    }
+  ]
+}

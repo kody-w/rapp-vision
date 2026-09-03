@@ -1,0 +1,396 @@
+{
+  "channel": "candidate-frame-0002-04",
+  "commission": {
+    "criterion": "A real browser reports scrollWidth greater than clientWidth at 320 px; changing only the grid item's automatic minimum makes those values equal at both 320 px and 1280 px.",
+    "id": "learn-grid-overflow",
+    "reset": [
+      "Activate Restore broken CSS.",
+      "Set the viewport control to 320 px.",
+      "Scroll the preview back to x = 0."
+    ]
+  },
+  "publications": [
+    {
+      "app": "apps/learn-grid-overflow.html",
+      "liveFraming": {
+        "actionCount": 21,
+        "coordinateFree": true,
+        "source": "channel.production.json#videos[0].live.scenes[0].actions",
+        "scrollSelectors": [
+          "#inspect-btn",
+          "#apply-fix-btn",
+          "#viewport-1280-btn",
+          "#status-message",
+          "#restore-broken-btn",
+          "#viewport-320-btn",
+          "#scroll-end-btn",
+          "#status-message",
+          "#restore-broken-btn",
+          "#viewport-320-btn",
+          "#scroll-zero-btn",
+          "#status-message"
+        ],
+        "checkpoints": [
+          {
+            "afterAction": 6,
+            "claim": "positive",
+            "selector": "#status-message"
+          },
+          {
+            "afterAction": 13,
+            "claim": "failure",
+            "selector": "#status-message"
+          },
+          {
+            "afterAction": 20,
+            "claim": "reset",
+            "selector": "#status-message"
+          }
+        ]
+      },
+      "claims": [
+        {
+          "actions": [
+            {
+              "selector": "#inspect-btn",
+              "type": "INSPECT"
+            },
+            {
+              "selector": "#apply-fix-btn",
+              "type": "APPLY_FIX"
+            },
+            {
+              "selector": "#viewport-1280-btn",
+              "type": "SET_VIEWPORT",
+              "value": 1280
+            }
+          ],
+          "assertions": [
+            {
+              "equals": "fixed",
+              "path": "mode"
+            },
+            {
+              "equals": 320,
+              "path": "checks.320.scrollWidth"
+            },
+            {
+              "equals": 320,
+              "path": "checks.320.clientWidth"
+            },
+            {
+              "equals": "0px",
+              "path": "checks.320.cause.itemMinWidth"
+            },
+            {
+              "equals": 174,
+              "path": "checks.320.cause.payloadWidth"
+            },
+            {
+              "equals": 1280,
+              "path": "checks.1280.scrollWidth"
+            },
+            {
+              "equals": 1280,
+              "path": "checks.1280.clientWidth"
+            },
+            {
+              "equals": "0px",
+              "path": "checks.1280.cause.itemMinWidth"
+            },
+            {
+              "equals": 480,
+              "path": "checks.1280.cause.railWidth"
+            },
+            {
+              "equals": 0,
+              "path": "x"
+            }
+          ],
+          "claim": "Changing only #payload from min-width: auto to min-width: 0 removes its automatic minimum contribution. Real DOM measurements become 320 = 320 and 1280 = 1280 while overflow: clip, the 1fr track, and the 480 px intrinsic rail stay unchanged.",
+          "expectedState": {
+            "mode": "fixed",
+            "cssText": "#fixture-grid {\n  grid-template-columns: 92px 1fr;\n  gap: 26px;\n}\n#payload {\n  min-width: 0;\n  overflow: clip;\n}\n#payload .token-rail {\n  width: 480px;\n}",
+            "token": "GRID_OVERFLOW_DEMO_RAIL_GRID_OVERFLOW_DEMO_RAIL",
+            "viewport": 1280,
+            "scrollWidth": 1280,
+            "clientWidth": 1280,
+            "x": 0,
+            "cause": {
+              "itemMinWidth": "0px",
+              "itemOverflow": "clip",
+              "payloadWidth": 1134,
+              "railWidth": 480
+            },
+            "diagnosed": true,
+            "restored": false,
+            "checks": {
+              "320": {
+                "viewport": 320,
+                "scrollWidth": 320,
+                "clientWidth": 320,
+                "verdict": "fits",
+                "cause": {
+                  "itemMinWidth": "0px",
+                  "itemOverflow": "clip",
+                  "payloadWidth": 174,
+                  "railWidth": 480
+                }
+              },
+              "1280": {
+                "viewport": 1280,
+                "scrollWidth": 1280,
+                "clientWidth": 1280,
+                "verdict": "fits",
+                "cause": {
+                  "itemMinWidth": "0px",
+                  "itemOverflow": "clip",
+                  "payloadWidth": 1134,
+                  "railWidth": 480
+                }
+              }
+            },
+            "verdict": "fits",
+            "status": "verified",
+            "message": "One-line fix verified: 320 = 320 and 1280 = 1280."
+          },
+          "id": "positive"
+        },
+        {
+          "actions": [
+            {
+              "selector": "#inspect-btn",
+              "type": "INSPECT"
+            },
+            {
+              "selector": "#apply-fix-btn",
+              "type": "APPLY_FIX"
+            },
+            {
+              "selector": "#viewport-1280-btn",
+              "type": "SET_VIEWPORT",
+              "value": 1280
+            },
+            {
+              "selector": "#restore-broken-btn",
+              "type": "RESTORE_BROKEN"
+            },
+            {
+              "selector": "#viewport-320-btn",
+              "type": "SET_VIEWPORT",
+              "value": 320
+            },
+            {
+              "selector": "#scroll-end-btn",
+              "type": "SCROLL_END"
+            }
+          ],
+          "assertions": [
+            {
+              "equals": "broken",
+              "path": "mode"
+            },
+            {
+              "equals": 612,
+              "path": "scrollWidth"
+            },
+            {
+              "equals": 320,
+              "path": "clientWidth"
+            },
+            {
+              "equals": "auto",
+              "path": "cause.itemMinWidth"
+            },
+            {
+              "equals": 480,
+              "path": "cause.payloadWidth"
+            },
+            {
+              "equals": 292,
+              "path": "x"
+            },
+            {
+              "equals": "overflow",
+              "path": "verdict"
+            }
+          ],
+          "claim": "Restoring min-width: auto, returning to 320 px, and scrolling to the end makes the 480 px intrinsic rail set the payload's automatic minimum again, reproducing 612 > 320 at x = 292.",
+          "expectedState": {
+            "mode": "broken",
+            "cssText": "#fixture-grid {\n  grid-template-columns: 92px 1fr;\n  gap: 26px;\n}\n#payload {\n  min-width: auto;\n  overflow: clip;\n}\n#payload .token-rail {\n  width: 480px;\n}",
+            "token": "GRID_OVERFLOW_DEMO_RAIL_GRID_OVERFLOW_DEMO_RAIL",
+            "viewport": 320,
+            "scrollWidth": 612,
+            "clientWidth": 320,
+            "x": 292,
+            "cause": {
+              "itemMinWidth": "auto",
+              "itemOverflow": "clip",
+              "payloadWidth": 480,
+              "railWidth": 480
+            },
+            "diagnosed": false,
+            "restored": true,
+            "checks": {},
+            "verdict": "overflow",
+            "status": "restored-overflow",
+            "message": "Automatic minimum restored: scrollWidth 612 > clientWidth 320; preview x = 292."
+          },
+          "id": "failure",
+          "preserves": "reset.cssText+reset.token+reset.cause.railWidth"
+        },
+        {
+          "actions": [
+            {
+              "selector": "#restore-broken-btn",
+              "type": "RESTORE_BROKEN"
+            },
+            {
+              "selector": "#viewport-320-btn",
+              "type": "SET_VIEWPORT",
+              "value": 320
+            },
+            {
+              "selector": "#scroll-zero-btn",
+              "type": "SCROLL_ZERO"
+            }
+          ],
+          "assertions": [
+            {
+              "equals": "broken",
+              "path": "mode"
+            },
+            {
+              "equals": 320,
+              "path": "viewport"
+            },
+            {
+              "equals": 612,
+              "path": "scrollWidth"
+            },
+            {
+              "equals": 320,
+              "path": "clientWidth"
+            },
+            {
+              "equals": "auto",
+              "path": "cause.itemMinWidth"
+            },
+            {
+              "equals": 480,
+              "path": "cause.railWidth"
+            },
+            {
+              "equals": 0,
+              "path": "x"
+            },
+            {
+              "equals": {},
+              "path": "checks"
+            }
+          ],
+          "claim": "The required three actions restore the exact opening CSS text, automatic minimum, 480 px intrinsic rail, 320 px viewport, 612 > 320 measurement, empty verification record, and DOM scrollLeft x = 0.",
+          "expectedState": {
+            "mode": "broken",
+            "cssText": "#fixture-grid {\n  grid-template-columns: 92px 1fr;\n  gap: 26px;\n}\n#payload {\n  min-width: auto;\n  overflow: clip;\n}\n#payload .token-rail {\n  width: 480px;\n}",
+            "token": "GRID_OVERFLOW_DEMO_RAIL_GRID_OVERFLOW_DEMO_RAIL",
+            "viewport": 320,
+            "scrollWidth": 612,
+            "clientWidth": 320,
+            "x": 0,
+            "cause": {
+              "itemMinWidth": "auto",
+              "itemOverflow": "clip",
+              "payloadWidth": 480,
+              "railWidth": 480
+            },
+            "diagnosed": false,
+            "restored": false,
+            "checks": {},
+            "verdict": "overflow",
+            "status": "overflow",
+            "message": "Opening bug: automatic min-width keeps 480 px; scrollWidth 612 > clientWidth 320; x = 0."
+          },
+          "id": "reset"
+        }
+      ],
+      "id": "learn-grid-overflow",
+      "measurements": {
+        "fixed": {
+          "1280": {
+            "cause": {
+              "itemMinWidth": "0px",
+              "itemOverflow": "clip",
+              "payloadWidth": 1134,
+              "railWidth": 480
+            },
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "320": {
+            "cause": {
+              "itemMinWidth": "0px",
+              "itemOverflow": "clip",
+              "payloadWidth": 174,
+              "railWidth": 480
+            },
+            "clientWidth": 320,
+            "scrollWidth": 320
+          }
+        },
+        "opening": {
+          "cause": {
+            "itemMinWidth": "auto",
+            "itemOverflow": "clip",
+            "payloadWidth": 480,
+            "railWidth": 480
+          },
+          "clientWidth": 320,
+          "scrollWidth": 612,
+          "viewport": 320,
+          "x": 0
+        },
+        "restoredFailure": {
+          "cause": {
+            "itemMinWidth": "auto",
+            "itemOverflow": "clip",
+            "payloadWidth": 480,
+            "railWidth": 480
+          },
+          "clientWidth": 320,
+          "scrollWidth": 612,
+          "viewport": 320,
+          "x": 292
+        }
+      },
+      "sourceFix": {
+        "after": [
+          "min-width: 0;"
+        ],
+        "before": [
+          "min-width: auto;"
+        ],
+        "changedDeclarations": 1,
+        "unchanged": [
+          "grid-template-columns: 92px 1fr;",
+          "overflow: clip;",
+          "width: 480px;"
+        ]
+      },
+      "sizingProof": {
+        "fixedPayloadTrackAt320": "320 - 28px grid padding - 92px fixed track - 26px gap = 174px",
+        "openingOverflow": "14px left grid padding + 92px fixed track + 26px gap + 480px automatic item minimum = 612px"
+      }
+    }
+  ],
+  "rightsPrivacy": {
+    "externalResources": [],
+    "fonts": "System UI and monospace fallbacks only; no font files are embedded or fetched.",
+    "noSecrets": true,
+    "originalFixture": true,
+    "privacyAttestation": true,
+    "rightsAttestation": true
+  },
+  "schema": "candidate-frame-evidence/1.0"
+}

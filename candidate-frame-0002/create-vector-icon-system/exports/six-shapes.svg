@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <title>Six Shapes shared geometric icon sprite</title>
+  <defs>
+    <symbol id="icon-bloom" data-name="Bloom" viewBox="0 0 24 24">
+      <title>Bloom</title>
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L18 8L12 14L6 8L12 2"/>
+        <path d="M12 14L12 22"/>
+        <path d="M8 18L16 18"/>
+      </g>
+    </symbol>
+    <symbol id="icon-cairn" data-name="Cairn" viewBox="0 0 24 24">
+      <title>Cairn</title>
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 20L8 16L16 16L20 20"/>
+        <path d="M6 14L10 10L14 10L18 14"/>
+        <path d="M10 8L12 4L14 8"/>
+      </g>
+    </symbol>
+    <symbol id="icon-hinge" data-name="Hinge" viewBox="0 0 24 24">
+      <title>Hinge</title>
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4L4 20L20 20"/>
+        <path d="M8 8L16 8L16 16L8 16L8 8"/>
+        <path d="M4 12L8 12"/>
+        <path d="M12 16L12 20"/>
+      </g>
+    </symbol>
+    <symbol id="icon-orbit" data-name="Orbit" viewBox="0 0 24 24">
+      <title>Orbit</title>
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L18 4L22 10L20 16L14 22L8 20L2 14L4 8L12 2"/>
+        <path d="M12 8L16 12L12 16L8 12L12 8"/>
+      </g>
+    </symbol>
+    <symbol id="icon-pulse" data-name="Pulse" viewBox="0 0 24 24">
+      <title>Pulse</title>
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 12L6 12L8 6L12 18L16 6L18 12L22 12"/>
+        <path d="M4 4L20 4"/>
+      </g>
+    </symbol>
+    <symbol id="icon-weave" data-name="Weave" viewBox="0 0 24 24">
+      <title>Weave</title>
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 6L8 6L16 18L20 18"/>
+        <path d="M20 6L16 6L8 18L4 18"/>
+        <path d="M4 12L8 12"/>
+        <path d="M16 12L20 12"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
