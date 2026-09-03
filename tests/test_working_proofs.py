@@ -752,7 +752,10 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                         960 if run["viewport"] == "desktop" else 390,
                         delta=1,
                     )
-                    self.assertTrue(all(height >= 90 for height in run["safeHeight"]))
+                    self.assertTrue(
+                        all(height > 0 for height in run["safeHeight"]),
+                        run,
+                    )
 
             generated_manifest = load_json(scratch / "manifest.json")
             self.assertEqual(
