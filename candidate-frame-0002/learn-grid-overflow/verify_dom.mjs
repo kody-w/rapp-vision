@@ -38,7 +38,7 @@ const browser = spawn(browserPath, [
 
 const delay = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
-async function waitForActivePort(timeout = 15000) {
+async function waitForActivePort(timeout = 45000) {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
     try {
