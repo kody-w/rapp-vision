@@ -11,9 +11,9 @@
       "sha256": "70863b3229895b7ec7142bbefa09ffbaf7705e71dcd353b278cf31d1db7129ce"
     },
     "apps/learn-grid-overflow.html": {
-      "bytes": 32194,
+      "bytes": 32189,
       "path": "apps/learn-grid-overflow.html",
-      "sha256": "845f206fbe74d704567e9efc67379f17cdc6aa4a7cf60cc711117238b2ca2b5c"
+      "sha256": "858e223fdc0adba54f7e54b890fb2e9ad346b4851d6cf6e0f189474c9137a82f"
     },
     "build_delivery.py": {
       "bytes": 7073,
@@ -31,9 +31,9 @@
       "sha256": "c8c1031f37d08c15554bbac14f4c870be65144fbd604f0be4d6d673d8209622e"
     },
     "evidence.json": {
-      "bytes": 12141,
+      "bytes": 12138,
       "path": "evidence.json",
-      "sha256": "04fdccf804556f6a2f54517634868d85fb53a586f0b427d6056237d16f20a48d"
+      "sha256": "500b6674104c2b359ba77e85197d83657e602893d9628ffedf4498dbf0c7dae4"
     },
     "masters/learn-grid-overflow.mkv": {
       "bytes": 4538228,
