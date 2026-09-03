@@ -544,7 +544,12 @@
       "id": "explore-ecosystem-threshold",
       "title": "Explore an ecosystem threshold",
       "category": "explore",
-      "status": "open",
+      "status": "closed",
+      "fulfillment": {
+        "result_channel": "working-proofs",
+        "publication_id": "ecosystem-island-threshold",
+        "source_candidate": "candidate-frame-0003/ecosystem-island-threshold"
+      },
       "brief": "Let the viewer sweep one model parameter, observe a stable band and a collapse, and reset to a reproducible starting population.",
       "gates": {
         "paired_delivery": {
@@ -595,7 +600,12 @@
       "id": "explore-archive-map-contrast",
       "title": "Explore change across two archive maps",
       "category": "explore",
-      "status": "open",
+      "status": "closed",
+      "fulfillment": {
+        "result_channel": "working-proofs",
+        "publication_id": "explore-archive-map-contrast",
+        "source_candidate": "candidate-frame-0003/archive-wetland-contrast"
+      },
       "brief": "Build a spatial comparison over a synthetic 24-record archive where the viewer can isolate changed records, trigger an empty query, and return to the same view.",
       "gates": {
         "paired_delivery": {

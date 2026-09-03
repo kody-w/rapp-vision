@@ -21,9 +21,10 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
+  html{overflow-y:scroll;scrollbar-gutter:stable}
   body{background:var(--bg);color:var(--ink);
     font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
-    -webkit-font-smoothing:antialiased;overflow-y:scroll}
+    -webkit-font-smoothing:antialiased}
   a{color:var(--accent);text-decoration:none}
   button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -1248,6 +1249,11 @@ function mountLive(v, host, progressKey) {
      first version silently failed to press START ENGINE. */
   function realClick(el) {
     const doc = frame.contentDocument, win = frame.contentWindow;
+    try {
+      el.focus && el.focus({ preventScroll: true });
+      if (typeof el.select === "function") el.select();
+    } catch (e) {}
+    keepLiveTargetAboveChrome(el);
     const r = el.getBoundingClientRect();
     const x = r.left + r.width / 2, y = r.top + r.height / 2;
     const target = doc.elementFromPoint(x, y) || el;
@@ -1311,6 +1317,33 @@ function mountLive(v, host, progressKey) {
       }
     };
     attempt();
+  }
+
+  function keepLiveTargetAboveChrome(el) {
+    if (!el || !frame ||
+        el === frame.contentDocument.body ||
+        el === frame.contentDocument.documentElement) return;
+    const lower = $(".l3", stage);
+    const frameRect = frame.getBoundingClientRect();
+    const lowerRect = lower ? lower.getBoundingClientRect() : null;
+    const safeBottom = Math.max(
+      0,
+      Math.min(
+        frameRect.height,
+        lowerRect ? lowerRect.top - frameRect.top : frameRect.height
+      )
+    );
+    let rect = el.getBoundingClientRect();
+    if (rect.bottom > safeBottom - 8) {
+      const clearance = Math.max(0, frameRect.height - safeBottom + 16);
+      const root = frame.contentDocument.documentElement;
+      root.style.paddingBottom = clearance ? clearance + "px" : "";
+      root.style.scrollPaddingBottom = clearance ? clearance + "px" : "";
+      rect = el.getBoundingClientRect();
+      frame.contentWindow.scrollBy(0, rect.bottom - safeBottom + 8);
+    } else if (rect.top < 8) {
+      frame.contentWindow.scrollBy(0, rect.top - 8);
+    }
   }
 
   function act(a) {
@@ -1394,9 +1427,12 @@ function mountLive(v, host, progressKey) {
         // scenery…" when the cue fires. Retry briefly instead of silently
         // missing the click, which is exactly what happened the first time.
         case "click":   { retryClick(hit, 20000); break; }
-        case "keydown": doc.dispatchEvent(kev("keydown", a.code, a.key)); break;
-        case "keyup":   doc.dispatchEvent(kev("keyup", a.code, a.key)); break;
-        case "key":     doc.dispatchEvent(kev("keydown", a.code, a.key));
+        case "keydown": keepLiveTargetAboveChrome(doc.activeElement);
+                        doc.dispatchEvent(kev("keydown", a.code, a.key)); break;
+        case "keyup":   keepLiveTargetAboveChrome(doc.activeElement);
+                        doc.dispatchEvent(kev("keyup", a.code, a.key)); break;
+        case "key":     keepLiveTargetAboveChrome(doc.activeElement);
+                        doc.dispatchEvent(kev("keydown", a.code, a.key));
                         doc.dispatchEvent(kev("keyup", a.code, a.key)); break;
         /* Typing has to change the value, not just announce itself. Synthetic
            key events never mutate an <input>, by design, so the old version
@@ -1412,6 +1448,7 @@ function mountLive(v, host, progressKey) {
           if (!el) el = doc.activeElement;
           if (!el || el === doc.body) el = doc.querySelector("input:not([type=hidden]),textarea,[contenteditable=true]") || doc.body;
           try { el.focus && el.focus(); } catch (e) {}
+          keepLiveTargetAboveChrome(el);
           const editable = !!el && (/^(INPUT|TEXTAREA)$/.test(el.tagName) || el.isContentEditable);
           for (const ch of txt) {
             if (ch === "\n" || ch === "\r") {
@@ -1422,7 +1459,12 @@ function mountLive(v, host, progressKey) {
             const code = /[a-z]/i.test(ch) ? "Key" + ch.toUpperCase() : /\d/.test(ch) ? "Digit" + ch : ch === " " ? "Space" : "";
             el.dispatchEvent(kev("keydown", code, ch));
             if (editable) {
-              if (el.isContentEditable) el.textContent += ch; else el.value += ch;
+              if (el.isContentEditable) el.textContent += ch;
+              else if (typeof el.setRangeText === "function" &&
+                       typeof el.selectionStart === "number" &&
+                       typeof el.selectionEnd === "number")
+                el.setRangeText(ch, el.selectionStart, el.selectionEnd, "end");
+              else el.value += ch;
               try { el.dispatchEvent(new win.InputEvent("input", { bubbles: true, data: ch, inputType: "insertText" })); }
               catch (e) { el.dispatchEvent(new win.Event("input", { bubbles: true })); }
             }
@@ -1444,7 +1486,11 @@ function mountLive(v, host, progressKey) {
            settings page — is simply below the fold for the whole scene, and
            the only fix available to a scene author was to not use the app. */
         case "scroll":  { const el = (a.selector || a.text) ? hit() : null;
-                          if (el && el.scrollIntoView) el.scrollIntoView({ block: a.block || "center", inline: "nearest", behavior: a.behavior || "smooth" });
+                          if (el && el.scrollIntoView) {
+                            el.scrollIntoView({ block: a.block || "center", inline: "nearest", behavior: a.behavior || "smooth" });
+                            keepLiveTargetAboveChrome(el);
+                            requestAnimationFrame(() => keepLiveTargetAboveChrome(el));
+                          }
                           else if (a.to) win.scrollTo({ left: a.to[0] || 0, top: a.to[1] || 0, behavior: a.behavior || "smooth" });
                           break; }
       }

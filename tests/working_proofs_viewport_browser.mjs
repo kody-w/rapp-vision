@@ -46,23 +46,49 @@ const channelPath = resolve(channelArgument);
 const evidenceIndexPath = resolve(evidenceIndexArgument);
 const outputRoot = resolve(outputArgument);
 const profilePath = resolve(profileArgument);
+const workingRoot = resolve(ROOT, "working-proofs");
 const channel = JSON.parse(await readFile(channelPath, "utf8"));
 const evidenceIndex = JSON.parse(await readFile(evidenceIndexPath, "utf8"));
+
+function assertWorkingScratch(path, label) {
+  const prefix = workingRoot.endsWith(sep)
+    ? workingRoot
+    : `${workingRoot}${sep}`;
+  assert.ok(
+    path !== workingRoot && path.startsWith(prefix),
+    `${label} must be a child of ${workingRoot}`,
+  );
+}
+
+assertWorkingScratch(outputRoot, "output");
+assertWorkingScratch(profilePath, "browser profile");
 
 const VIEWPORTS = [
   {
     id: "desktop",
     pageWidth: 1387,
     pageHeight: 900,
-    minFrameWidth: 958,
-    maxFrameWidth: 962,
+    frameWidth: 960,
+    frameHeight: 599.25,
+    stageWidth: 962,
+    stageHeight: 601.25,
+    screenshotWidth: 962,
+    screenshotHeight: 601,
+    outerClientWidths: [1372, 1387],
+    scrollbarWidths: [0, 15],
   },
   {
     id: "390",
     pageWidth: 435,
     pageHeight: 900,
-    minFrameWidth: 388,
-    maxFrameWidth: 392,
+    frameWidth: 390,
+    frameHeight: 243,
+    stageWidth: 392,
+    stageHeight: 245,
+    screenshotWidth: 392,
+    screenshotHeight: 245,
+    outerClientWidths: [420, 435],
+    scrollbarWidths: [0, 15],
   },
 ];
 
@@ -98,7 +124,37 @@ const CONFIG = {
       };
     },
   },
+  "ecosystem-island-threshold": {
+    contract: "islandLab",
+    snapshotMethod: "summary",
+    evidence(document) {
+      return {
+        actionCount: document.manifestReplay.actionCount,
+        checkpoints: document.manifestReplay.checkpoints,
+        claims: document.claims,
+      };
+    },
+  },
+  "explore-archive-map-contrast": {
+    contract: "archiveWetlandMap",
+    snapshotMethod: "snapshot",
+    evidence(document) {
+      return {
+        actionCount: document.manifestReplay.actionCount,
+        activationActions: document.manifestReplay.activationActions,
+        checkpoints: document.manifestReplay.checkpoints,
+        claims: document.claims,
+        finalPrompt: document.manifestReplay.finalPrompt,
+      };
+    },
+  },
 };
+
+assert.deepEqual(
+  channel.videos.map(item => item.id),
+  Object.keys(CONFIG),
+  "aggregate publication order and browser configuration diverged",
+);
 
 function publication(id) {
   const found = channel.videos.find((item) => item.id === id);
@@ -115,11 +171,30 @@ function indexRecord(id) {
 }
 
 function referencedPath(basePath, reference) {
-  return fileURLToPath(new URL(reference, pathToFileURL(basePath)));
+  const path = resolve(fileURLToPath(new URL(reference, pathToFileURL(basePath))));
+  const prefix = ROOT.endsWith(sep) ? ROOT : `${ROOT}${sep}`;
+  assert.ok(
+    path === ROOT || path.startsWith(prefix),
+    `reference escapes the repository: ${reference}`,
+  );
+  return path;
 }
 
 function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
+}
+
+function canonicalJson(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map(canonicalJson).join(",")}]`;
+  }
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value)
+      .sort()
+      .map(key => `${JSON.stringify(key)}:${canonicalJson(value[key])}`)
+      .join(",")}}`;
+  }
+  return JSON.stringify(value);
 }
 
 const mimeTypes = new Map([
@@ -211,12 +286,17 @@ const browser = spawn(
 
 const delay = (milliseconds) =>
   new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds));
+const browserRunning = () =>
+  browser.exitCode === null && browser.signalCode === null;
 
 async function activePort(timeout = 45_000) {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
-    if (browser.exitCode !== null) {
-      throw new Error(`browser exited before DevTools was ready: ${browser.exitCode}`);
+    if (!browserRunning()) {
+      throw new Error(
+        "browser exited before DevTools was ready: " +
+          `${browser.exitCode ?? browser.signalCode}`,
+      );
     }
     try {
       const response = await fetch(
@@ -232,6 +312,12 @@ async function activePort(timeout = 45_000) {
 async function readJson(url, timeout = 15_000) {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
+    if (!browserRunning()) {
+      throw new Error(
+        `browser exited while waiting for ${url}: ` +
+          `${browser.exitCode ?? browser.signalCode}`,
+      );
+    }
     try {
       const response = await fetch(url);
       if (response.ok) return await response.json();
@@ -361,7 +447,27 @@ async function snapshot(config) {
   })()`);
 }
 
-async function targetMetrics(selector = null) {
+async function waitForSnapshot(config, expected, label, timeout = 20_000) {
+  const deadline = Date.now() + timeout;
+  let actual = null;
+  let mismatch = null;
+  while (Date.now() < deadline) {
+    actual = await snapshot(config);
+    try {
+      assert.deepEqual(actual, expected);
+      return actual;
+    } catch (error) {
+      mismatch = error;
+    }
+    await delay(75);
+  }
+  throw new Error(
+    `${label} did not reach its evidence state: ${mismatch?.message || ""}\n` +
+      `actual=${canonicalJson(actual)}\nexpected=${canonicalJson(expected)}`,
+  );
+}
+
+async function targetMetrics(selector = null, reveal = false) {
   return evaluate(`(() => {
     const stage = document.querySelector("#stage");
     const frame = stage.querySelector("iframe");
@@ -374,7 +480,7 @@ async function targetMetrics(selector = null) {
     const frameRect = frame.getBoundingClientRect();
     const stageRect = stage.getBoundingClientRect();
     const lowerRect = lower ? lower.getBoundingClientRect() : null;
-    const rect = target.getBoundingClientRect();
+    const style = frame.contentWindow.getComputedStyle(target);
     const safeHeight = Math.max(
       0,
       Math.min(
@@ -382,6 +488,21 @@ async function targetMetrics(selector = null) {
         lowerRect ? lowerRect.top - frameRect.top : frameRect.height
       )
     );
+    let rect = target.getBoundingClientRect();
+    if (${JSON.stringify(reveal)}) {
+      if (rect.bottom > safeHeight - 8) {
+        const clearance = Math.max(0, frameRect.height - safeHeight + 16);
+        doc.documentElement.style.paddingBottom =
+          clearance ? clearance + "px" : "";
+        doc.documentElement.style.scrollPaddingBottom =
+          clearance ? clearance + "px" : "";
+        rect = target.getBoundingClientRect();
+        frame.contentWindow.scrollBy(0, rect.bottom - safeHeight + 8);
+      } else if (rect.top < 8) {
+        frame.contentWindow.scrollBy(0, rect.top - 8);
+      }
+      rect = target.getBoundingClientRect();
+    }
     const visibleWidth = Math.max(
       0,
       Math.min(rect.right, frameRect.width) - Math.max(rect.left, 0)
@@ -392,8 +513,20 @@ async function targetMetrics(selector = null) {
     );
     const requiredWidth = Math.min(32, Math.max(1, rect.width / 2));
     const requiredHeight = Math.min(24, Math.max(1, rect.height / 2));
+    const rendered =
+      !target.hidden &&
+      style.display !== "none" &&
+      style.visibility !== "hidden" &&
+      Number(style.opacity) > 0.5 &&
+      rect.width > 0 &&
+      rect.height > 0;
     return {
       id: target.id,
+      tag: target.tagName,
+      disabled:
+        Boolean(target.disabled) ||
+        target.getAttribute("aria-disabled") === "true",
+      rendered,
       left: rect.left,
       top: rect.top,
       right: rect.right,
@@ -404,11 +537,24 @@ async function targetMetrics(selector = null) {
       visibleHeight,
       requiredWidth,
       requiredHeight,
-      visible: visibleWidth >= requiredWidth && visibleHeight >= requiredHeight,
+      visible:
+        rendered &&
+        visibleWidth >= requiredWidth &&
+        visibleHeight >= requiredHeight,
       frameWidth: frameRect.width,
       frameHeight: frameRect.height,
       stageWidth: stageRect.width,
       stageHeight: stageRect.height,
+      outerViewportWidth: innerWidth,
+      outerClientWidth: document.documentElement.clientWidth,
+      outerScrollbarWidth:
+        innerWidth - document.documentElement.clientWidth,
+      outerScrollHeight: document.documentElement.scrollHeight,
+      outerClientHeight: document.documentElement.clientHeight,
+      htmlOverflowY: getComputedStyle(document.documentElement).overflowY,
+      bodyOverflowY: getComputedStyle(document.body).overflowY,
+      scrollbarGutter:
+        getComputedStyle(document.documentElement).scrollbarGutter,
       safeHeight,
       lowerThirdHeight: lowerRect ? lowerRect.height : 0
     };
@@ -421,6 +567,42 @@ function assertVisible(metrics, label) {
     true,
     `${label} is not visible above the live-player lower third: ` +
       JSON.stringify(metrics),
+  );
+}
+
+function assertViewportGeometry(metrics, viewport, label) {
+  const diagnostic = `${label}: ${JSON.stringify(metrics)}`;
+  assert.ok(
+    Math.abs(metrics.frameWidth - viewport.frameWidth) <= 0.5,
+    diagnostic,
+  );
+  assert.ok(
+    Math.abs(metrics.frameHeight - viewport.frameHeight) <= 0.5,
+    diagnostic,
+  );
+  assert.ok(
+    Math.abs(metrics.stageWidth - viewport.stageWidth) <= 0.5,
+    diagnostic,
+  );
+  assert.ok(
+    Math.abs(metrics.stageHeight - viewport.stageHeight) <= 0.5,
+    diagnostic,
+  );
+  assert.equal(metrics.outerViewportWidth, viewport.pageWidth, diagnostic);
+  assert.ok(
+    viewport.outerClientWidths.includes(metrics.outerClientWidth),
+    diagnostic,
+  );
+  assert.ok(
+    viewport.scrollbarWidths.includes(metrics.outerScrollbarWidth),
+    diagnostic,
+  );
+  assert.equal(metrics.htmlOverflowY, "scroll", diagnostic);
+  assert.equal(metrics.bodyOverflowY, "visible", diagnostic);
+  assert.match(metrics.scrollbarGutter, /^stable/, diagnostic);
+  assert.ok(
+    metrics.outerScrollHeight > metrics.outerClientHeight,
+    `real page scrolling was lost; ${diagnostic}`,
   );
 }
 
@@ -451,11 +633,33 @@ async function applyAction(action) {
     if (action.do === "scroll") {
       const target = doc.querySelector(action.selector);
       if (!target) throw new Error("missing scroll target " + action.selector);
+      const frameRect = frame.getBoundingClientRect();
+      const lower = document.querySelector("#stage .l3");
+      const lowerRect = lower ? lower.getBoundingClientRect() : null;
+      const safeBottom = Math.max(
+        0,
+        Math.min(
+          frameRect.height,
+          lowerRect ? lowerRect.top - frameRect.top : frameRect.height
+        )
+      );
       target.scrollIntoView({
         block: action.block || "center",
         inline: "nearest",
         behavior: "auto"
       });
+      let rect = target.getBoundingClientRect();
+      if (rect.bottom > safeBottom - 8) {
+        const clearance = Math.max(0, frameRect.height - safeBottom + 16);
+        doc.documentElement.style.paddingBottom =
+          clearance ? clearance + "px" : "";
+        doc.documentElement.style.scrollPaddingBottom =
+          clearance ? clearance + "px" : "";
+        rect = target.getBoundingClientRect();
+        win.scrollBy(0, rect.bottom - safeBottom + 8);
+      } else if (rect.top < 8) {
+        win.scrollBy(0, rect.top - 8);
+      }
       return;
     }
     if (action.do === "click") {
@@ -464,20 +668,27 @@ async function applyAction(action) {
       if (target.disabled || target.getAttribute("aria-disabled") === "true") {
         throw new Error("disabled click target " + action.selector);
       }
+      target.focus({ preventScroll: true });
+      if (typeof target.select === "function") target.select();
       target.click();
       return;
     }
     if (action.do === "keydown") {
-      doc.dispatchEvent(keyEvent("keydown", action.code, action.key));
+      (doc.activeElement || doc).dispatchEvent(
+        keyEvent("keydown", action.code, action.key)
+      );
       return;
     }
     if (action.do === "keyup") {
-      doc.dispatchEvent(keyEvent("keyup", action.code, action.key));
+      (doc.activeElement || doc).dispatchEvent(
+        keyEvent("keyup", action.code, action.key)
+      );
       return;
     }
     if (action.do === "key") {
-      doc.dispatchEvent(keyEvent("keydown", action.code, action.key));
-      doc.dispatchEvent(keyEvent("keyup", action.code, action.key));
+      const target = doc.activeElement || doc;
+      target.dispatchEvent(keyEvent("keydown", action.code, action.key));
+      target.dispatchEvent(keyEvent("keyup", action.code, action.key));
       return;
     }
     if (action.do === "type") {
@@ -492,8 +703,22 @@ async function applyAction(action) {
               ? "Space"
               : "";
         target.dispatchEvent(keyEvent("keydown", code, character));
-        if (target.isContentEditable) target.textContent += character;
-        else target.value += character;
+        if (target.isContentEditable) {
+          target.textContent += character;
+        } else if (
+          typeof target.setRangeText === "function" &&
+          typeof target.selectionStart === "number" &&
+          typeof target.selectionEnd === "number"
+        ) {
+          target.setRangeText(
+            character,
+            target.selectionStart,
+            target.selectionEnd,
+            "end"
+          );
+        } else {
+          target.value += character;
+        }
         try {
           target.dispatchEvent(new win.InputEvent("input", {
             bubbles: true,
@@ -545,13 +770,37 @@ async function captureStage(path) {
 }
 
 function requiresVisibleActivation(action) {
-  return (
-    action.do === "click" ||
-    action.do === "type" ||
-    (action.do === "key" && /^(Enter|NumpadEnter)$/.test(action.code || ""))
-  );
+  return action.do !== "scroll";
 }
 
+function waitForBrowserExit(timeout) {
+  if (!browserRunning()) return Promise.resolve(true);
+  return new Promise(resolveExit => {
+    const onExit = () => {
+      clearTimeout(timer);
+      resolveExit(true);
+    };
+    const timer = setTimeout(() => {
+      browser.off("exit", onExit);
+      resolveExit(false);
+    }, timeout);
+    browser.once("exit", onExit);
+    if (!browserRunning()) onExit();
+  });
+}
+
+async function pathExists(path) {
+  try {
+    await stat(path);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") return false;
+    throw error;
+  }
+}
+
+let report = null;
+let cleanup = null;
 try {
   const port = await activePort();
   const targets = await readJson(`http://127.0.0.1:${port}/json/list`);
@@ -568,6 +817,13 @@ try {
     browserErrors.push(
       exceptionDetails.exception?.description || exceptionDetails.text,
     );
+  });
+  cdp.on("Runtime.consoleAPICalled", ({ type, args }) => {
+    if (type === "error") {
+      browserErrors.push(
+        args.map(value => value.value ?? value.description ?? "").join(" "),
+      );
+    }
   });
   cdp.on("Log.entryAdded", ({ entry }) => {
     if (entry.level === "error" && entry.source === "javascript") {
@@ -601,38 +857,75 @@ try {
         ]),
       );
 
-      assert.equal(
-        evidenceContract.checkpoints.length,
-        3,
-        `${publicationId} must expose success, failure, and reset framing`,
+      assert.ok(
+        evidenceContract.checkpoints.length >= 3,
+        `${publicationId} must expose at least success, failure, and reset framing`,
       );
+      if (evidenceContract.actionCount !== undefined) {
+        assert.equal(
+          actions.length,
+          evidenceContract.actionCount,
+          `${publicationId} action count diverged from evidence`,
+        );
+      }
       await openReplay(publicationId, config);
       const resetClaim =
         claims.get("reset") ||
         claims.get(evidenceContract.checkpoints.at(-1).claim);
-      assert.deepEqual(await snapshot(config), resetClaim.expectedState);
+      assert.ok(resetClaim, `${publicationId} has no opening/reset claim`);
+      await waitForSnapshot(
+        config,
+        resetClaim.expectedState,
+        `${publicationId}/${viewport.id}/opening`,
+      );
 
+      const geometrySamples = [];
+      const checkGeometry = (metrics, label) => {
+        assertViewportGeometry(metrics, viewport, label);
+        geometrySamples.push(metrics);
+      };
       const frame = await targetMetrics(
         aggregatePublication.live.scenes[0].ready.selector,
       );
-      assert.ok(
-        frame.frameWidth >= viewport.minFrameWidth &&
-          frame.frameWidth <= viewport.maxFrameWidth,
-        `${viewport.id} iframe width is outside the player-stage target: ` +
-          JSON.stringify(frame),
+      checkGeometry(
+        frame,
+        `${publicationId}/${viewport.id}/opening geometry`,
       );
 
       const activationVisibility = [];
+      const framingVisibility = [];
       const checkpointResults = [];
+      const timingSkews = [];
+      let finalPromptChecked = false;
+      const replayStarted = performance.now();
       for (let actionIndex = 0; actionIndex < actions.length; actionIndex += 1) {
         const action = actions[actionIndex];
+        const remaining =
+          action.at * 1000 - (performance.now() - replayStarted);
+        if (remaining > 0) await delay(remaining);
+        const actualAt = performance.now() - replayStarted;
+        assert.ok(
+          actualAt + 5 >= action.at * 1000,
+          `${publicationId}/${viewport.id} action ${actionIndex} ran early`,
+        );
+        timingSkews.push(actualAt - action.at * 1000);
         if (requiresVisibleActivation(action)) {
           const metrics = await targetMetrics(
             action.do === "click" ? action.selector : null,
+            true,
           );
           assertVisible(
             metrics,
             `${publicationId}/${viewport.id} action ${actionIndex}`,
+          );
+          checkGeometry(
+            metrics,
+            `${publicationId}/${viewport.id} action ${actionIndex} geometry`,
+          );
+          assert.equal(
+            metrics.disabled,
+            false,
+            `${publicationId}/${viewport.id} action ${actionIndex} is disabled`,
           );
           activationVisibility.push({
             actionIndex,
@@ -643,14 +936,57 @@ try {
         }
 
         await applyAction(action);
+        if (action.do === "scroll") {
+          const metrics = await targetMetrics(action.selector);
+          assertVisible(
+            metrics,
+            `${publicationId}/${viewport.id} framing action ${actionIndex}`,
+          );
+          checkGeometry(
+            metrics,
+            `${publicationId}/${viewport.id} framing action ` +
+              `${actionIndex} geometry`,
+          );
+          framingVisibility.push({
+            actionIndex,
+            selector: action.selector,
+            metrics,
+          });
+        }
+
+        if (evidenceContract.finalPrompt?.afterAction === actionIndex) {
+          const prompt = evidenceContract.finalPrompt;
+          const metrics = await targetMetrics(prompt.selector);
+          assertVisible(
+            metrics,
+            `${publicationId}/${viewport.id} final prompt`,
+          );
+          checkGeometry(
+            metrics,
+            `${publicationId}/${viewport.id} final prompt geometry`,
+          );
+          const promptText = await evaluate(`(() => {
+            const frame = document.querySelector("#stage iframe");
+            return frame.contentDocument
+              .querySelector(${JSON.stringify(prompt.selector)})
+              ?.textContent;
+          })()`);
+          assert.equal(promptText, prompt.text);
+          await waitForSnapshot(
+            config,
+            resetClaim.expectedState,
+            `${publicationId}/${viewport.id}/final prompt state`,
+          );
+          finalPromptChecked = true;
+        }
+
         const checkpoint = checkpoints.get(actionIndex);
         if (!checkpoint) continue;
 
-        const actual = await snapshot(config);
         const claim = claims.get(checkpoint.claim);
         assert.ok(claim, `missing evidence claim ${checkpoint.claim}`);
-        assert.deepEqual(
-          actual,
+        const actual = await waitForSnapshot(
+          config,
           claim.expectedState,
           `${publicationId}/${viewport.id}/${checkpoint.claim}`,
         );
@@ -659,9 +995,23 @@ try {
           metrics,
           `${publicationId}/${viewport.id}/${checkpoint.claim} result`,
         );
+        checkGeometry(
+          metrics,
+          `${publicationId}/${viewport.id}/${checkpoint.claim} geometry`,
+        );
         const filename =
           `${publicationId}-${viewport.id}-${checkpoint.claim}.png`;
         const screenshot = await captureStage(join(outputRoot, filename));
+        assert.equal(
+          screenshot.width,
+          viewport.screenshotWidth,
+          `${filename}: screenshot width drifted`,
+        );
+        assert.equal(
+          screenshot.height,
+          viewport.screenshotHeight,
+          `${filename}: screenshot height drifted`,
+        );
         const entry = {
           publication: publicationId,
           viewport: viewport.id,
@@ -669,6 +1019,14 @@ try {
           actionIndex,
           resultSelector: checkpoint.selector,
           metrics,
+          state: {
+            actualSha256: sha256(
+              Buffer.from(canonicalJson(actual), "utf8"),
+            ),
+            expectedSha256: sha256(
+              Buffer.from(canonicalJson(claim.expectedState), "utf8"),
+            ),
+          },
           screenshot: {
             path: filename,
             ...screenshot,
@@ -678,7 +1036,21 @@ try {
         checkpointResults.push(entry);
       }
 
-      assert.equal(checkpointResults.length, 3);
+      assert.equal(
+        checkpointResults.length,
+        evidenceContract.checkpoints.length,
+      );
+      assert.equal(
+        finalPromptChecked,
+        Boolean(evidenceContract.finalPrompt),
+      );
+      assert.equal(
+        geometrySamples.length,
+        1 +
+          actions.length +
+          evidenceContract.checkpoints.length +
+          (evidenceContract.finalPrompt ? 1 : 0),
+      );
       runs.push({
         publication: publicationId,
         viewport: viewport.id,
@@ -687,21 +1059,64 @@ try {
         frameHeight: frame.frameHeight,
         safeHeight: checkpointResults.map((entry) => entry.metrics.safeHeight),
         activationsChecked: activationVisibility.length,
+        framingActionsChecked: framingVisibility.length,
+        finalPromptChecked,
+        exactTiming: true,
+        maxTimingSkewMs: Math.round(Math.max(...timingSkews)),
+        geometryChecks: geometrySamples.length,
+        frameWidthsChecked: [
+          ...new Set(geometrySamples.map(sample => sample.frameWidth)),
+        ],
+        stageWidthsChecked: [
+          ...new Set(geometrySamples.map(sample => sample.stageWidth)),
+        ],
+        outerClientWidthsChecked: [
+          ...new Set(geometrySamples.map(sample => sample.outerClientWidth)),
+        ],
+        scrollbarWidthsChecked: [
+          ...new Set(
+            geometrySamples.map(sample => sample.outerScrollbarWidth),
+          ),
+        ],
         checkpoints: checkpointResults.map((entry) => entry.checkpoint),
       });
     }
   }
 
-  assert.equal(captures.length, 18);
+  assert.equal(runs.length, VIEWPORTS.length * Object.keys(CONFIG).length);
+  assert.equal(
+    captures.length,
+    runs.reduce((total, run) => total + run.checkpoints.length, 0),
+  );
   assert.deepEqual(browserErrors, []);
   const manifest = {
     schema: "working-proofs-viewport-evidence/1.0",
     browser: version.product,
     channel: channel.id,
-    viewports: VIEWPORTS.map(({ id, pageWidth, pageHeight }) => ({
+    viewports: VIEWPORTS.map(({
       id,
       pageWidth,
       pageHeight,
+      frameWidth,
+      frameHeight,
+      stageWidth,
+      stageHeight,
+      screenshotWidth,
+      screenshotHeight,
+      outerClientWidths,
+      scrollbarWidths,
+    }) => ({
+      id,
+      pageWidth,
+      pageHeight,
+      frameWidth,
+      frameHeight,
+      stageWidth,
+      stageHeight,
+      screenshotWidth,
+      screenshotHeight,
+      outerClientWidths,
+      scrollbarWidths,
     })),
     captures,
   };
@@ -710,37 +1125,43 @@ try {
     `${JSON.stringify(manifest, null, 2)}\n`,
     "utf8",
   );
-  process.stdout.write(
-    JSON.stringify({
-      browser: version.product,
-      captures: captures.length,
-      errors: browserErrors,
-      output: relative(ROOT, outputRoot),
-      runs,
-    }),
-  );
+  report = {
+    browser: version.product,
+    captures: captures.length,
+    errors: browserErrors,
+    output: relative(ROOT, outputRoot),
+    runs,
+  };
 } finally {
   if (cdp) cdp.close();
-  if (browser.exitCode === null) browser.kill();
-  await new Promise((resolveExit) => {
-    if (browser.exitCode !== null) {
-      resolveExit();
-      return;
-    }
-    const timeout = setTimeout(resolveExit, 3_000);
-    browser.once("exit", () => {
-      clearTimeout(timeout);
-      resolveExit();
+  if (browserRunning()) browser.kill();
+  let browserExited = await waitForBrowserExit(5_000);
+  if (!browserExited) {
+    browser.kill("SIGKILL");
+    browserExited = await waitForBrowserExit(5_000);
+  }
+  assert.equal(browserExited, true, "browser process did not terminate");
+
+  await new Promise((resolveClose, rejectClose) => {
+    server.close(error => {
+      if (error) rejectClose(error);
+      else resolveClose();
     });
   });
-  server.close();
-  await new Promise((resolveClose) => server.once("close", resolveClose));
-  try {
-    await rm(profilePath, {
-      recursive: true,
-      force: true,
-      maxRetries: 12,
-      retryDelay: 150,
-    });
-  } catch {}
+  await rm(profilePath, {
+    recursive: true,
+    force: true,
+    maxRetries: 12,
+    retryDelay: 150,
+  });
+  const profileRemoved = !(await pathExists(profilePath));
+  assert.equal(profileRemoved, true, "browser profile cleanup failed");
+  cleanup = {
+    browserExited,
+    profileRemoved,
+    serverClosed: !server.listening,
+  };
 }
+
+assert.ok(report, "aggregate browser report was not produced");
+process.stdout.write(JSON.stringify({ ...report, cleanup }));

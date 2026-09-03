@@ -1,0 +1,1546 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="candidate-frame-reset" content="exact">
+  <title>Read the Wetland Twice</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #d8d1bd;
+      color: #172c2a;
+      --ink: #173c38;
+      --paper: #f3ecd8;
+      --paper-deep: #e4d8bb;
+      --water: #8fbcc0;
+      --water-dark: #2d6e72;
+      --reed: #b6aa62;
+      --moss: #637a53;
+      --rust: #a64c32;
+      --amber: #e0aa45;
+      --shadow: #726b58;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    body {
+      min-width: 0;
+      min-height: 100vh;
+      margin: 0;
+      background:
+        linear-gradient(90deg, rgba(23, 60, 56, 0.06) 1px, transparent 1px),
+        linear-gradient(rgba(23, 60, 56, 0.06) 1px, transparent 1px),
+        #d8d1bd;
+      background-size: 22px 22px;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: 4px solid #f7c34d;
+      outline-offset: 3px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1180px;
+      min-width: 0;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: clamp(14px, 2.5vw, 34px);
+      display: grid;
+      align-content: center;
+      gap: 14px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 24px;
+      padding: 15px 18px 12px;
+      border: 2px solid var(--ink);
+      background: var(--paper);
+      box-shadow: 7px 7px 0 var(--shadow);
+    }
+
+    .kicker {
+      margin: 0 0 5px;
+      color: var(--rust);
+      font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+      font-size: 0.8rem;
+      font-weight: 900;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 5vw, 4.35rem);
+      font-weight: 700;
+      line-height: 0.9;
+      letter-spacing: -0.045em;
+    }
+
+    .header-stamp {
+      display: grid;
+      grid-template-columns: repeat(2, auto);
+      gap: 6px 16px;
+      padding: 10px 12px;
+      border: 2px dashed var(--rust);
+      color: var(--rust);
+      font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .header-stamp span {
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+    }
+
+    .header-stamp strong {
+      font-size: 1.15rem;
+    }
+
+    .workspace {
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.78fr);
+      grid-template-areas:
+        "failure failure"
+        "map ledger"
+        "takeover takeover";
+      gap: 14px;
+    }
+
+    .map-card,
+    .ledger {
+      min-width: 0;
+      border: 2px solid var(--ink);
+      background: var(--paper);
+      box-shadow: 7px 7px 0 var(--shadow);
+    }
+
+    .map-card {
+      grid-area: map;
+      padding: 13px;
+    }
+
+    .map-toolbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 9px;
+    }
+
+    .snapshot-pair {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+      font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+      font-size: 0.8rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .snapshot-pair span {
+      padding: 5px 8px;
+      border: 1px solid var(--ink);
+      background: #fffaf0;
+    }
+
+    .map-view-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .map-view-controls button {
+      min-width: 42px;
+      min-height: 42px;
+      padding: 4px 7px;
+      border: 1px solid var(--ink);
+      background: #fffaf0;
+      color: var(--ink);
+      font-weight: 900;
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+
+    .map-window {
+      position: relative;
+      min-width: 0;
+      height: 390px;
+      overflow: hidden;
+      border: 3px double var(--ink);
+      background:
+        linear-gradient(90deg, rgba(23, 60, 56, 0.09) 1px, transparent 1px),
+        linear-gradient(rgba(23, 60, 56, 0.09) 1px, transparent 1px),
+        #efe6ce;
+      background-size: 28px 28px;
+      isolation: isolate;
+    }
+
+    .map-sheet {
+      position: absolute;
+      inset: 0;
+      transform-origin: 50% 50%;
+      transition: transform 180ms ease;
+    }
+
+    .terrain {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .record-marker {
+      position: absolute;
+      left: calc((var(--x) - 1000) / 600 * 100%);
+      top: calc(100% - ((var(--y) - 2000) / 400 * 100%));
+      width: 31px;
+      height: 31px;
+      padding: 0;
+      border: 3px solid #fffaf0;
+      border-radius: 50%;
+      background: #fffaf0;
+      color: var(--ink);
+      font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+      font-size: 0.75rem;
+      font-weight: 900;
+      line-height: 1;
+      box-shadow: 0 0 0 3px var(--ink), 2px 3px 0 rgba(23, 44, 42, 0.3);
+      transform: translate(-50%, -50%);
+      transition: opacity 140ms ease, transform 140ms ease;
+      z-index: 2;
+    }
+
+    .record-marker[data-changed="true"] {
+      color: var(--rust);
+      box-shadow: 0 0 0 3px var(--rust), 2px 3px 0 rgba(72, 35, 25, 0.3);
+    }
+
+    .record-marker[data-focused="true"] {
+      z-index: 4;
+      background: #101a18;
+      box-shadow:
+        0 0 0 3px #fffaf0,
+        0 0 0 7px var(--amber),
+        3px 5px 0 rgba(23, 44, 42, 0.4);
+      transform: translate(-50%, -50%) scale(1.16);
+    }
+
+    .record-marker[hidden] {
+      display: none;
+    }
+
+    .north-arrow {
+      position: absolute;
+      right: 13px;
+      bottom: 12px;
+      z-index: 5;
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 58px;
+      border: 1px solid var(--ink);
+      background: rgba(243, 236, 216, 0.9);
+      color: var(--ink);
+      font-family: Georgia, serif;
+      font-size: 0.8rem;
+      font-weight: 900;
+      pointer-events: none;
+    }
+
+    .north-arrow::before {
+      content: "▲";
+      display: block;
+      font-size: 1.4rem;
+    }
+
+    .map-caption {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      margin-top: 8px;
+      color: #3e514b;
+      font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .ledger {
+      grid-area: ledger;
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .ledger > * {
+      min-width: 0;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .metric {
+      padding: 8px;
+      border: 1px solid var(--ink);
+      background: #fffaf0;
+    }
+
+    .metric span {
+      display: block;
+      margin-bottom: 2px;
+      color: #53645e;
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      overflow: hidden;
+      font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+      font-size: 0.9rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .query {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 6px;
+      align-items: end;
+    }
+
+    .query label {
+      display: grid;
+      gap: 3px;
+      color: #53645e;
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .query input {
+      width: 100%;
+      min-height: 44px;
+      padding: 7px 8px;
+      border: 2px solid var(--ink);
+      background: #fffaf0;
+      color: var(--ink);
+      font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+      font-weight: 900;
+    }
+
+    .query-arrow {
+      padding-bottom: 12px;
+      color: var(--rust);
+      font-weight: 900;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .button-grid button {
+      min-height: 44px;
+      padding: 7px 8px;
+      border: 2px solid var(--ink);
+      background: #fffaf0;
+      color: var(--ink);
+      font-size: 0.8rem;
+      font-weight: 900;
+      line-height: 1.15;
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+
+    #compare-btn,
+    #export-btn {
+      background: var(--ink);
+      color: #fffaf0;
+    }
+
+    #filter-changed-btn {
+      background: var(--amber);
+    }
+
+    #restore-btn {
+      border-color: var(--rust);
+      background: var(--rust);
+      color: #fffaf0;
+      box-shadow: 2px 2px 0 #6f2e1e;
+    }
+
+    .status,
+    .query-error,
+    .record-detail,
+    .export-output,
+    .takeover-prompt,
+    .legend {
+      margin: 0;
+      padding: 9px 10px;
+      border-left: 6px solid var(--moss);
+      background: #e4ead7;
+      color: #233e35;
+      font-size: 0.82rem;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+      scroll-margin-top: 5px;
+    }
+
+    .status[data-status="failure"] {
+      border-left-color: var(--rust);
+      background: #f2d9cb;
+      color: #6d281d;
+    }
+
+    .query-error {
+      grid-area: failure;
+      width: 100%;
+      border: 3px solid var(--rust);
+      border-left-color: var(--rust);
+      background: #f2d9cb;
+      color: #6d281d;
+      font-weight: 800;
+    }
+
+    .query-error strong,
+    .query-error span {
+      display: block;
+    }
+
+    .query-error strong {
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+
+    .query-error[hidden],
+    .record-detail[hidden] {
+      display: none;
+    }
+
+    .record-detail {
+      border-left-color: var(--water-dark);
+      background: #d9e7e5;
+    }
+
+    .record-detail strong {
+      color: var(--water-dark);
+    }
+
+    .change-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .change-list li {
+      padding: 3px 5px;
+      border: 1px solid var(--rust);
+      background: #fffaf0;
+      color: var(--rust);
+      font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .export-output {
+      border-left-color: var(--water-dark);
+      background: #d9e7e5;
+    }
+
+    .export-output strong,
+    .export-output code {
+      display: block;
+    }
+
+    .export-output code {
+      margin-top: 4px;
+      overflow-wrap: anywhere;
+      font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .export-provenance {
+      display: block;
+      margin-top: 6px;
+      font-weight: 800;
+    }
+
+    .legend {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px 16px;
+      border: 2px solid var(--ink);
+      border-left-color: var(--ink);
+      background: #fffaf0;
+      font-weight: 800;
+      box-shadow: 3px 3px 0 var(--shadow);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .legend-ring {
+      width: 17px;
+      height: 17px;
+      border: 4px solid var(--ink);
+      border-radius: 50%;
+      background: #fffaf0;
+    }
+
+    .legend-ring.changed {
+      border-color: var(--rust);
+    }
+
+    .takeover-prompt {
+      grid-area: takeover;
+      border: 2px solid var(--ink);
+      border-left: 8px solid var(--amber);
+      background: var(--ink);
+      color: #fffaf0;
+      font-weight: 900;
+    }
+
+    @media (max-width: 860px) {
+      .shell {
+        align-content: start;
+      }
+
+      header,
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .workspace {
+        grid-template-areas:
+          "ledger"
+          "failure"
+          "map"
+          "takeover";
+      }
+
+      .header-stamp {
+        width: fit-content;
+      }
+
+      .map-window {
+        height: 360px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .shell {
+        padding: 6px;
+        gap: 7px;
+      }
+
+      header,
+      .map-card,
+      .ledger {
+        box-shadow: 3px 3px 0 var(--shadow);
+      }
+
+      header {
+        padding: 9px 10px;
+      }
+
+      h1 {
+        font-size: 2rem;
+        line-height: 1;
+      }
+
+      .header-stamp {
+        display: none;
+      }
+
+      .map-card,
+      .ledger {
+        padding: 8px;
+      }
+
+      .map-toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .map-view-controls {
+        width: 100%;
+        overflow: visible;
+        padding: 2px 1px 4px;
+      }
+
+      .map-view-controls button {
+        flex: 1 1 44px;
+        min-height: 44px;
+      }
+
+      .map-window {
+        height: 300px;
+      }
+
+      .record-marker {
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+      }
+
+      .map-caption {
+        grid-template-columns: 1fr;
+        gap: 2px;
+      }
+
+      .ledger {
+        gap: 7px;
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .query {
+        grid-template-columns: 1fr;
+      }
+
+      .query-arrow {
+        display: none;
+      }
+
+      .metric {
+        padding: 6px;
+      }
+
+      .button-grid button {
+        min-height: 46px;
+      }
+
+      .change-list li {
+        font-size: 0.82rem;
+      }
+
+      .export-output code {
+        font-size: 0.86rem;
+        line-height: 1.45;
+      }
+    }
+
+    @media (max-height: 620px) and (min-width: 700px) {
+      .shell {
+        padding: 7px;
+        align-content: start;
+        gap: 7px;
+      }
+
+      header {
+        padding: 7px 10px;
+        box-shadow: 3px 3px 0 var(--shadow);
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .header-stamp {
+        padding: 5px 8px;
+      }
+
+      .map-card,
+      .ledger {
+        padding: 7px;
+        box-shadow: 3px 3px 0 var(--shadow);
+      }
+
+      .map-window {
+        height: 310px;
+      }
+
+      .ledger {
+        gap: 6px;
+      }
+
+      .metric,
+      .status,
+      .query-error,
+      .record-detail,
+      .export-output {
+        padding: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <p class="kicker">Synthetic wetland plot survey · archive sheet 03</p>
+        <h1>Read the Wetland Twice</h1>
+      </div>
+      <div class="header-stamp" aria-label="Archive summary">
+        <span>Records</span><span>Changed</span>
+        <strong>24</strong><strong>7</strong>
+      </div>
+    </header>
+
+    <div id="change-legend" class="legend" aria-label="rust ring = changed 1990→2020; dark ring = unchanged">
+      <span class="legend-item"><i class="legend-ring changed" aria-hidden="true"></i>rust ring = changed 1990→2020;</span>
+      <span class="legend-item"><i class="legend-ring" aria-hidden="true"></i>dark ring = unchanged</span>
+    </div>
+
+    <div class="workspace">
+      <aside class="ledger" aria-label="Archive comparison controls and results">
+        <div class="metrics">
+          <div class="metric"><span>Total</span><strong id="total-count">24 records</strong></div>
+          <div class="metric"><span>Changed</span><strong id="changed-count">7 records</strong></div>
+          <div class="metric"><span>Visible / filter</span><strong id="visible-filter">24 · all</strong></div>
+          <div class="metric"><span>Focus</span><strong id="focus-readout">none</strong></div>
+        </div>
+
+        <div class="query" aria-label="Snapshot comparison inputs">
+          <label for="from-year">From snapshot
+            <input id="from-year" inputmode="numeric" autocomplete="off" list="archive-years" value="1990">
+          </label>
+          <span class="query-arrow" aria-hidden="true">→</span>
+          <label for="to-year">To snapshot
+            <input id="to-year" inputmode="numeric" autocomplete="off" list="archive-years" value="2020">
+          </label>
+          <datalist id="archive-years">
+            <option value="1880"></option>
+            <option value="1885"></option>
+            <option value="1990"></option>
+            <option value="2020"></option>
+          </datalist>
+        </div>
+
+        <div class="button-grid" aria-label="Archive comparison actions">
+          <button id="compare-btn" type="button" data-action="COMPARE">Compare snapshots</button>
+          <button id="filter-changed-btn" type="button" data-action="FILTER_CHANGED">Show 7 changed</button>
+          <button id="filter-all-btn" type="button" data-action="FILTER_ALL">Show all 24</button>
+          <button id="export-btn" type="button" data-action="EXPORT">Export sorted IDs</button>
+          <button id="restore-btn" type="button" data-action="RESET" data-reset="exact">Restore archive view</button>
+        </div>
+
+        <p id="status-message" class="status" data-status="success" role="status" aria-live="polite">Archive restored: all 24 records, 7 changed, original view.</p>
+
+        <p id="record-detail" class="record-detail" hidden>
+          <strong id="record-detail-title">WL-016 · Quartz Reed</strong><br>
+          <span id="record-detail-body">reed-bed → willow-edge · east position 1400 · north position 2280</span>
+        </p>
+
+        <ol id="change-list" class="change-list" aria-label="Sorted changed record IDs">
+          <li>WL-002</li><li>WL-005</li><li>WL-009</li><li>WL-012</li>
+          <li>WL-016</li><li>WL-020</li><li>WL-023</li>
+        </ol>
+
+        <section id="export-output" class="export-output" aria-labelledby="export-heading">
+          <strong id="export-heading">Canonical export ready</strong>
+          <code id="export-json">["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"]</code>
+          <code id="export-digest">SHA-256 fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6</code>
+          <span id="export-provenance" class="export-provenance">Observed from 24 synthetic records.</span>
+        </section>
+      </aside>
+
+      <section id="query-error" class="query-error" role="alert" hidden>
+        <strong id="query-error-title">INVALID RANGE — NOT A VALID ZERO-CHANGE RESULT</strong>
+        <span id="query-error-body">No archive sheets exist for 1880 → 1885. The accepted seven-ID export remains preserved.</span>
+      </section>
+
+      <section class="map-card" aria-labelledby="map-heading">
+        <div class="map-toolbar">
+          <div class="snapshot-pair" id="map-heading">
+            <span id="from-label">1990 field sheet</span>
+            <b aria-hidden="true">→</b>
+            <span id="to-label">2020 field sheet</span>
+          </div>
+          <div class="map-view-controls" aria-label="Pan and zoom the synthetic map">
+            <button id="pan-west-btn" type="button" data-action="PAN_WEST" aria-label="Pan west">←</button>
+            <button id="pan-north-btn" type="button" data-action="PAN_NORTH" aria-label="Pan north">↑</button>
+            <button id="pan-south-btn" type="button" data-action="PAN_SOUTH" aria-label="Pan south">↓</button>
+            <button id="pan-east-btn" type="button" data-action="PAN_EAST" aria-label="Pan east">→</button>
+            <button id="zoom-out-btn" type="button" data-action="ZOOM_OUT" aria-label="Zoom out">−</button>
+            <button id="zoom-in-btn" type="button" data-action="ZOOM_IN" aria-label="Zoom in">+</button>
+          </div>
+        </div>
+
+        <div id="map-window" class="map-window" aria-label="Synthetic wetland survey map">
+          <div id="map-sheet" class="map-sheet" role="group" aria-label="24 synthetic WL plots. Use arrow keys to move between plots and Enter or Space to select.">
+            <svg class="terrain" viewBox="0 0 600 400" aria-hidden="true">
+              <rect x="18" y="18" width="564" height="364" fill="#efe6ce" stroke="#173c38" stroke-width="2"/>
+              <path d="M-20 112 C82 64 136 150 218 121 S350 51 430 101 S550 170 630 115" fill="none" stroke="#8fbcc0" stroke-width="48" opacity=".78"/>
+              <path d="M-20 112 C82 64 136 150 218 121 S350 51 430 101 S550 170 630 115" fill="none" stroke="#2d6e72" stroke-width="3"/>
+              <path d="M40 322 C122 252 187 333 274 279 S442 246 568 305" fill="none" stroke="#8fbcc0" stroke-width="27" opacity=".65"/>
+              <path d="M40 322 C122 252 187 333 274 279 S442 246 568 305" fill="none" stroke="#2d6e72" stroke-width="2"/>
+              <path d="M78 176 C129 144 177 158 208 204 C160 232 104 228 78 176Z" fill="#b6aa62" opacity=".56" stroke="#637a53" stroke-width="2"/>
+              <path d="M307 183 C358 142 430 153 466 207 C410 242 340 238 307 183Z" fill="#b6aa62" opacity=".52" stroke="#637a53" stroke-width="2"/>
+              <path d="M185 345 C239 302 308 314 337 359 C286 387 225 387 185 345Z" fill="#637a53" opacity=".35" stroke="#173c38" stroke-width="2"/>
+              <path d="M35 31 L118 18 M35 58 L160 18 M440 382 L582 324 M488 382 L582 343 M536 382 L582 364" stroke="#637a53" stroke-width="2" opacity=".45"/>
+              <g fill="none" stroke="#173c38" stroke-width="1" opacity=".25">
+                <path d="M80 24V376M180 24V376M280 24V376M380 24V376M480 24V376"/>
+                <path d="M24 82H576M24 162H576M24 242H576M24 322H576"/>
+              </g>
+              <g fill="#173c38" font-family="monospace" font-size="14" font-weight="700">
+                <text x="22" y="397">WEST 1000</text>
+                <text x="498" y="397">EAST 1600</text>
+                <text x="3" y="32">NORTH 2400</text>
+                <text x="3" y="380">SOUTH 2000</text>
+              </g>
+            </svg>
+
+            <button id="record-wl-001" class="record-marker" style="--x:1060;--y:2070" type="button" tabindex="0" data-record-id="WL-001" aria-label="Inspect WL-001 Alder Pool">01</button>
+            <button id="record-wl-002" class="record-marker" style="--x:1160;--y:2055" type="button" tabindex="-1" data-record-id="WL-002" aria-label="Inspect changed record WL-002 Bittern Bend">02</button>
+            <button id="record-wl-003" class="record-marker" style="--x:1270;--y:2085" type="button" tabindex="-1" data-record-id="WL-003" aria-label="Inspect WL-003 Copper Reed">03</button>
+            <button id="record-wl-004" class="record-marker" style="--x:1390;--y:2060" type="button" tabindex="-1" data-record-id="WL-004" aria-label="Inspect WL-004 Drift Willow">04</button>
+            <button id="record-wl-005" class="record-marker" style="--x:1510;--y:2095" type="button" tabindex="-1" data-record-id="WL-005" aria-label="Inspect changed record WL-005 Egret Pocket">05</button>
+            <button id="record-wl-006" class="record-marker" style="--x:1580;--y:2050" type="button" tabindex="-1" data-record-id="WL-006" aria-label="Inspect WL-006 Fen Mirror">06</button>
+            <button id="record-wl-007" class="record-marker" style="--x:1040;--y:2180" type="button" tabindex="-1" data-record-id="WL-007" aria-label="Inspect WL-007 Glass Rush">07</button>
+            <button id="record-wl-008" class="record-marker" style="--x:1150;--y:2160" type="button" tabindex="-1" data-record-id="WL-008" aria-label="Inspect WL-008 Heron Shelf">08</button>
+            <button id="record-wl-009" class="record-marker" style="--x:1260;--y:2195" type="button" tabindex="-1" data-record-id="WL-009" aria-label="Inspect changed record WL-009 Indigo Flat">09</button>
+            <button id="record-wl-010" class="record-marker" style="--x:1380;--y:2170" type="button" tabindex="-1" data-record-id="WL-010" aria-label="Inspect WL-010 Juniper Pool">10</button>
+            <button id="record-wl-011" class="record-marker" style="--x:1490;--y:2145" type="button" tabindex="-1" data-record-id="WL-011" aria-label="Inspect WL-011 Kestrel Edge">11</button>
+            <button id="record-wl-012" class="record-marker" style="--x:1590;--y:2190" type="button" tabindex="-1" data-record-id="WL-012" aria-label="Inspect changed record WL-012 Marsh Lantern">12</button>
+            <button id="record-wl-013" class="record-marker" style="--x:1055;--y:2290" type="button" tabindex="-1" data-record-id="WL-013" aria-label="Inspect WL-013 Needle Willow">13</button>
+            <button id="record-wl-014" class="record-marker" style="--x:1175;--y:2260" type="button" tabindex="-1" data-record-id="WL-014" aria-label="Inspect WL-014 Otter Glass">14</button>
+            <button id="record-wl-015" class="record-marker" style="--x:1285;--y:2310" type="button" tabindex="-1" data-record-id="WL-015" aria-label="Inspect WL-015 Pickerel Flat">15</button>
+            <button id="record-wl-016" class="record-marker" style="--x:1400;--y:2280" type="button" tabindex="-1" data-record-id="WL-016" aria-label="Inspect changed record WL-016 Quartz Reed">16</button>
+            <button id="record-wl-017" class="record-marker" style="--x:1505;--y:2325" type="button" tabindex="-1" data-record-id="WL-017" aria-label="Inspect WL-017 Rill Sedge">17</button>
+            <button id="record-wl-018" class="record-marker" style="--x:1585;--y:2270" type="button" tabindex="-1" data-record-id="WL-018" aria-label="Inspect WL-018 Silt Mirror">18</button>
+            <button id="record-wl-019" class="record-marker" style="--x:1035;--y:2380" type="button" tabindex="-1" data-record-id="WL-019" aria-label="Inspect WL-019 Tern Pocket">19</button>
+            <button id="record-wl-020" class="record-marker" style="--x:1160;--y:2360" type="button" tabindex="-1" data-record-id="WL-020" aria-label="Inspect changed record WL-020 Umbra Flat">20</button>
+            <button id="record-wl-021" class="record-marker" style="--x:1280;--y:2390" type="button" tabindex="-1" data-record-id="WL-021" aria-label="Inspect WL-021 Vesper Willow">21</button>
+            <button id="record-wl-022" class="record-marker" style="--x:1390;--y:2350" type="button" tabindex="-1" data-record-id="WL-022" aria-label="Inspect WL-022 Wren Reed">22</button>
+            <button id="record-wl-023" class="record-marker" style="--x:1500;--y:2385" type="button" tabindex="-1" data-record-id="WL-023" aria-label="Inspect changed record WL-023 Yellow Pool">23</button>
+            <button id="record-wl-024" class="record-marker" style="--x:1595;--y:2340" type="button" tabindex="-1" data-record-id="WL-024" aria-label="Inspect WL-024 Zephyr Sedge">24</button>
+          </div>
+          <span class="north-arrow">N</span>
+        </div>
+
+        <div class="map-caption">
+          <span id="extent-readout">Synthetic bounds: west 1000 to east 1600; south 2000 to north 2400. Exact extent: SYN E 1000–1600 / N 2000–2400.</span>
+          <span id="view-readout">horizontal shift 0 px · vertical shift 0 px · zoom 1.00×</span>
+        </div>
+      </section>
+
+      <p id="takeover-prompt" class="takeover-prompt">YOUR TURN — choose any WL plot; arrows pan; −/+ zoom; Compare reruns; Export binds the result.</p>
+    </div>
+  </main>
+
+  <script type="application/json" id="wetland-fixture">
+{
+  "schema": "synthetic-wetland-archive/1.0",
+  "synthetic": true,
+  "snapshotLabels": {
+    "1990": "1990 field sheet",
+    "2020": "2020 field sheet"
+  },
+  "availableYears": [1990, 2020],
+  "impossibleRange": [1880, 1885],
+  "extent": {
+    "minX": 1000,
+    "maxX": 1600,
+    "minY": 2000,
+    "maxY": 2400,
+    "label": "SYN E 1000–1600 / N 2000–2400"
+  },
+  "expectedChangedIds": ["WL-002", "WL-005", "WL-009", "WL-012", "WL-016", "WL-020", "WL-023"],
+  "exportText": "[\"WL-002\",\"WL-005\",\"WL-009\",\"WL-012\",\"WL-016\",\"WL-020\",\"WL-023\"]\n",
+  "exportSha256": "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6",
+  "records": [
+    {"id":"WL-001","name":"Alder Pool","x":1060,"y":2070,"snapshots":{"1990":"open-water","2020":"open-water"}},
+    {"id":"WL-002","name":"Bittern Bend","x":1160,"y":2055,"snapshots":{"1990":"sedge-meadow","2020":"mudflat"}},
+    {"id":"WL-003","name":"Copper Reed","x":1270,"y":2085,"snapshots":{"1990":"reed-bed","2020":"reed-bed"}},
+    {"id":"WL-004","name":"Drift Willow","x":1390,"y":2060,"snapshots":{"1990":"willow-edge","2020":"willow-edge"}},
+    {"id":"WL-005","name":"Egret Pocket","x":1510,"y":2095,"snapshots":{"1990":"shallow-pool","2020":"reed-bed"}},
+    {"id":"WL-006","name":"Fen Mirror","x":1580,"y":2050,"snapshots":{"1990":"mudflat","2020":"mudflat"}},
+    {"id":"WL-007","name":"Glass Rush","x":1040,"y":2180,"snapshots":{"1990":"reed-bed","2020":"reed-bed"}},
+    {"id":"WL-008","name":"Heron Shelf","x":1150,"y":2160,"snapshots":{"1990":"sedge-meadow","2020":"sedge-meadow"}},
+    {"id":"WL-009","name":"Indigo Flat","x":1260,"y":2195,"snapshots":{"1990":"mudflat","2020":"open-water"}},
+    {"id":"WL-010","name":"Juniper Pool","x":1380,"y":2170,"snapshots":{"1990":"open-water","2020":"open-water"}},
+    {"id":"WL-011","name":"Kestrel Edge","x":1490,"y":2145,"snapshots":{"1990":"willow-edge","2020":"willow-edge"}},
+    {"id":"WL-012","name":"Marsh Lantern","x":1590,"y":2190,"snapshots":{"1990":"sedge-meadow","2020":"reed-bed"}},
+    {"id":"WL-013","name":"Needle Willow","x":1055,"y":2290,"snapshots":{"1990":"willow-edge","2020":"willow-edge"}},
+    {"id":"WL-014","name":"Otter Glass","x":1175,"y":2260,"snapshots":{"1990":"shallow-pool","2020":"shallow-pool"}},
+    {"id":"WL-015","name":"Pickerel Flat","x":1285,"y":2310,"snapshots":{"1990":"mudflat","2020":"mudflat"}},
+    {"id":"WL-016","name":"Quartz Reed","x":1400,"y":2280,"snapshots":{"1990":"reed-bed","2020":"willow-edge"}},
+    {"id":"WL-017","name":"Rill Sedge","x":1505,"y":2325,"snapshots":{"1990":"sedge-meadow","2020":"sedge-meadow"}},
+    {"id":"WL-018","name":"Silt Mirror","x":1585,"y":2270,"snapshots":{"1990":"open-water","2020":"open-water"}},
+    {"id":"WL-019","name":"Tern Pocket","x":1035,"y":2380,"snapshots":{"1990":"shallow-pool","2020":"shallow-pool"}},
+    {"id":"WL-020","name":"Umbra Flat","x":1160,"y":2360,"snapshots":{"1990":"mudflat","2020":"sedge-meadow"}},
+    {"id":"WL-021","name":"Vesper Willow","x":1280,"y":2390,"snapshots":{"1990":"willow-edge","2020":"willow-edge"}},
+    {"id":"WL-022","name":"Wren Reed","x":1390,"y":2350,"snapshots":{"1990":"reed-bed","2020":"reed-bed"}},
+    {"id":"WL-023","name":"Yellow Pool","x":1500,"y":2385,"snapshots":{"1990":"open-water","2020":"shallow-pool"}},
+    {"id":"WL-024","name":"Zephyr Sedge","x":1595,"y":2340,"snapshots":{"1990":"sedge-meadow","2020":"sedge-meadow"}}
+  ]
+}
+  </script>
+
+  <script type="application/json" id="contract-states">
+{
+  "positive": {
+    "schema": "archive-map-state/1.0",
+    "snapshotLabels": {"from":"1990 field sheet","to":"2020 field sheet"},
+    "years": {"from":1990,"to":2020},
+    "acceptedYears": {"from":1990,"to":2020},
+    "totalRecords": 24,
+    "visibleRecordIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
+    "visibleCount": 7,
+    "changedIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
+    "changedCount": 7,
+    "filter": "changed",
+    "focus": "WL-016",
+    "focusedRecord": {"id":"WL-016","name":"Quartz Reed","from":"reed-bed","to":"willow-edge","changed":true,"coordinate":"east position 1400 · north position 2280"},
+    "view": {"panX":40,"panY":0,"zoom":1.25},
+    "extent": {"minX":1000,"maxX":1600,"minY":2000,"maxY":2400,"label":"SYN E 1000–1600 / N 2000–2400"},
+    "comparison": {"status":"success","message":"1990 → 2020: 7 of 24 synthetic records changed.","queryResultCount":7,"canonical":true},
+    "export": {"ids":["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],"text":"[\"WL-002\",\"WL-005\",\"WL-009\",\"WL-012\",\"WL-016\",\"WL-020\",\"WL-023\"]\n","digest":"fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6","status":"exported"},
+    "message": "Export bound: 7 sorted IDs observed from 24 synthetic records. SHA-256 fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6.",
+    "status": "success"
+  },
+  "failure": {
+    "schema": "archive-map-state/1.0",
+    "snapshotLabels": {"from":"1880 (no sheet)","to":"1885 (no sheet)"},
+    "years": {"from":1880,"to":1885},
+    "acceptedYears": {"from":1990,"to":2020},
+    "totalRecords": 24,
+    "visibleRecordIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
+    "visibleCount": 7,
+    "changedIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
+    "changedCount": 7,
+    "filter": "changed",
+    "focus": "WL-016",
+    "focusedRecord": {"id":"WL-016","name":"Quartz Reed","from":"reed-bed","to":"willow-edge","changed":true,"coordinate":"east position 1400 · north position 2280"},
+    "view": {"panX":40,"panY":0,"zoom":1.25},
+    "extent": {"minX":1000,"maxX":1600,"minY":2000,"maxY":2400,"label":"SYN E 1000–1600 / N 2000–2400"},
+    "comparison": {"status":"rejected-empty","message":"No archive sheets exist for 1880 → 1885. The accepted seven-ID export remains preserved.","queryResultCount":null,"canonical":false},
+    "export": {"ids":["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],"text":"[\"WL-002\",\"WL-005\",\"WL-009\",\"WL-012\",\"WL-016\",\"WL-020\",\"WL-023\"]\n","digest":"fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6","status":"preserved"},
+    "message": "No archive sheets exist for 1880 → 1885. The accepted seven-ID export remains preserved.",
+    "status": "failure"
+  },
+  "reset": {
+    "schema": "archive-map-state/1.0",
+    "snapshotLabels": {"from":"1990 field sheet","to":"2020 field sheet"},
+    "years": {"from":1990,"to":2020},
+    "acceptedYears": {"from":1990,"to":2020},
+    "totalRecords": 24,
+    "visibleRecordIds": ["WL-001","WL-002","WL-003","WL-004","WL-005","WL-006","WL-007","WL-008","WL-009","WL-010","WL-011","WL-012","WL-013","WL-014","WL-015","WL-016","WL-017","WL-018","WL-019","WL-020","WL-021","WL-022","WL-023","WL-024"],
+    "visibleCount": 24,
+    "changedIds": ["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],
+    "changedCount": 7,
+    "filter": "all",
+    "focus": null,
+    "focusedRecord": null,
+    "view": {"panX":0,"panY":0,"zoom":1},
+    "extent": {"minX":1000,"maxX":1600,"minY":2000,"maxY":2400,"label":"SYN E 1000–1600 / N 2000–2400"},
+    "comparison": {"status":"success","message":"1990 → 2020: 7 of 24 synthetic records changed.","queryResultCount":7,"canonical":true},
+    "export": {"ids":["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],"text":"[\"WL-002\",\"WL-005\",\"WL-009\",\"WL-012\",\"WL-016\",\"WL-020\",\"WL-023\"]\n","digest":"fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6","status":"ready"},
+    "message": "Archive restored: all 24 records, 7 changed, original view.",
+    "status": "success"
+  }
+}
+  </script>
+
+  <script>
+    "use strict";
+
+    const FIXTURE = JSON.parse(
+      document.querySelector("#wetland-fixture").textContent
+    );
+    const CONTRACT_STATES = JSON.parse(
+      document.querySelector("#contract-states").textContent
+    );
+    const ALL_IDS = Object.freeze(FIXTURE.records.map((record) => record.id).sort());
+    const RECORDS = new Map(FIXTURE.records.map((record) => [record.id, record]));
+
+    function rotateRight(value, count) {
+      return (value >>> count) | (value << (32 - count));
+    }
+
+    function sha256Utf8(text) {
+      if (typeof text !== "string") {
+        throw new TypeError("SHA-256 input must be a string");
+      }
+      const constants = [
+        0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+        0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+        0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+        0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+        0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+        0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+        0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+        0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+      ];
+      const bytes = Array.from(new TextEncoder().encode(text));
+      const bitLength = BigInt(bytes.length) * 8n;
+      bytes.push(0x80);
+      while (bytes.length % 64 !== 56) bytes.push(0);
+      for (let index = 7; index >= 0; index -= 1) {
+        bytes.push(Number((bitLength >> BigInt(index * 8)) & 0xffn));
+      }
+      const hash = [
+        0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,
+        0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19
+      ];
+      for (let offset = 0; offset < bytes.length; offset += 64) {
+        const words = new Array(64).fill(0);
+        for (let index = 0; index < 16; index += 1) {
+          const start = offset + index * 4;
+          words[index] = (
+            (bytes[start] << 24) |
+            (bytes[start + 1] << 16) |
+            (bytes[start + 2] << 8) |
+            bytes[start + 3]
+          );
+        }
+        for (let index = 16; index < 64; index += 1) {
+          const previous = words[index - 15];
+          const recent = words[index - 2];
+          const s0 = rotateRight(previous, 7) ^ rotateRight(previous, 18) ^ (previous >>> 3);
+          const s1 = rotateRight(recent, 17) ^ rotateRight(recent, 19) ^ (recent >>> 10);
+          words[index] = (words[index - 16] + s0 + words[index - 7] + s1) | 0;
+        }
+        let [a,b,c,d,e,f,g,h] = hash;
+        for (let index = 0; index < 64; index += 1) {
+          const upper = rotateRight(e, 6) ^ rotateRight(e, 11) ^ rotateRight(e, 25);
+          const choose = (e & f) ^ (~e & g);
+          const temp1 = (h + upper + choose + constants[index] + words[index]) | 0;
+          const lower = rotateRight(a, 2) ^ rotateRight(a, 13) ^ rotateRight(a, 22);
+          const majority = (a & b) ^ (a & c) ^ (b & c);
+          const temp2 = (lower + majority) | 0;
+          h = g; g = f; f = e; e = (d + temp1) | 0;
+          d = c; c = b; b = a; a = (temp1 + temp2) | 0;
+        }
+        [a,b,c,d,e,f,g,h].forEach((value, index) => {
+          hash[index] = (hash[index] + value) | 0;
+        });
+      }
+      return hash.map((value) => (value >>> 0).toString(16).padStart(8, "0")).join("");
+    }
+
+    function changedIds(fromYear, toYear) {
+      if (
+        !Number.isSafeInteger(fromYear) ||
+        !Number.isSafeInteger(toYear) ||
+        !FIXTURE.availableYears.includes(fromYear) ||
+        !FIXTURE.availableYears.includes(toYear)
+      ) {
+        throw new RangeError("comparison years must name available archive sheets");
+      }
+      return FIXTURE.records
+        .filter((record) => record.snapshots[String(fromYear)] !== record.snapshots[String(toYear)])
+        .map((record) => record.id)
+        .sort();
+    }
+
+    function exportFor(ids, status) {
+      if (
+        !Array.isArray(ids) ||
+        ids.some((id) => typeof id !== "string" || !RECORDS.has(id)) ||
+        new Set(ids).size !== ids.length
+      ) {
+        throw new TypeError("export IDs must be unique synthetic record IDs");
+      }
+      if (!["ready", "exported", "preserved"].includes(status)) {
+        throw new RangeError("unsupported export status");
+      }
+      const sorted = [...ids].sort();
+      const text = `${JSON.stringify(sorted)}\n`;
+      return {
+        ids: sorted,
+        text,
+        digest: sha256Utf8(text),
+        status
+      };
+    }
+
+    function parseYear(value) {
+      const text = String(value).trim();
+      if (!/^-?\d+$/.test(text)) return null;
+      const year = Number(text);
+      return Number.isSafeInteger(year) ? year : null;
+    }
+
+    function snapshotLabel(year) {
+      return FIXTURE.snapshotLabels[String(year)] || `${year} (no sheet)`;
+    }
+
+    function focusedRecord(state) {
+      if (!state.focus) return null;
+      const record = RECORDS.get(state.focus);
+      if (!record) return null;
+      const fromYear = String(state.acceptedYears.from);
+      const toYear = String(state.acceptedYears.to);
+      return {
+        id: record.id,
+        name: record.name,
+        from: record.snapshots[fromYear],
+        to: record.snapshots[toYear],
+        changed: state.changedIds.includes(record.id),
+        coordinate: `east position ${record.x} · north position ${record.y}`
+      };
+    }
+
+    function visibleIds(state) {
+      return state.filter === "changed" ? [...state.changedIds] : [...ALL_IDS];
+    }
+
+    function freezeState(value) {
+      const changed = Object.freeze([...value.changedIds].sort());
+      const view = Object.freeze({
+        panX: value.view.panX,
+        panY: value.view.panY,
+        zoom: value.view.zoom
+      });
+      const comparison = Object.freeze({ ...value.comparison });
+      const exported = Object.freeze({
+        ids: Object.freeze([...value.export.ids]),
+        text: value.export.text,
+        digest: value.export.digest,
+        status: value.export.status
+      });
+      return Object.freeze({
+        years: Object.freeze({ from: value.years.from, to: value.years.to }),
+        acceptedYears: Object.freeze({
+          from: value.acceptedYears.from,
+          to: value.acceptedYears.to
+        }),
+        changedIds: changed,
+        filter: value.filter,
+        focus: value.focus,
+        view,
+        comparison,
+        export: exported,
+        message: value.message,
+        status: value.status
+      });
+    }
+
+    function initialState() {
+      const changed = changedIds(1990, 2020);
+      return freezeState({
+        years: { from: 1990, to: 2020 },
+        acceptedYears: { from: 1990, to: 2020 },
+        changedIds: changed,
+        filter: "all",
+        focus: null,
+        view: { panX: 0, panY: 0, zoom: 1 },
+        comparison: {
+          status: "success",
+          message: "1990 → 2020: 7 of 24 synthetic records changed.",
+          queryResultCount: 7,
+          canonical: true
+        },
+        export: exportFor(changed, "ready"),
+        message: "Archive restored: all 24 records, 7 changed, original view.",
+        status: "success"
+      });
+    }
+
+    function reduce(state, action) {
+      switch (action.type) {
+        case "COMPARE": {
+          const fromYear = parseYear(action.from);
+          const toYear = parseYear(action.to);
+          if (fromYear === null || toYear === null) {
+            const message =
+              "Snapshot years must be whole numbers. The accepted export and map state remain preserved.";
+            return freezeState({
+              ...state,
+              comparison: {
+                status: "rejected-invalid",
+                message,
+                queryResultCount: null,
+                canonical: false
+              },
+              export: { ...state.export, status: "preserved" },
+              message,
+              status: "failure"
+            });
+          }
+          const available = FIXTURE.availableYears.includes(fromYear) &&
+            FIXTURE.availableYears.includes(toYear);
+          if (!available) {
+            const exportCount =
+              state.export.ids.length === 7
+                ? "seven-ID"
+                : `${state.export.ids.length}-ID`;
+            const message =
+              `No archive sheets exist for ${fromYear} → ${toYear}. ` +
+              `The accepted ${exportCount} export remains preserved.`;
+            return freezeState({
+              ...state,
+              years: { from: fromYear, to: toYear },
+              comparison: {
+                status: "rejected-empty",
+                message,
+                queryResultCount: null,
+                canonical: false
+              },
+              export: { ...state.export, status: "preserved" },
+              message,
+              status: "failure"
+            });
+          }
+          const changed = changedIds(fromYear, toYear);
+          const canonical = fromYear === 1990 && toYear === 2020;
+          return freezeState({
+            ...state,
+            years: { from: fromYear, to: toYear },
+            acceptedYears: { from: fromYear, to: toYear },
+            changedIds: changed,
+            focus: null,
+            comparison: {
+              status: "success",
+              message: `${fromYear} → ${toYear}: ${changed.length} of 24 synthetic records changed.`,
+              queryResultCount: changed.length,
+              canonical
+            },
+            export: exportFor(changed, "ready"),
+            message: `Comparison complete: ${changed.length} of 24 synthetic records changed.`,
+            status: "success"
+          });
+        }
+        case "FILTER_CHANGED":
+          return freezeState({
+            ...state,
+            filter: "changed",
+            focus: state.changedIds.includes(state.focus) ? state.focus : null,
+            message: `Showing the ${state.changedIds.length} changed records.`
+          });
+        case "FILTER_ALL":
+          return freezeState({
+            ...state,
+            filter: "all",
+            message: "All 24 synthetic records are visible."
+          });
+        case "FOCUS_RECORD":
+          if (!RECORDS.has(action.id)) {
+            throw new RangeError(`unknown synthetic record: ${action.id}`);
+          }
+          if (!visibleIds(state).includes(action.id)) {
+            throw new RangeError(`record is not visible: ${action.id}`);
+          }
+          return freezeState({
+            ...state,
+            focus: action.id,
+            message: `${action.id} selected. Its 1990 and 2020 observations are shown below.`
+          });
+        case "ZOOM_IN":
+          return freezeState({
+            ...state,
+            view: { ...state.view, zoom: Math.min(1.75, state.view.zoom + 0.25) },
+            message: "Map zoom increased."
+          });
+        case "ZOOM_OUT":
+          return freezeState({
+            ...state,
+            view: { ...state.view, zoom: Math.max(0.75, state.view.zoom - 0.25) },
+            message: "Map zoom decreased."
+          });
+        case "PAN_WEST":
+          return freezeState({
+            ...state,
+            view: { ...state.view, panX: Math.max(-120, state.view.panX - 40) },
+            message: "Map panned west."
+          });
+        case "PAN_EAST":
+          return freezeState({
+            ...state,
+            view: { ...state.view, panX: Math.min(120, state.view.panX + 40) },
+            message: "Map panned east."
+          });
+        case "PAN_NORTH":
+          return freezeState({
+            ...state,
+            view: { ...state.view, panY: Math.max(-80, state.view.panY - 40) },
+            message: "Map panned north."
+          });
+        case "PAN_SOUTH":
+          return freezeState({
+            ...state,
+            view: { ...state.view, panY: Math.min(80, state.view.panY + 40) },
+            message: "Map panned south."
+          });
+        case "EXPORT": {
+          const exported = exportFor(state.changedIds, "exported");
+          return freezeState({
+            ...state,
+            export: exported,
+            message: `Export bound: ${exported.ids.length} sorted IDs observed from 24 synthetic records. SHA-256 ${exported.digest}.`,
+            status: "success"
+          });
+        }
+        case "RESET":
+          return initialState();
+        default:
+          throw new RangeError(`unsupported archive action: ${action.type}`);
+      }
+    }
+
+    function snapshot(value = state) {
+      const visibleRecordIds = visibleIds(value);
+      return {
+        schema: "archive-map-state/1.0",
+        snapshotLabels: {
+          from: snapshotLabel(value.years.from),
+          to: snapshotLabel(value.years.to)
+        },
+        years: { from: value.years.from, to: value.years.to },
+        acceptedYears: {
+          from: value.acceptedYears.from,
+          to: value.acceptedYears.to
+        },
+        totalRecords: FIXTURE.records.length,
+        visibleRecordIds,
+        visibleCount: visibleRecordIds.length,
+        changedIds: [...value.changedIds],
+        changedCount: value.changedIds.length,
+        filter: value.filter,
+        focus: value.focus,
+        focusedRecord: focusedRecord(value),
+        view: { ...value.view },
+        extent: { ...FIXTURE.extent },
+        comparison: { ...value.comparison },
+        export: {
+          ids: [...value.export.ids],
+          text: value.export.text,
+          digest: value.export.digest,
+          status: value.export.status
+        },
+        message: value.message,
+        status: value.status
+      };
+    }
+
+    let state = initialState();
+    let rovingRecordId = ALL_IDS[0];
+
+    function render() {
+      const current = snapshot();
+      document.querySelector("#from-year").value = String(current.years.from);
+      document.querySelector("#to-year").value = String(current.years.to);
+      document.querySelector("#from-label").textContent = current.snapshotLabels.from;
+      document.querySelector("#to-label").textContent = current.snapshotLabels.to;
+      document.querySelector("#total-count").textContent = `${current.totalRecords} records`;
+      document.querySelector("#changed-count").textContent = `${current.changedCount} records`;
+      document.querySelector("#visible-filter").textContent =
+        `${current.visibleCount} · ${current.filter}`;
+      document.querySelector("#focus-readout").textContent = current.focus || "none";
+      document.querySelector("#extent-readout").textContent =
+        "Synthetic bounds: west 1000 to east 1600; south 2000 to north 2400. " +
+        `Exact extent: ${current.extent.label}.`;
+      document.querySelector("#view-readout").textContent =
+        `horizontal shift ${current.view.panX} px · vertical shift ${current.view.panY} px · ` +
+        `zoom ${current.view.zoom.toFixed(2)}×`;
+      document.querySelector("#map-sheet").style.transform =
+        `translate(${current.view.panX}px, ${current.view.panY}px) scale(${current.view.zoom})`;
+
+      const visible = new Set(current.visibleRecordIds);
+      if (!visible.has(rovingRecordId)) {
+        rovingRecordId =
+          (current.focus && visible.has(current.focus) && current.focus) ||
+          current.visibleRecordIds[0] ||
+          null;
+      }
+      for (const record of FIXTURE.records) {
+        const marker = document.querySelector(`#record-${record.id.toLowerCase()}`);
+        const changed = current.changedIds.includes(record.id);
+        marker.style.left = `${((record.x - 1000) / 600) * 100}%`;
+        marker.style.top = `${100 - ((record.y - 2000) / 400) * 100}%`;
+        marker.hidden = !visible.has(record.id);
+        marker.dataset.changed = String(changed);
+        marker.dataset.focused = String(record.id === current.focus);
+        marker.setAttribute("aria-pressed", String(record.id === current.focus));
+        marker.tabIndex = record.id === rovingRecordId ? 0 : -1;
+      }
+
+      const detail = document.querySelector("#record-detail");
+      if (current.focusedRecord) {
+        detail.hidden = false;
+        document.querySelector("#record-detail-title").textContent =
+          `${current.focusedRecord.id} · ${current.focusedRecord.name}`;
+        document.querySelector("#record-detail-body").textContent =
+          `${current.focusedRecord.from} → ${current.focusedRecord.to} · ${current.focusedRecord.coordinate}`;
+      } else {
+        detail.hidden = true;
+      }
+
+      const status = document.querySelector("#status-message");
+      status.textContent = current.message;
+      status.dataset.status = current.status;
+      status.hidden = current.status === "failure";
+      const queryError = document.querySelector("#query-error");
+      queryError.hidden = !current.comparison.status.startsWith("rejected-");
+      document.querySelector("#query-error-title").textContent =
+        current.comparison.status === "rejected-empty"
+          ? "INVALID RANGE — NOT A VALID ZERO-CHANGE RESULT"
+          : "INVALID QUERY — ENTER WHOLE-YEAR SNAPSHOTS";
+      document.querySelector("#query-error-body").textContent =
+        current.comparison.message;
+      document.querySelector("#filter-changed-btn").textContent =
+        `Show ${current.changedCount} changed`;
+
+      document.querySelector("#change-list").innerHTML = current.changedIds
+        .map((id) => `<li>${id}</li>`)
+        .join("");
+      const heading = {
+        ready: "Canonical export ready",
+        exported: "Sorted export complete",
+        preserved: "Canonical export preserved"
+      }[current.export.status] || "Sorted export";
+      document.querySelector("#export-heading").textContent = heading;
+      document.querySelector("#export-json").textContent = current.export.text.trimEnd();
+      document.querySelector("#export-digest").textContent =
+        `SHA-256 ${current.export.digest}`;
+    }
+
+    function dispatch(action) {
+      if (action.type === "RESET") rovingRecordId = ALL_IDS[0];
+      if (action.type === "FOCUS_RECORD") rovingRecordId = action.id;
+      state = reduce(state, action);
+      render();
+      return snapshot();
+    }
+
+    function moveRecordFocus(currentId, key) {
+      const ids = visibleIds(state);
+      if (!ids.length) return null;
+      const currentIndex = Math.max(0, ids.indexOf(currentId));
+      let nextIndex = currentIndex;
+      if (key === "Home") nextIndex = 0;
+      else if (key === "End") nextIndex = ids.length - 1;
+      else if (key === "ArrowRight" || key === "ArrowDown") {
+        nextIndex = (currentIndex + 1) % ids.length;
+      } else if (key === "ArrowLeft" || key === "ArrowUp") {
+        nextIndex = (currentIndex - 1 + ids.length) % ids.length;
+      } else {
+        return null;
+      }
+      rovingRecordId = ids[nextIndex];
+      render();
+      const marker = document.querySelector(`#record-${rovingRecordId.toLowerCase()}`);
+      marker.focus({ preventScroll: true });
+      return rovingRecordId;
+    }
+
+    document.querySelector("#compare-btn").addEventListener("click", () => {
+      dispatch({
+        type: "COMPARE",
+        from: document.querySelector("#from-year").value,
+        to: document.querySelector("#to-year").value
+      });
+    });
+    document.querySelector("#filter-changed-btn").addEventListener(
+      "click",
+      () => dispatch({ type: "FILTER_CHANGED" })
+    );
+    document.querySelector("#filter-all-btn").addEventListener(
+      "click",
+      () => dispatch({ type: "FILTER_ALL" })
+    );
+    document.querySelector("#export-btn").addEventListener(
+      "click",
+      () => dispatch({ type: "EXPORT" })
+    );
+    document.querySelector("#restore-btn").addEventListener(
+      "click",
+      () => dispatch({ type: "RESET" })
+    );
+    for (const type of ["from", "to"]) {
+      document.querySelector(`#${type}-year`).addEventListener(
+        "focus",
+        (event) => event.currentTarget.select()
+      );
+    }
+    for (const marker of document.querySelectorAll(".record-marker")) {
+      marker.addEventListener("click", () => {
+        dispatch({ type: "FOCUS_RECORD", id: marker.dataset.recordId });
+      });
+      marker.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          dispatch({ type: "FOCUS_RECORD", id: marker.dataset.recordId });
+          return;
+        }
+        if (moveRecordFocus(marker.dataset.recordId, event.key)) {
+          event.preventDefault();
+        }
+      });
+    }
+    const viewActions = {
+      "pan-west-btn": "PAN_WEST",
+      "pan-east-btn": "PAN_EAST",
+      "pan-north-btn": "PAN_NORTH",
+      "pan-south-btn": "PAN_SOUTH",
+      "zoom-in-btn": "ZOOM_IN",
+      "zoom-out-btn": "ZOOM_OUT"
+    };
+    for (const [id, type] of Object.entries(viewActions)) {
+      document.querySelector(`#${id}`).addEventListener(
+        "click",
+        () => dispatch({ type })
+      );
+    }
+
+    const contract = Object.freeze({
+      fixture: FIXTURE,
+      contractStates: CONTRACT_STATES,
+      initialState,
+      reduce,
+      dispatch,
+      snapshot,
+      changedIds,
+      exportFor,
+      parseYear,
+      moveRecordFocus,
+      rovingRecord: () => rovingRecordId,
+      digestText: sha256Utf8
+    });
+    window.archiveWetlandMap = contract;
+    window.tinySystem = contract;
+    render();
+  </script>
+</body>
+</html>

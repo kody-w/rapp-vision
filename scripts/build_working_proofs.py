@@ -11,11 +11,10 @@ import posixpath
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import unquote, urlsplit, urlunsplit
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CANDIDATE_ROOT = ROOT / "candidate-frame-0002"
 OUTPUT_ROOT = ROOT / "working-proofs"
 CHANNEL_PATH = OUTPUT_ROOT / "channel.json"
 EVIDENCE_INDEX_PATH = OUTPUT_ROOT / "evidence-index.json"
@@ -40,22 +39,48 @@ CANDIDATE_ONLY_KEYS = {
 
 @dataclass(frozen=True)
 class Winner:
+    candidate_frame: str
     source_directory: str
+    commission_id: str
     publication_id: str
     title: str
 
 
 WINNERS = (
-    Winner("learn-grid-overflow", "learn-grid-overflow", "Why the Grid Overflows"),
     Winner(
+        "candidate-frame-0002",
+        "learn-grid-overflow",
+        "learn-grid-overflow",
+        "learn-grid-overflow",
+        "Why the Grid Overflows",
+    ),
+    Winner(
+        "candidate-frame-0002",
+        "use-keyboard-invoice-triage",
         "use-keyboard-invoice-triage",
         "use-keyboard-invoice-triage",
         "Triage Invoices Without a Pointer",
     ),
     Winner(
+        "candidate-frame-0002",
+        "create-vector-icon-system",
         "create-vector-icon-system",
         "create-vector-icon-system",
         "Six Shapes, One Grid",
+    ),
+    Winner(
+        "candidate-frame-0003",
+        "ecosystem-island-threshold",
+        "explore-ecosystem-threshold",
+        "ecosystem-island-threshold",
+        "Will the Island Herd Hold?",
+    ),
+    Winner(
+        "candidate-frame-0003",
+        "archive-wetland-contrast",
+        "explore-archive-map-contrast",
+        "explore-archive-map-contrast",
+        "Read the Wetland Twice",
     ),
 )
 
@@ -87,21 +112,45 @@ def strip_candidate_metadata(value: Any) -> Any:
     return value
 
 
+def candidate_prefix(winner: Winner) -> str:
+    for label, component in (
+        ("candidate frame", winner.candidate_frame),
+        ("source directory", winner.source_directory),
+    ):
+        if (
+            not component
+            or component in {".", ".."}
+            or "/" in component
+            or "\\" in component
+        ):
+            raise ValueError(
+                f"{winner.publication_id}: unsafe {label}: {component!r}"
+            )
+    return f"../{winner.candidate_frame}/{winner.source_directory}"
+
+
 def rebase_relative_url(value: str, winner: Winner) -> str:
     parsed = urlsplit(value)
     if parsed.scheme or parsed.netloc or parsed.path.startswith("/"):
         return value
-    if not parsed.path or "\\" in parsed.path:
+    decoded_path = unquote(parsed.path)
+    if (
+        not parsed.path
+        or "\\" in parsed.path
+        or "\\" in decoded_path
+        or decoded_path.startswith("/")
+        or ".." in decoded_path.split("/")
+    ):
         raise ValueError(
             f"{winner.source_directory}: expected a non-empty POSIX relative path, "
             f"got {value!r}"
         )
 
-    candidate_prefix = f"../candidate-frame-0002/{winner.source_directory}"
+    source_prefix = candidate_prefix(winner)
     rebased_path = posixpath.normpath(
-        posixpath.join(candidate_prefix, parsed.path)
+        posixpath.join(source_prefix, parsed.path)
     )
-    expected_prefix = f"{candidate_prefix}/"
+    expected_prefix = f"{source_prefix}/"
     if not rebased_path.startswith(expected_prefix):
         raise ValueError(
             f"{winner.source_directory}: path escapes its candidate directory: "
@@ -142,7 +191,7 @@ def source_binding(source_root: Path, filename: str, winner: Winner) -> dict[str
     if not path.is_file():
         raise FileNotFoundError(path)
     return {
-        "path": f"../candidate-frame-0002/{winner.source_directory}/{filename}",
+        "path": f"{candidate_prefix(winner)}/{filename}",
         "sha256": sha256(path),
     }
 
@@ -152,7 +201,7 @@ def build_documents() -> tuple[dict[str, Any], dict[str, Any]]:
     evidence_entries: list[dict[str, Any]] = []
 
     for winner in WINNERS:
-        source_root = CANDIDATE_ROOT / winner.source_directory
+        source_root = ROOT / winner.candidate_frame / winner.source_directory
         source_channel = load_json(source_root / "channel.json")
         source_publications = source_channel.get("videos")
         if not isinstance(source_publications, list) or len(source_publications) != 1:
@@ -185,13 +234,11 @@ def build_documents() -> tuple[dict[str, Any], dict[str, Any]]:
         source_channel_binding["id"] = str(source_channel.get("id", ""))
         evidence_entries.append(
             {
-                "commission_id": winner.source_directory,
+                "commission_id": winner.commission_id,
                 "delivery": source_binding(source_root, "delivery.json", winner),
                 "evidence": source_binding(source_root, "evidence.json", winner),
                 "publication_id": winner.publication_id,
-                "source_candidate": (
-                    f"../candidate-frame-0002/{winner.source_directory}"
-                ),
+                "source_candidate": candidate_prefix(winner),
                 "source_channel": source_channel_binding,
             }
         )

@@ -12,8 +12,10 @@ import struct
 import subprocess
 import sys
 import unittest
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
+from unittest import mock
 from urllib.parse import urljoin, urlsplit
 
 
@@ -24,29 +26,111 @@ EVIDENCE_INDEX_PATH = WORKING_ROOT / "evidence-index.json"
 BUILDER_PATH = ROOT / "scripts" / "build_working_proofs.py"
 VALIDATOR_PATH = ROOT / "scripts" / "validate_publications.py"
 VIEWPORT_RUNNER_PATH = ROOT / "tests" / "working_proofs_viewport_browser.mjs"
-CANDIDATE_ROOT = ROOT / "candidate-frame-0002"
 SCREENSHOT_ROOT = WORKING_ROOT / "screenshots"
 
+
+@dataclass(frozen=True)
+class PublicationSpec:
+    candidate_frame: str
+    source_directory: str
+    commission_id: str
+    publication_id: str
+    title: str
+
+    @property
+    def source_root(self) -> Path:
+        return ROOT / self.candidate_frame / self.source_directory
+
+
 PUBLICATIONS = (
-    (
+    PublicationSpec(
+        "candidate-frame-0002",
+        "learn-grid-overflow",
         "learn-grid-overflow",
         "learn-grid-overflow",
         "Why the Grid Overflows",
     ),
-    (
+    PublicationSpec(
+        "candidate-frame-0002",
+        "use-keyboard-invoice-triage",
         "use-keyboard-invoice-triage",
         "use-keyboard-invoice-triage",
         "Triage Invoices Without a Pointer",
     ),
-    (
+    PublicationSpec(
+        "candidate-frame-0002",
+        "create-vector-icon-system",
         "create-vector-icon-system",
         "create-vector-icon-system",
         "Six Shapes, One Grid",
+    ),
+    PublicationSpec(
+        "candidate-frame-0003",
+        "ecosystem-island-threshold",
+        "explore-ecosystem-threshold",
+        "ecosystem-island-threshold",
+        "Will the Island Herd Hold?",
+    ),
+    PublicationSpec(
+        "candidate-frame-0003",
+        "archive-wetland-contrast",
+        "explore-archive-map-contrast",
+        "explore-archive-map-contrast",
+        "Read the Wetland Twice",
     ),
 )
 EXPECTED_CODECS = {
     "video/mp4": "h264",
     "video/webm": "vp9",
+}
+EXPECTED_ACTION_COUNTS = {
+    "learn-grid-overflow": 21,
+    "use-keyboard-invoice-triage": 33,
+    "create-vector-icon-system": 17,
+    "ecosystem-island-threshold": 23,
+    "explore-archive-map-contrast": 25,
+}
+EXPECTED_CHECKPOINTS = {
+    "learn-grid-overflow": ["positive", "failure", "reset"],
+    "use-keyboard-invoice-triage": ["positive", "rejected", "reset"],
+    "create-vector-icon-system": ["positive", "rejected", "reset"],
+    "ecosystem-island-threshold": [
+        "stable",
+        "collapse",
+        "export",
+        "reset",
+        "your-turn",
+    ],
+    "explore-archive-map-contrast": ["positive", "failure", "reset"],
+}
+EXPECTED_CAPTURE_COUNT = 2 * sum(
+    len(checkpoints) for checkpoints in EXPECTED_CHECKPOINTS.values()
+)
+EXPECTED_VIEWPORT_GEOMETRY = {
+    "desktop": {
+        "pageWidth": 1387,
+        "pageHeight": 900,
+        "frameWidth": 960,
+        "frameHeight": 599.25,
+        "stageWidth": 962,
+        "stageHeight": 601.25,
+        "screenshotWidth": 962,
+        "screenshotHeight": 601,
+        "outerClientWidths": [1372, 1387],
+        "scrollbarWidths": [0, 15],
+    },
+    "390": {
+        "pageWidth": 435,
+        "pageHeight": 900,
+        "frameWidth": 390,
+        "frameHeight": 243,
+        "stageWidth": 392,
+        "stageHeight": 245,
+        "screenshotWidth": 392,
+        "screenshotHeight": 245,
+        "outerClientWidths": [420, 435],
+        "scrollbarWidths": [0, 15],
+    },
 }
 
 
@@ -86,6 +170,7 @@ def resolve_reference(base_file: Path, reference: str) -> Path:
 
 def resolve_browser() -> str | None:
     for environment_name in (
+        "RAPP_BROWSER",
         "BROWSER",
         "CHROME_PATH",
         "CHROMIUM_PATH",
@@ -136,7 +221,12 @@ def resolve_browser() -> str | None:
 
 
 def resolve_ffprobe() -> str | None:
-    for environment_name in ("FFPROBE", "FFPROBE_PATH", "FRAME_FFPROBE"):
+    for environment_name in (
+        "RAPP_FFPROBE",
+        "FFPROBE",
+        "FFPROBE_PATH",
+        "FRAME_FFPROBE",
+    ):
         value = os.environ.get(environment_name)
         if value and Path(value).is_file():
             return str(Path(value).resolve())
@@ -185,6 +275,56 @@ class TestWorkingProofsBuild(unittest.TestCase):
                 self.assertIn("RAPP_FFMPEG: /usr/bin/ffmpeg", source)
                 self.assertIn("RAPP_FFPROBE: /usr/bin/ffprobe", source)
 
+    def test_release_tool_environment_precedes_path_shims(self):
+        environment = {
+            "RAPP_BROWSER": str(CHANNEL_PATH),
+            "BROWSER": "",
+            "CHROME_PATH": "",
+            "CHROMIUM_PATH": "",
+            "EDGE_PATH": "",
+            "FRAME_BROWSER": "",
+        }
+        with (
+            mock.patch.dict(os.environ, environment, clear=False),
+            mock.patch.object(shutil, "which", return_value="/usr/bin/chromium"),
+        ):
+            self.assertEqual(resolve_browser(), str(CHANNEL_PATH.resolve()))
+
+        with (
+            mock.patch.dict(
+                os.environ,
+                {
+                    "RAPP_FFPROBE": str(EVIDENCE_INDEX_PATH),
+                    "FFPROBE": "",
+                    "FFPROBE_PATH": "",
+                    "FRAME_FFPROBE": "",
+                },
+                clear=False,
+            ),
+            mock.patch.object(shutil, "which", return_value="/usr/bin/ffprobe"),
+        ):
+            self.assertEqual(
+                resolve_ffprobe(),
+                str(EVIDENCE_INDEX_PATH.resolve()),
+            )
+
+    def test_player_semantic_actions_preserve_focus_and_clear_chrome(self):
+        source = (ROOT / "index.html").read_text(encoding="utf-8")
+        self.assertIn(
+            "html{overflow-y:scroll;scrollbar-gutter:stable}",
+            source,
+        )
+        self.assertIn("function keepLiveTargetAboveChrome(el)", source)
+        self.assertIn('el.focus && el.focus({ preventScroll: true });', source)
+        self.assertIn(
+            'el.setRangeText(ch, el.selectionStart, el.selectionEnd, "end");',
+            source,
+        )
+        self.assertIn(
+            "requestAnimationFrame(() => keepLiveTargetAboveChrome(el));",
+            source,
+        )
+
     def test_builder_output_is_sorted_utf8_lf_and_current(self):
         expected_channel, expected_index = BUILDER.build_documents()
         self.assertEqual(CHANNEL_PATH.read_bytes(), BUILDER.json_bytes(expected_channel))
@@ -202,11 +342,11 @@ class TestWorkingProofsBuild(unittest.TestCase):
 
         source_hashes = {
             path: sha256(path)
-            for source_directory, _publication_id, _title in PUBLICATIONS
+            for spec in PUBLICATIONS
             for path in (
-                CANDIDATE_ROOT / source_directory / "channel.json",
-                CANDIDATE_ROOT / source_directory / "evidence.json",
-                CANDIDATE_ROOT / source_directory / "delivery.json",
+                spec.source_root / "channel.json",
+                spec.source_root / "evidence.json",
+                spec.source_root / "delivery.json",
             )
         }
         completed = subprocess.run(
@@ -221,6 +361,47 @@ class TestWorkingProofsBuild(unittest.TestCase):
         self.assertEqual(
             {path: sha256(path) for path in source_hashes},
             source_hashes,
+        )
+        self.assertEqual(
+            [
+                (
+                    winner.candidate_frame,
+                    winner.source_directory,
+                    winner.commission_id,
+                    winner.publication_id,
+                    winner.title,
+                )
+                for winner in BUILDER.WINNERS
+            ],
+            [
+                (
+                    spec.candidate_frame,
+                    spec.source_directory,
+                    spec.commission_id,
+                    spec.publication_id,
+                    spec.title,
+                )
+                for spec in PUBLICATIONS
+            ],
+        )
+
+    def test_builder_rejects_candidate_path_escape_attempts(self):
+        winner = BUILDER.WINNERS[-1]
+        for reference in (
+            "../outside.json",
+            "../../outside.json",
+            "%2e%2e/outside.json",
+            r"..\outside.json",
+        ):
+            with self.subTest(reference=reference):
+                with self.assertRaises(ValueError):
+                    BUILDER.rebase_relative_url(reference, winner)
+        self.assertEqual(
+            BUILDER.rebase_relative_url(
+                "https://example.test/proof.json",
+                winner,
+            ),
+            "https://example.test/proof.json",
         )
 
     def test_channel_identity_order_and_constitution_are_exact(self):
@@ -249,11 +430,11 @@ class TestWorkingProofsBuild(unittest.TestCase):
                 for publication in self.channel["videos"]
             ],
             [
-                (publication_id, title)
-                for _source_directory, publication_id, title in PUBLICATIONS
+                (spec.publication_id, spec.title)
+                for spec in PUBLICATIONS
             ],
         )
-        self.assertEqual(len(self.channel["videos"]), 3)
+        self.assertEqual(len(self.channel["videos"]), 5)
 
         policy = load_json(ROOT / "policy" / "legacy-publications.json")
         self.assertEqual(
@@ -272,6 +453,23 @@ class TestWorkingProofsBuild(unittest.TestCase):
                 )
                 self.assertEqual(publication["live"]["kind"], "rapp-vision-live/1.0")
                 self.assertTrue(publication["live"]["scenes"])
+
+        for spec, publication in zip(
+            PUBLICATIONS,
+            self.channel["videos"],
+            strict=True,
+        ):
+            source_publication = load_json(
+                spec.source_root / "channel.json"
+            )["videos"][0]
+            self.assertEqual(
+                publication["live"]["scenes"][0]["actions"],
+                source_publication["live"]["scenes"][0]["actions"],
+            )
+            self.assertEqual(
+                publication["live"]["scenes"][0]["ready"],
+                source_publication["live"]["scenes"][0]["ready"],
+            )
 
     def test_candidate_branding_and_review_metadata_are_not_public(self):
         serialized = json.dumps(self.channel, ensure_ascii=False).lower()
@@ -295,11 +493,11 @@ class TestWorkingProofsBuild(unittest.TestCase):
 
     def test_paths_resolve_to_source_files_without_binary_copies(self):
         channel_uri = CHANNEL_PATH.resolve().as_uri()
-        for source_directory, publication_id, _title in PUBLICATIONS:
+        for spec in PUBLICATIONS:
             publication = next(
                 item
                 for item in self.channel["videos"]
-                if item["id"] == publication_id
+                if item["id"] == spec.publication_id
             )
             references = [publication["thumb"]]
             references.extend(source["src"] for source in publication["sources"])
@@ -308,9 +506,12 @@ class TestWorkingProofsBuild(unittest.TestCase):
                 for scene in publication["live"]["scenes"]
                 if "app" in scene
             )
-            expected_root = (CANDIDATE_ROOT / source_directory).resolve()
+            expected_root = spec.source_root.resolve()
             for reference in references:
-                with self.subTest(publication=publication_id, reference=reference):
+                with self.subTest(
+                    publication=spec.publication_id,
+                    reference=reference,
+                ):
                     resolved = resolve_reference(CHANNEL_PATH, reference)
                     self.assertTrue(resolved.is_file(), resolved)
                     self.assertEqual(urljoin(channel_uri, reference), resolved.as_uri())
@@ -339,7 +540,7 @@ class TestWorkingProofsBuild(unittest.TestCase):
                 record["publication_id"]
                 for record in self.evidence_index["publications"]
             ],
-            [item[1] for item in PUBLICATIONS],
+            [spec.publication_id for spec in PUBLICATIONS],
         )
 
         for expected, record in zip(
@@ -347,17 +548,22 @@ class TestWorkingProofsBuild(unittest.TestCase):
             self.evidence_index["publications"],
             strict=True,
         ):
-            source_directory, publication_id, _title = expected
-            with self.subTest(publication=publication_id):
-                self.assertEqual(record["commission_id"], source_directory)
-                self.assertEqual(record["publication_id"], publication_id)
+            with self.subTest(publication=expected.publication_id):
+                self.assertEqual(
+                    record["commission_id"],
+                    expected.commission_id,
+                )
+                self.assertEqual(
+                    record["publication_id"],
+                    expected.publication_id,
+                )
                 source_root = resolve_reference(
                     EVIDENCE_INDEX_PATH,
                     record["source_candidate"],
                 )
                 self.assertEqual(
                     source_root,
-                    (CANDIDATE_ROOT / source_directory).resolve(),
+                    expected.source_root.resolve(),
                 )
                 self.assertTrue(source_root.is_dir())
 
@@ -393,7 +599,10 @@ class TestWorkingProofsBuild(unittest.TestCase):
                     record["source_channel"]["id"],
                     source_channel["id"],
                 )
-                self.assertEqual(delivery["publication"], publication_id)
+                self.assertEqual(
+                    delivery["publication"],
+                    expected.publication_id,
+                )
 
     def test_registry_readme_and_fulfilled_commissions_are_bound(self):
         registry = load_json(ROOT / "channels.json")
@@ -437,15 +646,25 @@ class TestWorkingProofsBuild(unittest.TestCase):
             for commission_id, commission in commissions.items()
             if commission["status"] == "closed"
         }
-        self.assertEqual(closed, {item[0] for item in PUBLICATIONS})
-        for source_directory, publication_id, _title in PUBLICATIONS:
+        self.assertEqual(
+            closed,
+            {spec.commission_id for spec in PUBLICATIONS},
+        )
+        self.assertEqual(
+            sum(
+                commission["status"] == "open"
+                for commission in commissions.values()
+            ),
+            7,
+        )
+        for spec in PUBLICATIONS:
             self.assertEqual(
-                commissions[source_directory]["fulfillment"],
+                commissions[spec.commission_id]["fulfillment"],
                 {
                     "result_channel": "working-proofs",
-                    "publication_id": publication_id,
+                    "publication_id": spec.publication_id,
                     "source_candidate": (
-                        f"candidate-frame-0002/{source_directory}"
+                        f"{spec.candidate_frame}/{spec.source_directory}"
                     ),
                 },
             )
@@ -576,7 +795,13 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
             for record in load_json(EVIDENCE_INDEX_PATH)["publications"]
         }
 
-    def run_json(self, command: list[str], profile: Path):
+    def run_json(
+        self,
+        command: list[str],
+        profile: Path,
+        *,
+        timeout: int = 120,
+    ):
         shutil.rmtree(profile, ignore_errors=True)
         try:
             completed = subprocess.run(
@@ -586,7 +811,7 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
-                timeout=90,
+                timeout=timeout,
             )
             self.assertEqual(
                 completed.returncode,
@@ -612,13 +837,26 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
             self.index[publication_id]["evidence"]["path"],
         )
 
-    def test_all_three_aggregate_live_replays_execute_in_real_browser(self):
+    def source_spec(self, publication_id: str) -> PublicationSpec:
+        return next(
+            spec
+            for spec in PUBLICATIONS
+            if spec.publication_id == publication_id
+        )
+
+    def source_channel_path(self, publication_id: str) -> Path:
+        return resolve_reference(
+            EVIDENCE_INDEX_PATH,
+            self.index[publication_id]["source_channel"]["path"],
+        )
+
+    def test_all_five_aggregate_live_replays_execute_in_real_browser(self):
         grid_id = "learn-grid-overflow"
         grid_profile = WORKING_ROOT / ".browser-grid"
         grid = self.run_json(
             [
                 NODE,
-                str(CANDIDATE_ROOT / grid_id / "verify_dom.mjs"),
+                str(self.source_spec(grid_id).source_root / "verify_dom.mjs"),
                 BROWSER,
                 str(self.aggregate_app(grid_id)),
                 str(self.evidence_path(grid_id)),
@@ -631,17 +869,16 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
         self.assertEqual(grid["fixed320"], "320=320")
         self.assertEqual(grid["fixed1280"], "1280=1280")
         self.assertEqual(grid["resetX"], 0)
-
         keyboard_id = "use-keyboard-invoice-triage"
         keyboard_profile = WORKING_ROOT / ".browser-keyboard"
-        source_channel_path = resolve_reference(
-            EVIDENCE_INDEX_PATH,
-            self.index[keyboard_id]["source_channel"]["path"],
-        )
+        keyboard_profile = WORKING_ROOT / ".browser-keyboard"
         keyboard = self.run_json(
             [
                 NODE,
-                str(CANDIDATE_ROOT / keyboard_id / "verify_dom.mjs"),
+                str(
+                    self.source_spec(keyboard_id).source_root
+                    / "verify_dom.mjs"
+                ),
                 "--browser",
                 BROWSER,
                 "--app",
@@ -649,7 +886,7 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                 "--evidence",
                 str(self.evidence_path(keyboard_id)),
                 "--manifest",
-                str(source_channel_path),
+                str(self.source_channel_path(keyboard_id)),
                 "--profile",
                 str(keyboard_profile),
             ],
@@ -703,6 +940,95 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
         self.assertEqual(vector["steps"][-1]["state"], vector["initial"]["state"])
         self.assertEqual(vector["positivePath"]["changedIconCount"], 6)
 
+        island_id = "ecosystem-island-threshold"
+        island_profile = (
+            self.source_spec(island_id).source_root
+            / ".working-proofs-browser-profile"
+        )
+        island = self.run_json(
+            [
+                NODE,
+                str(self.source_spec(island_id).source_root / "verify_dom.mjs"),
+                "--browser",
+                BROWSER,
+                "--app",
+                str(self.aggregate_app(island_id)),
+                "--evidence",
+                str(self.evidence_path(island_id)),
+                "--manifest",
+                str(self.source_channel_path(island_id)),
+                "--profile",
+                str(island_profile),
+            ],
+            island_profile,
+        )
+        self.assertEqual(island["browserErrors"], 0)
+        self.assertEqual(island["externalRequests"], 0)
+        self.assertEqual(island["actionCount"], 23)
+        self.assertEqual(island["replayedWidths"], [1120, 390])
+        self.assertEqual(
+            island["checkpoints"],
+            ["stable", "collapse", "export", "reset", "your-turn"],
+        )
+        self.assertEqual(
+            island["responsiveCheckpoints"],
+            island["checkpoints"],
+        )
+        self.assertEqual(island["stableFinal"], 112)
+        self.assertEqual(island["collapseCrossingTick"], 134)
+        self.assertEqual(island["collapseFinal"], 8)
+        self.assertEqual(island["canonicalExportPointCount"], 601)
+        self.assertEqual(island["canonicalExportDigest"], "8bb46765")
+        self.assertTrue(island["exportCleanedOnReset"])
+        self.assertTrue(island["profileCleaned"])
+
+        wetland_id = "explore-archive-map-contrast"
+        wetland_profile = WORKING_ROOT / ".browser-wetland"
+        wetland = self.run_json(
+            [
+                NODE,
+                str(
+                    self.source_spec(wetland_id).source_root
+                    / "verify_dom.mjs"
+                ),
+                "--browser",
+                BROWSER,
+                "--app",
+                str(self.aggregate_app(wetland_id)),
+                "--evidence",
+                str(self.evidence_path(wetland_id)),
+                "--manifest",
+                str(self.source_channel_path(wetland_id)),
+                "--profile",
+                str(wetland_profile),
+            ],
+            wetland_profile,
+        )
+        self.assertEqual(wetland["browserErrors"], 0)
+        self.assertEqual(wetland["externalNetworkRequests"], 0)
+        self.assertEqual(wetland["blockedExternalRequests"], 0)
+        self.assertEqual(wetland["actionCount"], 25)
+        self.assertEqual(
+            wetland["viewports"],
+            ["desktop", "mobile-390"],
+        )
+        self.assertTrue(wetland["exactTiming"])
+        self.assertEqual(wetland["recordCount"], 24)
+        self.assertEqual(wetland["changedCount"], 7)
+        self.assertEqual(wetland["failureStatus"], "rejected-empty")
+        self.assertIsNone(wetland["failureResultCount"])
+        self.assertEqual(wetland["failureExportStatus"], "preserved")
+        self.assertEqual(wetland["resetVisibleCount"], 24)
+        self.assertIsNone(wetland["resetFocus"])
+        self.assertEqual(
+            wetland["resetView"],
+            {"panX": 0, "panY": 0, "zoom": 1},
+        )
+        self.assertEqual(
+            wetland["cleanup"],
+            {"browserExited": True, "profileRemoved": True},
+        )
+
     def test_desktop_and_390_player_stage_evidence_is_visible(self):
         profile = WORKING_ROOT / ".browser-viewports"
         scratch = WORKING_ROOT / ".viewport-captures"
@@ -719,16 +1045,20 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                     str(profile),
                 ],
                 profile,
+                timeout=300,
             )
             self.assertEqual(result["errors"], [])
-            self.assertEqual(result["captures"], 18)
-            self.assertEqual(len(result["runs"]), 6)
+            self.assertEqual(
+                result["cleanup"],
+                {
+                    "browserExited": True,
+                    "profileRemoved": True,
+                    "serverClosed": True,
+                },
+            )
+            self.assertEqual(result["captures"], EXPECTED_CAPTURE_COUNT)
+            self.assertEqual(len(result["runs"]), 10)
 
-            expected_counts = {
-                "learn-grid-overflow": 21,
-                "use-keyboard-invoice-triage": 33,
-                "create-vector-icon-system": 17,
-            }
             for run in result["runs"]:
                 with self.subTest(
                     publication=run["publication"],
@@ -736,21 +1066,65 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                 ):
                     self.assertEqual(
                         run["actionCount"],
-                        expected_counts[run["publication"]],
+                        EXPECTED_ACTION_COUNTS[run["publication"]],
                     )
                     self.assertEqual(
                         run["checkpoints"],
-                        (
-                            ["positive", "failure", "reset"]
-                            if run["publication"] == "learn-grid-overflow"
-                            else ["positive", "rejected", "reset"]
+                        EXPECTED_CHECKPOINTS[run["publication"]],
+                    )
+                    actions = self.publications[run["publication"]][
+                        "live"
+                    ]["scenes"][0]["actions"]
+                    self.assertEqual(
+                        run["activationsChecked"],
+                        sum(
+                            action["do"] != "scroll"
+                            for action in actions
                         ),
                     )
-                    self.assertGreater(run["activationsChecked"], 0)
-                    self.assertAlmostEqual(
+                    self.assertEqual(
+                        run["framingActionsChecked"],
+                        sum(
+                            action["do"] == "scroll"
+                            for action in actions
+                        ),
+                    )
+                    self.assertEqual(
+                        run["finalPromptChecked"],
+                        run["publication"] == "explore-archive-map-contrast",
+                    )
+                    self.assertTrue(run["exactTiming"])
+                    self.assertGreaterEqual(run["maxTimingSkewMs"], 0)
+                    self.assertLess(run["maxTimingSkewMs"], 1000)
+                    geometry = EXPECTED_VIEWPORT_GEOMETRY[run["viewport"]]
+                    self.assertEqual(
+                        run["geometryChecks"],
+                        1
+                        + len(actions)
+                        + len(run["checkpoints"])
+                        + int(run["finalPromptChecked"]),
+                    )
+                    self.assertEqual(
+                        run["frameWidthsChecked"],
+                        [geometry["frameWidth"]],
+                    )
+                    self.assertEqual(
+                        run["stageWidthsChecked"],
+                        [geometry["stageWidth"]],
+                    )
+                    self.assertTrue(
+                        set(run["outerClientWidthsChecked"])
+                        <= set(geometry["outerClientWidths"]),
+                        run,
+                    )
+                    self.assertTrue(
+                        set(run["scrollbarWidthsChecked"])
+                        <= set(geometry["scrollbarWidths"]),
+                        run,
+                    )
+                    self.assertEqual(
                         run["frameWidth"],
-                        960 if run["viewport"] == "desktop" else 390,
-                        delta=1,
+                        geometry["frameWidth"],
                     )
                     self.assertTrue(
                         all(height > 0 for height in run["safeHeight"]),
@@ -763,7 +1137,17 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                 "working-proofs-viewport-evidence/1.0",
             )
             self.assertEqual(generated_manifest["channel"], "working-proofs")
-            self.assertEqual(len(generated_manifest["captures"]), 18)
+            self.assertEqual(
+                generated_manifest["viewports"],
+                [
+                    {"id": name, **geometry}
+                    for name, geometry in EXPECTED_VIEWPORT_GEOMETRY.items()
+                ],
+            )
+            self.assertEqual(
+                len(generated_manifest["captures"]),
+                EXPECTED_CAPTURE_COUNT,
+            )
             for capture in generated_manifest["captures"]:
                 screenshot = scratch / capture["screenshot"]["path"]
                 with self.subTest(
@@ -777,10 +1161,51 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                         capture["metrics"]["requiredHeight"],
                     )
                     self.assertEqual(
+                        capture["state"]["actualSha256"],
+                        capture["state"]["expectedSha256"],
+                    )
+                    geometry = EXPECTED_VIEWPORT_GEOMETRY[
+                        capture["viewport"]
+                    ]
+                    self.assertEqual(
+                        capture["metrics"]["frameWidth"],
+                        geometry["frameWidth"],
+                    )
+                    self.assertEqual(
+                        capture["metrics"]["frameHeight"],
+                        geometry["frameHeight"],
+                    )
+                    self.assertEqual(
+                        capture["metrics"]["stageWidth"],
+                        geometry["stageWidth"],
+                    )
+                    self.assertEqual(
+                        capture["metrics"]["stageHeight"],
+                        geometry["stageHeight"],
+                    )
+                    self.assertIn(
+                        capture["metrics"]["outerClientWidth"],
+                        geometry["outerClientWidths"],
+                    )
+                    self.assertIn(
+                        capture["metrics"]["outerScrollbarWidth"],
+                        geometry["scrollbarWidths"],
+                    )
+                    self.assertEqual(
                         png_dimensions(screenshot),
+                        (
+                            geometry["screenshotWidth"],
+                            geometry["screenshotHeight"],
+                        ),
+                    )
+                    self.assertEqual(
                         (
                             capture["screenshot"]["width"],
                             capture["screenshot"]["height"],
+                        ),
+                        (
+                            geometry["screenshotWidth"],
+                            geometry["screenshotHeight"],
                         ),
                     )
 
@@ -805,7 +1230,10 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                     for item in generated_manifest["captures"]
                 },
             )
-            self.assertEqual(len(committed_manifest["captures"]), 18)
+            self.assertEqual(
+                len(committed_manifest["captures"]),
+                EXPECTED_CAPTURE_COUNT,
+            )
             for capture in committed_manifest["captures"]:
                 screenshot = SCREENSHOT_ROOT / capture["screenshot"]["path"]
                 with self.subTest(committed=capture["screenshot"]["path"]):
@@ -819,10 +1247,51 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                         screenshot.stat().st_size,
                     )
                     self.assertEqual(
+                        capture["state"]["actualSha256"],
+                        capture["state"]["expectedSha256"],
+                    )
+                    geometry = EXPECTED_VIEWPORT_GEOMETRY[
+                        capture["viewport"]
+                    ]
+                    self.assertEqual(
+                        capture["metrics"]["frameWidth"],
+                        geometry["frameWidth"],
+                    )
+                    self.assertEqual(
+                        capture["metrics"]["frameHeight"],
+                        geometry["frameHeight"],
+                    )
+                    self.assertEqual(
+                        capture["metrics"]["stageWidth"],
+                        geometry["stageWidth"],
+                    )
+                    self.assertEqual(
+                        capture["metrics"]["stageHeight"],
+                        geometry["stageHeight"],
+                    )
+                    self.assertIn(
+                        capture["metrics"]["outerClientWidth"],
+                        geometry["outerClientWidths"],
+                    )
+                    self.assertIn(
+                        capture["metrics"]["outerScrollbarWidth"],
+                        geometry["scrollbarWidths"],
+                    )
+                    self.assertEqual(
                         png_dimensions(screenshot),
+                        (
+                            geometry["screenshotWidth"],
+                            geometry["screenshotHeight"],
+                        ),
+                    )
+                    self.assertEqual(
                         (
                             capture["screenshot"]["width"],
                             capture["screenshot"]["height"],
+                        ),
+                        (
+                            geometry["screenshotWidth"],
+                            geometry["screenshotHeight"],
                         ),
                     )
         finally:

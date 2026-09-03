@@ -1,0 +1,182 @@
+{
+  "artifacts": {
+    "master": {
+      "bytes": 9688031,
+      "codec": "ffv1",
+      "colorRange": "pc",
+      "colorSpace": "gbr",
+      "duration": 22.0,
+      "height": 540,
+      "path": "masters/explore-archive-map-contrast.mkv",
+      "pixelFormat": "bgr0",
+      "sha256": "998d4e08645780fdd56a6bd1a494e5646847a1e00d0abe35d705c6060da1d45a",
+      "width": 960
+    },
+    "mp4": {
+      "bytes": 258126,
+      "codec": "h264",
+      "colorPrimaries": "bt709",
+      "colorRange": "tv",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "duration": 22.0,
+      "height": 540,
+      "path": "media/explore-archive-map-contrast.mp4",
+      "pixelFormat": "yuv420p",
+      "sha256": "a0d01b9d6da8b108f9b9a4949ad2f0e23cdd12ac15f4e008eb31926547c41f3c",
+      "width": 960
+    },
+    "webm": {
+      "bytes": 242677,
+      "codec": "vp9",
+      "colorPrimaries": "bt709",
+      "colorRange": "tv",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "duration": 22.0,
+      "height": 540,
+      "path": "media/explore-archive-map-contrast.webm",
+      "pixelFormat": "yuv420p",
+      "sha256": "3ce3115d8c6a3b63f9f76b5e5bb9bf8792e19a091b86d3d1caef393a9eb7b2ea",
+      "width": 960
+    }
+  },
+  "binding": {
+    "algorithm": "sha256",
+    "artifactCount": 13,
+    "pathStyle": "POSIX-relative",
+    "selfExcluded": "delivery.json"
+  },
+  "channel": "candidate-frame-0003-09-archive-wetland-contrast",
+  "objective": {
+    "changedIds": [
+      "WL-002",
+      "WL-005",
+      "WL-009",
+      "WL-012",
+      "WL-016",
+      "WL-020",
+      "WL-023"
+    ],
+    "exportSha256": "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6",
+    "records": 24
+  },
+  "publication": "explore-archive-map-contrast",
+  "render": {
+    "audio": false,
+    "duration": 22.0,
+    "exportHoldSeconds": 4.0,
+    "exportProvenance": "OBSERVED FROM 24 SYNTHETIC RECORDS",
+    "fps": 12,
+    "frameSamples": {
+      "0": "75a8c47788dd551fe6d4c6c34a7fa3f6d7c452545d0c6d71d94d3a656b576655",
+      "138": "c5632471b9c9ffe9e802a90b09fb30fc6fd71f55dc71917ff18436bde4cbf4ce",
+      "186": "bb7de74d0fbd91c045d8600b05151dd18a45386c7856a9af7c7843dfb6dcaa29",
+      "263": "b6179efc63bcc8421b9bf8370b8f837ec17cad320ccccee7794d2587e46986a1",
+      "42": "6f7c76fd6366aefc0bff90b424bcee1eaaa653e1a22f4f317dafffc59cc18627",
+      "90": "7d5cb680b1005d7445fb7d6f3237a1f41055f46ca24d118fcee512ff9eff213c"
+    },
+    "frames": 264,
+    "height": 540,
+    "legend": "RUST RING = CHANGED 1990→2020; DARK RING = UNCHANGED",
+    "masterCodec": "ffv1",
+    "openingChanged": "7 of 24 changed",
+    "positiveView": {
+      "panX": 40,
+      "panY": 0,
+      "zoom": 1.25
+    },
+    "takeover": "YOUR TURN — CHOOSE ANY WL PLOT; ARROWS PAN; −/+ ZOOM; COMPARE RERUNS; EXPORT BINDS THE RESULT.",
+    "timeline": [
+      {
+        "end": 2.0,
+        "phase": "opening",
+        "start": 0.0
+      },
+      {
+        "end": 5.0,
+        "phase": "compare",
+        "start": 2.0
+      },
+      {
+        "end": 8.0,
+        "phase": "inspect",
+        "start": 5.0
+      },
+      {
+        "end": 12.0,
+        "phase": "export",
+        "start": 8.0
+      },
+      {
+        "end": 16.0,
+        "phase": "failure",
+        "start": 12.0
+      },
+      {
+        "end": 19.0,
+        "phase": "reset",
+        "start": 16.0
+      },
+      {
+        "end": 22.0,
+        "phase": "takeover",
+        "start": 19.0
+      }
+    ],
+    "width": 960
+  },
+  "schema": "archive-wetland-contrast-delivery/1.0",
+  "sourceArtifacts": [
+    {
+      "bytes": 175,
+      "path": ".gitattributes",
+      "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
+    },
+    {
+      "bytes": 6192,
+      "path": "README.md",
+      "sha256": "c18bb98276cf0790a610084da42db1edf4f837e9f1b0d7a543ea4178c4f6b0d2"
+    },
+    {
+      "bytes": 56461,
+      "path": "apps/explore-archive-map-contrast.html",
+      "sha256": "5a8e5215b7ae47c4d52a70a266e422aa33886c75f7e85c12c09d58c2dbf33426"
+    },
+    {
+      "bytes": 7762,
+      "path": "channel.production.json",
+      "sha256": "12f3915d14be50e6d80e1cc0262687a362fbf1066e578c950edc1a1de8d28bd7"
+    },
+    {
+      "bytes": 7916,
+      "path": "channel.json",
+      "sha256": "d9549fbf05dc18f2211cc8623e5ffb9ba079ca720702ce3b98713989ceca0d8b"
+    },
+    {
+      "bytes": 16909,
+      "path": "evidence.json",
+      "sha256": "cb44b128b019522985d9dfc854ab90185fbc95e0b4da38f09f9ca47c113a10da"
+    },
+    {
+      "bytes": 65,
+      "path": "exports/changed-record-ids.json",
+      "sha256": "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6"
+    },
+    {
+      "bytes": 42191,
+      "path": "render.py",
+      "sha256": "5c852b60263f646ae900fba235401fbdfd6c35a3f04c2b4fa8b782fe60a7c87e"
+    },
+    {
+      "bytes": 5768,
+      "path": "thumbs/explore-archive-map-contrast.svg",
+      "sha256": "55755d1df8f25d92e95b7e8b36e448aa469ceddb57517547242240469d523f65"
+    },
+    {
+      "bytes": 47356,
+      "path": "verify_dom.mjs",
+      "sha256": "e3d40be113410d1dbbfc6acb7d6c5a36fd03a5450b7d01d453e2165210389d0e"
+    }
+  ]
+}

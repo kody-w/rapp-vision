@@ -1,0 +1,1263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Will the Island Herd Hold?</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #0c1f2b;
+      --sea: #113847;
+      --sea-light: #18505d;
+      --paper: #fffdf6;
+      --muted: #b7c7c7;
+      --mint: #99e2b1;
+      --grass: #52ad7d;
+      --herd: #ffba54;
+      --coral: #f25f4c;
+      --line: #416872;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--sea);
+      color: var(--paper);
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--sea); }
+    body {
+      margin: 0;
+      min-width: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, #0e2c39 0, var(--sea) 22rem, #0d303d 100%);
+    }
+    button, input, textarea { font: inherit; }
+    button, input[type="range"], a.download-link {
+      min-height: 44px;
+    }
+    button {
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      padding: .7rem .9rem;
+      background: #163f4b;
+      color: var(--paper);
+      font-weight: 760;
+      cursor: pointer;
+    }
+    button:hover { border-color: var(--mint); }
+    button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible {
+      outline: 4px solid var(--herd);
+      outline-offset: 3px;
+    }
+    button[aria-pressed="true"] {
+      border-color: var(--herd);
+      background: #27594f;
+      box-shadow: inset 0 0 0 2px #0c1f2b;
+    }
+    button.danger[aria-pressed="true"] {
+      border-color: #ffb0a4;
+      background: #7a3835;
+    }
+    button.transition[aria-pressed="true"] {
+      border-color: #9ee8f2;
+      background: #235b68;
+    }
+    button:disabled { opacity: .64; cursor: not-allowed; }
+    [hidden] { display: none !important; }
+    .shell {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    header {
+      display: flex;
+      gap: 1rem;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    .eyebrow {
+      margin: 0 0 .35rem;
+      color: var(--mint);
+      font-size: .78rem;
+      font-weight: 850;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      max-width: 20ch;
+      font-size: clamp(1.65rem, 5vw, 3rem);
+      line-height: .98;
+      letter-spacing: -.04em;
+    }
+    .seed-chip {
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: .55rem .8rem;
+      color: var(--muted);
+      background: #0c2834;
+      font: 700 .86rem ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    .intro {
+      margin: 0 0 1rem;
+      max-width: 74ch;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .lab-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, .72fr) minmax(0, 1.5fr);
+      gap: 1rem;
+      align-items: start;
+    }
+    .stack { display: grid; gap: 1rem; min-width: 0; }
+    .panel {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 1rem;
+      background: rgba(8, 31, 42, .88);
+      box-shadow: 0 16px 42px rgba(0, 0, 0, .15);
+    }
+    .step-label {
+      display: inline-flex;
+      min-height: 28px;
+      align-items: center;
+      margin-bottom: .55rem;
+      border-radius: 999px;
+      padding: .25rem .55rem;
+      background: #214f55;
+      color: var(--mint);
+      font-size: .75rem;
+      font-weight: 850;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    h2, h3 { margin: 0; line-height: 1.15; }
+    h2 { font-size: 1.24rem; }
+    h3 { font-size: 1rem; }
+    .hint, .microcopy {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .hint { margin: .45rem 0 .8rem; }
+    .microcopy { margin: .55rem 0 0; font-size: .85rem; }
+    .range-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 4.5rem;
+      gap: .75rem;
+      align-items: center;
+      margin-top: .75rem;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--herd);
+    }
+    output {
+      border-radius: 10px;
+      padding: .58rem .4rem;
+      background: #071f2a;
+      color: var(--herd);
+      text-align: center;
+      font: 850 1rem ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    .button-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .6rem;
+      margin-top: .7rem;
+    }
+    .button-row.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .preset {
+      min-height: 44px;
+      padding: .55rem;
+      font-size: .84rem;
+    }
+    .primary {
+      border-color: var(--herd);
+      background: var(--herd);
+      color: #251b0c;
+    }
+    .reset {
+      border-color: var(--mint);
+      color: var(--mint);
+      background: transparent;
+    }
+    .status {
+      min-height: 72px;
+      margin-top: .8rem;
+      border-left: 5px solid var(--line);
+      border-radius: 9px;
+      padding: .75rem .8rem;
+      background: #0a2834;
+      line-height: 1.42;
+    }
+    .status[data-state="stable"], .status[data-state="stable-inspected"] {
+      border-left-color: var(--mint);
+    }
+    .status[data-state="transition"], .status[data-state="transition-inspected"] {
+      border-left-color: #77d6e3;
+    }
+    .status[data-state="collapse"] { border-left-color: var(--coral); }
+    .status[data-state="exported"] { border-left-color: var(--herd); }
+    .status[data-state="running"] { border-left-color: var(--herd); }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: .55rem;
+      margin-top: .85rem;
+    }
+    .metric {
+      min-width: 0;
+      border-radius: 12px;
+      padding: .65rem;
+      background: #102f3a;
+    }
+    .metric span {
+      display: block;
+      overflow-wrap: anywhere;
+      color: var(--muted);
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .metric strong {
+      display: block;
+      margin-top: .2rem;
+      color: var(--paper);
+      font: 850 clamp(.92rem, 2vw, 1.22rem) ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    .chart-wrap {
+      min-width: 0;
+      overflow: hidden;
+      border-radius: 14px;
+      background: #071f2a;
+    }
+    #population-chart {
+      display: block;
+      width: 100%;
+      height: auto;
+      min-height: 250px;
+    }
+    .chart-label {
+      fill: #b7c7c7;
+      font: 750 15px ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    .axis-label { font-size: 19px; font-weight: 850; }
+    .axis-title { fill: var(--paper); font-size: 18px; font-weight: 850; }
+    .chart-grid { stroke: #315661; stroke-width: 1; }
+    #trace-path {
+      fill: none;
+      stroke: var(--herd);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    #trace-path.collapse { stroke: var(--coral); }
+    #trace-path.transition { stroke: #77d6e3; }
+    #crossing-line { stroke: var(--coral); stroke-width: 2; stroke-dasharray: 6 5; }
+    #crossing-dot { fill: var(--coral); stroke: var(--paper); stroke-width: 3; }
+    .result {
+      margin-top: .8rem;
+      border: 2px solid;
+      border-radius: 14px;
+      padding: .85rem;
+      font-size: .95rem;
+      line-height: 1.45;
+    }
+    .result strong { display: block; margin-bottom: .25rem; font-size: 1.05rem; }
+    .success { border-color: var(--mint); background: #173f39; }
+    .transition-result { border-color: #77d6e3; background: #173d48; }
+    .failure { border-color: var(--coral); background: #572f30; }
+    .reset-proof { border-color: var(--herd); background: #44381f; }
+    .trace-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      margin-top: .8rem;
+    }
+    .trace-actions > * { flex: 1 1 12rem; }
+    .table-wrap {
+      max-width: 100%;
+      overflow-x: auto;
+      margin-top: .7rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+    table {
+      width: 100%;
+      min-width: 420px;
+      border-collapse: collapse;
+      font: 700 .8rem ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    th, td { padding: .55rem .6rem; border-bottom: 1px solid #274954; text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: var(--mint); background: #0d2d38; }
+    tr.crossing { background: #5c3131; color: var(--paper); }
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      margin-top: .7rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: .75rem;
+      resize: vertical;
+      background: #071f2a;
+      color: var(--paper);
+      font: 600 .75rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    .download-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: .65rem;
+      border: 2px solid var(--mint);
+      border-radius: 12px;
+      padding: .55rem .8rem;
+      color: var(--mint);
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .export-proof {
+      margin: .7rem 0 0;
+      border: 2px solid var(--herd);
+      border-radius: 12px;
+      padding: .7rem .8rem;
+      background: #44381f;
+      color: var(--paper);
+      font-weight: 750;
+      line-height: 1.45;
+    }
+    .export-proof code { color: var(--herd); overflow-wrap: anywhere; }
+    .your-turn {
+      margin-top: 1rem;
+      border: 2px solid var(--herd);
+      border-radius: 16px;
+      padding: 1rem;
+      background: #3c331d;
+      color: var(--paper);
+    }
+    .your-turn strong {
+      display: block;
+      color: var(--herd);
+      font-size: 1.2rem;
+      letter-spacing: .12em;
+    }
+    .your-turn p { margin: .45rem 0 0; line-height: 1.5; }
+    .model-note {
+      margin: 1rem 0 0;
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.5;
+    }
+    @media (max-width: 760px) {
+      .lab-grid { grid-template-columns: 1fr; }
+      header { align-items: stretch; }
+      .seed-chip { align-self: flex-start; }
+    }
+    @media (max-width: 430px) {
+      .shell { padding: .65rem; }
+      header { display: grid; gap: .7rem; }
+      h1 { font-size: 1.8rem; }
+      .panel { border-radius: 14px; padding: .8rem; }
+      .button-row, .button-row.three { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #population-chart { min-height: 220px; }
+      .result { font-size: .9rem; }
+      .trace-actions { display: grid; }
+    }
+    @media (max-height: 620px) and (min-width: 700px) {
+      .shell { padding-top: .55rem; }
+      header { margin-bottom: .5rem; }
+      .intro { margin-bottom: .55rem; }
+      .panel { padding: .75rem; }
+      .hint { margin-bottom: .45rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell" id="app-ready">
+    <header>
+      <div>
+        <p class="eyebrow">Island herd prediction lab</p>
+        <h1>Will the island herd hold?</h1>
+      </div>
+      <div class="seed-chip">seed <strong id="seed-value">31415</strong></div>
+    </header>
+    <p class="intro">
+      Choose one of three predictions before the deterministic trace appears:
+      stable band, transition, or collapse. The same seed drives every run;
+      only the grazing rate changes.
+    </p>
+
+    <div class="lab-grid">
+      <div class="stack">
+        <section class="panel" id="prediction-panel" aria-labelledby="prediction-title">
+          <span class="step-label">1 · predict first</span>
+          <h2 id="prediction-title">At this grazing rate, what happens by tick 600?</h2>
+          <p class="hint" id="prediction-prompt">The trace stays hidden until you choose.</p>
+
+          <label for="grazing-input"><strong>Grazing rate</strong></label>
+          <div class="range-row">
+            <input id="grazing-input" type="range" min="0" max="0.75" step="0.01" value="0.24" aria-describedby="rate-help">
+            <output id="grazing-output" for="grazing-input">0.24</output>
+          </div>
+          <p class="microcopy" id="rate-help">Try any value from 0.00 to 0.75. Canonical evidence uses 0.24 and 0.60.</p>
+          <div class="button-row three" aria-label="Grazing presets">
+            <button class="preset" id="rate-24-btn" type="button">Use 0.24</button>
+            <button class="preset" id="rate-60-btn" type="button">Use 0.60</button>
+            <button class="preset" id="rate-45-btn" type="button">Try 0.45</button>
+          </div>
+
+          <div class="button-row three" aria-label="Prediction choices">
+            <button id="predict-band-btn" type="button" aria-pressed="false">Stable band 80–120</button>
+            <button class="transition" id="predict-transition-btn" type="button" aria-pressed="false">Transition 10–80</button>
+            <button class="danger" id="predict-collapse-btn" type="button" aria-pressed="false">Collapse below 10</button>
+          </div>
+          <p class="microcopy" id="prediction-history">No prediction yet.</p>
+        </section>
+
+        <section class="panel" id="run-panel" aria-labelledby="run-title">
+          <span class="step-label">2 · reveal</span>
+          <h2 id="run-title">Run the same 600-tick model</h2>
+          <div class="button-row three" aria-label="Simulation speed">
+            <button class="preset" id="speed-1-btn" type="button" aria-pressed="true">1× speed</button>
+            <button class="preset" id="speed-2-btn" type="button" aria-pressed="false">2× speed</button>
+            <button class="preset" id="speed-4-btn" type="button" aria-pressed="false">4× speed</button>
+          </div>
+          <div class="button-row">
+            <button class="primary" id="run-btn" type="button" disabled>Reveal trace</button>
+            <button class="reset" id="reset-btn" type="button" data-reset="exact">Reset ecosystem</button>
+          </div>
+          <div class="status" id="status-message" data-state="ready" role="status" aria-live="polite">
+            Choose what happens before the trace is revealed.
+          </div>
+          <div class="result reset-proof" id="reset-proof" role="status" hidden>
+            <strong>Exact reset complete.</strong>
+            Seed 31415, grazing 0.24, speed 1×, population 104, resources 146,
+            tick zero, no prediction, an empty trace, and no prepared export
+            are restored.
+          </div>
+        </section>
+      </div>
+
+      <section class="panel" id="trace-panel" aria-labelledby="trace-title">
+        <span class="step-label">3 · inspect the result</span>
+        <h2 id="trace-title">Population trace</h2>
+        <div class="metrics" aria-label="Current model measurements">
+          <div class="metric"><span>Tick</span><strong id="tick-value">0</strong></div>
+          <div class="metric"><span>Population</span><strong id="population-value">104</strong></div>
+          <div class="metric"><span>Resources</span><strong id="resources-value">146</strong></div>
+          <div class="metric"><span>Crossing</span><strong id="crossing-value">—</strong></div>
+        </div>
+
+        <div class="chart-wrap" id="chart-frame">
+          <svg id="population-chart" viewBox="0 0 720 410" role="img" aria-labelledby="chart-title chart-description">
+            <title id="chart-title">Herd population through tick 600</title>
+            <desc id="chart-description">The trace is hidden until a prediction is selected and the run begins.</desc>
+            <rect x="58" y="36" width="624" height="314" fill="#071f2a"/>
+            <rect x="58" y="60.2" width="624" height="96.6" fill="#173f39" opacity=".85"/>
+            <line class="chart-grid" x1="58" y1="350" x2="682" y2="350"/>
+            <line class="chart-grid" x1="58" y1="253.4" x2="682" y2="253.4"/>
+            <line class="chart-grid" x1="58" y1="156.8" x2="682" y2="156.8"/>
+            <line class="chart-grid" x1="58" y1="60.2" x2="682" y2="60.2"/>
+            <line class="chart-grid" x1="58" y1="36" x2="58" y2="350"/>
+            <line class="chart-grid" x1="214" y1="36" x2="214" y2="350"/>
+            <line class="chart-grid" x1="370" y1="36" x2="370" y2="350"/>
+            <line class="chart-grid" x1="526" y1="36" x2="526" y2="350"/>
+            <line class="chart-grid" x1="682" y1="36" x2="682" y2="350"/>
+            <line id="collapse-threshold" x1="58" y1="325.8" x2="682" y2="325.8" stroke="#f25f4c" stroke-width="2"/>
+            <text class="chart-label axis-label" x="12" y="354">0</text>
+            <text class="chart-label axis-label" x="0" y="257">40</text>
+            <text class="chart-label axis-label" x="0" y="161">80</text>
+            <text class="chart-label axis-label" x="0" y="64">120</text>
+            <text class="chart-label axis-label" x="54" y="382">0</text>
+            <text class="chart-label axis-label" x="190" y="382">150</text>
+            <text class="chart-label axis-label" x="346" y="382">300</text>
+            <text class="chart-label axis-label" x="502" y="382">450</text>
+            <text class="chart-label axis-label" x="654" y="382">600</text>
+            <text class="chart-label axis-title" id="tick-axis-title" x="298" y="397">TICK</text>
+            <text class="chart-label axis-title" id="population-axis-title" x="60" y="28">POPULATION</text>
+            <text class="chart-label" x="69" y="52">STABLE BAND 80–120</text>
+            <text class="chart-label" x="69" y="320" fill="#f25f4c">COLLAPSE BELOW 10</text>
+            <text class="chart-label" id="hidden-trace-label" x="284" y="210">TRACE HIDDEN</text>
+            <polyline id="trace-path" points=""/>
+            <line id="crossing-line" x1="0" y1="36" x2="0" y2="350" hidden/>
+            <circle id="crossing-dot" cx="0" cy="0" r="7" hidden/>
+          </svg>
+        </div>
+
+        <div class="result success" id="stable-result" data-result="success" hidden>
+          <strong>Prediction: <span id="stable-prediction">stable band</span>.</strong>
+          <b>Observed outcome: stable band held.</b>
+          At tick 600 the population is <span id="stable-final">112</span>.
+          Across the run it stays from <span id="stable-min">104</span> to
+          <span id="stable-max">112</span>, inside 80–120.
+        </div>
+        <div class="result transition-result" id="transition-result" data-result="transition" hidden>
+          <strong>Prediction: <span id="transition-prediction">transition</span>.</strong>
+          <b>Observed outcome: intermediate transition.</b>
+          The herd leaves the stable band without crossing below 10 and ends
+          at <span id="transition-final">45.117</span>.
+        </div>
+        <div class="result failure" id="collapse-result" data-result="failure" hidden>
+          <strong>Prediction: <span id="collapse-prediction">collapse</span>.</strong>
+          <b>Observed outcome: collapse threshold crossed.</b>
+          Population first falls below 10 at tick
+          <span id="collapse-tick">134</span> and ends at
+          <span id="collapse-final">8</span>.
+        </div>
+
+        <div class="trace-actions">
+          <button id="inspect-trace-btn" type="button" disabled>Inspect sampled ticks</button>
+          <button id="export-series-btn" type="button" disabled>Prepare full JSON export</button>
+        </div>
+
+        <section id="trace-inspection" aria-labelledby="inspection-title" hidden>
+          <h3 id="inspection-title">Sampled trace; full series remains exportable</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tick</th><th>Population</th><th>Resources</th><th>Supported herd</th></tr></thead>
+              <tbody id="trace-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="export-panel" aria-labelledby="export-title" hidden>
+          <h3 id="export-title">Full deterministic series</h3>
+          <textarea id="series-export" readonly aria-label="Full series JSON"></textarea>
+          <p class="export-proof" id="export-proof" role="status">
+            Export prepared: <strong id="export-point-count">0</strong> points ·
+            computed series digest <code id="export-digest">—</code>
+          </p>
+          <a class="download-link" id="download-series-link" download="island-herd-series.json" hidden>Download prepared JSON</a>
+        </section>
+
+        <p class="model-note">
+          Plain-language model: seeded weather nudges the grass; grass regrows
+          toward 180 while grazing removes it; a herd above the grass-supported
+          size shrinks, and a herd below it grows. The support curve drops
+          sharply when grass falls from 120 toward 90.
+        </p>
+        <section class="your-turn" id="your-turn" aria-labelledby="your-turn-title">
+          <strong id="your-turn-title">YOUR TURN</strong>
+          <p>Choose a grazing rate, predict stable band, transition, or collapse,
+          reveal the trace, inspect the observed outcome, and export all 601 points.</p>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <script type="application/json" id="model-contract">
+{
+  "schema": "seeded-island-herd/1.0",
+  "seed": 31415,
+  "fixedPointScale": 1000,
+  "initial": {
+    "populationMilli": 104000,
+    "resourcesMilli": 146000,
+    "randomState": 31415
+  },
+  "limits": {
+    "resourceCeilingMilli": 180000,
+    "stableLowMilli": 80000,
+    "stableHighMilli": 120000,
+    "collapseMilli": 10000,
+    "horizon": 600,
+    "minimumRateMilli": 0,
+    "maximumRateMilli": 750,
+    "minimumSeed": 1,
+    "maximumSeed": 4294967295
+  },
+  "outcomes": {
+    "band": "Population stays between 80 and 120 through tick 600.",
+    "transition": "Population leaves the stable band without falling below 10.",
+    "collapse": "Population falls below 10 before tick 600."
+  }
+}
+  </script>
+  <script type="application/json" id="fixture-expectations">
+{
+  "stable": {
+    "grazingRate": 0.24,
+    "tick": 600,
+    "populationMilli": 112000,
+    "resourcesMilli": 141688,
+    "collapseCrossingTick": null,
+    "traceDigest": "81d44b16"
+  },
+  "transition": {
+    "grazingRate": 0.45,
+    "tick": 600,
+    "populationMilli": 45117,
+    "resourcesMilli": 108088,
+    "collapseCrossingTick": null,
+    "traceDigest": "761aa190"
+  },
+  "collapse": {
+    "grazingRate": 0.60,
+    "tick": 600,
+    "populationMilli": 8000,
+    "resourcesMilli": 84088,
+    "collapseCrossingTick": 134,
+    "traceDigest": "8bb46765"
+  }
+}
+  </script>
+  <script>
+    (() => {
+      "use strict";
+
+      const MODEL = Object.freeze(JSON.parse(document.querySelector("#model-contract").textContent));
+      const SCALE = MODEL.fixedPointScale;
+      const INITIAL = Object.freeze(initialPoint(MODEL.seed));
+      const elements = Object.freeze({
+        grazingInput: document.querySelector("#grazing-input"),
+        grazingOutput: document.querySelector("#grazing-output"),
+        rate24: document.querySelector("#rate-24-btn"),
+        rate60: document.querySelector("#rate-60-btn"),
+        rate45: document.querySelector("#rate-45-btn"),
+        predictBand: document.querySelector("#predict-band-btn"),
+        predictTransition: document.querySelector("#predict-transition-btn"),
+        predictCollapse: document.querySelector("#predict-collapse-btn"),
+        predictionHistory: document.querySelector("#prediction-history"),
+        speed1: document.querySelector("#speed-1-btn"),
+        speed2: document.querySelector("#speed-2-btn"),
+        speed4: document.querySelector("#speed-4-btn"),
+        run: document.querySelector("#run-btn"),
+        reset: document.querySelector("#reset-btn"),
+        status: document.querySelector("#status-message"),
+        resetProof: document.querySelector("#reset-proof"),
+        tick: document.querySelector("#tick-value"),
+        population: document.querySelector("#population-value"),
+        resources: document.querySelector("#resources-value"),
+        crossing: document.querySelector("#crossing-value"),
+        chartDescription: document.querySelector("#chart-description"),
+        hiddenTrace: document.querySelector("#hidden-trace-label"),
+        tracePath: document.querySelector("#trace-path"),
+        crossingLine: document.querySelector("#crossing-line"),
+        crossingDot: document.querySelector("#crossing-dot"),
+        stableResult: document.querySelector("#stable-result"),
+        stablePrediction: document.querySelector("#stable-prediction"),
+        stableFinal: document.querySelector("#stable-final"),
+        stableMin: document.querySelector("#stable-min"),
+        stableMax: document.querySelector("#stable-max"),
+        transitionResult: document.querySelector("#transition-result"),
+        transitionPrediction: document.querySelector("#transition-prediction"),
+        transitionFinal: document.querySelector("#transition-final"),
+        collapseResult: document.querySelector("#collapse-result"),
+        collapsePrediction: document.querySelector("#collapse-prediction"),
+        collapseTick: document.querySelector("#collapse-tick"),
+        collapseFinal: document.querySelector("#collapse-final"),
+        inspect: document.querySelector("#inspect-trace-btn"),
+        inspection: document.querySelector("#trace-inspection"),
+        tableBody: document.querySelector("#trace-table-body"),
+        exportButton: document.querySelector("#export-series-btn"),
+        exportPanel: document.querySelector("#export-panel"),
+        exportText: document.querySelector("#series-export"),
+        exportPointCount: document.querySelector("#export-point-count"),
+        exportDigest: document.querySelector("#export-digest"),
+        download: document.querySelector("#download-series-link")
+      });
+
+      let timer = null;
+      let downloadUrl = null;
+      let resetVisible = false;
+
+      function displayMilli(value) {
+        const result = Math.round(value) / SCALE;
+        return Number(result.toFixed(3));
+      }
+
+      function finiteNumber(value, label) {
+        if (typeof value === "string" && value.trim() === "") {
+          throw new TypeError(`${label} must be numeric`);
+        }
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) {
+          throw new TypeError(`${label} must be finite`);
+        }
+        return numeric;
+      }
+
+      function normalizeRateMilli(rate) {
+        const numeric = finiteNumber(rate, "grazing rate");
+        if (numeric < 0 || numeric > MODEL.limits.maximumRateMilli / SCALE) {
+          throw new RangeError("grazing rate must be from 0.00 through 0.75");
+        }
+        const scaled = numeric * SCALE;
+        const rateMilli = Math.round(scaled);
+        if (Math.abs(scaled - rateMilli) > 1e-7) {
+          throw new RangeError("grazing rate must use increments of one thousandth");
+        }
+        return rateMilli;
+      }
+
+      function normalizeTicks(ticks) {
+        if (
+          typeof ticks !== "number" ||
+          !Number.isInteger(ticks) ||
+          ticks < 0 ||
+          ticks > MODEL.limits.horizon
+        ) {
+          throw new RangeError(`ticks must be an integer from 0 through ${MODEL.limits.horizon}`);
+        }
+        return ticks;
+      }
+
+      function normalizeSeed(seed) {
+        if (
+          typeof seed !== "number" ||
+          !Number.isInteger(seed) ||
+          seed < MODEL.limits.minimumSeed ||
+          seed > MODEL.limits.maximumSeed
+        ) {
+          throw new RangeError(
+            `seed must be an integer from ${MODEL.limits.minimumSeed} through ${MODEL.limits.maximumSeed}`
+          );
+        }
+        return seed;
+      }
+
+      function xorshift32(value) {
+        let next = value >>> 0;
+        next ^= (next << 13);
+        next ^= (next >>> 17);
+        next ^= (next << 5);
+        return next >>> 0;
+      }
+
+      function supportedPopulationMilli(resourcesMilli) {
+        if (resourcesMilli <= 90000) return 8000;
+        if (resourcesMilli >= 120000) return 112000;
+        const distance = resourcesMilli - 90000;
+        return 8000 + Math.floor(
+          (104000 * distance * distance) / (30000 * 30000)
+        );
+      }
+
+      function initialPoint(seed = MODEL.seed) {
+        const normalizedSeed = normalizeSeed(seed);
+        return {
+          tick: 0,
+          populationMilli: MODEL.initial.populationMilli,
+          resourcesMilli: MODEL.initial.resourcesMilli,
+          supportMilli: supportedPopulationMilli(MODEL.initial.resourcesMilli),
+          weatherMilli: 0,
+          randomState: normalizedSeed
+        };
+      }
+
+      function stepModel(point, grazingRateMilli) {
+        const randomState = xorshift32(point.randomState);
+        const weatherMilli = Math.floor(
+          (((randomState & 1023) - 512) * 550) / 1024
+        );
+        const regrowthMilli = Math.floor(
+          ((MODEL.limits.resourceCeilingMilli - point.resourcesMilli) * 40) / 1000
+        );
+        const grazingLossMilli = Math.floor((grazingRateMilli * 6400) / 1000);
+        const resourcesMilli = Math.max(
+          0,
+          Math.min(
+            MODEL.limits.resourceCeilingMilli,
+            point.resourcesMilli + regrowthMilli - grazingLossMilli + weatherMilli
+          )
+        );
+        const supportMilli = supportedPopulationMilli(resourcesMilli);
+        const gap = supportMilli - point.populationMilli;
+        let movement = Math.floor((Math.abs(gap) * 35) / 1000);
+        if (gap !== 0 && movement === 0) movement = 1;
+        if (gap < 0) movement = -movement;
+        return {
+          tick: point.tick + 1,
+          populationMilli: Math.max(0, point.populationMilli + movement),
+          resourcesMilli,
+          supportMilli,
+          weatherMilli,
+          randomState
+        };
+      }
+
+      function simulate(grazingRate, ticks = MODEL.limits.horizon, seed = MODEL.seed) {
+        const rateMilli = normalizeRateMilli(grazingRate);
+        const normalizedTicks = normalizeTicks(ticks);
+        const points = [initialPoint(seed)];
+        for (let tick = 0; tick < normalizedTicks; tick += 1) {
+          points.push(stepModel(points[points.length - 1], rateMilli));
+        }
+        return points;
+      }
+
+      function compactPoint(point) {
+        return [
+          point.tick,
+          point.populationMilli,
+          point.resourcesMilli,
+          point.supportMilli,
+          point.weatherMilli,
+          point.randomState
+        ];
+      }
+
+      function traceDigest(points) {
+        if (!points.length) return null;
+        let value = 0x811c9dc5;
+        for (const point of points) {
+          const text = `${compactPoint(point).join(":")};`;
+          for (const character of text) {
+            value ^= character.charCodeAt(0);
+            value = Math.imul(value, 0x01000193) >>> 0;
+          }
+        }
+        return value.toString(16).padStart(8, "0");
+      }
+
+      function crossingTick(points) {
+        const point = points.find(candidate =>
+          candidate.tick > 0 &&
+          candidate.populationMilli < MODEL.limits.collapseMilli
+        );
+        return point ? point.tick : null;
+      }
+
+      function initialState() {
+        return {
+          rateMilli: 240,
+          speed: 1,
+          prediction: null,
+          predictionRevision: 0,
+          predictionHistory: [],
+          trace: [],
+          current: { ...INITIAL },
+          crossingTick: null,
+          outcome: null,
+          running: false,
+          status: "ready",
+          message: "Choose what happens before the trace is revealed.",
+          inspectionOpen: false,
+          exportPrepared: false,
+          exportPointCount: 0,
+          exportTraceDigest: null
+        };
+      }
+
+      let state = initialState();
+
+      function snapshot() {
+        return {
+          seed: MODEL.seed,
+          grazingRate: displayMilli(state.rateMilli),
+          speed: state.speed,
+          initialPopulation: displayMilli(MODEL.initial.populationMilli),
+          initialResources: displayMilli(MODEL.initial.resourcesMilli),
+          tick: state.trace.length ? state.current.tick : 0,
+          population: displayMilli(state.current.populationMilli),
+          resources: displayMilli(state.current.resourcesMilli),
+          support: displayMilli(state.current.supportMilli),
+          prediction: state.prediction,
+          predictionRevision: state.predictionRevision,
+          predictionHistory: state.predictionHistory.map(item => ({ ...item })),
+          traceLength: state.trace.length,
+          traceDigest: traceDigest(state.trace),
+          collapseCrossingTick: state.crossingTick,
+          outcome: state.outcome,
+          running: state.running,
+          status: state.status,
+          message: state.message,
+          inspectionOpen: state.inspectionOpen,
+          exportPrepared: state.exportPrepared,
+          exportPointCount: state.exportPointCount,
+          exportTraceDigest: state.exportTraceDigest,
+          trace: state.trace.map(compactPoint)
+        };
+      }
+
+      function summary() {
+        const value = snapshot();
+        delete value.trace;
+        return value;
+      }
+
+      function stopRun() {
+        if (timer !== null) {
+          clearInterval(timer);
+          timer = null;
+        }
+        state.running = false;
+      }
+
+      function clearPreparedExport() {
+        if (downloadUrl !== null) {
+          URL.revokeObjectURL(downloadUrl);
+          downloadUrl = null;
+        }
+        elements.exportText.value = "";
+        elements.exportPointCount.textContent = "0";
+        elements.exportDigest.textContent = "—";
+        elements.download.hidden = true;
+        elements.download.removeAttribute("href");
+        elements.exportPanel.hidden = true;
+        state = {
+          ...state,
+          exportPrepared: false,
+          exportPointCount: 0,
+          exportTraceDigest: null
+        };
+      }
+
+      function hideResetProof() {
+        resetVisible = false;
+        elements.resetProof.hidden = true;
+      }
+
+      function setRate(rate) {
+        const rateMilli = normalizeRateMilli(rate);
+        hideResetProof();
+        stopRun();
+        clearPreparedExport();
+        state = {
+          ...state,
+          rateMilli,
+          prediction: null,
+          trace: [],
+          current: { ...INITIAL },
+          crossingTick: null,
+          outcome: null,
+          running: false,
+          status: "prediction-needed",
+          message: "Rate changed. Revise the prediction before revealing a new trace.",
+          inspectionOpen: false
+        };
+        render();
+      }
+
+      function predictionLabel(choice) {
+        if (choice === "band") return "stable band";
+        if (choice === "transition") return "transition";
+        if (choice === "collapse") return "collapse";
+        throw new RangeError(`unknown prediction choice: ${choice}`);
+      }
+
+      function selectPrediction(choice) {
+        const label = predictionLabel(choice);
+        hideResetProof();
+        const history = state.predictionHistory.map(item => ({ ...item }));
+        const rate = displayMilli(state.rateMilli);
+        const existingIndex = history.findIndex(item => item.grazingRate === rate);
+        let revision = state.predictionRevision;
+        if (existingIndex >= 0) {
+          if (history[existingIndex].choice !== choice) revision += 1;
+          history[existingIndex] = { grazingRate: rate, choice };
+        } else {
+          if (history.length > 0) revision += 1;
+          history.push({ grazingRate: rate, choice });
+        }
+        state = {
+          ...state,
+          prediction: choice,
+          predictionRevision: revision,
+          predictionHistory: history,
+          status: "predicted",
+          message: `Prediction locked: ${label}. Reveal the trace to observe the outcome.`,
+          inspectionOpen: false
+        };
+        render();
+      }
+
+      function setSpeed(speed) {
+        hideResetProof();
+        state = { ...state, speed };
+        render();
+      }
+
+      function finishRun() {
+        stopRun();
+        const populations = state.trace.map(point => point.populationMilli);
+        const finalPopulation = state.current.populationMilli;
+        const bandHeld = Math.min(...populations) >= MODEL.limits.stableLowMilli
+          && Math.max(...populations) <= MODEL.limits.stableHighMilli;
+        const outcome = state.crossingTick !== null
+          ? "collapse"
+          : bandHeld
+            ? "band"
+            : "transition";
+        const observed = outcome === "collapse"
+          ? `collapse below 10 at tick ${state.crossingTick}`
+          : outcome === "band"
+            ? "stable band through tick 600"
+            : `transition outside the stable band, ending at ${displayMilli(finalPopulation)}`;
+        const message = `Prediction: ${predictionLabel(state.prediction)}. Observed outcome: ${observed}.`;
+        state = {
+          ...state,
+          running: false,
+          outcome,
+          status: outcome === "collapse" ? "collapse" : outcome === "band" ? "stable" : "transition",
+          message
+        };
+        render();
+      }
+
+      function runModel() {
+        hideResetProof();
+        if (!state.prediction || state.running) return;
+        stopRun();
+        clearPreparedExport();
+        state = {
+          ...state,
+          trace: [{ ...INITIAL }],
+          current: { ...INITIAL },
+          crossingTick: null,
+          outcome: null,
+          running: true,
+          status: "running",
+          message: `Prediction: ${predictionLabel(state.prediction)}. Trace revealed; observing the seeded model through tick 600.`,
+          inspectionOpen: false
+        };
+        render();
+        timer = setInterval(() => {
+          const ticksPerPulse = 24 * state.speed;
+          for (
+            let count = 0;
+            count < ticksPerPulse && state.current.tick < MODEL.limits.horizon;
+            count += 1
+          ) {
+            const next = stepModel(state.current, state.rateMilli);
+            state.current = next;
+            state.trace.push(next);
+            if (
+              state.crossingTick === null &&
+              next.populationMilli < MODEL.limits.collapseMilli
+            ) {
+              state.crossingTick = next.tick;
+            }
+          }
+          if (state.current.tick >= MODEL.limits.horizon) finishRun();
+          else render();
+        }, 60);
+      }
+
+      function inspectTrace() {
+        hideResetProof();
+        if (!state.trace.length || state.running) return;
+        state.inspectionOpen = !state.inspectionOpen;
+        if (state.inspectionOpen && state.outcome === "band") {
+          state.status = "stable-inspected";
+          state.message = "Prediction: stable band. Observed outcome: inspected stable band through tick 600.";
+        } else if (state.inspectionOpen && state.outcome === "transition") {
+          state.status = "transition-inspected";
+          state.message = `Prediction: ${predictionLabel(state.prediction)}. Observed outcome: inspected transition ending at ${displayMilli(state.current.populationMilli)}.`;
+        }
+        render();
+      }
+
+      function exportPoint(point) {
+        return {
+          tick: point.tick,
+          population: displayMilli(point.populationMilli),
+          populationMilli: point.populationMilli,
+          resources: displayMilli(point.resourcesMilli),
+          resourcesMilli: point.resourcesMilli,
+          support: displayMilli(point.supportMilli),
+          supportMilli: point.supportMilli,
+          weatherMilli: point.weatherMilli,
+          randomState: point.randomState
+        };
+      }
+
+      function prepareExport() {
+        hideResetProof();
+        if (!state.trace.length || state.running) return;
+        clearPreparedExport();
+        const payload = {
+          schema: "island-herd-run-export/1.0",
+          model: MODEL.schema,
+          seed: MODEL.seed,
+          grazingRate: displayMilli(state.rateMilli),
+          speed: state.speed,
+          collapseCrossingTick: state.crossingTick,
+          traceDigest: traceDigest(state.trace),
+          series: state.trace.map(exportPoint)
+        };
+        state = {
+          ...state,
+          status: "exported",
+          message: `Export prepared from the observed ${state.outcome === "band" ? "stable band" : state.outcome} outcome: ${payload.series.length} points · digest ${payload.traceDigest}.`,
+          exportPrepared: true,
+          exportPointCount: payload.series.length,
+          exportTraceDigest: payload.traceDigest
+        };
+        const content = `${JSON.stringify(payload, null, 2)}\n`;
+        elements.exportText.value = content;
+        elements.exportPointCount.textContent = String(payload.series.length);
+        elements.exportDigest.textContent = payload.traceDigest;
+        const blob = new Blob([content], { type: "application/json" });
+        downloadUrl = URL.createObjectURL(blob);
+        elements.download.href = downloadUrl;
+        elements.download.hidden = false;
+        elements.exportPanel.hidden = false;
+        render();
+        elements.exportPanel.scrollIntoView({ block: "start", behavior: "smooth" });
+      }
+
+      function resetEcosystem() {
+        stopRun();
+        clearPreparedExport();
+        state = initialState();
+        resetVisible = true;
+        render();
+        elements.resetProof.hidden = false;
+      }
+
+      function chartPoint(point) {
+        const x = 58 + (point.tick / MODEL.limits.horizon) * 624;
+        const y = 350 - (point.populationMilli / 130000) * 314;
+        return `${x.toFixed(2)},${y.toFixed(2)}`;
+      }
+
+      function setSvgHidden(element, hidden) {
+        element.toggleAttribute("hidden", hidden);
+        element.style.display = hidden ? "none" : "";
+        element.setAttribute("aria-hidden", String(hidden));
+      }
+
+      function renderChart() {
+        const visible = state.trace.filter((point, index) =>
+          index === state.trace.length - 1 || point.tick % 4 === 0
+        );
+        elements.tracePath.setAttribute("points", visible.map(chartPoint).join(" "));
+        elements.tracePath.classList.toggle("collapse", state.outcome === "collapse" || state.crossingTick !== null);
+        elements.tracePath.classList.toggle("transition", state.outcome === "transition");
+        setSvgHidden(elements.hiddenTrace, state.trace.length > 0);
+        if (state.crossingTick === null) {
+          setSvgHidden(elements.crossingLine, true);
+          setSvgHidden(elements.crossingDot, true);
+        } else {
+          const point = state.trace[state.crossingTick];
+          const x = 58 + (point.tick / MODEL.limits.horizon) * 624;
+          const y = 350 - (point.populationMilli / 130000) * 314;
+          elements.crossingLine.setAttribute("x1", x.toFixed(2));
+          elements.crossingLine.setAttribute("x2", x.toFixed(2));
+          elements.crossingDot.setAttribute("cx", x.toFixed(2));
+          elements.crossingDot.setAttribute("cy", y.toFixed(2));
+          setSvgHidden(elements.crossingLine, false);
+          setSvgHidden(elements.crossingDot, false);
+        }
+        elements.chartDescription.textContent = state.trace.length
+          ? `Population trace through tick ${state.current.tick}; ${state.crossingTick === null ? "no collapse crossing" : `collapse crossing at tick ${state.crossingTick}`}.`
+          : "The trace is hidden until a prediction is selected and the run begins.";
+      }
+
+      function renderInspection() {
+        elements.inspection.hidden = !state.inspectionOpen;
+        elements.tableBody.replaceChildren();
+        if (!state.inspectionOpen) return;
+        const ticks = new Set([0, 600]);
+        for (let tick = 50; tick < 600; tick += 50) ticks.add(tick);
+        if (state.crossingTick !== null) {
+          ticks.add(state.crossingTick - 1);
+          ticks.add(state.crossingTick);
+        }
+        for (const tick of [...ticks].filter(value => value >= 0 && value < state.trace.length).sort((a, b) => a - b)) {
+          const point = state.trace[tick];
+          const row = document.createElement("tr");
+          if (tick === state.crossingTick) row.className = "crossing";
+          for (const value of [
+            point.tick,
+            displayMilli(point.populationMilli),
+            displayMilli(point.resourcesMilli),
+            displayMilli(point.supportMilli)
+          ]) {
+            const cell = document.createElement("td");
+            cell.textContent = String(value);
+            row.append(cell);
+          }
+          elements.tableBody.append(row);
+        }
+      }
+
+      function render() {
+        const rate = displayMilli(state.rateMilli).toFixed(2);
+        elements.grazingInput.value = rate;
+        elements.grazingOutput.value = rate;
+        elements.grazingOutput.textContent = rate;
+        elements.predictBand.setAttribute("aria-pressed", String(state.prediction === "band"));
+        elements.predictTransition.setAttribute("aria-pressed", String(state.prediction === "transition"));
+        elements.predictCollapse.setAttribute("aria-pressed", String(state.prediction === "collapse"));
+        elements.speed1.setAttribute("aria-pressed", String(state.speed === 1));
+        elements.speed2.setAttribute("aria-pressed", String(state.speed === 2));
+        elements.speed4.setAttribute("aria-pressed", String(state.speed === 4));
+        elements.run.disabled = !state.prediction || state.running;
+        elements.inspect.disabled = !state.trace.length || state.running;
+        elements.exportButton.disabled = !state.trace.length || state.running;
+        elements.status.dataset.state = state.status;
+        elements.status.textContent = state.message;
+        elements.tick.textContent = String(state.trace.length ? state.current.tick : 0);
+        elements.population.textContent = String(displayMilli(state.current.populationMilli));
+        elements.resources.textContent = String(displayMilli(state.current.resourcesMilli));
+        elements.crossing.textContent = state.crossingTick === null ? "—" : `tick ${state.crossingTick}`;
+        elements.predictionHistory.textContent = state.predictionHistory.length
+          ? `Prediction record: ${state.predictionHistory.map(item => `${item.grazingRate.toFixed(2)} ${predictionLabel(item.choice)}`).join(" · ")}${state.predictionRevision ? ` · revised ${state.predictionRevision} time` : ""}${state.predictionRevision > 1 ? "s" : ""}.`
+          : "No prediction yet.";
+        const populations = state.trace.map(point => point.populationMilli);
+        const selectedPrediction = state.prediction
+          ? predictionLabel(state.prediction)
+          : "none";
+        elements.stablePrediction.textContent = selectedPrediction;
+        elements.transitionPrediction.textContent = selectedPrediction;
+        elements.collapsePrediction.textContent = selectedPrediction;
+        elements.stableResult.hidden = state.outcome !== "band";
+        elements.transitionResult.hidden = state.outcome !== "transition";
+        elements.collapseResult.hidden = state.outcome !== "collapse";
+        if (state.outcome === "band") {
+          elements.stableFinal.textContent = String(displayMilli(state.current.populationMilli));
+          elements.stableMin.textContent = String(displayMilli(Math.min(...populations)));
+          elements.stableMax.textContent = String(displayMilli(Math.max(...populations)));
+        }
+        if (state.outcome === "transition") {
+          elements.transitionFinal.textContent = String(displayMilli(state.current.populationMilli));
+        }
+        if (state.outcome === "collapse") {
+          elements.collapseTick.textContent = String(state.crossingTick);
+          elements.collapseFinal.textContent = String(displayMilli(state.current.populationMilli));
+        }
+        elements.resetProof.hidden = !resetVisible;
+        renderChart();
+        renderInspection();
+      }
+
+      elements.grazingInput.addEventListener("input", event => setRate(event.currentTarget.value));
+      elements.rate24.addEventListener("click", () => setRate(0.24));
+      elements.rate60.addEventListener("click", () => setRate(0.60));
+      elements.rate45.addEventListener("click", () => setRate(0.45));
+      elements.predictBand.addEventListener("click", () => selectPrediction("band"));
+      elements.predictTransition.addEventListener("click", () => selectPrediction("transition"));
+      elements.predictCollapse.addEventListener("click", () => selectPrediction("collapse"));
+      elements.speed1.addEventListener("click", () => setSpeed(1));
+      elements.speed2.addEventListener("click", () => setSpeed(2));
+      elements.speed4.addEventListener("click", () => setSpeed(4));
+      elements.run.addEventListener("click", runModel);
+      elements.reset.addEventListener("click", resetEcosystem);
+      elements.inspect.addEventListener("click", inspectTrace);
+      elements.exportButton.addEventListener("click", prepareExport);
+
+      const contract = Object.freeze({
+        model: MODEL,
+        initialPoint,
+        initialState,
+        stepModel,
+        simulate,
+        snapshot,
+        summary,
+        traceDigest,
+        reset: resetEcosystem
+      });
+      window.islandLab = contract;
+      window.tinySystem = contract;
+      render();
+    })();
+  </script>
+</body>
+</html>

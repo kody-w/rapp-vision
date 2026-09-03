@@ -3,17 +3,19 @@
 **Useful work, measurable results, controls included.**
 
 Working Proofs is a recurring public channel for reviewed RAPP Vision work. Its
-first release promotes three cycle-2 publications in this order:
+first release promotes five cycle-2 and cycle-3 publications in this order:
 
 1. **Why the Grid Overflows**
 2. **Triage Invoices Without a Pointer**
 3. **Six Shapes, One Grid**
+4. **Will the Island Herd Hold?**
+5. **Read the Wetland Twice**
 
 The aggregate does not copy apps, thumbnails, masters, or encoded media.
 Instead, `channel.json` resolves each publication asset from its reviewed source
-under `candidate-frame-0002/`. `evidence-index.json` binds every source
-`channel.json`, `evidence.json`, and `delivery.json` by the SHA-256 of its raw
-bytes.
+under `candidate-frame-0002/` or `candidate-frame-0003/`.
+`evidence-index.json` binds every source `channel.json`, `evidence.json`, and
+`delivery.json` by the SHA-256 of its raw bytes.
 
 Rebuild and verify the aggregate with:
 
@@ -28,8 +30,8 @@ The source candidates remain the authority for their behavior, evidence, and
 media. The builder only deep-copies the selected publication metadata, removes
 review-only fields, and rebases relative URLs for this channel.
 
-`screenshots/` contains real Edge captures of the exact aggregate live actions
-at the 960 px desktop player stage and the 390 px iframe stage. Every
-success/failure/reset capture includes the player lower third, and
+`screenshots/` contains real Edge captures of every configured checkpoint after
+the exact aggregate live actions run at the 960 px desktop player stage and the
+390 px iframe stage. Every result capture includes the player lower third, and
 `manifest.json` records screenshot hashes plus the measured visible
-intersection for the stable result selector.
+intersection for each configured result selector.
