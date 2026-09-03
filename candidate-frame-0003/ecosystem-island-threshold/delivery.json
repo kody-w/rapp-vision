@@ -1,0 +1,123 @@
+{
+  "artifacts": {
+    ".gitattributes": {
+      "bytes": 59,
+      "path": ".gitattributes",
+      "sha256": "f5a75bfaf94f649af19b9d24acb429d4fc0c5ee46e913ff05713e37663aa4521"
+    },
+    "README.md": {
+      "bytes": 5403,
+      "path": "README.md",
+      "sha256": "c45fc3340ec106f6cddcef65fa1df7c705a19fc6037c64c96a71f569772a1cee"
+    },
+    "apps/ecosystem-island-threshold.html": {
+      "bytes": 40806,
+      "path": "apps/ecosystem-island-threshold.html",
+      "sha256": "1b175938ae1796e3800d67513e3fe5158770ee888a3db1737a57848bc5094ebd"
+    },
+    "channel.json": {
+      "bytes": 6616,
+      "path": "channel.json",
+      "sha256": "cefd51c4069ec9289226813515d96c9a5cd589403eff69a763923583eb5f6a26"
+    },
+    "channel.production.json": {
+      "bytes": 6464,
+      "path": "channel.production.json",
+      "sha256": "95400a1bf0958e75a5fdf694267d6ed99ea8ce138dae32447752e51353193aa7"
+    },
+    "evidence.json": {
+      "bytes": 159264,
+      "path": "evidence.json",
+      "sha256": "607e52dbbe708566f0412fd40fd7fdf9f9490cbc461b9c89ca52127447d6b59b"
+    },
+    "exports/fixture-series.json": {
+      "bytes": 364105,
+      "path": "exports/fixture-series.json",
+      "sha256": "0ea26033dba500450caaa7d1fa3e7fb6d5df80c384ea83b3509e35f91f77fc9f"
+    },
+    "masters/ecosystem-island-threshold.mkv": {
+      "bytes": 6003571,
+      "path": "masters/ecosystem-island-threshold.mkv",
+      "sha256": "094698330485945de89563255195a64fff6dcaf561b58b86f4cddd8011fd7f4b"
+    },
+    "media/ecosystem-island-threshold.mp4": {
+      "bytes": 166629,
+      "path": "media/ecosystem-island-threshold.mp4",
+      "sha256": "89b320b703faa40bc9b57da645d6b20c3f16287802e4cedcec279df3c16dc76d"
+    },
+    "media/ecosystem-island-threshold.webm": {
+      "bytes": 152062,
+      "path": "media/ecosystem-island-threshold.webm",
+      "sha256": "7646e3e9980e2241b36aed3fe64aaa36773b024500031fe7eea551c6a8da9d49"
+    },
+    "render.py": {
+      "bytes": 50097,
+      "path": "render.py",
+      "sha256": "986ea5614b80e774b12ee035ba32379ab635a4115929129a15a88fe1026b5913"
+    },
+    "snapshots/canonical-states.json": {
+      "bytes": 2569,
+      "path": "snapshots/canonical-states.json",
+      "sha256": "6b2c04ae0a8665b05bfbb62d87ea2a24327b990f86e0ffe71f1ae97127e3d411"
+    },
+    "thumbs/ecosystem-island-threshold.svg": {
+      "bytes": 1664,
+      "path": "thumbs/ecosystem-island-threshold.svg",
+      "sha256": "5b052dba08ee0b7b99c83d483e4373ff0aab95e0ac17f89a9b7e3c26f364aeee"
+    },
+    "verify_dom.mjs": {
+      "bytes": 22267,
+      "path": "verify_dom.mjs",
+      "sha256": "8b5e31250f2f6eb500446423de1917ad96c89fd96e5760e1b7c993036626eb16"
+    }
+  },
+  "bindings": {
+    "compiledChannelSha256": "cefd51c4069ec9289226813515d96c9a5cd589403eff69a763923583eb5f6a26",
+    "evidenceSha256": "607e52dbbe708566f0412fd40fd7fdf9f9490cbc461b9c89ca52127447d6b59b",
+    "fixtureSeriesSha256": "0ea26033dba500450caaa7d1fa3e7fb6d5df80c384ea83b3509e35f91f77fc9f",
+    "productionSha256": "95400a1bf0958e75a5fdf694267d6ed99ea8ce138dae32447752e51353193aa7"
+  },
+  "channel": "candidate-frame-0003-03",
+  "media": {
+    "master": {
+      "bytes": 6003571,
+      "codec": "ffv1",
+      "duration": 22,
+      "height": 540,
+      "path": "masters/ecosystem-island-threshold.mkv",
+      "pixelFormat": "bgr0",
+      "sha256": "094698330485945de89563255195a64fff6dcaf561b58b86f4cddd8011fd7f4b",
+      "width": 960
+    },
+    "mp4": {
+      "bytes": 166629,
+      "codec": "h264",
+      "colorPrimaries": "bt709",
+      "colorRange": "tv",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "duration": 22,
+      "height": 540,
+      "path": "media/ecosystem-island-threshold.mp4",
+      "pixelFormat": "yuv420p",
+      "sha256": "89b320b703faa40bc9b57da645d6b20c3f16287802e4cedcec279df3c16dc76d",
+      "width": 960
+    },
+    "webm": {
+      "bytes": 152062,
+      "codec": "vp9",
+      "colorPrimaries": "bt709",
+      "colorRange": "tv",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "duration": 22,
+      "height": 540,
+      "path": "media/ecosystem-island-threshold.webm",
+      "pixelFormat": "yuv420p",
+      "sha256": "7646e3e9980e2241b36aed3fe64aaa36773b024500031fe7eea551c6a8da9d49",
+      "width": 960
+    }
+  },
+  "publication": "ecosystem-island-threshold",
+  "schema": "candidate-frame-delivery/1.0"
+}

@@ -1,0 +1,106 @@
+{
+  "collapse": {
+    "collapseCrossingTick": 134,
+    "grazingRate": 0.6,
+    "initialPopulation": 104,
+    "initialResources": 146,
+    "inspectionOpen": false,
+    "message": "Collapse observed: population first falls below 10 at tick 134.",
+    "outcome": "collapse",
+    "population": 8,
+    "prediction": "collapse",
+    "predictionHistory": [
+      {
+        "choice": "band",
+        "grazingRate": 0.24
+      },
+      {
+        "choice": "collapse",
+        "grazingRate": 0.6
+      }
+    ],
+    "predictionRevision": 1,
+    "resources": 84.088,
+    "running": false,
+    "seed": 31415,
+    "speed": 2,
+    "status": "collapse",
+    "support": 8,
+    "tick": 600,
+    "traceDigest": "8bb46765",
+    "traceLength": 601
+  },
+  "model": "seeded-island-herd/1.0",
+  "opening": {
+    "collapseCrossingTick": null,
+    "grazingRate": 0.24,
+    "initialPopulation": 104,
+    "initialResources": 146,
+    "inspectionOpen": false,
+    "message": "Choose what happens before the trace is revealed.",
+    "outcome": null,
+    "population": 104,
+    "prediction": null,
+    "predictionHistory": [],
+    "predictionRevision": 0,
+    "resources": 146,
+    "running": false,
+    "seed": 31415,
+    "speed": 1,
+    "status": "ready",
+    "support": 112,
+    "tick": 0,
+    "traceDigest": null,
+    "traceLength": 0
+  },
+  "reset": {
+    "collapseCrossingTick": null,
+    "grazingRate": 0.24,
+    "initialPopulation": 104,
+    "initialResources": 146,
+    "inspectionOpen": false,
+    "message": "Choose what happens before the trace is revealed.",
+    "outcome": null,
+    "population": 104,
+    "prediction": null,
+    "predictionHistory": [],
+    "predictionRevision": 0,
+    "resources": 146,
+    "running": false,
+    "seed": 31415,
+    "speed": 1,
+    "status": "ready",
+    "support": 112,
+    "tick": 0,
+    "traceDigest": null,
+    "traceLength": 0
+  },
+  "schema": "island-herd-canonical-states/1.0",
+  "stable": {
+    "collapseCrossingTick": null,
+    "grazingRate": 0.24,
+    "initialPopulation": 104,
+    "initialResources": 146,
+    "inspectionOpen": true,
+    "message": "Inspected: the herd stays inside the 80–120 band through tick 600.",
+    "outcome": "band",
+    "population": 112,
+    "prediction": "band",
+    "predictionHistory": [
+      {
+        "choice": "band",
+        "grazingRate": 0.24
+      }
+    ],
+    "predictionRevision": 0,
+    "resources": 141.688,
+    "running": false,
+    "seed": 31415,
+    "speed": 1,
+    "status": "stable-inspected",
+    "support": 112,
+    "tick": 600,
+    "traceDigest": "81d44b16",
+    "traceLength": 601
+  }
+}

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title description">
+  <title id="title">Will the Island Herd Hold?</title>
+  <desc id="description">A prediction-first island herd model asks whether grazing point two four stays in band before any trace is shown.</desc>
+  <rect width="960" height="540" fill="#113847"/>
+  <rect x="36" y="32" width="888" height="476" rx="28" fill="#0c1f2b" stroke="#52ad7d" stroke-width="3"/>
+  <text x="72" y="92" fill="#99e2b1" font-family="Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="2">ISLAND HERD PREDICTION LAB</text>
+  <text x="72" y="174" fill="#fffdf6" font-family="Arial, sans-serif" font-size="58" font-weight="800">Will the herd hold?</text>
+  <text x="72" y="220" fill="#abbfbf" font-family="Arial, sans-serif" font-size="24">Seed 31415 · grazing 0.24 · trace hidden</text>
+  <rect x="72" y="270" width="376" height="104" rx="18" fill="#1d534f" stroke="#ffba54" stroke-width="6"/>
+  <text x="102" y="333" fill="#fffdf6" font-family="Arial, sans-serif" font-size="30" font-weight="800">STAYS 80–120</text>
+  <rect x="474" y="270" width="376" height="104" rx="18" fill="#20464d" stroke="#abbfbf" stroke-width="3"/>
+  <text x="504" y="333" fill="#fffdf6" font-family="Arial, sans-serif" font-size="30" font-weight="800">COLLAPSES &lt; 10</text>
+  <rect x="72" y="418" width="778" height="14" rx="7" fill="#113847"/>
+  <rect x="72" y="418" width="286" height="14" rx="7" fill="#ffba54"/>
+  <text x="72" y="473" fill="#ffba54" font-family="Arial, sans-serif" font-size="24" font-weight="700">PREDICT FIRST. THEN REVEAL THE SAME SEEDED RUN.</text>
+</svg>
