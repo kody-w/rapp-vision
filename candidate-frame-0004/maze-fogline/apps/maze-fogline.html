@@ -1,0 +1,1580 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fogline Survey</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #051112;
+      --panel: #0b1f1f;
+      --panel-2: #102b29;
+      --line: #1d4a47;
+      --ink: #e8f1e4;
+      --muted: #8caea2;
+      --mint: #5be5ae;
+      --amber: #ffcb69;
+      --red: #ff6969;
+      --purple: #d7a9ff;
+      --blue: #5eb8d3;
+      --fog: #071012;
+      --floor: #19423b;
+      font-family: ui-monospace, "Cascadia Mono", "Segoe UI Mono", monospace;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-width: 0;
+      background: var(--bg);
+      scroll-padding-block: 18px 150px;
+    }
+
+    body {
+      margin: 0;
+      min-width: 0;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(91, 229, 174, 0.08), transparent 34rem),
+        var(--bg);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.45;
+      padding: 0 0 170px;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #12332f;
+      color: var(--ink);
+      padding: 9px 13px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: var(--mint);
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    #maze-board:focus-visible {
+      outline: 3px solid var(--amber);
+      outline-offset: 3px;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      color: #668078;
+      background: #0b2321;
+      border-color: #183a37;
+    }
+
+    .shell {
+      width: min(1160px, 100%);
+      margin: 0 auto;
+      padding: 18px clamp(12px, 3vw, 34px) 0;
+      min-width: 0;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px 24px;
+      align-items: end;
+      border-bottom: 1px solid var(--line);
+      padding: 0 0 16px;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow,
+    .label {
+      color: var(--mint);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 4px;
+      font-family: system-ui, sans-serif;
+      font-size: clamp(30px, 7vw, 58px);
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+    }
+
+    .hero p {
+      max-width: 62rem;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-family: system-ui, sans-serif;
+      font-size: 16px;
+    }
+
+    .hero-badge {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: var(--amber);
+      white-space: nowrap;
+    }
+
+    .proof-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .proof {
+      min-width: 0;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+    }
+
+    .proof output {
+      display: block;
+      margin-top: 3px;
+      color: var(--ink);
+      font-size: 17px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .proof.digest {
+      grid-column: span 2;
+    }
+
+    #digest-value {
+      color: var(--blue);
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(300px, 1.05fr) minmax(280px, 0.95fr);
+      gap: 18px;
+      align-items: start;
+      min-width: 0;
+    }
+
+    .map-card,
+    .panel {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+      padding: clamp(12px, 2.4vw, 20px);
+    }
+
+    .map-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .map-heading h2 {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      font-size: 22px;
+    }
+
+    .map-heading span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    #maze-board {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      width: min(100%, 520px);
+      aspect-ratio: 1;
+      margin: 0 auto;
+      border: 7px solid #102b2b;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--fog);
+      touch-action: manipulation;
+      scroll-margin-block: 20px 150px;
+    }
+
+    .cell {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      background:
+        repeating-linear-gradient(
+          135deg,
+          #071012 0,
+          #071012 8px,
+          #0a181a 8px,
+          #0a181a 10px
+        );
+      border: 1px solid #0d2426;
+      color: var(--muted);
+      overflow: hidden;
+    }
+
+    .cell.revealed {
+      background: var(--floor);
+      border-color: #153d39;
+      box-shadow: inset 0 0 22px rgba(91, 229, 174, 0.06);
+    }
+
+    .cell.trail::before {
+      content: "";
+      width: 22%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--mint);
+      box-shadow: 0 0 10px rgba(91, 229, 174, 0.75);
+    }
+
+    .cell.entrance::after {
+      content: "IN";
+      position: absolute;
+      left: 4px;
+      bottom: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .exit-marker,
+    .trap-marker,
+    .player {
+      position: absolute;
+      z-index: 3;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .exit-marker {
+      width: 48%;
+      aspect-ratio: 1;
+      border: 4px solid var(--purple);
+      color: var(--purple);
+      background: rgba(7, 16, 18, 0.88);
+      box-shadow: 0 0 16px rgba(215, 169, 255, 0.72);
+      font-size: clamp(12px, 2.3vw, 20px);
+    }
+
+    .trap-marker {
+      width: 44%;
+      aspect-ratio: 1;
+      border: 4px solid var(--red);
+      color: var(--red);
+      background: rgba(72, 22, 25, 0.9);
+      box-shadow: 0 0 13px rgba(255, 105, 105, 0.68);
+      font-size: clamp(13px, 2.3vw, 21px);
+    }
+
+    .player {
+      width: 38%;
+      aspect-ratio: 1;
+      color: #092323;
+      background: var(--amber);
+      box-shadow: 0 0 13px rgba(255, 203, 105, 0.72);
+      font-size: clamp(13px, 2.5vw, 22px);
+      transform: rotate(var(--bearing));
+    }
+
+    .map-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px 16px;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .map-legend strong {
+      color: var(--ink);
+    }
+
+    .panel {
+      display: grid;
+      gap: 12px;
+    }
+
+    .readout {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .metric {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 9px 10px;
+      background: #081919;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .metric output {
+      display: block;
+      color: var(--ink);
+      font-size: 18px;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .compass-card {
+      display: grid;
+      grid-template-columns: 100px minmax(0, 1fr);
+      align-items: center;
+      gap: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: #081919;
+    }
+
+    .compass {
+      position: relative;
+      width: 92px;
+      aspect-ratio: 1;
+      border: 2px solid var(--muted);
+      border-radius: 50%;
+      background: #0c2523;
+    }
+
+    .compass .north,
+    .compass .east,
+    .compass .south,
+    .compass .west {
+      position: absolute;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .compass .north { top: 3px; left: 50%; transform: translateX(-50%); color: var(--ink); }
+    .compass .east { right: 6px; top: 50%; transform: translateY(-50%); }
+    .compass .south { bottom: 3px; left: 50%; transform: translateX(-50%); }
+    .compass .west { left: 6px; top: 50%; transform: translateY(-50%); }
+
+    #compass-needle {
+      position: absolute;
+      left: calc(50% - 3px);
+      top: 15px;
+      width: 6px;
+      height: 31px;
+      border-radius: 5px;
+      background: var(--amber);
+      transform-origin: 50% 100%;
+      transform: rotate(var(--bearing));
+      box-shadow: 0 0 9px rgba(255, 203, 105, 0.72);
+    }
+
+    .compass-copy strong {
+      display: block;
+      color: var(--amber);
+      font-size: 22px;
+    }
+
+    .compass-copy span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .notice {
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #0a1a1a;
+      overflow-wrap: anywhere;
+      scroll-margin-block: 20px 150px;
+    }
+
+    .notice.hint {
+      border-color: #8e712d;
+      background: #2d2816;
+      color: var(--amber);
+      font-weight: 900;
+    }
+
+    .notice.trap,
+    .notice.error {
+      border-color: #8e3537;
+      background: #32191b;
+      color: #ffd7d2;
+    }
+
+    .notice.success {
+      border-color: #367f61;
+      background: #102e25;
+      color: #c9ffe5;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      align-items: center;
+    }
+
+    #move-north { grid-column: 2; }
+    #move-west { grid-column: 1; }
+    #move-south { grid-column: 2; }
+    #move-east { grid-column: 3; }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    #hint-btn {
+      color: var(--amber);
+    }
+
+    #restart-btn {
+      color: var(--mint);
+    }
+
+    .seed-card {
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+      padding: clamp(13px, 2.5vw, 20px);
+      scroll-margin-block: 20px 150px;
+    }
+
+    .seed-card h2 {
+      margin-bottom: 5px;
+      font-family: system-ui, sans-serif;
+      font-size: 22px;
+    }
+
+    .seed-card > p {
+      color: var(--muted);
+      margin-bottom: 13px;
+    }
+
+    .seed-controls {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 9px;
+    }
+
+    #seed-input {
+      min-width: 0;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #071616;
+      color: var(--ink);
+      padding: 9px 11px;
+    }
+
+    #seed-change-proof {
+      margin: 12px 0 0;
+      color: var(--blue);
+      overflow-wrap: anywhere;
+      scroll-margin-block: 20px 150px;
+    }
+
+    #reset-proof {
+      color: var(--muted);
+      font-size: 13px;
+      scroll-margin-block: 20px 150px;
+    }
+
+    .takeover {
+      margin-top: 18px;
+      margin-bottom: 140px;
+      border: 2px solid var(--amber);
+      border-radius: 16px;
+      background: #2a2617;
+      padding: clamp(16px, 4vw, 28px);
+      color: #fff2c9;
+      scroll-margin-block: 20px 170px;
+    }
+
+    .takeover strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--amber);
+      font-family: system-ui, sans-serif;
+      font-size: clamp(23px, 6vw, 35px);
+    }
+
+    .takeover p {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 760px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+        align-items: start;
+      }
+
+      .hero-badge {
+        justify-self: start;
+      }
+
+      .proof-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .proof.digest {
+        grid-column: span 2;
+      }
+
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 430px) {
+      body {
+        font-size: 14px;
+      }
+
+      .shell {
+        padding-inline: 9px;
+      }
+
+      .proof-strip {
+        gap: 7px;
+      }
+
+      .proof {
+        padding: 9px;
+      }
+
+      .map-card,
+      .panel,
+      .seed-card {
+        border-radius: 12px;
+        padding: 11px;
+      }
+
+      .readout {
+        gap: 7px;
+      }
+
+      .metric output {
+        font-size: 16px;
+      }
+
+      .compass-card {
+        grid-template-columns: 92px minmax(0, 1fr);
+      }
+
+      .action-row,
+      .seed-controls {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      #digest-value {
+        font-size: 12px;
+      }
+
+      .takeover {
+        margin-bottom: 155px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <div class="eyebrow">Top-down fog of war · deterministic survey</div>
+        <h1>Fogline Survey</h1>
+        <p>
+          Read only revealed ground. The compass and trail keep your bearing;
+          the exit beacon stays marked through the fog. No route is printed.
+        </p>
+      </div>
+      <div class="hero-badge">Arrow / WASD direct play</div>
+    </header>
+
+    <section class="proof-strip" aria-label="Canonical proof">
+      <div class="proof">
+        <span class="label">Accepted seed</span>
+        <output id="seed-value">RAPP-42</output>
+      </div>
+      <div class="proof">
+        <span class="label">Reference</span>
+        <output id="reference-value">18 moves</output>
+      </div>
+      <div class="proof digest">
+        <span class="label">SHA-256 topology digest</span>
+        <output id="digest-value">126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda</output>
+      </div>
+    </section>
+
+    <div class="layout">
+      <section class="map-card" aria-labelledby="map-heading">
+        <div class="map-heading">
+          <h2 id="map-heading">Revealed survey</h2>
+          <span>6 × 6 · exit stays marked</span>
+        </div>
+        <div
+          id="maze-board"
+          tabindex="0"
+          role="application"
+          aria-describedby="status-message"
+          aria-label="Fogline maze. Use arrow keys or WASD to move."
+        ></div>
+        <p class="map-legend">
+          <span><strong>amber</strong> surveyor</span>
+          <span><strong>mint</strong> revealed trail</span>
+          <span><strong>violet</strong> exit beacon</span>
+          <span><strong>red</strong> marked trap when surveyed</span>
+        </p>
+      </section>
+
+      <section class="panel" aria-label="Survey controls and state">
+        <div class="readout">
+          <div class="metric">
+            <span>Steps / ref</span>
+            <output id="step-value">0 / 18</output>
+          </div>
+          <div class="metric">
+            <span>Best finish</span>
+            <output id="projection-value">18</output>
+          </div>
+          <div class="metric">
+            <span>Position</span>
+            <output id="position-value">(0,0)</output>
+          </div>
+          <div class="metric">
+            <span>Exit</span>
+            <output id="exit-value">closed · marked</output>
+          </div>
+        </div>
+
+        <div class="compass-card">
+          <div class="compass" aria-label="Compass">
+            <span class="north">N</span>
+            <span class="east">E</span>
+            <span class="south">S</span>
+            <span class="west">W</span>
+            <span id="compass-needle" aria-hidden="true"></span>
+          </div>
+          <div class="compass-copy">
+            <span>Facing</span>
+            <strong id="compass-value">NORTH</strong>
+            <span id="assist-value">Survey charge locked · earn at 4</span>
+          </div>
+        </div>
+
+        <p id="status-message" class="notice" role="status" aria-live="polite">
+          Seed RAPP-42 ready. Find the marked exit; reference length 18.
+        </p>
+        <p id="hint-panel" class="notice hint" role="status" aria-live="polite" hidden></p>
+        <p id="trap-panel" class="notice trap" role="alert" hidden></p>
+        <p id="success-panel" class="notice success" role="status" aria-live="polite" hidden></p>
+
+        <div class="controls" aria-label="Directional controls">
+          <button id="move-north" type="button" data-direction="N" aria-label="Move north">↑ N</button>
+          <button id="move-west" type="button" data-direction="W" aria-label="Move west">← W</button>
+          <button id="move-south" type="button" data-direction="S" aria-label="Move south">↓ S</button>
+          <button id="move-east" type="button" data-direction="E" aria-label="Move east">→ E</button>
+        </div>
+
+        <div class="action-row">
+          <button id="hint-btn" type="button" disabled>Earn hint after 4 moves</button>
+          <button id="restart-btn" type="button" data-reset="exact">Restart same seed</button>
+        </div>
+        <div id="reset-proof">
+          Reset contract: same digest · entrance (0,0) · north · 0 · closed · empty trail.
+        </div>
+      </section>
+    </div>
+
+    <section class="seed-card" aria-labelledby="seed-heading">
+      <h2 id="seed-heading">Generate another fogline</h2>
+      <p>
+        Any 1–64 byte UTF-8 seed recomputes the maze, digest, shortest length,
+        and marked trap. Invalid text stays editable while the accepted game is preserved.
+      </p>
+      <div class="seed-controls">
+        <input
+          id="seed-input"
+          type="text"
+          value="RAPP-42"
+          maxlength="80"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          aria-describedby="seed-rule seed-error"
+        >
+        <button id="load-seed-btn" type="button">Generate seed</button>
+      </div>
+      <p id="seed-rule" class="label">1–64 UTF-8 bytes · no control characters</p>
+      <p id="seed-error" class="notice error" role="alert" hidden></p>
+      <p id="seed-change-proof">
+        Active topology: RAPP-42 · reference 18 · digest 126bf70440d3…
+      </p>
+    </section>
+
+    <section id="takeover-prompt" class="takeover" tabindex="0">
+      <strong>YOUR TURN</strong>
+      <p>
+        Type another seed or keep this one. Focus the survey and move with
+        Arrow/WASD. After four accepted moves, explicitly spend the one-step
+        bearing—or finish unassisted.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const WIDTH = 6;
+      const HEIGHT = 6;
+      const ENTRANCE = Object.freeze([0, 0]);
+      const EXIT = Object.freeze([5, 3]);
+      const MAXIMUM_SEED_BYTES = 64;
+      const INVALID_SEED_MESSAGE =
+        "Seed must contain 1–64 UTF-8 bytes and no controls.";
+      const DIRECTIONS = Object.freeze([
+        Object.freeze(["N", 0, -1, "S"]),
+        Object.freeze(["E", 1, 0, "W"]),
+        Object.freeze(["S", 0, 1, "N"]),
+        Object.freeze(["W", -1, 0, "E"])
+      ]);
+      const VECTOR = Object.freeze({
+        N: Object.freeze([0, -1]),
+        E: Object.freeze([1, 0]),
+        S: Object.freeze([0, 1]),
+        W: Object.freeze([-1, 0])
+      });
+      const OPPOSITE = Object.freeze({ N: "S", E: "W", S: "N", W: "E" });
+      const NAMES = Object.freeze({
+        N: "north",
+        E: "east",
+        S: "south",
+        W: "west"
+      });
+      const BEARING = Object.freeze({ N: "0deg", E: "90deg", S: "180deg", W: "270deg" });
+
+      const elements = Object.freeze({
+        board: document.querySelector("#maze-board"),
+        seed: document.querySelector("#seed-value"),
+        reference: document.querySelector("#reference-value"),
+        digest: document.querySelector("#digest-value"),
+        steps: document.querySelector("#step-value"),
+        projection: document.querySelector("#projection-value"),
+        position: document.querySelector("#position-value"),
+        exit: document.querySelector("#exit-value"),
+        compass: document.querySelector("#compass-value"),
+        needle: document.querySelector("#compass-needle"),
+        assist: document.querySelector("#assist-value"),
+        status: document.querySelector("#status-message"),
+        hintPanel: document.querySelector("#hint-panel"),
+        trapPanel: document.querySelector("#trap-panel"),
+        successPanel: document.querySelector("#success-panel"),
+        hintButton: document.querySelector("#hint-btn"),
+        restartButton: document.querySelector("#restart-btn"),
+        seedInput: document.querySelector("#seed-input"),
+        seedButton: document.querySelector("#load-seed-btn"),
+        seedError: document.querySelector("#seed-error"),
+        seedProof: document.querySelector("#seed-change-proof")
+      });
+
+      const keyOf = cell => `${cell[0]},${cell[1]}`;
+      const copyCell = cell => [cell[0], cell[1]];
+      const sameCell = (left, right) =>
+        left[0] === right[0] && left[1] === right[1];
+
+      function normalizeSeed(value) {
+        if (typeof value !== "string") {
+          throw new Error(INVALID_SEED_MESSAGE);
+        }
+        const bytes = new TextEncoder().encode(value);
+        if (
+          bytes.length < 1 ||
+          bytes.length > MAXIMUM_SEED_BYTES ||
+          /[\u0000-\u001f\u007f]/.test(value)
+        ) {
+          throw new Error(INVALID_SEED_MESSAGE);
+        }
+        return value;
+      }
+
+      function fnv1a32(value) {
+        const bytes = new TextEncoder().encode(normalizeSeed(value));
+        let result = 0x811c9dc5;
+        for (const byte of bytes) {
+          result ^= byte;
+          result = Math.imul(result, 0x01000193) >>> 0;
+        }
+        return result >>> 0;
+      }
+
+      function createMulberry32(seed) {
+        let state = seed >>> 0;
+        return function nextUint32() {
+          state = (state + 0x6d2b79f5) >>> 0;
+          let value = state;
+          value = Math.imul(value ^ (value >>> 15), value | 1) >>> 0;
+          const mixed = Math.imul(value ^ (value >>> 7), value | 61) >>> 0;
+          value = (value ^ ((value + mixed) >>> 0)) >>> 0;
+          return (value ^ (value >>> 14)) >>> 0;
+        };
+      }
+
+      function nextCell(cell, direction) {
+        const vector = VECTOR[direction];
+        if (!vector) throw new Error(`Unknown direction ${direction}`);
+        return [cell[0] + vector[0], cell[1] + vector[1]];
+      }
+
+      function generateMaze(seed, width = WIDTH, height = HEIGHT) {
+        normalizeSeed(seed);
+        if (
+          !Number.isInteger(width) ||
+          !Number.isInteger(height) ||
+          width <= 0 ||
+          height <= 0
+        ) {
+          throw new Error("Maze dimensions must be positive integers.");
+        }
+        const random = createMulberry32(fnv1a32(seed));
+        const maze = new Map();
+        for (let y = 0; y < height; y += 1) {
+          for (let x = 0; x < width; x += 1) {
+            maze.set(`${x},${y}`, new Set());
+          }
+        }
+        const visited = new Set(["0,0"]);
+        const stack = [[0, 0]];
+        while (stack.length) {
+          const cell = stack[stack.length - 1];
+          const candidates = [];
+          for (const [direction, dx, dy, opposite] of DIRECTIONS) {
+            const neighbor = [cell[0] + dx, cell[1] + dy];
+            const neighborKey = keyOf(neighbor);
+            if (
+              neighbor[0] >= 0 &&
+              neighbor[0] < width &&
+              neighbor[1] >= 0 &&
+              neighbor[1] < height &&
+              !visited.has(neighborKey)
+            ) {
+              candidates.push([direction, opposite, neighbor]);
+            }
+          }
+          if (!candidates.length) {
+            stack.pop();
+            continue;
+          }
+          const [direction, opposite, neighbor] =
+            candidates[random() % candidates.length];
+          maze.get(keyOf(cell)).add(direction);
+          maze.get(keyOf(neighbor)).add(opposite);
+          visited.add(keyOf(neighbor));
+          stack.push(neighbor);
+        }
+        return maze;
+      }
+
+      function canonicalTopology(maze, seed, width = WIDTH, height = HEIGHT) {
+        const cells = [];
+        for (let y = 0; y < height; y += 1) {
+          for (let x = 0; x < width; x += 1) {
+            const openings = maze.get(`${x},${y}`);
+            cells.push(
+              `${x},${y}:` +
+                "NESW".split("").filter(direction => openings.has(direction)).join("")
+            );
+          }
+        }
+        return `${seed}|${width}x${height}|${cells.join(";")}`;
+      }
+
+      function sha256(value) {
+        const bytes = Array.from(new TextEncoder().encode(value));
+        const bitLength = bytes.length * 8;
+        bytes.push(0x80);
+        while (bytes.length % 64 !== 56) bytes.push(0);
+        const high = Math.floor(bitLength / 0x100000000);
+        const low = bitLength >>> 0;
+        for (let shift = 24; shift >= 0; shift -= 8) {
+          bytes.push((high >>> shift) & 0xff);
+        }
+        for (let shift = 24; shift >= 0; shift -= 8) {
+          bytes.push((low >>> shift) & 0xff);
+        }
+        const hash = [
+          0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+          0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+        ];
+        const constants = [
+          0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
+          0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+          0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
+          0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+          0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc,
+          0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+          0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7,
+          0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+          0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13,
+          0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+          0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3,
+          0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+          0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5,
+          0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+          0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
+          0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+        ];
+        const rotateRight = (word, amount) =>
+          (word >>> amount) | (word << (32 - amount));
+        for (let offset = 0; offset < bytes.length; offset += 64) {
+          const words = new Array(64).fill(0);
+          for (let index = 0; index < 16; index += 1) {
+            const start = offset + index * 4;
+            words[index] = (
+              (bytes[start] << 24) |
+              (bytes[start + 1] << 16) |
+              (bytes[start + 2] << 8) |
+              bytes[start + 3]
+            ) >>> 0;
+          }
+          for (let index = 16; index < 64; index += 1) {
+            const s0 =
+              rotateRight(words[index - 15], 7) ^
+              rotateRight(words[index - 15], 18) ^
+              (words[index - 15] >>> 3);
+            const s1 =
+              rotateRight(words[index - 2], 17) ^
+              rotateRight(words[index - 2], 19) ^
+              (words[index - 2] >>> 10);
+            words[index] = (
+              words[index - 16] + s0 + words[index - 7] + s1
+            ) >>> 0;
+          }
+          let [a, b, c, d, e, f, g, h] = hash;
+          for (let index = 0; index < 64; index += 1) {
+            const sigma1 =
+              rotateRight(e, 6) ^ rotateRight(e, 11) ^ rotateRight(e, 25);
+            const choose = (e & f) ^ (~e & g);
+            const first = (
+              h + sigma1 + choose + constants[index] + words[index]
+            ) >>> 0;
+            const sigma0 =
+              rotateRight(a, 2) ^ rotateRight(a, 13) ^ rotateRight(a, 22);
+            const majority = (a & b) ^ (a & c) ^ (b & c);
+            const second = (sigma0 + majority) >>> 0;
+            h = g;
+            g = f;
+            f = e;
+            e = (d + first) >>> 0;
+            d = c;
+            c = b;
+            b = a;
+            a = (first + second) >>> 0;
+          }
+          hash[0] = (hash[0] + a) >>> 0;
+          hash[1] = (hash[1] + b) >>> 0;
+          hash[2] = (hash[2] + c) >>> 0;
+          hash[3] = (hash[3] + d) >>> 0;
+          hash[4] = (hash[4] + e) >>> 0;
+          hash[5] = (hash[5] + f) >>> 0;
+          hash[6] = (hash[6] + g) >>> 0;
+          hash[7] = (hash[7] + h) >>> 0;
+        }
+        return hash.map(word => word.toString(16).padStart(8, "0")).join("");
+      }
+
+      function shortestRoute(maze, start = ENTRANCE, finish = EXIT) {
+        const queue = [copyCell(start)];
+        const previous = new Map([[keyOf(start), null]]);
+        const previousMove = new Map();
+        while (queue.length) {
+          const cell = queue.shift();
+          if (sameCell(cell, finish)) break;
+          const openings = maze.get(keyOf(cell));
+          for (const direction of "NESW") {
+            if (!openings.has(direction)) continue;
+            const neighbor = nextCell(cell, direction);
+            const neighborKey = keyOf(neighbor);
+            if (previous.has(neighborKey)) continue;
+            previous.set(neighborKey, copyCell(cell));
+            previousMove.set(neighborKey, direction);
+            queue.push(neighbor);
+          }
+        }
+        if (!previous.has(keyOf(finish))) throw new Error("Exit is unreachable.");
+        const route = [];
+        let cursor = copyCell(finish);
+        while (!sameCell(cursor, start)) {
+          const cursorKey = keyOf(cursor);
+          route.push(previousMove.get(cursorKey));
+          cursor = previous.get(cursorKey);
+        }
+        return route.reverse();
+      }
+
+      function routePositions(route, start = ENTRANCE) {
+        const positions = [copyCell(start)];
+        let cursor = copyCell(start);
+        for (const direction of route) {
+          cursor = nextCell(cursor, direction);
+          positions.push(cursor);
+        }
+        return positions;
+      }
+
+      function selectTrap(maze, route) {
+        const positions = routePositions(route);
+        const routeCells = new Set(positions.map(keyOf));
+        for (let index = positions.length - 2; index >= 0; index -= 1) {
+          const approach = positions[index];
+          const openings = maze.get(keyOf(approach));
+          for (const direction of "NESW") {
+            if (!openings.has(direction)) continue;
+            const neighbor = nextCell(approach, direction);
+            if (!routeCells.has(keyOf(neighbor))) {
+              return {
+                approachIndex: index,
+                approach: copyCell(approach),
+                turn: direction,
+                cell: neighbor,
+                returnDirection: OPPOSITE[direction],
+                selection: "latest off-route branch before exit; NESW tie-break"
+              };
+            }
+          }
+        }
+        if (route.length < 2) throw new Error("Route is too short for a trap.");
+        const index = Math.max(1, Math.floor(route.length / 2));
+        const previousDirection = route[index - 1];
+        return {
+          approachIndex: index,
+          approach: copyCell(positions[index]),
+          turn: OPPOSITE[previousDirection],
+          cell: copyCell(positions[index - 1]),
+          returnDirection: previousDirection,
+          selection: "deterministic backtrack fallback for a Hamiltonian route"
+        };
+      }
+
+      function buildFixture(seed) {
+        seed = normalizeSeed(seed);
+        const maze = generateMaze(seed);
+        const signature = canonicalTopology(maze, seed);
+        const route = shortestRoute(maze);
+        const trap = selectTrap(maze, route);
+        const detour = [
+          ...route.slice(0, trap.approachIndex),
+          trap.turn,
+          trap.returnDirection,
+          ...route.slice(trap.approachIndex)
+        ];
+        return {
+          seed,
+          width: WIDTH,
+          height: HEIGHT,
+          entrance: copyCell(ENTRANCE),
+          exit: copyCell(EXIT),
+          maze,
+          topologySignature: signature,
+          topologyDigest: sha256(signature),
+          shortestRoute: route,
+          routePositions: routePositions(route),
+          trap,
+          detourRoute: detour
+        };
+      }
+
+      function revealedFrom(fixture, cell) {
+        const revealed = new Set([keyOf(cell)]);
+        for (const direction of fixture.maze.get(keyOf(cell))) {
+          revealed.add(keyOf(nextCell(cell, direction)));
+        }
+        return revealed;
+      }
+
+      function initialState(fixture) {
+        return {
+          position: copyCell(fixture.entrance),
+          facing: "N",
+          acceptedMoves: [],
+          trail: [],
+          revealed: revealedFrom(fixture, fixture.entrance),
+          status: "ready",
+          message:
+            `Seed ${fixture.seed} ready. Find the marked exit; ` +
+            `reference length ${fixture.shortestRoute.length}.`,
+          lastAttempt: null,
+          lastRejected: null,
+          exitOpen: false,
+          completed: false,
+          matchedOptimal: null,
+          projectedTotal: fixture.shortestRoute.length,
+          surveyEarned: false,
+          hintAvailable: false,
+          assistanceUsed: false,
+          hintRequests: 0,
+          hintDirection: null
+        };
+      }
+
+      function moveState(fixture, current, direction) {
+        if (!VECTOR[direction]) throw new Error(`Unknown direction ${direction}`);
+        if (current.completed) {
+          return {
+            ...current,
+            facing: direction,
+            status: "closed",
+            message: "Exit already open. Restart or load another seed.",
+            lastAttempt: direction,
+            lastRejected: direction,
+            hintDirection: null
+          };
+        }
+        if (!fixture.maze.get(keyOf(current.position)).has(direction)) {
+          return {
+            ...current,
+            facing: direction,
+            status: "wall",
+            message:
+              `${NAMES[direction][0].toUpperCase()}${NAMES[direction].slice(1)} ` +
+              "is fogbound by a wall; accepted steps and trail are preserved.",
+            lastAttempt: direction,
+            lastRejected: direction
+          };
+        }
+        const position = nextCell(current.position, direction);
+        const acceptedMoves = [...current.acceptedMoves, direction];
+        const trail = [...current.trail, position];
+        const revealed = new Set(current.revealed);
+        for (const cellKey of revealedFrom(fixture, position)) revealed.add(cellKey);
+        const acceptedSteps = acceptedMoves.length;
+        const projectedTotal =
+          acceptedSteps + shortestRoute(fixture.maze, position, fixture.exit).length;
+        const completed = sameCell(position, fixture.exit);
+        const surveyEarned = current.surveyEarned || acceptedSteps >= 4;
+        const hintAvailable = surveyEarned && !current.assistanceUsed;
+        let status;
+        let message;
+        let matchedOptimal = null;
+        if (completed) {
+          matchedOptimal = acceptedSteps === fixture.shortestRoute.length;
+          status = matchedOptimal ? "complete-optimal" : "complete-detour";
+          message = matchedOptimal
+            ? `Exit open in ${acceptedSteps}. Direct survey matched the reference.`
+            : `Exit open in ${acceptedSteps}: +${
+                acceptedSteps - fixture.shortestRoute.length
+              } over reference ${fixture.shortestRoute.length}.`;
+        } else if (sameCell(position, fixture.trap.cell)) {
+          status = "trap";
+          message =
+            `Marked trap entered. Best finish is now ${projectedTotal} ` +
+            `(+${projectedTotal - fixture.shortestRoute.length}); ` +
+            "exit beacon remains marked.";
+        } else if (projectedTotal > fixture.shortestRoute.length) {
+          status = "detour";
+          message =
+            `Valid detour recorded. Best finish ${projectedTotal} ` +
+            `(+${projectedTotal - fixture.shortestRoute.length}).`;
+        } else {
+          status = "moving";
+          message =
+            `${direction} accepted. ${acceptedSteps} steps; ` +
+            `best finish ${projectedTotal}.`;
+        }
+        return {
+          position,
+          facing: direction,
+          acceptedMoves,
+          trail,
+          revealed,
+          status,
+          message,
+          lastAttempt: direction,
+          lastRejected: null,
+          exitOpen: completed,
+          completed,
+          matchedOptimal,
+          projectedTotal,
+          surveyEarned,
+          hintAvailable,
+          assistanceUsed: current.assistanceUsed,
+          hintRequests: current.hintRequests,
+          hintDirection: null
+        };
+      }
+
+      function requestHintState(fixture, current) {
+        if (current.completed) {
+          return {
+            ...current,
+            status: "hint-unavailable",
+            message: "Survey hint unavailable after completion."
+          };
+        }
+        if (!current.hintAvailable) {
+          return {
+            ...current,
+            status: "hint-unavailable",
+            message: !current.surveyEarned
+              ? "Survey charge unlocks after four accepted moves."
+              : "The one-step survey hint has already been spent."
+          };
+        }
+        const direction = shortestRoute(
+          fixture.maze,
+          current.position,
+          fixture.exit
+        )[0];
+        return {
+          ...current,
+          status: "hint",
+          message:
+            `One-step survey: ${direction}. Assistance is recorded; ` +
+            "no later moves are revealed.",
+          hintAvailable: false,
+          assistanceUsed: true,
+          hintRequests: current.hintRequests + 1,
+          hintDirection: direction
+        };
+      }
+
+      let fixture = buildFixture("RAPP-42");
+      let state = initialState(fixture);
+      let seedError = null;
+      let seedChangeCount = 0;
+
+      if (
+        fixture.topologyDigest !==
+          "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda" ||
+        fixture.shortestRoute.length !== 18 ||
+        fixture.detourRoute.length !== 20 ||
+        !sameCell(fixture.trap.cell, [2, 5])
+      ) {
+        throw new Error("Canonical RAPP-42 fixture drifted.");
+      }
+
+      function fixtureSnapshot() {
+        return {
+          seed: fixture.seed,
+          width: fixture.width,
+          height: fixture.height,
+          entrance: copyCell(fixture.entrance),
+          exit: copyCell(fixture.exit),
+          topologySignature: fixture.topologySignature,
+          topologyDigest: fixture.topologyDigest,
+          referenceLength: fixture.shortestRoute.length,
+          trap: {
+            approachIndex: fixture.trap.approachIndex,
+            approach: copyCell(fixture.trap.approach),
+            turn: fixture.trap.turn,
+            cell: copyCell(fixture.trap.cell),
+            returnDirection: fixture.trap.returnDirection,
+            selection: fixture.trap.selection
+          },
+          detourLength: fixture.detourRoute.length,
+          cells: Array.from({ length: fixture.height }, (_, y) =>
+            Array.from({ length: fixture.width }, (_, x) => ({
+              x,
+              y,
+              openings: "NESW"
+                .split("")
+                .filter(direction => fixture.maze.get(`${x},${y}`).has(direction))
+                .join("")
+            }))
+          ).flat()
+        };
+      }
+
+      function snapshot() {
+        const trapEntered = state.trail.some(cell => sameCell(cell, fixture.trap.cell));
+        return {
+          schema: "fogline-survey-state/1.0",
+          seed: fixture.seed,
+          seedInput: elements.seedInput.value,
+          seedError,
+          seedChangeCount,
+          grid: { width: fixture.width, height: fixture.height },
+          topologyDigest: fixture.topologyDigest,
+          topologySignature: fixture.topologySignature,
+          position: { x: state.position[0], y: state.position[1] },
+          facing: state.facing,
+          steps: state.acceptedMoves.length,
+          acceptedMoves: [...state.acceptedMoves],
+          referenceLength: fixture.shortestRoute.length,
+          projectedTotal: state.projectedTotal,
+          trail: state.trail.map(copyCell),
+          revealed: [...state.revealed]
+            .map(value => value.split(",").map(Number))
+            .sort((left, right) => left[1] - right[1] || left[0] - right[0]),
+          status: state.status,
+          message: state.message,
+          lastAttempt: state.lastAttempt,
+          lastRejected: state.lastRejected,
+          completed: state.completed,
+          matchedOptimal: state.matchedOptimal,
+          exit: {
+            x: fixture.exit[0],
+            y: fixture.exit[1],
+            state: state.exitOpen ? "open" : "closed",
+            marked: true
+          },
+          trap: {
+            x: fixture.trap.cell[0],
+            y: fixture.trap.cell[1],
+            approachStep: fixture.trap.approachIndex,
+            enteredStep: fixture.trap.approachIndex + 1,
+            turn: fixture.trap.turn,
+            marked: state.revealed.has(keyOf(fixture.trap.cell)),
+            entered: trapEntered
+          },
+          assistance: {
+            earned: state.surveyEarned,
+            available: state.hintAvailable,
+            used: state.assistanceUsed,
+            requests: state.hintRequests,
+            hintDirection: state.hintDirection,
+            scope: "one next move only"
+          }
+        };
+      }
+
+      function renderBoard() {
+        const trail = new Set(state.trail.map(keyOf));
+        const bearing = BEARING[state.facing];
+        elements.board.style.setProperty("--bearing", bearing);
+        elements.board.replaceChildren();
+        for (let y = 0; y < fixture.height; y += 1) {
+          for (let x = 0; x < fixture.width; x += 1) {
+            const cell = [x, y];
+            const cellKey = keyOf(cell);
+            const node = document.createElement("div");
+            node.id = `cell-${x}-${y}`;
+            node.className = "cell";
+            node.setAttribute("aria-hidden", "true");
+            if (state.revealed.has(cellKey)) {
+              node.classList.add("revealed");
+              const openings = fixture.maze.get(cellKey);
+              node.style.borderTopWidth = openings.has("N") ? "1px" : "3px";
+              node.style.borderRightWidth = openings.has("E") ? "1px" : "3px";
+              node.style.borderBottomWidth = openings.has("S") ? "1px" : "3px";
+              node.style.borderLeftWidth = openings.has("W") ? "1px" : "3px";
+              node.style.borderColor = openings.size ? "#d5e8d6" : "#1d4a47";
+            }
+            if (trail.has(cellKey)) node.classList.add("trail");
+            if (sameCell(cell, fixture.entrance)) node.classList.add("entrance");
+            if (sameCell(cell, fixture.exit)) {
+              const marker = document.createElement("span");
+              marker.className = "exit-marker";
+              marker.id = "exit-beacon";
+              marker.textContent = "X";
+              marker.title = "Marked exit beacon";
+              node.append(marker);
+            }
+            if (
+              sameCell(cell, fixture.trap.cell) &&
+              state.revealed.has(cellKey)
+            ) {
+              const marker = document.createElement("span");
+              marker.className = "trap-marker";
+              marker.textContent = "!";
+              marker.title = "Marked trap";
+              node.append(marker);
+            }
+            if (sameCell(cell, state.position)) {
+              const player = document.createElement("span");
+              player.className = "player";
+              player.textContent = "▲";
+              player.title = `Surveyor facing ${NAMES[state.facing]}`;
+              node.append(player);
+            }
+            elements.board.append(node);
+          }
+        }
+        elements.board.setAttribute(
+          "aria-label",
+          `Fogline maze, seed ${fixture.seed}. Position ` +
+          `${state.position[0]},${state.position[1]}, facing ${NAMES[state.facing]}. ` +
+          `${state.acceptedMoves.length} accepted steps.`
+        );
+      }
+
+      function render() {
+        renderBoard();
+        const steps = state.acceptedMoves.length;
+        elements.seed.textContent = fixture.seed;
+        elements.reference.textContent = `${fixture.shortestRoute.length} moves`;
+        elements.digest.textContent = fixture.topologyDigest;
+        elements.steps.textContent = `${steps} / ${fixture.shortestRoute.length}`;
+        elements.projection.textContent = String(state.projectedTotal);
+        elements.projection.style.color =
+          state.projectedTotal > fixture.shortestRoute.length
+            ? "var(--red)"
+            : "var(--mint)";
+        elements.position.textContent = `(${state.position[0]},${state.position[1]})`;
+        elements.exit.textContent = `${state.exitOpen ? "open" : "closed"} · marked`;
+        elements.compass.textContent = NAMES[state.facing].toUpperCase();
+        elements.needle.style.setProperty("--bearing", BEARING[state.facing]);
+        elements.assist.textContent = state.assistanceUsed
+          ? "ASSISTED · one bearing spent"
+          : state.hintAvailable
+            ? "Earned · one bearing ready"
+            : "Survey charge locked · earn at 4";
+        elements.status.textContent = state.message;
+        elements.hintPanel.hidden = state.hintDirection === null;
+        elements.hintPanel.textContent = state.hintDirection
+          ? `ONE STEP ONLY: ${state.hintDirection} · assistance recorded`
+          : "";
+        elements.trapPanel.hidden = state.status !== "trap";
+        elements.trapPanel.textContent =
+          state.status === "trap"
+            ? `MARKED TRAP · projected ${state.projectedTotal} · exit still marked`
+            : "";
+        elements.successPanel.hidden = !state.completed;
+        elements.successPanel.textContent = state.completed
+          ? state.matchedOptimal
+            ? `EXIT OPEN · ${steps} = reference · unassisted`
+            : `EXIT OPEN · final ${steps} · reference ${fixture.shortestRoute.length} · ${
+                state.assistanceUsed ? "assisted" : "unassisted"
+              }`
+          : "";
+        elements.hintButton.disabled = !state.hintAvailable;
+        elements.hintButton.textContent = state.hintAvailable
+          ? "Request earned one-step hint"
+          : state.assistanceUsed
+            ? "One-step hint spent"
+            : "Earn hint after 4 moves";
+        elements.seedError.hidden = seedError === null;
+        elements.seedError.textContent = seedError || "";
+        elements.seedProof.textContent =
+          `Active topology: ${fixture.seed} · reference ` +
+          `${fixture.shortestRoute.length} · digest ` +
+          `${fixture.topologyDigest.slice(0, 12)}…`;
+      }
+
+      function move(direction) {
+        state = moveState(fixture, state, direction);
+        render();
+      }
+
+      function restart() {
+        state = initialState(fixture);
+        seedError = null;
+        elements.seedInput.value = fixture.seed;
+        render();
+        elements.board.focus({ preventScroll: true });
+        return snapshot();
+      }
+
+      function requestHint() {
+        state = requestHintState(fixture, state);
+        render();
+      }
+
+      function loadSeed() {
+        const draft = elements.seedInput.value;
+        try {
+          const nextFixture = buildFixture(draft);
+          fixture = nextFixture;
+          state = initialState(fixture);
+          seedError = null;
+          seedChangeCount += 1;
+          render();
+        } catch (error) {
+          seedError = INVALID_SEED_MESSAGE;
+          render();
+        }
+      }
+
+      for (const button of document.querySelectorAll("[data-direction]")) {
+        button.addEventListener("click", () => {
+          move(button.dataset.direction);
+          elements.board.focus({ preventScroll: true });
+        });
+      }
+      elements.board.addEventListener("click", () => {
+        elements.board.focus({ preventScroll: true });
+      });
+      elements.hintButton.addEventListener("click", requestHint);
+      elements.restartButton.addEventListener("click", restart);
+      elements.seedButton.addEventListener("click", loadSeed);
+
+      document.addEventListener("keydown", event => {
+        if (
+          event.target instanceof HTMLInputElement ||
+          event.target instanceof HTMLTextAreaElement ||
+          event.target instanceof HTMLSelectElement
+        ) {
+          return;
+        }
+        const direction = {
+          ArrowUp: "N",
+          ArrowRight: "E",
+          ArrowDown: "S",
+          ArrowLeft: "W",
+          KeyW: "N",
+          KeyD: "E",
+          KeyS: "S",
+          KeyA: "W"
+        }[event.code];
+        if (!direction) return;
+        event.preventDefault();
+        move(direction);
+      });
+
+      window.foglineSurvey = Object.freeze({
+        snapshot,
+        fixture: fixtureSnapshot,
+        restart
+      });
+
+      render();
+      document.documentElement.dataset.ready = "true";
+      elements.board.focus({ preventScroll: true });
+    })();
+  </script>
+</body>
+</html>
