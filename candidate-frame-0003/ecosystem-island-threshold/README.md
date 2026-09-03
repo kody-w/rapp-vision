@@ -25,13 +25,16 @@ herd stays in the 80–120 band or collapses below 10.
 The live range accepts every hundredth from 0.00 through 0.75. Either
 prediction can be chosen for any rate. The committed evidence remains fixed to
 0.24 and 0.60 so review does not depend on an arbitrary interactive choice.
+The pure Python and browser simulation APIs additionally accept thousandth
+rate increments and any nonzero 32-bit seed. They reject non-finite,
+off-grid, out-of-range, or over-horizon inputs before starting a run.
 
 ## Seeded model
 
 The implementation uses integer thousandths so Python and JavaScript take the
 same steps without rounding drift.
 
-At each tick:
+At each tick, starting from the selected nonzero 32-bit seed:
 
 1. `xorshift32` advances once from the selected seed. Its low ten bits produce
    a small weather change between -0.275 and +0.274 resource units.
@@ -54,7 +57,7 @@ change. `render.py`, the browser app, `exports/fixture-series.json`, and
 | --- | --- |
 | `apps/ecosystem-island-threshold.html` | Offline single-file prediction lab, model, chart, full-series export, and `window.islandLab.snapshot()` |
 | `render.py` | Standard-library model, RGB renderer, lossless-master writer, thumbnail/evidence/delivery generator |
-| `masters/ecosystem-island-threshold.mkv` | 22-second single-threaded FFV1 lossless master |
+| `masters/ecosystem-island-threshold.mkv` | 22-second single-threaded FFV1 bgr0, full-range GBR lossless master |
 | `media/ecosystem-island-threshold.mp4` | Compiler-produced H.264/yuv420p/BT.709 delivery |
 | `media/ecosystem-island-threshold.webm` | Compiler-produced VP9/yuv420p/BT.709 delivery |
 | `channel.production.json` | Production authoring source and semantic live replay |

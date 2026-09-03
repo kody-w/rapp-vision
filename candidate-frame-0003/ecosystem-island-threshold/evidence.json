@@ -1,14 +1,14 @@
 {
   "artifactBindings": {
     "README.md": {
-      "bytes": 5403,
+      "bytes": 5686,
       "path": "README.md",
-      "sha256": "c45fc3340ec106f6cddcef65fa1df7c705a19fc6037c64c96a71f569772a1cee"
+      "sha256": "8f9fb99af380cbfb9902bdda190ce7c18d74bae381776f8cf258390ade2089ad"
     },
     "apps/ecosystem-island-threshold.html": {
-      "bytes": 40806,
+      "bytes": 42560,
       "path": "apps/ecosystem-island-threshold.html",
-      "sha256": "1b175938ae1796e3800d67513e3fe5158770ee888a3db1737a57848bc5094ebd"
+      "sha256": "92917d0781170e80eb430aa8aea77ecde87c7f1b2d255330a177b632e9c078fb"
     },
     "channel.json": {
       "bytes": 6616,
@@ -21,9 +21,9 @@
       "sha256": "95400a1bf0958e75a5fdf694267d6ed99ea8ce138dae32447752e51353193aa7"
     },
     "exports/fixture-series.json": {
-      "bytes": 364105,
+      "bytes": 364162,
       "path": "exports/fixture-series.json",
-      "sha256": "0ea26033dba500450caaa7d1fa3e7fb6d5df80c384ea83b3509e35f91f77fc9f"
+      "sha256": "699317f301045e9f91bc427dafade178c96009f90b19bf1c0d35b55627038280"
     },
     "masters/ecosystem-island-threshold.mkv": {
       "bytes": 6003571,
@@ -41,9 +41,9 @@
       "sha256": "7646e3e9980e2241b36aed3fe64aaa36773b024500031fe7eea551c6a8da9d49"
     },
     "render.py": {
-      "bytes": 50097,
+      "bytes": 58018,
       "path": "render.py",
-      "sha256": "986ea5614b80e774b12ee035ba32379ab635a4115929129a15a88fe1026b5913"
+      "sha256": "20e0a599ce8ece36715133da524115dd0603e484e3f403263b686f88ffee4ea0"
     },
     "snapshots/canonical-states.json": {
       "bytes": 2569,
@@ -56,9 +56,9 @@
       "sha256": "5b052dba08ee0b7b99c83d483e4373ff0aab95e0ac17f89a9b7e3c26f364aeee"
     },
     "verify_dom.mjs": {
-      "bytes": 22267,
+      "bytes": 39788,
       "path": "verify_dom.mjs",
-      "sha256": "8b5e31250f2f6eb500446423de1917ad96c89fd96e5760e1b7c993036626eb16"
+      "sha256": "9988a6104f0e831d8dce15379990a7b801742d26ab39899d8efa8883d255c1b3"
     }
   },
   "canonicalSnapshots": {
@@ -9972,7 +9972,9 @@
       "collapseMilli": 10000,
       "horizon": 600,
       "maximumRateMilli": 750,
+      "maximumSeed": 4294967295,
       "minimumRateMilli": 0,
+      "minimumSeed": 1,
       "resourceCeilingMilli": 180000,
       "stableHighMilli": 120000,
       "stableLowMilli": 80000
@@ -9999,10 +10001,10 @@
   },
   "schema": "ecosystem-island-threshold-evidence/1.0",
   "seriesExport": {
-    "bytes": 364105,
+    "bytes": 364162,
     "containsEveryTick": true,
     "path": "exports/fixture-series.json",
     "pointCountPerFixture": 601,
-    "sha256": "0ea26033dba500450caaa7d1fa3e7fb6d5df80c384ea83b3509e35f91f77fc9f"
+    "sha256": "699317f301045e9f91bc427dafade178c96009f90b19bf1c0d35b55627038280"
   }
 }

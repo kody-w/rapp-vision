@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import shutil
 import subprocess
@@ -21,6 +22,8 @@ CHANNEL_ID = "candidate-frame-0003-03"
 TITLE = "Will the Island Herd Hold?"
 MODEL_ID = "seeded-island-herd/1.0"
 SEED = 31415
+MINIMUM_SEED = 1
+MAXIMUM_SEED = 0xFFFFFFFF
 INITIAL_POPULATION_MILLI = 104_000
 INITIAL_RESOURCES_MILLI = 146_000
 RESOURCE_CEILING_MILLI = 180_000
@@ -122,18 +125,72 @@ def supported_population_milli(resources_milli: int) -> int:
     )
 
 
-def initial_point() -> ModelPoint:
+def normalize_seed(seed: int) -> int:
+    if isinstance(seed, bool) or not isinstance(seed, int):
+        raise ValueError("seed must be an integer")
+    if not MINIMUM_SEED <= seed <= MAXIMUM_SEED:
+        raise ValueError(
+            f"seed must be between {MINIMUM_SEED} and {MAXIMUM_SEED}"
+        )
+    return seed
+
+
+def normalize_ticks(ticks: int) -> int:
+    if isinstance(ticks, bool) or not isinstance(ticks, int):
+        raise ValueError("ticks must be an integer")
+    if not 0 <= ticks <= HORIZON:
+        raise ValueError(f"ticks must be between 0 and {HORIZON}")
+    return ticks
+
+
+def normalize_rate_milli(
+    grazing_rate: float | int,
+    *,
+    rate_is_milli: bool = False,
+) -> int:
+    if isinstance(grazing_rate, bool):
+        raise ValueError("grazing rate must be numeric")
+    if rate_is_milli:
+        if not isinstance(grazing_rate, int):
+            raise ValueError("milli grazing rate must be an integer")
+        rate_milli = grazing_rate
+    else:
+        try:
+            numeric_rate = float(grazing_rate)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("grazing rate must be numeric") from exc
+        if not math.isfinite(numeric_rate):
+            raise ValueError("grazing rate must be finite")
+        if not 0 <= numeric_rate <= 0.75:
+            raise ValueError("grazing rate must be between 0.00 and 0.75")
+        scaled_rate = numeric_rate * 1000
+        rate_milli = round(scaled_rate)
+        if abs(scaled_rate - rate_milli) > 1e-7:
+            raise ValueError(
+                "grazing rate must use increments of one thousandth"
+            )
+    if not 0 <= rate_milli <= 750:
+        raise ValueError("grazing rate must be between 0.00 and 0.75")
+    return rate_milli
+
+
+def initial_point(seed: int = SEED) -> ModelPoint:
+    seed = normalize_seed(seed)
     return ModelPoint(
         tick=0,
         population_milli=INITIAL_POPULATION_MILLI,
         resources_milli=INITIAL_RESOURCES_MILLI,
         support_milli=supported_population_milli(INITIAL_RESOURCES_MILLI),
         weather_milli=0,
-        random_state=SEED,
+        random_state=seed,
     )
 
 
 def step_model(point: ModelPoint, grazing_rate_milli: int) -> ModelPoint:
+    grazing_rate_milli = normalize_rate_milli(
+        grazing_rate_milli,
+        rate_is_milli=True,
+    )
     random_state = xorshift32(point.random_state)
     weather_milli = ((random_state & 1023) - 512) * 550 // 1024
     regrowth_milli = (
@@ -173,13 +230,15 @@ def simulate(
     ticks: int = HORIZON,
     *,
     rate_is_milli: bool = False,
+    seed: int = SEED,
 ) -> list[ModelPoint]:
-    rate_milli = int(grazing_rate) if rate_is_milli else round(float(grazing_rate) * 1000)
-    if not 0 <= rate_milli <= 750:
-        raise ValueError("grazing rate must be between 0.00 and 0.75")
-    if ticks < 0:
-        raise ValueError("ticks must be non-negative")
-    points = [initial_point()]
+    rate_milli = normalize_rate_milli(
+        grazing_rate,
+        rate_is_milli=rate_is_milli,
+    )
+    ticks = normalize_ticks(ticks)
+    seed = normalize_seed(seed)
+    points = [initial_point(seed)]
     for _ in range(ticks):
         points.append(step_model(points[-1], rate_milli))
     return points
@@ -199,9 +258,15 @@ def collapse_crossing(points: Sequence[ModelPoint]) -> int | None:
 def trace_digest(points: Sequence[ModelPoint]) -> str | None:
     if not points:
         return None
+    return compact_trace_digest([point.compact() for point in points])
+
+
+def compact_trace_digest(points: Sequence[Sequence[int]]) -> str | None:
+    if not points:
+        return None
     value = 0x811C9DC5
     for point in points:
-        text = ":".join(str(item) for item in point.compact()) + ";"
+        text = ":".join(str(item) for item in point) + ";"
         for character in text:
             value ^= ord(character)
             value = (value * 0x01000193) & 0xFFFFFFFF
@@ -363,6 +428,8 @@ def model_contract() -> dict[str, Any]:
             "horizon": HORIZON,
             "minimumRateMilli": 0,
             "maximumRateMilli": 750,
+            "minimumSeed": MINIMUM_SEED,
+            "maximumSeed": MAXIMUM_SEED,
         },
         "rules": [
             "Advance xorshift32 once per tick from the selected seed.",
@@ -730,6 +797,9 @@ def frame_rgb(spec: RenderSpec, frame_index: int) -> bytes:
     canvas = Canvas(spec.width, spec.height, SEA)
     stable = simulate(RATE_STABLE_MILLI, rate_is_milli=True)
     collapse = simulate(RATE_COLLAPSE_MILLI, rate_is_milli=True)
+    stable_final = stable[-1]
+    collapse_final = collapse[-1]
+    crossing = collapse_crossing(collapse)
 
     if seconds < 4:
         draw_header(canvas, "GRAZE .24", "1 / PREDICT BEFORE THE TRACE")
@@ -755,7 +825,16 @@ def frame_rgb(spec: RenderSpec, frame_index: int) -> bytes:
         canvas.text(72, 171, "STAYS IN BAND", HERD, 3)
         if progress >= 0.99:
             canvas.rect(414, 458, 481, 58, (30, 104, 78))
-            canvas.text(436, 477, "TICK 600 / HERD 112 / BAND HELD", WHITE, 2)
+            canvas.text(
+                436,
+                477,
+                (
+                    f"TICK {stable_final.tick} / HERD "
+                    f"{display_milli(stable_final.population_milli)} / BAND HELD"
+                ),
+                WHITE,
+                2,
+            )
         else:
             canvas.text(420, 458, f"RUNNING TICK {point.tick}", PAPER, 2)
     elif seconds < 13:
@@ -773,7 +852,6 @@ def frame_rgb(spec: RenderSpec, frame_index: int) -> bytes:
         canvas.text(42, 440, "SAME SEED. ONE RATE CHANGED.", MUTED, 2)
     elif seconds < 18.5:
         progress = smooth((seconds - 13.3) / 3.1)
-        crossing = collapse_crossing(collapse)
         point = collapse[min(HORIZON, int(progress * HORIZON))]
         draw_header(canvas, "GRAZE .60", "4 / WATCH FOR THE CROSSING")
         draw_island(canvas, point.population_milli, point.resources_milli)
@@ -786,9 +864,18 @@ def frame_rgb(spec: RenderSpec, frame_index: int) -> bytes:
         )
         canvas.text(72, 145, "PREDICTION", MUTED, 2)
         canvas.text(72, 171, "COLLAPSES", CORAL, 3)
-        if progress >= crossing / HORIZON:
+        if crossing is not None and progress >= crossing / HORIZON:
             canvas.rect(414, 458, 481, 58, (124, 48, 45))
-            canvas.text(436, 477, "BELOW 10 AT TICK 134 / FINAL 8", WHITE, 2)
+            canvas.text(
+                436,
+                477,
+                (
+                    f"BELOW 10 AT TICK {crossing} / FINAL "
+                    f"{display_milli(collapse_final.population_milli)}"
+                ),
+                WHITE,
+                2,
+            )
         else:
             canvas.text(420, 458, f"RUNNING TICK {point.tick}", PAPER, 2)
     else:
@@ -898,6 +985,8 @@ def ffmpeg_command(ffmpeg: str, target: Path, spec: RenderSpec = SPEC) -> list[s
         "1",
         "-pix_fmt",
         "bgr0",
+        "-color_range",
+        "pc",
         "-fflags",
         "+bitexact",
         "-flags:v",
@@ -909,7 +998,16 @@ def ffmpeg_command(ffmpeg: str, target: Path, spec: RenderSpec = SPEC) -> list[s
 
 
 def _resolve_executable(value: str) -> str | None:
-    expanded = Path(os.path.expandvars(value)).expanduser()
+    cleaned = value.strip()
+    if (
+        len(cleaned) >= 2
+        and cleaned[0] == cleaned[-1]
+        and cleaned[0] in {'"', "'"}
+    ):
+        cleaned = cleaned[1:-1]
+    if not cleaned:
+        return None
+    expanded = Path(os.path.expandvars(cleaned)).expanduser()
     if expanded.is_absolute() or expanded.parent != Path("."):
         return str(expanded.resolve()) if expanded.is_file() else None
     return shutil.which(value)
@@ -982,6 +1080,21 @@ def render_master(
         process.stdin.close()
         error = process.stderr.read().decode("utf-8", errors="replace").strip()
         return_code = process.wait()
+    except OSError as exc:
+        if process.poll() is None:
+            process.kill()
+        process.wait()
+        error = process.stderr.read().decode("utf-8", errors="replace").strip()
+        if not process.stdin.closed:
+            try:
+                process.stdin.close()
+            except OSError as close_exc:
+                if not error:
+                    error = str(close_exc)
+        temporary.unlink(missing_ok=True)
+        raise RuntimeError(
+            f"ffmpeg failed while receiving frames: {error or exc}"
+        ) from exc
     except BaseException:
         if process.poll() is None:
             process.kill()
@@ -1138,13 +1251,68 @@ def resolve_document_path(document: Any, path: str) -> Any:
 
 
 def validate_evidence(document: dict[str, Any]) -> None:
+    if document.get("schema") != "ecosystem-island-threshold-evidence/1.0":
+        raise RuntimeError("evidence schema is incorrect")
+    if document.get("model") != model_contract():
+        raise RuntimeError("evidence model contract is stale")
     fixtures = {fixture["id"]: fixture for fixture in document["fixtures"]}
+    if set(fixtures) != {"stable-band", "collapse"}:
+        raise RuntimeError("evidence must contain exactly both canonical fixtures")
     stable = fixtures["stable-band"]
     collapse = fixtures["collapse"]
-    if not STABLE_LOW_MILLI <= stable["final"]["populationMilli"] <= STABLE_HIGH_MILLI:
-        raise RuntimeError("stable fixture final population is outside the commission band")
+    for fixture, rate_milli in (
+        (stable, RATE_STABLE_MILLI),
+        (collapse, RATE_COLLAPSE_MILLI),
+    ):
+        series = fixture.get("series")
+        if not isinstance(series, list) or len(series) != HORIZON + 1:
+            raise RuntimeError("fixture series must contain every tick")
+        for tick, point in enumerate(series):
+            if (
+                not isinstance(point, list)
+                or len(point) != 6
+                or any(isinstance(value, bool) or not isinstance(value, int) for value in point)
+                or point[0] != tick
+            ):
+                raise RuntimeError(f"fixture series point {tick} is malformed")
+        if series[0] != initial_point().compact():
+            raise RuntimeError("fixture series opening point is incorrect")
+        if fixture.get("seed") != SEED:
+            raise RuntimeError("fixture seed is incorrect")
+        if fixture.get("horizon") != HORIZON:
+            raise RuntimeError("fixture horizon is incorrect")
+        if fixture.get("grazingRate") != display_milli(rate_milli):
+            raise RuntimeError("fixture grazing rate is incorrect")
+        expected_crossing = next(
+            (
+                point[0]
+                for point in series[1:]
+                if point[1] < COLLAPSE_MILLI
+            ),
+            None,
+        )
+        if fixture.get("collapseCrossingTick") != expected_crossing:
+            raise RuntimeError("fixture collapse crossing is stale")
+        if fixture.get("traceDigest") != compact_trace_digest(series):
+            raise RuntimeError("fixture trace digest is stale")
+        final = fixture.get("final", {})
+        final_point = series[-1]
+        if (
+            final.get("tick") != final_point[0]
+            or final.get("populationMilli") != final_point[1]
+            or final.get("resourcesMilli") != final_point[2]
+            or final.get("supportMilli") != final_point[3]
+        ):
+            raise RuntimeError("fixture final measurements are stale")
+    if any(
+        not STABLE_LOW_MILLI <= point[1] <= STABLE_HIGH_MILLI
+        for point in stable["series"]
+    ):
+        raise RuntimeError("stable fixture leaves the commission band")
+    if stable["collapseCrossingTick"] is not None:
+        raise RuntimeError("stable fixture unexpectedly crosses below ten")
     crossing = collapse["collapseCrossingTick"]
-    if not isinstance(crossing, int) or not crossing < 300:
+    if not isinstance(crossing, int) or crossing >= 300:
         raise RuntimeError("collapse fixture does not cross before tick 300")
     if collapse["series"][crossing][1] >= COLLAPSE_MILLI:
         raise RuntimeError("collapse crossing point is not below ten")
@@ -1167,11 +1335,9 @@ def probe_media(ffprobe: str, relative: str) -> dict[str, Any]:
         ffprobe,
         "-v",
         "error",
-        "-select_streams",
-        "v:0",
         "-show_entries",
         (
-            "stream=codec_name,pix_fmt,width,height,color_space,color_transfer,"
+            "stream=codec_name,codec_type,pix_fmt,width,height,color_space,color_transfer,"
             "color_primaries,color_range:format=duration"
         ),
         "-of",
@@ -1191,7 +1357,13 @@ def probe_media(ffprobe: str, relative: str) -> dict[str, Any]:
         )
     try:
         payload = json.loads(completed.stdout)
-        stream = payload["streams"][0]
+        streams = payload["streams"]
+        video_streams = [
+            stream for stream in streams if stream.get("codec_type") == "video"
+        ]
+        if len(video_streams) != 1:
+            raise ValueError("expected exactly one video stream")
+        stream = video_streams[0]
         duration_value = round(float(payload["format"]["duration"]), 6)
     except (IndexError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
         raise RuntimeError(f"malformed ffprobe result for {relative}") from exc
@@ -1203,17 +1375,16 @@ def probe_media(ffprobe: str, relative: str) -> dict[str, Any]:
         "duration": duration,
         "height": stream.get("height"),
         "pixelFormat": stream.get("pix_fmt"),
+        "streamCount": len(streams),
+        "audioStreamCount": sum(
+            stream.get("codec_type") == "audio" for stream in streams
+        ),
         "width": stream.get("width"),
+        "colorPrimaries": stream.get("color_primaries"),
+        "colorRange": stream.get("color_range"),
+        "colorSpace": stream.get("color_space"),
+        "colorTransfer": stream.get("color_transfer"),
     }
-    if not relative.endswith(".mkv"):
-        result.update(
-            {
-                "colorPrimaries": stream.get("color_primaries"),
-                "colorRange": stream.get("color_range"),
-                "colorSpace": stream.get("color_space"),
-                "colorTransfer": stream.get("color_transfer"),
-            }
-        )
     return result
 
 
@@ -1237,7 +1408,7 @@ DELIVERY_FILES = (
 
 def delivery_document(ffprobe: str) -> dict[str, Any]:
     artifacts = {path: artifact_record(path) for path in DELIVERY_FILES}
-    return {
+    document = {
         "schema": "candidate-frame-delivery/1.0",
         "channel": CHANNEL_ID,
         "publication": PUBLICATION_ID,
@@ -1271,6 +1442,54 @@ def delivery_document(ffprobe: str) -> dict[str, Any]:
             ],
         },
     }
+    validate_delivery(document)
+    return document
+
+
+def validate_delivery(document: dict[str, Any]) -> None:
+    if document.get("schema") != "candidate-frame-delivery/1.0":
+        raise RuntimeError("delivery schema is incorrect")
+    expected = {
+        "master": {
+            "codec": "ffv1",
+            "pixelFormat": "bgr0",
+            "colorPrimaries": None,
+            "colorRange": "pc",
+            "colorSpace": "gbr",
+            "colorTransfer": None,
+        },
+        "mp4": {
+            "codec": "h264",
+            "pixelFormat": "yuv420p",
+            "colorPrimaries": "bt709",
+            "colorRange": "tv",
+            "colorSpace": "bt709",
+            "colorTransfer": "bt709",
+        },
+        "webm": {
+            "codec": "vp9",
+            "pixelFormat": "yuv420p",
+            "colorPrimaries": "bt709",
+            "colorRange": "tv",
+            "colorSpace": "bt709",
+            "colorTransfer": "bt709",
+        },
+    }
+    for kind, fields in expected.items():
+        record = document.get("media", {}).get(kind, {})
+        for field, value in fields.items():
+            if record.get(field) != value:
+                raise RuntimeError(
+                    f"{kind} {field} must equal {value!r}"
+                )
+        if (
+            record.get("width"),
+            record.get("height"),
+            record.get("duration"),
+        ) != (WIDTH, HEIGHT, DURATION):
+            raise RuntimeError(f"{kind} dimensions or duration are incorrect")
+        if record.get("streamCount") != 1 or record.get("audioStreamCount") != 0:
+            raise RuntimeError(f"{kind} must contain one silent video stream")
 
 
 def validate_manifest() -> None:

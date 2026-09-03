@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import copy
 import hashlib
 import importlib.util
 import json
@@ -14,7 +15,8 @@ import sys
 import unittest
 import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
-from pathlib import Path
+from pathlib import Path, PurePosixPath
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -101,6 +103,118 @@ FRAME_SAMPLES = {
     221: "fa190466336dbfe6a7d6e5669264d11d815172566e25577baf9ba91b19360c5c",
     263: "c41e6ce3bf01b5dd296e335e5b4e82ddb25ba916df38c75571d7636d109889d1",
 }
+EXPECTED_EVIDENCE_BINDINGS = {
+    "README.md",
+    "apps/ecosystem-island-threshold.html",
+    "channel.production.json",
+    "channel.json",
+    "exports/fixture-series.json",
+    "masters/ecosystem-island-threshold.mkv",
+    "media/ecosystem-island-threshold.mp4",
+    "media/ecosystem-island-threshold.webm",
+    "render.py",
+    "snapshots/canonical-states.json",
+    "thumbs/ecosystem-island-threshold.svg",
+    "verify_dom.mjs",
+}
+
+
+def independent_xorshift32(value: int) -> int:
+    value &= 0xFFFFFFFF
+    value ^= (value << 13) & 0xFFFFFFFF
+    value ^= value >> 17
+    value ^= (value << 5) & 0xFFFFFFFF
+    return value & 0xFFFFFFFF
+
+
+def independent_support(resources_milli: int) -> int:
+    if resources_milli <= 90_000:
+        return 8_000
+    if resources_milli >= 120_000:
+        return 112_000
+    distance = resources_milli - 90_000
+    return 8_000 + 104_000 * distance * distance // (30_000 * 30_000)
+
+
+def independent_simulate(
+    rate_milli: int,
+    *,
+    seed: int = 31415,
+    ticks: int = 600,
+) -> list[list[int]]:
+    point = [
+        0,
+        104_000,
+        146_000,
+        independent_support(146_000),
+        0,
+        seed,
+    ]
+    points = [point.copy()]
+    for tick in range(1, ticks + 1):
+        random_state = independent_xorshift32(point[5])
+        weather_milli = ((random_state & 1023) - 512) * 550 // 1024
+        regrowth_milli = (180_000 - point[2]) * 40 // 1000
+        grazing_loss_milli = rate_milli * 6400 // 1000
+        resources_milli = max(
+            0,
+            min(
+                180_000,
+                point[2] + regrowth_milli - grazing_loss_milli + weather_milli,
+            ),
+        )
+        support_milli = independent_support(resources_milli)
+        gap = support_milli - point[1]
+        movement = abs(gap) * 35 // 1000
+        if gap and movement == 0:
+            movement = 1
+        if gap < 0:
+            movement = -movement
+        point = [
+            tick,
+            max(0, point[1] + movement),
+            resources_milli,
+            support_milli,
+            weather_milli,
+            random_state,
+        ]
+        points.append(point.copy())
+    return points
+
+
+def independent_digest(points: list[list[int]]) -> str:
+    value = 0x811C9DC5
+    for point in points:
+        for character in (":".join(str(item) for item in point) + ";"):
+            value ^= ord(character)
+            value = (value * 0x01000193) & 0xFFFFFFFF
+    return f"{value:08x}"
+
+
+def independent_display(value: int) -> int | float:
+    return value // 1000 if value % 1000 == 0 else value / 1000
+
+
+def independent_export(points: list[list[int]]) -> list[dict[str, int | float]]:
+    return [
+        {
+            "tick": point[0],
+            "population": independent_display(point[1]),
+            "populationMilli": point[1],
+            "resources": independent_display(point[2]),
+            "resourcesMilli": point[2],
+            "support": independent_display(point[3]),
+            "supportMilli": point[3],
+            "weatherMilli": point[4],
+            "randomState": point[5],
+        }
+        for point in points
+    ]
+
+
+def remove_tree(path: Path) -> None:
+    if path.exists():
+        shutil.rmtree(path)
 
 
 def normalized_text(path: Path) -> str:
@@ -441,8 +555,18 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
     def test_seeded_model_exactly_meets_both_fixture_thresholds(self):
         stable_points = RENDERER.simulate(0.24)
         collapse_points = RENDERER.simulate(0.60)
+        stable_oracle = independent_simulate(240)
+        collapse_oracle = independent_simulate(600)
         self.assertEqual(len(stable_points), 601)
         self.assertEqual(len(collapse_points), 601)
+        self.assertEqual(
+            [point.compact() for point in stable_points],
+            stable_oracle,
+        )
+        self.assertEqual(
+            [point.compact() for point in collapse_points],
+            collapse_oracle,
+        )
         self.assertEqual(stable_points[0], RENDERER.initial_point())
         self.assertEqual(
             RENDERER.xorshift32(31415), stable_points[1].random_state
@@ -475,6 +599,54 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
         self.assertEqual(collapse_points[-1].resources_milli, 84088)
         self.assertEqual(RENDERER.trace_digest(stable_points), "81d44b16")
         self.assertEqual(RENDERER.trace_digest(collapse_points), "8bb46765")
+        self.assertEqual(independent_digest(stable_oracle), "81d44b16")
+        self.assertEqual(independent_digest(collapse_oracle), "8bb46765")
+
+    def test_arbitrary_rates_seeds_and_invalid_inputs_are_behavioral(self):
+        rate_451 = RENDERER.simulate(0.451)
+        seed_one = RENDERER.simulate(0.45, seed=1)
+        seed_two = RENDERER.simulate(0.45, seed=2)
+        self.assertEqual(
+            [point.compact() for point in rate_451],
+            independent_simulate(451),
+        )
+        self.assertEqual(
+            [point.compact() for point in seed_one],
+            independent_simulate(450, seed=1),
+        )
+        self.assertEqual(
+            [point.compact() for point in seed_two],
+            independent_simulate(450, seed=2),
+        )
+        self.assertNotEqual(
+            RENDERER.trace_digest(rate_451),
+            RENDERER.trace_digest(RENDERER.simulate(0.24)),
+        )
+        self.assertNotEqual(
+            RENDERER.trace_digest(seed_one),
+            RENDERER.trace_digest(seed_two),
+        )
+        self.assertEqual(RENDERER.simulate(0.75)[-1].resources_milli, 60_088)
+        self.assertEqual(RENDERER.simulate(0.00)[-1].resources_milli, 180_000)
+
+        invalid_calls = (
+            lambda: RENDERER.simulate(-0.001),
+            lambda: RENDERER.simulate(0.751),
+            lambda: RENDERER.simulate(0.2405),
+            lambda: RENDERER.simulate(float("nan")),
+            lambda: RENDERER.simulate(float("inf")),
+            lambda: RENDERER.simulate(True),
+            lambda: RENDERER.simulate(0.24, -1),
+            lambda: RENDERER.simulate(0.24, 600.5),
+            lambda: RENDERER.simulate(0.24, 601),
+            lambda: RENDERER.simulate(0.24, seed=0),
+            lambda: RENDERER.simulate(0.24, seed=0x1_0000_0000),
+            lambda: RENDERER.simulate(240.0, rate_is_milli=True),
+        )
+        for call in invalid_calls:
+            with self.subTest(call=call):
+                with self.assertRaises(ValueError):
+                    call()
 
     def test_evidence_exports_every_tick_and_exact_final_measurements(self):
         self.assertEqual(
@@ -490,16 +662,20 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
         self.assertEqual(set(self.fixtures), {"stable-band", "collapse"})
         for fixture_id, rate in (("stable-band", 0.24), ("collapse", 0.60)):
             points = RENDERER.simulate(rate)
+            oracle = independent_simulate(round(rate * 1000))
             fixture = self.fixtures[fixture_id]
             exported = next(
                 item for item in self.export["fixtures"] if item["id"] == fixture_id
             )
             self.assertEqual(fixture["series"], [point.compact() for point in points])
+            self.assertEqual(fixture["series"], oracle)
             self.assertEqual(len(fixture["series"]), 601)
             self.assertEqual(
                 exported["series"], [point.export() for point in points]
             )
+            self.assertEqual(exported["series"], independent_export(oracle))
             self.assertEqual(exported["traceDigest"], fixture["traceDigest"])
+            self.assertEqual(exported["traceDigest"], independent_digest(oracle))
             self.assertEqual(
                 exported["collapseCrossingTick"],
                 fixture["collapseCrossingTick"],
@@ -523,16 +699,31 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
         )
         self.assertEqual(self.snapshots["reset"], self.snapshots["opening"])
         reset = self.snapshots["reset"]
-        self.assertEqual(reset["seed"], 31415)
-        self.assertEqual(reset["grazingRate"], 0.24)
-        self.assertEqual(reset["speed"], 1)
-        self.assertEqual(reset["initialPopulation"], 104)
-        self.assertEqual(reset["initialResources"], 146)
-        self.assertEqual(reset["tick"], 0)
-        self.assertIsNone(reset["prediction"])
-        self.assertEqual(reset["predictionHistory"], [])
-        self.assertEqual(reset["traceLength"], 0)
-        self.assertIsNone(reset["traceDigest"])
+        self.assertEqual(
+            reset,
+            {
+                "seed": 31415,
+                "grazingRate": 0.24,
+                "speed": 1,
+                "initialPopulation": 104,
+                "initialResources": 146,
+                "tick": 0,
+                "population": 104,
+                "resources": 146,
+                "support": 112,
+                "prediction": None,
+                "predictionRevision": 0,
+                "predictionHistory": [],
+                "traceLength": 0,
+                "traceDigest": None,
+                "collapseCrossingTick": None,
+                "outcome": None,
+                "running": False,
+                "status": "ready",
+                "message": "Choose what happens before the trace is revealed.",
+                "inspectionOpen": False,
+            },
+        )
         for claim in self.claims.values():
             for assertion in claim["assertions"]:
                 self.assertEqual(
@@ -560,16 +751,11 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
         self.assertEqual(
             expectations["collapse"]["collapseCrossingTick"], 134
         )
+        contract = embedded_json(self.source, "model-contract")
+        self.assertEqual(contract["limits"]["minimumSeed"], 1)
+        self.assertEqual(contract["limits"]["maximumSeed"], 0xFFFFFFFF)
         for fragment in (
             "Make a prediction before the deterministic trace appears.",
-            "function xorshift32(value)",
-            "function supportedPopulationMilli(resourcesMilli)",
-            "function stepModel(point, grazingRateMilli)",
-            "function initialState()",
-            "function snapshot()",
-            "function summary()",
-            "window.islandLab = contract;",
-            "window.tinySystem = contract;",
             'data-reset="exact"',
             "Reset ecosystem",
             "Prepare full JSON export",
@@ -613,6 +799,7 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
                 "dataclasses",
                 "hashlib",
                 "json",
+                "math",
                 "os",
                 "pathlib",
                 "shutil",
@@ -639,6 +826,7 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
             "pipe:0",
             "ffv1",
             "bgr0",
+            "pc",
             "+bitexact",
             "matroska",
         ):
@@ -668,6 +856,50 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
                 self.assertNotIn("data:", value.lower())
                 self.assertNotIn("url(", value.lower())
 
+    def test_film_result_labels_are_derived_from_model_points(self):
+        original_simulate = RENDERER.simulate
+        labels: list[str] = []
+        original_text = RENDERER.Canvas.text
+
+        def altered_simulate(rate, *args, **kwargs):
+            points = original_simulate(rate, *args, **kwargs)
+            rate_milli = (
+                int(rate)
+                if kwargs.get("rate_is_milli")
+                else round(float(rate) * 1000)
+            )
+            final = points[-1]
+            if rate_milli == RENDERER.RATE_STABLE_MILLI:
+                points[-1] = RENDERER.ModelPoint(
+                    final.tick,
+                    111_000,
+                    final.resources_milli,
+                    final.support_milli,
+                    final.weather_milli,
+                    final.random_state,
+                )
+            elif rate_milli == RENDERER.RATE_COLLAPSE_MILLI:
+                points[-1] = RENDERER.ModelPoint(
+                    final.tick,
+                    9_000,
+                    final.resources_milli,
+                    final.support_milli,
+                    final.weather_milli,
+                    final.random_state,
+                )
+            return points
+
+        def record_text(canvas, x, y, value, color, scale=2, spacing=1):
+            labels.append(value)
+            return original_text(canvas, x, y, value, color, scale, spacing)
+
+        with mock.patch.object(RENDERER, "simulate", side_effect=altered_simulate):
+            with mock.patch.object(RENDERER.Canvas, "text", new=record_text):
+                RENDERER.frame_rgb(RENDERER.SPEC, 9 * RENDERER.SPEC.fps)
+                RENDERER.frame_rgb(RENDERER.SPEC, 18 * RENDERER.SPEC.fps)
+        self.assertIn("TICK 600 / HERD 111 / BAND HELD", labels)
+        self.assertIn("BELOW 10 AT TICK 134 / FINAL 9", labels)
+
     def test_evidence_and_delivery_sha_bindings_are_complete(self):
         series_record = self.evidence["seriesExport"]
         self.assertEqual(series_record["path"], "exports/fixture-series.json")
@@ -676,12 +908,23 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
         self.assertTrue(series_record["containsEveryTick"])
         self.assertEqual(series_record["pointCountPerFixture"], 601)
 
+        self.assertEqual(
+            set(self.evidence["artifactBindings"]),
+            EXPECTED_EVIDENCE_BINDINGS,
+        )
         for relative, record in self.evidence["artifactBindings"].items():
             path = CANDIDATE / relative
             self.assertTrue(path.is_file(), path)
             self.assertEqual(record["path"], relative)
             self.assertEqual(record["bytes"], path.stat().st_size)
             self.assertEqual(record["sha256"], sha256(path))
+        snapshots_record = self.evidence["canonicalSnapshots"]
+        self.assertEqual(
+            snapshots_record["path"],
+            "snapshots/canonical-states.json",
+        )
+        self.assertEqual(snapshots_record["bytes"], SNAPSHOT_PATH.stat().st_size)
+        self.assertEqual(snapshots_record["sha256"], sha256(SNAPSHOT_PATH))
 
         self.assertEqual(
             set(self.delivery["artifacts"]),
@@ -690,6 +933,7 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
         for relative, record in self.delivery["artifacts"].items():
             path = CANDIDATE / relative
             self.assertTrue(path.is_file(), path)
+            self.assertEqual(record["path"], relative)
             self.assertEqual(record["bytes"], path.stat().st_size)
             self.assertEqual(record["sha256"], sha256(path))
         self.assertEqual(
@@ -704,6 +948,10 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
             self.delivery["bindings"]["compiledChannelSha256"],
             sha256(CHANNEL_PATH),
         )
+        self.assertEqual(
+            self.delivery["bindings"]["fixtureSeriesSha256"],
+            sha256(FIXTURE_EXPORT_PATH),
+        )
 
     def test_rights_privacy_and_portable_documentation_are_explicit(self):
         rights = self.evidence["rightsPrivacy"]
@@ -716,23 +964,27 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
         self.assertEqual(rights["externalResources"], [])
         combined = "\n".join(
             normalized_text(path)
-            for path in (
-                README_PATH,
-                APP_PATH,
-                RENDERER_PATH,
-                VERIFY_DOM_PATH,
-                MANIFEST_PATH,
-            )
+            for path in CANDIDATE.rglob("*")
+            if path.is_file()
+            and path.suffix.lower() not in {".mkv", ".mp4", ".webm", ".pyc"}
         )
-        self.assertNotIn("kowildfe", combined.lower())
+        self.assertNotIn(Path.home().name.lower(), combined.lower())
         for token in ("RAPP_BROWSER", "RAPP_FFMPEG", "RAPP_FFPROBE"):
             self.assertIn(token, normalized_text(README_PATH))
-        for pattern in (
-            r"AKIA[0-9A-Z]{16}",
-            r"gh[pousr]_[A-Za-z0-9]{30,}",
-            r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----",
-        ):
-            self.assertIsNone(re.search(pattern, combined), pattern)
+        secret_patterns = (
+            rb"AKIA[0-9A-Z]{16}",
+            rb"gh[pousr]_[A-Za-z0-9]{30,}",
+            rb"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----",
+        )
+        for path in CANDIDATE.rglob("*"):
+            if not path.is_file() or path.suffix.lower() == ".pyc":
+                continue
+            payload = path.read_bytes()
+            for pattern in secret_patterns:
+                self.assertIsNone(
+                    re.search(pattern, payload),
+                    f"{path}: {pattern!r}",
+                )
 
     def test_generated_text_documents_are_current(self):
         self.assertEqual(
@@ -752,12 +1004,96 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
             RENDERER.deterministic_json(generated_evidence),
         )
 
+    def test_generated_text_is_lf_and_crlf_source_compiles_identically(self):
+        for path in CANDIDATE.rglob("*"):
+            if (
+                path.is_file()
+                and path.suffix.lower() not in {".mkv", ".mp4", ".webm", ".pyc"}
+            ):
+                self.assertNotIn(b"\r", path.read_bytes(), path)
+
+        scratch = CANDIDATE / "_test-crlf"
+        remove_tree(scratch)
+        try:
+            scratch_master = scratch / "masters" / MASTER_PATH.name
+            scratch_master.parent.mkdir(parents=True)
+            shutil.copyfile(MASTER_PATH, scratch_master)
+            scratch_manifest = scratch / MANIFEST_PATH.name
+            scratch_manifest.write_bytes(
+                MANIFEST_PATH.read_text(encoding="utf-8")
+                .replace("\n", "\r\n")
+                .encode("utf-8")
+            )
+            compilation = COMPILER.prepare_compilation(scratch_manifest)
+            self.assertEqual(compilation.channel, self.channel)
+        finally:
+            remove_tree(scratch)
+
+    def test_evidence_and_delivery_validators_reject_mutations(self):
+        evidence = RENDERER.evidence_document()
+        bad_band = copy.deepcopy(evidence)
+        bad_band["fixtures"][0]["series"][250][1] = 79_999
+        with self.assertRaisesRegex(RuntimeError, "band|digest"):
+            RENDERER.validate_evidence(bad_band)
+
+        bad_tick = copy.deepcopy(evidence)
+        bad_tick["fixtures"][1]["series"][134][0] = 999
+        with self.assertRaisesRegex(RuntimeError, "point"):
+            RENDERER.validate_evidence(bad_tick)
+
+        bad_crossing = copy.deepcopy(evidence)
+        bad_crossing["fixtures"][1]["collapseCrossingTick"] = 135
+        with self.assertRaisesRegex(RuntimeError, "crossing"):
+            RENDERER.validate_evidence(bad_crossing)
+
+        bad_delivery = copy.deepcopy(self.delivery)
+        bad_delivery["media"]["webm"]["codec"] = "h264"
+        with self.assertRaisesRegex(RuntimeError, "webm codec"):
+            RENDERER.validate_delivery(bad_delivery)
+
+    def test_portable_media_tool_resolution_accepts_quoted_paths(self):
+        require_tools(self, FFmpeg=FFMPEG, FFprobe=FFPROBE)
+        self.assertEqual(
+            Path(RENDERER.resolve_binary("ffmpeg", f'"{FFMPEG}"')),
+            Path(FFMPEG),
+        )
+        self.assertEqual(
+            Path(RENDERER.resolve_binary("ffprobe", f"'{FFPROBE}'")),
+            Path(FFPROBE),
+        )
+        candidates = {
+            str(path).lower()
+            for path in RENDERER._common_media_paths("ffmpeg")
+        }
+        self.assertTrue(any("usr" in path and "bin" in path for path in candidates))
+        if sys.platform == "win32":
+            self.assertTrue(
+                any("winget" in path or "program files" in path for path in candidates)
+            )
+        with mock.patch.object(RENDERER.os, "name", "posix"):
+            with mock.patch.object(RENDERER, "Path", PurePosixPath):
+                with mock.patch.dict(RENDERER.os.environ, {}, clear=True):
+                    posix_candidates = list(
+                        RENDERER._common_media_paths("ffmpeg")
+                    )
+        self.assertIn(PurePosixPath("/usr/bin/ffmpeg"), posix_candidates)
+        self.assertIn(
+            PurePosixPath("/usr/local/bin/ffmpeg"),
+            posix_candidates,
+        )
+
+    def test_verifiers_do_not_use_broad_silent_cleanup_catches(self):
+        verifier = normalized_text(VERIFY_DOM_PATH)
+        tests = normalized_text(Path(__file__))
+        self.assertIsNone(re.search(r"catch\s*\{\s*\}", verifier))
+        self.assertNotIn("ignore_errors" + "=True", tests)
+
 
 class TestFrame000303BrowserExecution(unittest.TestCase):
     def test_exact_manifest_actions_and_responsive_results_in_real_browser(self):
         require_tools(self, Node=NODE, Browser=BROWSER)
         profile = CANDIDATE / "_test-browser-profile"
-        shutil.rmtree(profile, ignore_errors=True)
+        remove_tree(profile)
         try:
             completed = subprocess.run(
                 [
@@ -771,14 +1107,23 @@ class TestFrame000303BrowserExecution(unittest.TestCase):
                 check=False,
                 capture_output=True,
                 text=True,
-                timeout=90,
+                timeout=150,
             )
             self.assertEqual(completed.returncode, 0, completed.stderr)
             result = json.loads(completed.stdout)
             self.assertRegex(result["browser"], r"(Chrome|Chromium|Edge|Edg)/")
             self.assertEqual(result["actionCount"], 19)
+            self.assertEqual(result["replayedWidths"], [1120, 390])
+            self.assertEqual(
+                result["activatedClicks"],
+                {"desktop": 8, "responsive": 8},
+            )
             self.assertEqual(
                 result["checkpoints"], ["stable", "collapse", "reset"]
+            )
+            self.assertEqual(
+                result["responsiveCheckpoints"],
+                ["stable", "collapse", "reset"],
             )
             self.assertEqual(result["stableFinal"], 112)
             self.assertEqual(result["collapseCrossingTick"], 134)
@@ -787,8 +1132,53 @@ class TestFrame000303BrowserExecution(unittest.TestCase):
             self.assertEqual(result["responsiveWidth"], 390)
             self.assertEqual(result["browserErrors"], 0)
             self.assertEqual(result["externalRequests"], 0)
+            self.assertEqual(
+                result["arbitraryRateDigest"],
+                independent_digest(independent_simulate(451)),
+            )
+            self.assertEqual(
+                result["seedDigests"],
+                [
+                    independent_digest(independent_simulate(450, seed=1)),
+                    independent_digest(independent_simulate(450, seed=2)),
+                ],
+            )
+            self.assertNotEqual(
+                result["seedDigests"][0],
+                result["seedDigests"][1],
+            )
+            self.assertEqual(
+                result["predictionDigest"],
+                independent_digest(independent_simulate(450)),
+            )
+            self.assertEqual(result["exportPointCount"], 601)
+            self.assertEqual(result["invalidInputCount"], 10)
+            self.assertTrue(result["exportCleanedOnReset"])
+            self.assertTrue(result["profileCleaned"])
+            self.assertFalse(profile.exists())
         finally:
-            shutil.rmtree(profile, ignore_errors=True)
+            remove_tree(profile)
+
+    def test_browser_verifier_refuses_destructive_profile_paths(self):
+        require_tools(self, Node=NODE, Browser=BROWSER)
+        readme_before = README_PATH.read_bytes()
+        completed = subprocess.run(
+            [
+                NODE,
+                str(VERIFY_DOM_PATH),
+                "--browser",
+                BROWSER,
+                "--profile",
+                str(CANDIDATE),
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertIn("direct child", completed.stderr)
+        self.assertEqual(README_PATH.read_bytes(), readme_before)
 
 
 class TestFrame000303MediaExecution(unittest.TestCase):
@@ -867,6 +1257,11 @@ class TestFrame000303MediaExecution(unittest.TestCase):
             ),
             (960, 540, 22),
         )
+        self.assertEqual(delivery["media"]["master"]["pixelFormat"], "bgr0")
+        self.assertEqual(delivery["media"]["master"]["colorSpace"], "gbr")
+        self.assertEqual(delivery["media"]["master"]["colorRange"], "pc")
+        self.assertIsNone(delivery["media"]["master"]["colorTransfer"])
+        self.assertIsNone(delivery["media"]["master"]["colorPrimaries"])
         for kind, codec in (("mp4", "h264"), ("webm", "vp9")):
             record = delivery["media"][kind]
             with self.subTest(kind=kind):
@@ -880,11 +1275,47 @@ class TestFrame000303MediaExecution(unittest.TestCase):
                 self.assertEqual(record["colorTransfer"], "bt709")
                 self.assertEqual(record["colorPrimaries"], "bt709")
                 self.assertEqual(record["colorRange"], "tv")
+        for kind, record in delivery["media"].items():
+            with self.subTest(streams=kind):
+                self.assertEqual(record["streamCount"], 1)
+                self.assertEqual(record["audioStreamCount"], 0)
+
+        for path in (MASTER_PATH, MP4_PATH, WEBM_PATH):
+            completed = subprocess.run(
+                [
+                    FFPROBE,
+                    "-v",
+                    "error",
+                    "-show_streams",
+                    "-show_format",
+                    "-of",
+                    "json",
+                    str(path),
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            payload = json.loads(completed.stdout)
+            embedded_metadata = {
+                "formatTags": payload["format"].get("tags", {}),
+                "streamTags": [
+                    stream.get("tags", {}) for stream in payload["streams"]
+                ],
+            }
+            metadata = json.dumps(embedded_metadata, sort_keys=True).lower()
+            self.assertNotIn(Path.home().name.lower(), metadata)
+            self.assertNotIn(str(ROOT).lower(), metadata)
+            self.assertEqual(
+                [stream["codec_type"] for stream in payload["streams"]],
+                ["video"],
+            )
 
     def test_clean_renderer_and_compiler_rebuild_is_byte_stable(self):
         require_tools(self, FFmpeg=FFMPEG, FFprobe=FFPROBE)
         scratch = CANDIDATE / "_test-rebuild"
-        shutil.rmtree(scratch, ignore_errors=True)
+        remove_tree(scratch)
         try:
             rebuilt_master = (
                 scratch / "masters" / f"{PUBLICATION_ID}.mkv"
@@ -913,7 +1344,7 @@ class TestFrame000303MediaExecution(unittest.TestCase):
                 sha256(WEBM_PATH),
             )
         finally:
-            shutil.rmtree(scratch, ignore_errors=True)
+            remove_tree(scratch)
 
 
 if __name__ == "__main__":

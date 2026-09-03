@@ -13254,7 +13254,9 @@
       "collapseMilli": 10000,
       "horizon": 600,
       "maximumRateMilli": 750,
+      "maximumSeed": 4294967295,
       "minimumRateMilli": 0,
+      "minimumSeed": 1,
       "resourceCeilingMilli": 180000,
       "stableHighMilli": 120000,
       "stableLowMilli": 80000

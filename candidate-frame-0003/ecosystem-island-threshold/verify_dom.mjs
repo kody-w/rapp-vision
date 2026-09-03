@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { constants as fsConstants } from "node:fs";
-import { access, readFile, rm } from "node:fs/promises";
+import {
+  access,
+  lstat,
+  mkdir,
+  readFile,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import {
   delimiter,
   dirname,
@@ -19,6 +26,17 @@ const DEFAULTS = {
   manifest: join(ROOT, "channel.production.json"),
   profile: join(ROOT, ".browser-profile"),
 };
+const PROFILE_MARKER = ".rapp-island-verifier-profile";
+const PROFILE_MARKER_CONTENT = "rapp-island-verifier-profile/1\n";
+
+function hasErrorCode(error, codes) {
+  return Boolean(
+    error &&
+    typeof error === "object" &&
+    "code" in error &&
+    codes.includes(error.code)
+  );
+}
 
 function parseOptions(argv) {
   const options = { ...DEFAULTS, browser: null, findBrowser: false };
@@ -49,11 +67,48 @@ function parseOptions(argv) {
 
 async function isExecutable(path) {
   try {
+    const metadata = await lstat(path);
+    if (!metadata.isFile() || metadata.isSymbolicLink()) return false;
     await access(path, fsConstants.X_OK);
     return true;
-  } catch {
-    return false;
+  } catch (error) {
+    if (hasErrorCode(error, ["ENOENT", "EACCES", "EPERM", "ENOTDIR"])) {
+      return false;
+    }
+    throw error;
   }
+}
+
+async function prepareProfile(path) {
+  if (dirname(path) !== ROOT) {
+    throw new Error("browser profile must be a direct child of the candidate directory");
+  }
+  let metadata = null;
+  try {
+    metadata = await lstat(path);
+  } catch (error) {
+    if (!hasErrorCode(error, ["ENOENT"])) throw error;
+  }
+  if (metadata) {
+    if (!metadata.isDirectory() || metadata.isSymbolicLink()) {
+      throw new Error("browser profile path must be a real directory");
+    }
+    let marker;
+    try {
+      marker = await readFile(join(path, PROFILE_MARKER), "utf8");
+    } catch (error) {
+      if (hasErrorCode(error, ["ENOENT"])) {
+        throw new Error("refusing to remove an unowned browser profile directory");
+      }
+      throw error;
+    }
+    if (marker !== PROFILE_MARKER_CONTENT) {
+      throw new Error("refusing to remove a browser profile with an invalid marker");
+    }
+    await rm(path, { recursive: true, force: false, maxRetries: 12, retryDelay: 150 });
+  }
+  await mkdir(path);
+  await writeFile(join(path, PROFILE_MARKER), PROFILE_MARKER_CONTENT, "utf8");
 }
 
 async function findOnPath(command) {
@@ -179,7 +234,7 @@ const appPath = resolve(options.app);
 const evidencePath = resolve(options.evidence);
 const manifestPath = resolve(options.manifest);
 const profilePath = resolve(options.profile);
-await rm(profilePath, { recursive: true, force: true });
+await prepareProfile(profilePath);
 
 let launchError = null;
 let stderrText = "";
@@ -214,9 +269,14 @@ browser.stderr?.on("data", chunk => {
 const delay = milliseconds =>
   new Promise(resolveDelay => setTimeout(resolveDelay, milliseconds));
 
+function errorText(error) {
+  return error instanceof Error ? error.message : String(error);
+}
+
 async function activePort(timeout = 45000) {
   const deadline = Date.now() + timeout;
   const activePortPath = join(profilePath, "DevToolsActivePort");
+  let lastError = null;
   while (Date.now() < deadline) {
     if (launchError) throw launchError;
     if (browser.exitCode !== null) {
@@ -233,16 +293,20 @@ async function activePort(timeout = 45000) {
         const response = await fetch(`http://127.0.0.1:${port}/json/version`);
         if (response.ok) return port;
       }
-    } catch {}
+    } catch (error) {
+      lastError = error;
+    }
     await delay(75);
   }
   throw new Error(
-    `browser did not publish an OS-reserved DevTools port within ${timeout} ms`
+    `browser did not publish an OS-reserved DevTools port within ${timeout} ms` +
+      (lastError ? `; last error: ${errorText(lastError)}` : "")
   );
 }
 
 async function readJson(url, timeout = 15000) {
   const deadline = Date.now() + timeout;
+  let lastError = null;
   while (Date.now() < deadline) {
     if (browser.exitCode !== null) {
       throw new Error(`browser exited while waiting for ${url}: ${browser.exitCode}`);
@@ -250,10 +314,16 @@ async function readJson(url, timeout = 15000) {
     try {
       const response = await fetch(url);
       if (response.ok) return await response.json();
-    } catch {}
+      lastError = new Error(`HTTP ${response.status} from ${url}`);
+    } catch (error) {
+      lastError = error;
+    }
     await delay(75);
   }
-  throw new Error(`timed out waiting for ${url}`);
+  throw new Error(
+    `timed out waiting for ${url}` +
+      (lastError ? `; last error: ${errorText(lastError)}` : "")
+  );
 }
 
 class Cdp {
@@ -309,6 +379,108 @@ let cdp = null;
 const browserErrors = [];
 const networkRequests = [];
 
+const ORACLE = Object.freeze({
+  seed: 31415,
+  horizon: 600,
+  initialPopulationMilli: 104000,
+  initialResourcesMilli: 146000,
+  resourceCeilingMilli: 180000,
+  stableLowMilli: 80000,
+  stableHighMilli: 120000,
+  collapseMilli: 10000,
+});
+
+function oracleXorshift32(value) {
+  let next = value >>> 0;
+  next ^= next << 13;
+  next ^= next >>> 17;
+  next ^= next << 5;
+  return next >>> 0;
+}
+
+function oracleSupport(resourcesMilli) {
+  if (resourcesMilli <= 90000) return 8000;
+  if (resourcesMilli >= 120000) return 112000;
+  const distance = resourcesMilli - 90000;
+  return 8000 + Math.floor(
+    (104000 * distance * distance) / (30000 * 30000)
+  );
+}
+
+function oracleSimulate(rateMilli, seed = ORACLE.seed, ticks = ORACLE.horizon) {
+  let point = [
+    0,
+    ORACLE.initialPopulationMilli,
+    ORACLE.initialResourcesMilli,
+    oracleSupport(ORACLE.initialResourcesMilli),
+    0,
+    seed,
+  ];
+  const points = [[...point]];
+  for (let tick = 1; tick <= ticks; tick += 1) {
+    const randomState = oracleXorshift32(point[5]);
+    const weatherMilli = Math.floor(
+      (((randomState & 1023) - 512) * 550) / 1024
+    );
+    const regrowthMilli = Math.floor(
+      ((ORACLE.resourceCeilingMilli - point[2]) * 40) / 1000
+    );
+    const grazingLossMilli = Math.floor((rateMilli * 6400) / 1000);
+    const resourcesMilli = Math.max(
+      0,
+      Math.min(
+        ORACLE.resourceCeilingMilli,
+        point[2] + regrowthMilli - grazingLossMilli + weatherMilli
+      )
+    );
+    const supportMilli = oracleSupport(resourcesMilli);
+    const gap = supportMilli - point[1];
+    let movement = Math.floor((Math.abs(gap) * 35) / 1000);
+    if (gap !== 0 && movement === 0) movement = 1;
+    if (gap < 0) movement = -movement;
+    point = [
+      tick,
+      Math.max(0, point[1] + movement),
+      resourcesMilli,
+      supportMilli,
+      weatherMilli,
+      randomState,
+    ];
+    points.push([...point]);
+  }
+  return points;
+}
+
+function oracleDigest(points) {
+  let value = 0x811c9dc5;
+  for (const point of points) {
+    const text = `${point.join(":")};`;
+    for (const character of text) {
+      value ^= character.charCodeAt(0);
+      value = Math.imul(value, 0x01000193) >>> 0;
+    }
+  }
+  return value.toString(16).padStart(8, "0");
+}
+
+function displayMilli(value) {
+  return value / 1000;
+}
+
+function oracleExport(points) {
+  return points.map(point => ({
+    tick: point[0],
+    population: displayMilli(point[1]),
+    populationMilli: point[1],
+    resources: displayMilli(point[2]),
+    resourcesMilli: point[2],
+    support: displayMilli(point[3]),
+    supportMilli: point[3],
+    weatherMilli: point[4],
+    randomState: point[5],
+  }));
+}
+
 async function evaluate(expression) {
   const result = await cdp.command("Runtime.evaluate", {
     expression,
@@ -327,16 +499,22 @@ async function evaluate(expression) {
 
 async function waitFor(expression, timeout = 15000) {
   const deadline = Date.now() + timeout;
+  let lastError = null;
   while (Date.now() < deadline) {
     if (browser.exitCode !== null) {
       throw new Error(`browser exited during condition wait: ${browser.exitCode}`);
     }
     try {
       if (await evaluate(expression)) return;
-    } catch {}
+    } catch (error) {
+      lastError = error;
+    }
     await delay(60);
   }
-  throw new Error(`timed out waiting for browser condition: ${expression}`);
+  throw new Error(
+    `timed out waiting for browser condition: ${expression}` +
+      (lastError ? `; last error: ${errorText(lastError)}` : "")
+  );
 }
 
 async function setViewport(width, height = 860) {
@@ -358,20 +536,55 @@ async function navigate(url) {
 
 async function click(selector) {
   const encoded = JSON.stringify(selector);
-  await evaluate(`(() => {
+  const target = await evaluate(`(() => {
     const element = document.querySelector(${encoded});
     if (!element) throw new Error("missing selector " + ${encoded});
     if (element.disabled || element.getAttribute("aria-disabled") === "true") {
       throw new Error("disabled selector " + ${encoded});
     }
     const bounds = element.getBoundingClientRect();
-    if (bounds.width <= 0 || bounds.height <= 0) {
+    const style = getComputedStyle(element);
+    if (
+      bounds.width <= 0 ||
+      bounds.height <= 0 ||
+      style.display === "none" ||
+      style.visibility === "hidden" ||
+      Number(style.opacity) <= 0.5
+    ) {
       throw new Error("hidden selector " + ${encoded});
     }
-    element.focus({ preventScroll: true });
-    element.click();
-    return true;
+    const x = bounds.left + bounds.width / 2;
+    const y = bounds.top + bounds.height / 2;
+    if (x < 0 || y < 0 || x >= innerWidth || y >= innerHeight) {
+      throw new Error("offscreen selector " + ${encoded});
+    }
+    const hit = document.elementFromPoint(x, y);
+    if (!hit || (hit !== element && !element.contains(hit))) {
+      throw new Error("covered selector " + ${encoded});
+    }
+    return { x, y };
   })()`);
+  await cdp.command("Input.dispatchMouseEvent", {
+    type: "mouseMoved",
+    x: target.x,
+    y: target.y,
+  });
+  await cdp.command("Input.dispatchMouseEvent", {
+    type: "mousePressed",
+    button: "left",
+    buttons: 1,
+    clickCount: 1,
+    x: target.x,
+    y: target.y,
+  });
+  await cdp.command("Input.dispatchMouseEvent", {
+    type: "mouseReleased",
+    button: "left",
+    buttons: 0,
+    clickCount: 1,
+    x: target.x,
+    y: target.y,
+  });
   await delay(45);
 }
 
@@ -380,12 +593,27 @@ async function scrollTo(selector, action) {
   assert.equal(action.block, "start");
   assert.equal(action.behavior, "auto");
   const encoded = JSON.stringify(selector);
-  await evaluate(`(() => {
+  const bounds = await evaluate(`(() => {
     const element = document.querySelector(${encoded});
     if (!element) throw new Error("missing selector " + ${encoded});
     element.scrollIntoView({ block: "start", inline: "nearest", behavior: "auto" });
-    return true;
+    const box = element.getBoundingClientRect();
+    return {
+      top: box.top,
+      bottom: box.bottom,
+      left: box.left,
+      right: box.right,
+      viewportWidth: innerWidth,
+      viewportHeight: innerHeight
+    };
   })()`);
+  assert.ok(
+    bounds.bottom > 0 &&
+      bounds.top < bounds.viewportHeight &&
+      bounds.right > 0 &&
+      bounds.left < bounds.viewportWidth,
+    `${selector} did not scroll into the viewport`
+  );
   await delay(35);
 }
 
@@ -467,6 +695,361 @@ async function assertLegible(selectors, width) {
   }
 }
 
+async function elementState(selector) {
+  return evaluate(`(() => {
+    const element = document.querySelector(${JSON.stringify(selector)});
+    if (!element) return { missing: true };
+    const style = getComputedStyle(element);
+    const box = element.getBoundingClientRect();
+    return {
+      missing: false,
+      hidden: element.hidden,
+      display: style.display,
+      visibility: style.visibility,
+      opacity: Number(style.opacity),
+      width: box.width,
+      height: box.height,
+      inViewport:
+        box.bottom > 0 &&
+        box.top < innerHeight &&
+        box.right > 0 &&
+        box.left < innerWidth,
+      text: element.textContent.replace(/\\s+/g, " ").trim()
+    };
+  })()`);
+}
+
+function assertVisible(state, selector) {
+  assert.equal(state.missing, false, `${selector} is missing`);
+  assert.equal(state.hidden, false, `${selector} is hidden`);
+  assert.notEqual(state.display, "none", `${selector} is not displayed`);
+  assert.notEqual(state.visibility, "hidden", `${selector} is invisible`);
+  assert.ok(state.opacity > 0.5, `${selector} is too faint`);
+  assert.ok(state.width > 100 && state.height > 20, `${selector} has no visible box`);
+  assert.equal(state.inViewport, true, `${selector} is outside the viewport`);
+}
+
+async function assertClickEffect(index, opening) {
+  const summary = await evaluate("window.islandLab.summary()");
+  if (index === 1) {
+    assert.equal(summary.prediction, "band");
+    assert.equal(summary.traceLength, 0);
+    assert.equal(await evaluate("document.querySelector('#run-btn').disabled"), false);
+  } else if (index === 3) {
+    assert.equal(summary.running, true);
+    assert.ok(summary.traceLength >= 1);
+  } else if (index === 5) {
+    assert.equal(summary.inspectionOpen, true);
+    assert.equal(summary.status, "stable-inspected");
+  } else if (index === 8) {
+    assert.equal(summary.grazingRate, 0.6);
+    assert.equal(summary.prediction, null);
+    assert.equal(summary.traceLength, 0);
+  } else if (index === 10) {
+    assert.equal(summary.prediction, "collapse");
+    assert.equal(summary.predictionRevision, 1);
+  } else if (index === 12) {
+    assert.equal(summary.speed, 2);
+  } else if (index === 14) {
+    assert.equal(summary.running, true);
+    assert.ok(summary.traceLength >= 1);
+  } else if (index === 17) {
+    assert.deepEqual(summary, opening);
+    assert.equal(await evaluate("document.querySelector('#reset-proof').hidden"), false);
+  }
+}
+
+async function runManifestReplay(width, scene, replay, claims, fixtures, oracleFixtures) {
+  await setViewport(width, width === 390 ? 844 : 860);
+  await navigate(pathToFileURL(appPath).href);
+  const opening = await evaluate("window.islandLab.summary()");
+  assert.deepEqual(opening, claims.get("reset").expectedState);
+  assert.equal(opening.seed, ORACLE.seed);
+  assert.equal(opening.grazingRate, 0.24);
+  assert.equal(opening.speed, 1);
+  assert.equal(opening.tick, 0);
+  assert.equal(opening.population, 104);
+  assert.equal(opening.resources, 146);
+  assert.equal(opening.prediction, null);
+  assert.deepEqual(opening.predictionHistory, []);
+  assert.equal(opening.traceLength, 0);
+  assert.equal(opening.traceDigest, null);
+  assert.deepEqual(await evaluate("window.islandLab.snapshot().trace"), []);
+  assert.equal(await evaluate("document.querySelector('#run-btn').disabled"), true);
+  assert.equal(await evaluate("document.querySelector('#hidden-trace-label').hidden"), false);
+  await assertLegible(
+    ["#predict-band-btn", "#predict-collapse-btn", "#run-btn", "#reset-btn"],
+    width
+  );
+
+  const checkpoints = new Map(
+    replay.checkpoints.map(checkpoint => [checkpoint.afterAction, checkpoint])
+  );
+  const observed = [];
+  let activatedClicks = 0;
+  const replayStarted = Date.now();
+  for (let index = 0; index < scene.actions.length; index += 1) {
+    const action = scene.actions[index];
+    const wait = replayStarted + action.at * 1000 - Date.now();
+    if (wait > 0) await delay(wait);
+    await replayAction(action);
+    if (action.do === "click") {
+      activatedClicks += 1;
+      await assertClickEffect(index, opening);
+    }
+    const checkpoint = checkpoints.get(index);
+    if (!checkpoint) continue;
+    const expected = claims.get(checkpoint.claim).expectedState;
+    await waitFor(
+      `window.islandLab.summary().status === ${JSON.stringify(expected.status)}`
+    );
+    const actual = await evaluate("window.islandLab.summary()");
+    assert.deepEqual(actual, expected, `${checkpoint.claim} at ${width}px`);
+    const visible = await elementState(checkpoint.selector);
+    assertVisible(visible, checkpoint.selector);
+
+    if (checkpoint.claim === "stable") {
+      assert.match(visible.text, /112/);
+      assert.match(visible.text, /80.+120/);
+      const trace = await evaluate("window.islandLab.snapshot().trace");
+      assert.deepEqual(trace, fixtures.get("stable-band").series);
+      assert.deepEqual(trace, oracleFixtures.stable);
+      assert.equal(
+        await evaluate("document.querySelector('#predict-band-btn').getAttribute('aria-pressed')"),
+        "true"
+      );
+      assert.ok(
+        (await evaluate("document.querySelector('#trace-path').getAttribute('points')")).length > 100
+      );
+      await assertLegible(["#stable-result", "#inspect-trace-btn"], width);
+    } else if (checkpoint.claim === "collapse") {
+      assert.match(visible.text, /tick 134/i);
+      assert.match(visible.text, /ends at 8/i);
+      const trace = await evaluate("window.islandLab.snapshot().trace");
+      assert.deepEqual(trace, fixtures.get("collapse").series);
+      assert.deepEqual(trace, oracleFixtures.collapse);
+      assert.equal(await evaluate("document.querySelector('#crossing-line').hidden"), false);
+      assert.equal(await evaluate("document.querySelector('#crossing-dot').hidden"), false);
+      assert.equal(
+        await evaluate("document.querySelector('#speed-2-btn').getAttribute('aria-pressed')"),
+        "true"
+      );
+      await assertLegible(["#collapse-result", "#reset-btn"], width);
+    } else if (checkpoint.claim === "reset") {
+      assert.match(visible.text, /Exact reset complete/i);
+      assert.deepEqual(actual, opening);
+      assert.deepEqual(await evaluate("window.islandLab.snapshot().trace"), []);
+      assert.equal(await evaluate("document.querySelector('#trace-path').getAttribute('points')"), "");
+      assert.equal(await evaluate("document.querySelector('#grazing-input').value"), "0.24");
+      assert.equal(
+        await evaluate("document.querySelector('#speed-1-btn').getAttribute('aria-pressed')"),
+        "true"
+      );
+      assert.equal(
+        await evaluate("document.querySelector('#predict-band-btn').getAttribute('aria-pressed')"),
+        "false"
+      );
+      assert.equal(
+        await evaluate("document.querySelector('#predict-collapse-btn').getAttribute('aria-pressed')"),
+        "false"
+      );
+      assert.equal(await evaluate("document.querySelector('#run-btn').disabled"), true);
+      assert.equal(await evaluate("document.querySelector('#stable-result').hidden"), true);
+      assert.equal(await evaluate("document.querySelector('#collapse-result').hidden"), true);
+      assert.equal(await evaluate("document.querySelector('#trace-inspection').hidden"), true);
+      assert.equal(await evaluate("document.querySelector('#trace-table-body').childElementCount"), 0);
+      assert.equal(await evaluate("document.querySelector('#export-panel').hidden"), true);
+      assert.equal(await evaluate("document.querySelector('#series-export').value"), "");
+      assert.equal(
+        await evaluate("document.querySelector('#download-series-link').hasAttribute('href')"),
+        false
+      );
+      assert.equal(await evaluate("document.querySelector('#crossing-line').hidden"), true);
+      assert.equal(await evaluate("document.querySelector('#crossing-dot').hidden"), true);
+      await assertLegible(["#reset-proof", "#predict-band-btn"], width);
+    }
+    observed.push(checkpoint.claim);
+  }
+
+  assert.deepEqual(observed, ["stable", "collapse", "reset"]);
+  return { activatedClicks, checkpoints: observed, opening };
+}
+
+async function compactAppSeries(rate, ticks, seed) {
+  return evaluate(
+    `window.islandLab.simulate(${JSON.stringify(rate)}, ${ticks}, ${seed})` +
+      ".map(point => [point.tick, point.populationMilli, point.resourcesMilli, " +
+      "point.supportMilli, point.weatherMilli, point.randomState])"
+  );
+}
+
+async function expectBrowserThrow(expression) {
+  const outcome = await evaluate(`(() => {
+    try {
+      ${expression};
+      return null;
+    } catch (error) {
+      return { name: error.name, message: error.message };
+    }
+  })()`);
+  assert.ok(outcome, `${expression} did not reject invalid input`);
+  assert.match(outcome.name, /^(RangeError|TypeError)$/);
+  return outcome;
+}
+
+async function semanticScroll(selector) {
+  await scrollTo(selector, { block: "start", behavior: "auto" });
+}
+
+async function runSupplementalBehavior(opening, oracleFixtures) {
+  await setViewport(1120);
+  await navigate(pathToFileURL(appPath).href);
+  assert.deepEqual(await compactAppSeries(0.24, 600, ORACLE.seed), oracleFixtures.stable);
+  assert.deepEqual(await compactAppSeries(0.6, 600, ORACLE.seed), oracleFixtures.collapse);
+
+  const arbitraryRate = await compactAppSeries(0.451, 600, ORACLE.seed);
+  assert.deepEqual(arbitraryRate, oracleSimulate(451));
+  assert.notEqual(oracleDigest(arbitraryRate), oracleDigest(oracleFixtures.stable));
+  const seedOne = await compactAppSeries(0.45, 600, 1);
+  const seedTwo = await compactAppSeries(0.45, 600, 2);
+  assert.deepEqual(seedOne, oracleSimulate(450, 1));
+  assert.deepEqual(seedTwo, oracleSimulate(450, 2));
+  assert.notEqual(oracleDigest(seedOne), oracleDigest(seedTwo));
+
+  const invalidInputs = [];
+  for (const expression of [
+    "window.islandLab.simulate(-0.001)",
+    "window.islandLab.simulate(0.751)",
+    "window.islandLab.simulate(0.2405)",
+    "window.islandLab.simulate(Number.NaN)",
+    "window.islandLab.simulate(Number.POSITIVE_INFINITY)",
+    "window.islandLab.simulate(0.24, -1)",
+    "window.islandLab.simulate(0.24, 600.5)",
+    "window.islandLab.simulate(0.24, 601)",
+    "window.islandLab.simulate(0.24, 600, 0)",
+    "window.islandLab.simulate(0.24, 600, 4294967296)",
+  ]) {
+    invalidInputs.push(await expectBrowserThrow(expression));
+  }
+
+  await navigate(pathToFileURL(appPath).href);
+  await semanticScroll("#rate-45-btn");
+  await click("#rate-45-btn");
+  await semanticScroll("#predict-band-btn");
+  await click("#predict-band-btn");
+  await semanticScroll("#speed-4-btn");
+  await click("#speed-4-btn");
+  await semanticScroll("#run-btn");
+  await click("#run-btn");
+  await waitFor(
+    "window.islandLab.summary().running === false && window.islandLab.summary().tick === 600"
+  );
+  const bandPredictionTrace = await evaluate("window.islandLab.snapshot().trace");
+  await semanticScroll("#predict-collapse-btn");
+  await click("#predict-collapse-btn");
+  await semanticScroll("#run-btn");
+  await click("#run-btn");
+  await waitFor(
+    "window.islandLab.summary().running === false && window.islandLab.summary().tick === 600"
+  );
+  const collapsePredictionTrace = await evaluate("window.islandLab.snapshot().trace");
+  assert.deepEqual(collapsePredictionTrace, bandPredictionTrace);
+  assert.deepEqual(collapsePredictionTrace, oracleSimulate(450));
+
+  await navigate(pathToFileURL(appPath).href);
+  await semanticScroll("#predict-band-btn");
+  await click("#predict-band-btn");
+  await semanticScroll("#speed-4-btn");
+  await click("#speed-4-btn");
+  await semanticScroll("#run-btn");
+  await click("#run-btn");
+  await waitFor(
+    "window.islandLab.summary().running === false && window.islandLab.summary().tick === 600"
+  );
+  await semanticScroll("#export-series-btn");
+  await click("#export-series-btn");
+  const exported = await evaluate(
+    "JSON.parse(document.querySelector('#series-export').value)"
+  );
+  assert.equal(exported.schema, "island-herd-run-export/1.0");
+  assert.equal(exported.seed, ORACLE.seed);
+  assert.equal(exported.grazingRate, 0.24);
+  assert.equal(exported.collapseCrossingTick, null);
+  assert.equal(exported.traceDigest, oracleDigest(oracleFixtures.stable));
+  assert.deepEqual(exported.series, oracleExport(oracleFixtures.stable));
+  const downloadUrl = await evaluate(
+    "document.querySelector('#download-series-link').href"
+  );
+  assert.match(downloadUrl, /^blob:/);
+  assert.equal(await evaluate("document.querySelector('#export-panel').hidden"), false);
+  await evaluate(`(() => {
+    const revoke = URL.revokeObjectURL.bind(URL);
+    window.__revokedObjectUrls = [];
+    URL.revokeObjectURL = value => {
+      window.__revokedObjectUrls.push(value);
+      return revoke(value);
+    };
+  })()`);
+
+  await semanticScroll("#reset-btn");
+  await click("#reset-btn");
+  assert.deepEqual(await evaluate("window.islandLab.summary()"), opening);
+  assert.equal(await evaluate("document.querySelector('#series-export').value"), "");
+  assert.equal(
+    await evaluate("document.querySelector('#download-series-link').hasAttribute('href')"),
+    false
+  );
+  assert.equal(await evaluate("document.querySelector('#export-panel').hidden"), true);
+  assert.deepEqual(
+    await evaluate("window.__revokedObjectUrls"),
+    [downloadUrl]
+  );
+
+  return {
+    arbitraryRateDigest: oracleDigest(arbitraryRate),
+    seedDigests: [oracleDigest(seedOne), oracleDigest(seedTwo)],
+    predictionDigest: oracleDigest(bandPredictionTrace),
+    exportPointCount: exported.series.length,
+    invalidInputCount: invalidInputs.length,
+    exportCleanedOnReset: true,
+  };
+}
+
+function waitForBrowserExit(timeout) {
+  if (browser.exitCode !== null || browser.signalCode !== null) {
+    return Promise.resolve(true);
+  }
+  return new Promise(resolveExit => {
+    const onExit = () => {
+      clearTimeout(timer);
+      resolveExit(true);
+    };
+    const timer = setTimeout(() => {
+      browser.off("exit", onExit);
+      resolveExit(false);
+    }, timeout);
+    browser.once("exit", onExit);
+    if (browser.exitCode !== null || browser.signalCode !== null) onExit();
+  });
+}
+
+async function removeOwnedProfile() {
+  await rm(profilePath, {
+    recursive: true,
+    force: true,
+    maxRetries: 12,
+    retryDelay: 150,
+  });
+  try {
+    await lstat(profilePath);
+  } catch (error) {
+    if (hasErrorCode(error, ["ENOENT"])) return;
+    throw error;
+  }
+  throw new Error("browser profile cleanup did not remove the owned directory");
+}
+
+let report = null;
 try {
   const port = await activePort();
   const targets = await readJson(`http://127.0.0.1:${port}/json/list`);
@@ -521,147 +1104,86 @@ try {
     assert.ok(!("from" in action) && !("to" in action));
   }
 
-  await setViewport(1120);
-  await navigate(pathToFileURL(appPath).href);
-  const opening = await evaluate("window.islandLab.summary()");
-  assert.deepEqual(opening, claims.get("reset").expectedState);
-  assert.deepEqual(await evaluate("window.islandLab.snapshot().trace"), []);
-  assert.equal(await evaluate("document.querySelector('#run-btn').disabled"), true);
-  assert.equal(await evaluate("document.querySelector('#hidden-trace-label').hidden"), false);
-  await assertLegible(
-    ["#predict-band-btn", "#predict-collapse-btn", "#run-btn", "#reset-btn"],
-    1120
+  const oracleFixtures = {
+    stable: oracleSimulate(240),
+    collapse: oracleSimulate(600),
+  };
+  assert.ok(
+    oracleFixtures.stable.every(
+      point =>
+        point[1] >= ORACLE.stableLowMilli &&
+        point[1] <= ORACLE.stableHighMilli
+    )
   );
-  await assertLegible(
-    ["#predict-band-btn", "#predict-collapse-btn", "#run-btn", "#reset-btn"],
-    390
+  assert.equal(oracleFixtures.stable.at(-1)[1], 112000);
+  const collapseCrossing = oracleFixtures.collapse.find(
+    point => point[0] > 0 && point[1] < ORACLE.collapseMilli
+  )?.[0];
+  assert.equal(collapseCrossing, 134);
+  assert.ok(collapseCrossing < 300);
+  assert.equal(oracleFixtures.collapse.at(-1)[1], 8000);
+  assert.deepEqual(fixtures.get("stable-band").series, oracleFixtures.stable);
+  assert.deepEqual(fixtures.get("collapse").series, oracleFixtures.collapse);
+
+  const desktop = await runManifestReplay(
+    1120,
+    scene,
+    replay,
+    claims,
+    fixtures,
+    oracleFixtures
   );
-  await setViewport(1120);
-
-  const checkpoints = new Map(
-    replay.checkpoints.map(checkpoint => [checkpoint.afterAction, checkpoint])
+  const responsive = await runManifestReplay(
+    390,
+    scene,
+    replay,
+    claims,
+    fixtures,
+    oracleFixtures
   );
-  const observed = [];
-  const replayStarted = Date.now();
-  for (let index = 0; index < scene.actions.length; index += 1) {
-    const action = scene.actions[index];
-    const wait = replayStarted + action.at * 1000 - Date.now();
-    if (wait > 0) await delay(wait);
-    await replayAction(action);
-    const checkpoint = checkpoints.get(index);
-    if (!checkpoint) continue;
-    const expected = claims.get(checkpoint.claim).expectedState;
-    await waitFor(
-      `window.islandLab.summary().status === ${JSON.stringify(expected.status)}`
-    );
-    const actual = await evaluate("window.islandLab.summary()");
-    assert.deepEqual(actual, expected, checkpoint.claim);
-    const visible = await evaluate(`(() => {
-      const element = document.querySelector(${JSON.stringify(checkpoint.selector)});
-      const style = getComputedStyle(element);
-      const box = element.getBoundingClientRect();
-      return {
-        hidden: element.hidden,
-        display: style.display,
-        visibility: style.visibility,
-        width: box.width,
-        height: box.height,
-        text: element.textContent.replace(/\\s+/g, " ").trim()
-      };
-    })()`);
-    assert.equal(visible.hidden, false);
-    assert.notEqual(visible.display, "none");
-    assert.notEqual(visible.visibility, "hidden");
-    assert.ok(visible.width > 100 && visible.height > 20);
+  const supplemental = await runSupplementalBehavior(
+    desktop.opening,
+    oracleFixtures
+  );
 
-    if (checkpoint.claim === "stable") {
-      assert.match(visible.text, /112/);
-      assert.match(visible.text, /80.+120/);
-      assert.deepEqual(
-        await evaluate("window.islandLab.snapshot().trace"),
-        fixtures.get("stable-band").series
-      );
-      assert.equal(
-        await evaluate("document.querySelector('#predict-band-btn').getAttribute('aria-pressed')"),
-        "true"
-      );
-      assert.ok(
-        (await evaluate("document.querySelector('#trace-path').getAttribute('points')")).length > 100
-      );
-      await assertLegible(["#stable-result", "#inspect-trace-btn"], 390);
-      await setViewport(1120);
-    } else if (checkpoint.claim === "collapse") {
-      assert.match(visible.text, /tick 134/i);
-      assert.match(visible.text, /ends at 8/i);
-      assert.deepEqual(
-        await evaluate("window.islandLab.snapshot().trace"),
-        fixtures.get("collapse").series
-      );
-      assert.equal(await evaluate("document.querySelector('#crossing-line').hidden"), false);
-      assert.equal(await evaluate("document.querySelector('#crossing-dot').hidden"), false);
-      assert.equal(
-        await evaluate("document.querySelector('#speed-2-btn').getAttribute('aria-pressed')"),
-        "true"
-      );
-      await assertLegible(["#collapse-result", "#reset-btn"], 390);
-      await setViewport(1120);
-    } else if (checkpoint.claim === "reset") {
-      assert.match(visible.text, /Exact reset complete/i);
-      assert.deepEqual(actual, opening);
-      assert.deepEqual(await evaluate("window.islandLab.snapshot().trace"), []);
-      assert.equal(await evaluate("document.querySelector('#trace-path').getAttribute('points')"), "");
-      assert.equal(await evaluate("document.querySelector('#grazing-input').value"), "0.24");
-      assert.equal(
-        await evaluate("document.querySelector('#speed-1-btn').getAttribute('aria-pressed')"),
-        "true"
-      );
-      assert.equal(
-        await evaluate("document.querySelector('#predict-band-btn').getAttribute('aria-pressed')"),
-        "false"
-      );
-      assert.equal(
-        await evaluate("document.querySelector('#predict-collapse-btn').getAttribute('aria-pressed')"),
-        "false"
-      );
-      await assertLegible(["#reset-proof", "#predict-band-btn"], 390);
-      await setViewport(1120);
-    }
-    observed.push(checkpoint.claim);
-  }
-
-  assert.deepEqual(observed, ["stable", "collapse", "reset"]);
   assert.deepEqual(browserErrors, []);
+  const externalRequests = networkRequests.filter(url => /^https?:/i.test(url));
   assert.deepEqual(
-    networkRequests.filter(url => /^https?:/i.test(url)),
+    externalRequests,
     [],
     "standalone app made an external network request"
   );
 
-  console.log(JSON.stringify({
+  report = {
     browser: browserVersion.product,
     actionCount: scene.actions.length,
-    checkpoints: observed,
-    stableFinal: fixtures.get("stable-band").final.population,
-    collapseCrossingTick: fixtures.get("collapse").collapseCrossingTick,
-    collapseFinal: fixtures.get("collapse").final.population,
-    resetTraceLength: opening.traceLength,
+    replayedWidths: [1120, 390],
+    activatedClicks: {
+      desktop: desktop.activatedClicks,
+      responsive: responsive.activatedClicks,
+    },
+    checkpoints: desktop.checkpoints,
+    responsiveCheckpoints: responsive.checkpoints,
+    stableFinal: oracleFixtures.stable.at(-1)[1] / 1000,
+    collapseCrossingTick: collapseCrossing,
+    collapseFinal: oracleFixtures.collapse.at(-1)[1] / 1000,
+    resetTraceLength: desktop.opening.traceLength,
     responsiveWidth: 390,
     browserErrors: browserErrors.length,
-    externalRequests: 0,
-  }));
+    externalRequests: externalRequests.length,
+    ...supplemental,
+  };
 } finally {
   if (cdp) cdp.close();
-  if (browser.exitCode === null) browser.kill();
-  await Promise.race([
-    new Promise(resolveExit => browser.once("exit", resolveExit)),
-    delay(2000),
-  ]);
-  try {
-    await rm(profilePath, {
-      recursive: true,
-      force: true,
-      maxRetries: 12,
-      retryDelay: 150,
-    });
-  } catch {}
+  if (browser.exitCode === null && browser.signalCode === null) browser.kill();
+  let exited = await waitForBrowserExit(3000);
+  if (!exited) {
+    browser.kill("SIGKILL");
+    exited = await waitForBrowserExit(3000);
+  }
+  assert.equal(exited, true, "browser process did not terminate");
+  await removeOwnedProfile();
 }
+
+report.profileCleaned = true;
+console.log(JSON.stringify(report));

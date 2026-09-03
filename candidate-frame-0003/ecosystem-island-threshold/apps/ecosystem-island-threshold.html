@@ -507,7 +507,9 @@
     "collapseMilli": 10000,
     "horizon": 600,
     "minimumRateMilli": 0,
-    "maximumRateMilli": 750
+    "maximumRateMilli": 750,
+    "minimumSeed": 1,
+    "maximumSeed": 4294967295
   }
 }
   </script>
@@ -537,14 +539,7 @@
 
       const MODEL = Object.freeze(JSON.parse(document.querySelector("#model-contract").textContent));
       const SCALE = MODEL.fixedPointScale;
-      const INITIAL = Object.freeze({
-        tick: 0,
-        populationMilli: MODEL.initial.populationMilli,
-        resourcesMilli: MODEL.initial.resourcesMilli,
-        supportMilli: 112000,
-        weatherMilli: 0,
-        randomState: MODEL.initial.randomState
-      });
+      const INITIAL = Object.freeze(initialPoint(MODEL.seed));
       const elements = Object.freeze({
         grazingInput: document.querySelector("#grazing-input"),
         grazingOutput: document.querySelector("#grazing-output"),
@@ -595,6 +590,56 @@
         return Number(result.toFixed(3));
       }
 
+      function finiteNumber(value, label) {
+        if (typeof value === "string" && value.trim() === "") {
+          throw new TypeError(`${label} must be numeric`);
+        }
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) {
+          throw new TypeError(`${label} must be finite`);
+        }
+        return numeric;
+      }
+
+      function normalizeRateMilli(rate) {
+        const numeric = finiteNumber(rate, "grazing rate");
+        if (numeric < 0 || numeric > MODEL.limits.maximumRateMilli / SCALE) {
+          throw new RangeError("grazing rate must be from 0.00 through 0.75");
+        }
+        const scaled = numeric * SCALE;
+        const rateMilli = Math.round(scaled);
+        if (Math.abs(scaled - rateMilli) > 1e-7) {
+          throw new RangeError("grazing rate must use increments of one thousandth");
+        }
+        return rateMilli;
+      }
+
+      function normalizeTicks(ticks) {
+        if (
+          typeof ticks !== "number" ||
+          !Number.isInteger(ticks) ||
+          ticks < 0 ||
+          ticks > MODEL.limits.horizon
+        ) {
+          throw new RangeError(`ticks must be an integer from 0 through ${MODEL.limits.horizon}`);
+        }
+        return ticks;
+      }
+
+      function normalizeSeed(seed) {
+        if (
+          typeof seed !== "number" ||
+          !Number.isInteger(seed) ||
+          seed < MODEL.limits.minimumSeed ||
+          seed > MODEL.limits.maximumSeed
+        ) {
+          throw new RangeError(
+            `seed must be an integer from ${MODEL.limits.minimumSeed} through ${MODEL.limits.maximumSeed}`
+          );
+        }
+        return seed;
+      }
+
       function xorshift32(value) {
         let next = value >>> 0;
         next ^= (next << 13);
@@ -610,6 +655,18 @@
         return 8000 + Math.floor(
           (104000 * distance * distance) / (30000 * 30000)
         );
+      }
+
+      function initialPoint(seed = MODEL.seed) {
+        const normalizedSeed = normalizeSeed(seed);
+        return {
+          tick: 0,
+          populationMilli: MODEL.initial.populationMilli,
+          resourcesMilli: MODEL.initial.resourcesMilli,
+          supportMilli: supportedPopulationMilli(MODEL.initial.resourcesMilli),
+          weatherMilli: 0,
+          randomState: normalizedSeed
+        };
       }
 
       function stepModel(point, grazingRateMilli) {
@@ -643,13 +700,11 @@
         };
       }
 
-      function simulate(grazingRate, ticks = MODEL.limits.horizon) {
-        const rateMilli = Math.round(Number(grazingRate) * SCALE);
-        if (!Number.isInteger(rateMilli) || rateMilli < 0 || rateMilli > 750) {
-          throw new RangeError("grazing rate must be from 0.00 through 0.75");
-        }
-        const points = [{ ...INITIAL }];
-        for (let tick = 0; tick < ticks; tick += 1) {
+      function simulate(grazingRate, ticks = MODEL.limits.horizon, seed = MODEL.seed) {
+        const rateMilli = normalizeRateMilli(grazingRate);
+        const normalizedTicks = normalizeTicks(ticks);
+        const points = [initialPoint(seed)];
+        for (let tick = 0; tick < normalizedTicks; tick += 1) {
           points.push(stepModel(points[points.length - 1], rateMilli));
         }
         return points;
@@ -764,11 +819,10 @@
       }
 
       function setRate(rate) {
+        const rateMilli = normalizeRateMilli(rate);
         hideResetProof();
         stopRun();
         clearPreparedExport();
-        const rateMilli = Math.round(Number(rate) * SCALE);
-        if (rateMilli < 0 || rateMilli > MODEL.limits.maximumRateMilli) return;
         state = {
           ...state,
           rateMilli,
@@ -1056,6 +1110,7 @@
 
       const contract = Object.freeze({
         model: MODEL,
+        initialPoint,
         initialState,
         stepModel,
         simulate,
