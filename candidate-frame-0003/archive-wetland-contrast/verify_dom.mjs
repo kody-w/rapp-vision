@@ -478,6 +478,186 @@ async function typeText(text) {
   await cdp.command("Input.insertText", { text });
 }
 
+async function pressKey(key, code = key) {
+  await cdp.command("Input.dispatchKeyEvent", {
+    type: "keyDown",
+    key,
+    code,
+  });
+  await cdp.command("Input.dispatchKeyEvent", {
+    type: "keyUp",
+    key,
+    code,
+  });
+  await delay(35);
+}
+
+async function tabSequence(count) {
+  await evaluate(`(() => {
+    document.body.setAttribute("tabindex", "-1");
+    document.body.focus({ preventScroll: true });
+    return document.activeElement === document.body;
+  })()`);
+  const sequence = [];
+  for (let index = 0; index < count; index += 1) {
+    await pressKey("Tab", "Tab");
+    sequence.push(await evaluate("document.activeElement?.id || ''"));
+  }
+  await evaluate(`(() => {
+    document.activeElement?.blur();
+    document.body.removeAttribute("tabindex");
+    return true;
+  })()`);
+  return sequence;
+}
+
+async function auditEditorialLayout(viewport) {
+  const audit = await evaluate(`(() => {
+    const firstRecord = document.querySelector("#record-wl-001");
+    const compare = document.querySelector("#compare-btn");
+    const markers = [...document.querySelectorAll(".record-marker")];
+    const visibleOwnText = [...document.querySelectorAll("body *")]
+      .filter(element => {
+        if (["SCRIPT", "STYLE", "DATALIST", "OPTION"].includes(element.tagName)) return false;
+        if (element.hidden) return false;
+        const style = getComputedStyle(element);
+        if (style.display === "none" || style.visibility === "hidden") return false;
+        return [...element.childNodes].some(
+          node => node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+        );
+      })
+      .map(element => ({
+        id: element.id || "",
+        tag: element.tagName,
+        text: element.textContent.trim().slice(0, 80),
+        pixels: Number.parseFloat(getComputedStyle(element).fontSize)
+      }));
+    const shell = document.querySelector(".shell").getBoundingClientRect();
+    const workspace = document.querySelector(".workspace").getBoundingClientRect();
+    return {
+      controlsBeforeRecords: Boolean(
+        compare.compareDocumentPosition(firstRecord) & Node.DOCUMENT_POSITION_FOLLOWING
+      ),
+      rovingStops: markers.filter(marker => !marker.hidden && marker.tabIndex === 0)
+        .map(marker => marker.id),
+      nonRovingStops: markers.filter(marker => marker.tabIndex > 0).map(marker => marker.id),
+      smallText: visibleOwnText.filter(item => item.pixels < 12),
+      exportPixels: Number.parseFloat(
+        getComputedStyle(document.querySelector("#export-json")).fontSize
+      ),
+      digestPixels: Number.parseFloat(
+        getComputedStyle(document.querySelector("#export-digest")).fontSize
+      ),
+      documentWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+      bodyWidth: document.body.scrollWidth,
+      shellWidth: shell.width,
+      shellLeft: shell.left,
+      shellRight: shell.right,
+      workspaceWidth: workspace.width,
+      htmlOverflowX: getComputedStyle(document.documentElement).overflowX,
+      bodyOverflowX: getComputedStyle(document.body).overflowX
+    };
+  })()`);
+  assert.equal(audit.controlsBeforeRecords, true);
+  assert.deepEqual(audit.rovingStops, ["record-wl-001"]);
+  assert.deepEqual(audit.nonRovingStops, []);
+  assert.deepEqual(audit.smallText, []);
+  if (viewport.width === 390) {
+    assert.ok(audit.clientWidth <= 390 && audit.clientWidth >= 370);
+    assert.equal(audit.documentWidth, audit.clientWidth);
+    assert.ok(audit.bodyWidth <= audit.clientWidth);
+    assert.ok(audit.shellWidth <= audit.clientWidth);
+    assert.ok(audit.workspaceWidth <= audit.clientWidth - 12);
+    assert.ok(
+      audit.shellLeft >= -0.5 &&
+        audit.shellRight <= audit.clientWidth + 0.5
+    );
+    assert.ok(!["clip", "hidden"].includes(audit.htmlOverflowX));
+    assert.ok(!["clip", "hidden"].includes(audit.bodyOverflowX));
+    assert.ok(audit.exportPixels >= 13);
+    assert.ok(audit.digestPixels >= 13);
+  }
+  return audit;
+}
+
+async function auditRovingKeyboard(opening) {
+  await scroll({ selector: "#record-wl-001", block: "center" });
+  await evaluate(`document.querySelector("#record-wl-001").focus({ preventScroll: true })`);
+  await pressKey("ArrowRight", "ArrowRight");
+  assert.equal(await evaluate("document.activeElement.id"), "record-wl-002");
+  assert.equal(await evaluate("window.archiveWetlandMap.snapshot().focus"), null);
+  await pressKey("Enter", "Enter");
+  assert.equal(await evaluate("window.archiveWetlandMap.snapshot().focus"), "WL-002");
+  await pressKey("ArrowRight", "ArrowRight");
+  assert.equal(await evaluate("document.activeElement.id"), "record-wl-003");
+  await pressKey(" ", "Space");
+  assert.equal(await evaluate("window.archiveWetlandMap.snapshot().focus"), "WL-003");
+  const tabStops = await evaluate(
+    `[...document.querySelectorAll(".record-marker")]
+      .filter(marker => !marker.hidden && marker.tabIndex === 0)
+      .map(marker => marker.id)`
+  );
+  assert.deepEqual(tabStops, ["record-wl-003"]);
+  assert.deepEqual(
+    await evaluate(`window.archiveWetlandMap.dispatch({ type: "RESET" })`),
+    opening
+  );
+  assert.equal(await evaluate("window.archiveWetlandMap.rovingRecord()"), "WL-001");
+  return {
+    arrowTarget: "record-wl-002",
+    enterSelection: "WL-002",
+    spaceSelection: "WL-003",
+    tabStops: 1,
+  };
+}
+
+async function auditFailureLayout(viewport) {
+  const layout = await evaluate(`(() => {
+    const error = document.querySelector("#query-error");
+    const map = document.querySelector(".map-card");
+    const workspace = document.querySelector(".workspace");
+    const errorBounds = error.getBoundingClientRect();
+    const mapBounds = map.getBoundingClientRect();
+    const workspaceBounds = workspace.getBoundingClientRect();
+    const visibleFailureNotices = [
+      document.querySelector("#query-error"),
+      document.querySelector("#status-message")
+    ].filter(element => {
+      const style = getComputedStyle(element);
+      return !element.hidden && style.display !== "none" && style.visibility !== "hidden";
+    });
+    return {
+      errorTitle: document.querySelector("#query-error-title").textContent,
+      errorBody: document.querySelector("#query-error-body").textContent,
+      statusHidden: document.querySelector("#status-message").hidden,
+      noticeCount: visibleFailureNotices.length,
+      errorWidth: errorBounds.width,
+      workspaceWidth: workspaceBounds.width,
+      errorLeft: errorBounds.left,
+      workspaceLeft: workspaceBounds.left,
+      adjacentGap: Math.min(
+        Math.abs(errorBounds.bottom - mapBounds.top),
+        Math.abs(mapBounds.bottom - errorBounds.top)
+      ),
+      viewportWidth: innerWidth
+    };
+  })()`);
+  assert.equal(layout.errorTitle, "INVALID RANGE — NOT A VALID ZERO-CHANGE RESULT");
+  assert.match(layout.errorBody, /accepted seven-ID export remains preserved/);
+  assert.equal(layout.statusHidden, true);
+  assert.equal(layout.noticeCount, 1);
+  assert.ok(Math.abs(layout.errorWidth - layout.workspaceWidth) <= 1);
+  assert.ok(Math.abs(layout.errorLeft - layout.workspaceLeft) <= 1);
+  assert.ok(layout.adjacentGap <= 15);
+  assert.equal(layout.viewportWidth, viewport.width);
+  return {
+    fullWidth: true,
+    adjacent: true,
+    visibleNotices: 1,
+  };
+}
+
 async function replayAction(action) {
   assert.ok(!("from" in action) && !("to" in action), "replay cannot use coordinates");
   if (action.do === "scroll") {
@@ -530,6 +710,7 @@ async function assertDisplayed(snapshot, viewport) {
       .filter(marker => !marker.hidden)
       .map(marker => marker.dataset.recordId)
       .sort();
+    const legendBounds = document.querySelector("#change-legend").getBoundingClientRect();
     return {
       fromLabel: document.querySelector("#from-label").textContent,
       toLabel: document.querySelector("#to-label").textContent,
@@ -542,10 +723,19 @@ async function assertDisplayed(snapshot, viewport) {
       view: document.querySelector("#view-readout").textContent,
       status: document.querySelector("#status-message").textContent,
       statusKind: document.querySelector("#status-message").dataset.status,
+      statusHidden: document.querySelector("#status-message").hidden,
       errorHidden: document.querySelector("#query-error").hidden,
-      error: document.querySelector("#query-error").textContent,
+      errorTitle: document.querySelector("#query-error-title").textContent,
+      errorBody: document.querySelector("#query-error-body").textContent,
       exportText: document.querySelector("#export-json").textContent,
       digest: document.querySelector("#export-digest").textContent,
+      exportProvenance: document.querySelector("#export-provenance").textContent,
+      legend: document.querySelector("#change-legend").getAttribute("aria-label"),
+      legendVisible:
+        legendBounds.width > 0 &&
+        legendBounds.height > 0 &&
+        legendBounds.bottom > 0 &&
+        legendBounds.top < innerHeight,
       visibleMarkers,
       horizontalFit: document.documentElement.scrollWidth <= document.documentElement.clientWidth,
       scrollWidth: document.documentElement.scrollWidth,
@@ -568,17 +758,35 @@ async function assertDisplayed(snapshot, viewport) {
   assert.equal(displayed.visibleFilter, `${snapshot.visibleCount} · ${snapshot.filter}`);
   assert.equal(displayed.changedButton, `Show ${snapshot.changedCount} changed`);
   assert.equal(displayed.focus, snapshot.focus || "none");
-  assert.equal(displayed.extent, `Synthetic extent · ${snapshot.extent.label}`);
+  assert.equal(
+    displayed.extent,
+    "Synthetic bounds: west 1000 to east 1600; south 2000 to north 2400. " +
+      `Exact extent: ${snapshot.extent.label}.`
+  );
   assert.equal(
     displayed.view,
-    `pan ${snapshot.view.panX},${snapshot.view.panY} · zoom ${snapshot.view.zoom.toFixed(2)}×`
+    `horizontal shift ${snapshot.view.panX} px · vertical shift ${snapshot.view.panY} px · ` +
+      `zoom ${snapshot.view.zoom.toFixed(2)}×`
   );
   assert.equal(displayed.status, snapshot.message);
   assert.equal(displayed.statusKind, snapshot.status);
+  assert.equal(displayed.statusHidden, snapshot.status === "failure");
   assert.equal(displayed.errorHidden, !snapshot.comparison.status.startsWith("rejected-"));
-  assert.equal(displayed.error, snapshot.comparison.message);
+  assert.equal(displayed.errorBody, snapshot.comparison.message);
+  assert.equal(
+    displayed.errorTitle,
+    snapshot.comparison.status === "rejected-empty"
+      ? "INVALID RANGE — NOT A VALID ZERO-CHANGE RESULT"
+      : "INVALID QUERY — ENTER WHOLE-YEAR SNAPSHOTS"
+  );
   assert.equal(displayed.exportText, snapshot.export.text.trimEnd());
-  assert.equal(displayed.digest, `sha256 ${snapshot.export.digest}`);
+  assert.equal(displayed.digest, `SHA-256 ${snapshot.export.digest}`);
+  assert.equal(displayed.exportProvenance, "Observed from 24 synthetic records.");
+  assert.equal(
+    displayed.legend,
+    "rust ring = changed 1990→2020; dark ring = unchanged"
+  );
+  assert.equal(displayed.legendVisible, true);
   assert.deepEqual(displayed.visibleMarkers, snapshot.visibleRecordIds);
   assert.equal(displayed.viewportWidth, viewport.width);
   if (viewport.width === 390) {
@@ -670,6 +878,11 @@ try {
   assert.equal(replay.exactTiming, true);
   assert.equal(replay.activationVisibilityRequired, true);
   assert.equal(replay.checkpointVisibilityRequired, true);
+  assert.equal(replay.finalPrompt.afterAction, scene.actions.length - 1);
+  assert.equal(
+    scene.actions[replay.finalPrompt.afterAction].selector,
+    replay.finalPrompt.selector
+  );
   assert.deepEqual(
     [...new Set(scene.actions.map(action => action.do))].sort(),
     [...replay.allowedActions].sort()
@@ -699,6 +912,11 @@ try {
   );
   const viewportResults = [];
   const timingSkews = [];
+  const tabOrders = [];
+  const editorialLayouts = [];
+  const rovingResults = [];
+  const failureLayouts = [];
+  let finalPromptChecks = 0;
   let lastReset = null;
   let lastFailure = null;
 
@@ -752,6 +970,27 @@ try {
       evidence.runtimeAudit.unicodeDigestVector.sha256
     );
     await assertDisplayed(opening, viewport);
+    editorialLayouts.push(await auditEditorialLayout(viewport));
+    const tabs = await tabSequence(14);
+    assert.deepEqual(tabs, [
+      "from-year",
+      "to-year",
+      "compare-btn",
+      "filter-changed-btn",
+      "filter-all-btn",
+      "export-btn",
+      "restore-btn",
+      "pan-west-btn",
+      "pan-north-btn",
+      "pan-south-btn",
+      "pan-east-btn",
+      "zoom-out-btn",
+      "zoom-in-btn",
+      "record-wl-001",
+    ]);
+    tabOrders.push(tabs);
+    rovingResults.push(await auditRovingKeyboard(opening));
+    await assertDisplayed(opening, viewport);
 
     const observed = [];
     let positiveState = null;
@@ -767,6 +1006,22 @@ try {
       );
       timingSkews.push(actualAt - action.at * 1000);
       await replayAction(action);
+      if (index === replay.finalPrompt.afterAction) {
+        assert.deepEqual(
+          await evaluate("window.archiveWetlandMap.snapshot()"),
+          opening
+        );
+        await assertVisible(replay.finalPrompt.selector);
+        assert.equal(
+          await evaluate(
+            `document.querySelector(${JSON.stringify(
+              replay.finalPrompt.selector
+            )}).textContent`
+          ),
+          replay.finalPrompt.text
+        );
+        finalPromptChecks += 1;
+      }
       const checkpoint = checkpoints.get(index);
       if (!checkpoint) continue;
       const actual = await evaluate("window.archiveWetlandMap.snapshot()");
@@ -800,6 +1055,10 @@ try {
         assert.equal(focusPlacement.inside, true);
         assert.equal(focusPlacement.focused, "true");
         assert.equal(focusPlacement.hidden, false);
+        assert.equal(
+          await evaluate("window.archiveWetlandMap.rovingRecord()"),
+          "WL-016"
+        );
       }
       if (checkpoint.claim === "failure") {
         assert.equal(actual.comparison.queryResultCount, null);
@@ -814,16 +1073,22 @@ try {
         assert.deepEqual(actual.export.ids, positiveState.export.ids);
         assert.equal(actual.export.text, positiveState.export.text);
         assert.equal(actual.export.digest, positiveState.export.digest);
+        failureLayouts.push(await auditFailureLayout(viewport));
         lastFailure = actual;
       }
       if (checkpoint.claim === "reset") {
         assert.deepEqual(actual, opening);
+        assert.equal(
+          await evaluate("window.archiveWetlandMap.rovingRecord()"),
+          "WL-001"
+        );
         lastReset = actual;
       }
     }
     assert.deepEqual(observed, ["positive", "failure", "reset"]);
     viewportResults.push(viewport.name);
   }
+  assert.equal(finalPromptChecks, replay.viewports.length);
 
   const beforeInvalid = await evaluate("window.archiveWetlandMap.snapshot()");
   await scroll({ selector: "#from-year", block: "start" });
@@ -951,6 +1216,18 @@ try {
     exactTiming: true,
     maxTimingSkewMs: Math.round(Math.max(...timingSkews)),
     viewports: viewportResults,
+    tabOrder: tabOrders[0],
+    rovingFocus: rovingResults[0],
+    mobileLayout: {
+      documentWidth: editorialLayouts[1].documentWidth,
+      clientWidth: editorialLayouts[1].clientWidth,
+      minimumTextPixels: 12,
+      exportPixels: editorialLayouts[1].exportPixels,
+      digestPixels: editorialLayouts[1].digestPixels,
+      overflowClipped: false,
+    },
+    failureLayout: failureLayouts[1],
+    finalPromptChecks,
     recordCount: lastReset.totalRecords,
     changedCount: lastReset.changedCount,
     changedIds: lastReset.changedIds,

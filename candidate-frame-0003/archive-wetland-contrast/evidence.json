@@ -80,7 +80,7 @@
   "claims": [
     {
       "id": "positive",
-      "claim": "The 1990 and 2020 sheets compare to seven changed IDs; the changed-only filter leaves those seven visible, WL-016 remains visible while it is inspected after a semantic zoom and pan, and export emits the exact sorted canonical bytes and digest.",
+      "claim": "The 1990 and 2020 sheets compare to seven changed IDs; readable rust and dark rings explain the result, the changed-only filter leaves those seven visible, WL-016 remains visible while inspected after zoom and pan, and export shows the exact sorted canonical bytes and digest observed from 24 synthetic records.",
       "actions": [
         {"do":"click","selector":"#compare-btn"},
         {"do":"click","selector":"#filter-changed-btn"},
@@ -113,12 +113,12 @@
         "changedCount": 7,
         "filter": "changed",
         "focus": "WL-016",
-        "focusedRecord": {"id":"WL-016","name":"Quartz Reed","from":"reed-bed","to":"willow-edge","changed":true,"coordinate":"E 1400 / N 2280"},
+        "focusedRecord": {"id":"WL-016","name":"Quartz Reed","from":"reed-bed","to":"willow-edge","changed":true,"coordinate":"east position 1400 · north position 2280"},
         "view": {"panX":40,"panY":0,"zoom":1.25},
         "extent": {"minX":1000,"maxX":1600,"minY":2000,"maxY":2400,"label":"SYN E 1000–1600 / N 2000–2400"},
-        "comparison": {"status":"success","message":"1990 → 2020: 7 changed records across 24 synthetic stations.","queryResultCount":7,"canonical":true},
+        "comparison": {"status":"success","message":"1990 → 2020: 7 of 24 synthetic records changed.","queryResultCount":7,"canonical":true},
         "export": {"ids":["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],"text":"[\"WL-002\",\"WL-005\",\"WL-009\",\"WL-012\",\"WL-016\",\"WL-020\",\"WL-023\"]\n","digest":"fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6","status":"exported"},
-        "message": "Exported 7 sorted IDs. SHA-256 fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6.",
+        "message": "Export bound: 7 sorted IDs observed from 24 synthetic records. SHA-256 fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6.",
         "status": "success"
       }
     },
@@ -126,7 +126,7 @@
       "id": "failure",
       "after": "positive",
       "preserves": "positive.export",
-      "claim": "Typing the supplied impossible years 1880 and 1885 produces a distinct rejected-empty state with no numeric zero-change result, while the canonical seven-ID export and digest remain intact.",
+      "claim": "Typing the supplied impossible years 1880 and 1885 produces one unmistakable full-width invalid-range notice next to the map, never a successful zero-change result, while the accepted seven-ID export and digest remain intact.",
       "actions": [
         {"do":"click","selector":"#from-year"},
         {"do":"type","text":"1880"},
@@ -157,12 +157,12 @@
         "changedCount": 7,
         "filter": "changed",
         "focus": "WL-016",
-        "focusedRecord": {"id":"WL-016","name":"Quartz Reed","from":"reed-bed","to":"willow-edge","changed":true,"coordinate":"E 1400 / N 2280"},
+        "focusedRecord": {"id":"WL-016","name":"Quartz Reed","from":"reed-bed","to":"willow-edge","changed":true,"coordinate":"east position 1400 · north position 2280"},
         "view": {"panX":40,"panY":0,"zoom":1.25},
         "extent": {"minX":1000,"maxX":1600,"minY":2000,"maxY":2400,"label":"SYN E 1000–1600 / N 2000–2400"},
-        "comparison": {"status":"rejected-empty","message":"Empty query rejected: no archive sheets exist for 1880 → 1885. Canonical export preserved.","queryResultCount":null,"canonical":false},
+        "comparison": {"status":"rejected-empty","message":"No archive sheets exist for 1880 → 1885. The accepted seven-ID export remains preserved.","queryResultCount":null,"canonical":false},
         "export": {"ids":["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],"text":"[\"WL-002\",\"WL-005\",\"WL-009\",\"WL-012\",\"WL-016\",\"WL-020\",\"WL-023\"]\n","digest":"fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6","status":"preserved"},
-        "message": "Empty query rejected: no archive sheets exist for 1880 → 1885. Canonical export preserved.",
+        "message": "No archive sheets exist for 1880 → 1885. The accepted seven-ID export remains preserved.",
         "status": "failure"
       }
     },
@@ -202,9 +202,9 @@
         "focusedRecord": null,
         "view": {"panX":0,"panY":0,"zoom":1},
         "extent": {"minX":1000,"maxX":1600,"minY":2000,"maxY":2400,"label":"SYN E 1000–1600 / N 2000–2400"},
-        "comparison": {"status":"success","message":"1990 → 2020: 7 changed records across 24 synthetic stations.","queryResultCount":7,"canonical":true},
+        "comparison": {"status":"success","message":"1990 → 2020: 7 of 24 synthetic records changed.","queryResultCount":7,"canonical":true},
         "export": {"ids":["WL-002","WL-005","WL-009","WL-012","WL-016","WL-020","WL-023"],"text":"[\"WL-002\",\"WL-005\",\"WL-009\",\"WL-012\",\"WL-016\",\"WL-020\",\"WL-023\"]\n","digest":"fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6","status":"ready"},
-        "message": "Canonical archive view: 24 records, 7 changes, original extent.",
+        "message": "Archive restored: all 24 records, 7 changed, original view.",
         "status": "success"
       }
     }
@@ -212,7 +212,7 @@
   "manifestReplay": {
     "manifest": "channel.production.json",
     "scene": 0,
-    "actionCount": 24,
+    "actionCount": 25,
     "allowedActions": [
       "click",
       "scroll",
@@ -239,7 +239,8 @@
       "#compare-btn",
       "#query-error",
       "#restore-btn",
-      "#status-message"
+      "#status-message",
+      "#takeover-prompt"
     ],
     "checkpoints": [
       {
@@ -269,7 +270,42 @@
         "width": 390,
         "height": 844
       }
-    ]
+    ],
+    "finalPrompt": {
+      "afterAction": 24,
+      "selector": "#takeover-prompt",
+      "text": "YOUR TURN — choose any WL plot; arrows pan; −/+ zoom; Compare reruns; Export binds the result."
+    }
+  },
+  "editorialAudit": {
+    "minimumPlayerWidth": 390,
+    "horizontalExpansionAllowed": false,
+    "minimumTextPixels": 12,
+    "mobileExportTextPixels": 13,
+    "spatialLanguage": {
+      "plainLabels": ["west", "east", "south", "north"],
+      "exactExtentRetained": "SYN E 1000–1600 / N 2000–2400"
+    },
+    "domOrder": {
+      "controlsBeforeRecords": true,
+      "rovingRecordTabStopCount": 1,
+      "keyboardSelection": ["Arrow keys move", "Enter selects", "Space selects"]
+    },
+    "legend": "rust ring = changed 1990→2020; dark ring = unchanged",
+    "failure": {
+      "selector": "#query-error",
+      "mapAdjacent": true,
+      "fullWidth": true,
+      "visibleNoticeCount": 1,
+      "title": "INVALID RANGE — NOT A VALID ZERO-CHANGE RESULT"
+    },
+    "export": {
+      "provenance": "Observed from 24 synthetic records.",
+      "filmHoldSeconds": 4,
+      "allSevenIdsVisible": true,
+      "readableDigest": true
+    },
+    "takeover": "YOUR TURN — choose any WL plot; arrows pan; −/+ zoom; Compare reruns; Export binds the result."
   },
   "runtimeAudit": {
     "digestEncoding": "UTF-8",

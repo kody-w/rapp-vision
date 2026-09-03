@@ -3,7 +3,8 @@
 This candidate answers commission `explore-archive-map-contrast` with one
 paired RAPP Vision publication: **Read the Wetland Twice**.
 
-The fixture is a wholly synthetic wetland plot survey bounded by
+The fixture is a wholly synthetic wetland plot survey running west 1000 to
+east 1600 and south 2000 to north 2400. The exact evidence label remains
 `SYN E 1000–1600 / N 2000–2400`. It contains exactly 24 records and two
 available archive sheets:
 
@@ -55,11 +56,28 @@ focused `type` actions. It performs the following path:
    never presents it as a successful zero-change result and preserves the
    accepted 1990/2020 state and canonical export.
 7. Activate **Restore archive view**.
+8. End on **YOUR TURN — choose any WL plot; arrows pan; −/+ zoom; Compare
+   reruns; Export binds the result.**
 
 Reset returns all 24 records, 1990/2020, seven changes, filter `all`, no
 focused record, pan `0,0`, zoom `1.00`, and the expected export digest. After
 the replay, every record button and each pan/zoom control remains available
 for viewer takeover.
+
+The live app has no minimum-width clipping: its assembled document fits a real
+390 px player without horizontal expansion. Comparison controls precede the
+map records in DOM and keyboard order. The 24 plot buttons use one roving tab
+stop; arrow keys move it and Enter or Space selects. All visible text is at
+least 12 px, mobile export IDs and digest are at least 13 px, and spatial
+labels use west/east/south/north language while retaining the exact extent.
+One sticky legend remains visible throughout:
+**rust ring = changed 1990→2020; dark ring = unchanged**.
+
+The film opens immediately with **7 of 24 changed**, carries the same legend
+on every frame, holds all seven sorted IDs and the readable digest for four
+seconds under **observed from 24 synthetic records**, renders the impossible
+range as invalid rather than zero changes, restores exactly, and ends on the
+same takeover instruction as live.
 
 Non-integer query text is rejected as `rejected-invalid` without poisoning the
 accepted state. The in-app SHA-256 implementation encodes all strings as
@@ -72,8 +90,11 @@ DevTools, observes every page request, and replays the production manifest at
 its authored timestamps in a real Chromium-family browser at 1120 px and
 390 px. It requires every activation and checkpoint result to be on-screen,
 asserts independent fixture arithmetic plus actual DOM/window state, captures
-JavaScript and console errors, demonstrates takeover through a measured map
-transform, closes the process, verifies browser exit, and removes its profile.
+JavaScript and console errors, verifies unclipped width, readable font sizes,
+actual tab order, roving keyboard focus/selection, one full-width map-adjacent
+failure notice, persistent legend and final prompt, demonstrates takeover
+through a measured map transform, closes the process, verifies browser exit,
+and removes its profile.
 
 ## Reproduce
 

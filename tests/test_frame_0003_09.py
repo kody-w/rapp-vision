@@ -322,7 +322,7 @@ class TestCommissionAndPairedManifest(unittest.TestCase):
         )
         self.assertEqual(scene["app"], f"apps/{PUBLICATION_ID}.html")
         actions = scene["actions"]
-        self.assertEqual(len(actions), 24)
+        self.assertEqual(len(actions), 25)
         self.assertEqual(
             {action["do"] for action in actions},
             {"scroll", "click", "type"},
@@ -354,6 +354,16 @@ class TestCommissionAndPairedManifest(unittest.TestCase):
         self.assertTrue(replay["exactTiming"])
         self.assertTrue(replay["activationVisibilityRequired"])
         self.assertTrue(replay["checkpointVisibilityRequired"])
+        self.assertEqual(
+            actions[-1],
+            {
+                "at": 16,
+                "do": "scroll",
+                "selector": "#takeover-prompt",
+                "block": "center",
+                "behavior": "auto",
+            },
+        )
         self.assertTrue(
             VALIDATOR.validate_action(
                 {"at": 0, "do": "drag"},
@@ -366,7 +376,15 @@ class TestCommissionAndPairedManifest(unittest.TestCase):
         chapters = self.video["chapters"]
         self.assertEqual(
             [RENDERER.film_phase(chapter["t"]) for chapter in chapters],
-            ["opening", "compare", "inspect", "export", "failure", "reset"],
+            [
+                "opening",
+                "compare",
+                "inspect",
+                "export",
+                "failure",
+                "reset",
+                "takeover",
+            ],
         )
         self.assertEqual(
             [chapter["label"] for chapter in chapters],
@@ -374,15 +392,16 @@ class TestCommissionAndPairedManifest(unittest.TestCase):
                 "Twenty-four synthetic field records",
                 "1990 and 2020 reveal seven changes",
                 "Filter and inspect WL-016",
-                "Export the sorted canonical IDs",
-                "Reject the impossible date query",
+                "Hold all seven IDs and readable digest",
+                "Reject the impossible range as invalid",
                 "Restore the exact archive view",
+                "Your turn to explore the wetland",
             ],
         )
         self.assertEqual(
             [
                 chapter["label"]
-                for chapter in self.video["live"]["chapters"][:6]
+                for chapter in self.video["live"]["chapters"]
             ],
             [
                 "Compare the archive sheets",
@@ -391,6 +410,7 @@ class TestCommissionAndPairedManifest(unittest.TestCase):
                 "Export the sorted ID list",
                 "Supply impossible dates and reject",
                 "Restore the canonical view",
+                "YOUR TURN — choose any WL plot",
             ],
         )
 
@@ -494,6 +514,10 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
         self.assertEqual(positive["acceptedYears"], {"from": 1990, "to": 2020})
         self.assertEqual(positive["visibleRecordIds"], list(EXPECTED_CHANGED_IDS))
         self.assertEqual(positive["focus"], "WL-016")
+        self.assertEqual(
+            positive["focusedRecord"]["coordinate"],
+            "east position 1400 · north position 2280",
+        )
         self.assertEqual(positive["filter"], "changed")
         self.assertEqual(positive["view"], {"panX": 40, "panY": 0, "zoom": 1.25})
         self.assertEqual(positive["export"]["status"], "exported")
@@ -501,6 +525,13 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
         self.assertEqual(failure["years"], {"from": 1880, "to": 1885})
         self.assertEqual(failure["acceptedYears"], positive["acceptedYears"])
         self.assertEqual(failure["comparison"]["status"], "rejected-empty")
+        self.assertEqual(
+            failure["comparison"]["message"],
+            (
+                "No archive sheets exist for 1880 → 1885. "
+                "The accepted seven-ID export remains preserved."
+            ),
+        )
         self.assertIsNone(failure["comparison"]["queryResultCount"])
         self.assertNotEqual(failure["comparison"]["status"], "success")
         self.assertEqual(failure["changedCount"], 7)
@@ -564,6 +595,17 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
                 {"name": "mobile-390", "width": 390, "height": 844},
             ],
         )
+        self.assertEqual(
+            replay["finalPrompt"],
+            {
+                "afterAction": 24,
+                "selector": "#takeover-prompt",
+                "text": (
+                    "YOUR TURN — choose any WL plot; arrows pan; −/+ zoom; "
+                    "Compare reruns; Export binds the result."
+                ),
+            },
+        )
         manifest_activations = [
             {
                 key: value
@@ -593,10 +635,15 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
             "from-year",
             "to-year",
             "query-error",
+            "query-error-title",
+            "query-error-body",
             "status-message",
             "export-output",
+            "export-provenance",
             "map-window",
             "view-readout",
+            "change-legend",
+            "takeover-prompt",
             "contract-states",
             "wetland-fixture",
             "record-wl-012",
@@ -634,20 +681,26 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
             "function changedIds(fromYear, toYear)",
             "function sha256Utf8(text)",
             "function parseYear(value)",
+            "function moveRecordFocus(currentId, key)",
             'case "COMPARE":',
             'case "RESET":',
             "return initialState();",
             "window.archiveWetlandMap = contract;",
             "window.tinySystem = contract;",
             "queryResultCount: null",
-            "Canonical export preserved.",
+            'preserved: "Canonical export preserved"',
             "rejected-invalid",
             "new TextEncoder().encode(text)",
+            "rust ring = changed 1990→2020; dark ring = unchanged",
+            "INVALID RANGE — NOT A VALID ZERO-CHANGE RESULT",
+            "Observed from 24 synthetic records.",
+            "YOUR TURN — choose any WL plot; arrows pan; −/+ zoom; Compare reruns; Export binds the result.",
             'data-reset="exact"',
             "@media (max-width: 520px)",
-            "overflow-x: clip",
         ):
             self.assertIn(fragment, self.source)
+        self.assertNotIn("overflow-x: clip", self.source)
+        self.assertNotIn("failure-fixture", self.source)
         forbidden = (
             r"\bfetch\s*\(",
             r"\bXMLHttpRequest\b",
@@ -679,11 +732,62 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
             self.assertEqual(tag, "button")
             self.assertEqual(attributes["data-record-id"], record["id"])
             self.assertEqual(
+                attributes["tabindex"],
+                "0" if record["id"] == "WL-001" else "-1",
+            )
+            self.assertEqual(
                 attributes["style"],
                 f"--x:{record['x']};--y:{record['y']}",
             )
             self.assertIn(record["id"], attributes["aria-label"])
             self.assertIn(record["name"], attributes["aria-label"])
+
+    def test_editorial_contract_binds_order_legibility_failure_and_takeover(self):
+        self.assertLess(
+            self.source.index('id="from-year"'),
+            self.source.index('id="record-wl-001"'),
+        )
+        self.assertLess(
+            self.source.index('id="compare-btn"'),
+            self.source.index('id="record-wl-001"'),
+        )
+        self.assertEqual(self.source.count('id="query-error"'), 1)
+        self.assertIn(
+            (
+                "Synthetic bounds: west 1000 to east 1600; south 2000 to "
+                "north 2400. Exact extent: SYN E 1000–1600 / N 2000–2400."
+            ),
+            self.source,
+        )
+        rem_sizes = [
+            float(value)
+            for value in re.findall(r"font-size:\s*([0-9.]+)rem", self.source)
+        ]
+        self.assertTrue(rem_sizes)
+        self.assertGreaterEqual(min(rem_sizes), 0.75)
+        editorial = self.evidence["editorialAudit"]
+        self.assertEqual(editorial["minimumPlayerWidth"], 390)
+        self.assertFalse(editorial["horizontalExpansionAllowed"])
+        self.assertEqual(editorial["minimumTextPixels"], 12)
+        self.assertEqual(editorial["mobileExportTextPixels"], 13)
+        self.assertEqual(
+            editorial["spatialLanguage"]["exactExtentRetained"],
+            "SYN E 1000–1600 / N 2000–2400",
+        )
+        self.assertEqual(editorial["domOrder"]["rovingRecordTabStopCount"], 1)
+        self.assertEqual(
+            editorial["legend"],
+            "rust ring = changed 1990→2020; dark ring = unchanged",
+        )
+        self.assertEqual(editorial["failure"]["visibleNoticeCount"], 1)
+        self.assertEqual(editorial["export"]["filmHoldSeconds"], 4)
+        self.assertEqual(
+            editorial["takeover"],
+            (
+                "YOUR TURN — choose any WL plot; arrows pan; −/+ zoom; "
+                "Compare reruns; Export binds the result."
+            ),
+        )
 
     def test_utf8_digest_vector_and_invalid_query_contract_are_independent(self):
         runtime = self.evidence["runtimeAudit"]
@@ -820,12 +924,13 @@ class TestRendererMediaAndDelivery(unittest.TestCase):
         self.assertEqual(
             RENDERER.FILM_TIMELINE,
             (
-                ("opening", 0.0, 3.5),
-                ("compare", 3.5, 7.0),
-                ("inspect", 7.0, 10.5),
-                ("export", 10.5, 14.0),
-                ("failure", 14.0, 18.0),
-                ("reset", 18.0, 22.0),
+                ("opening", 0.0, 2.0),
+                ("compare", 2.0, 5.0),
+                ("inspect", 5.0, 8.0),
+                ("export", 8.0, 12.0),
+                ("failure", 12.0, 16.0),
+                ("reset", 16.0, 19.0),
+                ("takeover", 19.0, 22.0),
             ),
         )
         self.assertEqual(
@@ -839,6 +944,32 @@ class TestRendererMediaAndDelivery(unittest.TestCase):
                 for name, start, end in RENDERER.FILM_TIMELINE
             ],
         )
+        self.assertEqual(
+            self.delivery["render"]["openingChanged"],
+            "7 of 24 changed",
+        )
+        self.assertEqual(
+            self.delivery["render"]["legend"],
+            RENDERER.LEGEND_TEXT,
+        )
+        self.assertEqual(
+            self.delivery["render"]["exportProvenance"],
+            "OBSERVED FROM 24 SYNTHETIC RECORDS",
+        )
+        self.assertGreaterEqual(
+            self.delivery["render"]["exportHoldSeconds"],
+            2,
+        )
+        self.assertEqual(
+            self.delivery["render"]["takeover"],
+            RENDERER.TAKEOVER_TEXT,
+        )
+        export_phase = next(
+            phase
+            for phase in RENDERER.FILM_TIMELINE
+            if phase[0] == "export"
+        )
+        self.assertGreaterEqual(export_phase[2] - export_phase[1], 2)
         for name, start, end in RENDERER.FILM_TIMELINE:
             self.assertEqual(RENDERER.film_phase(start), name)
             self.assertEqual(
@@ -853,16 +984,37 @@ class TestRendererMediaAndDelivery(unittest.TestCase):
             pan_x=40,
         )
         pixel_offset = (
-            marker_y * RENDERER.SPEC.width + marker_x
+            marker_y * RENDERER.SPEC.width + marker_x + 8
         ) * 3
         self.assertEqual(
             tuple(inspect_frame[pixel_offset:pixel_offset + 3]),
             RENDERER.RUST,
         )
+        canvas_text_scales = []
+        for node in ast.walk(tree):
+            if (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and isinstance(node.func.value, ast.Name)
+                and node.func.value.id == "canvas"
+                and node.func.attr in {"text", "centered_text"}
+            ):
+                scale = node.args[-1]
+                self.assertIsInstance(scale, ast.Constant)
+                canvas_text_scales.append(scale.value)
+        self.assertTrue(canvas_text_scales)
+        self.assertGreaterEqual(min(canvas_text_scales), 2)
         self.assertEqual(
             len(RENDERER.frame_rgb(0)),
             RENDERER.SPEC.width * RENDERER.SPEC.height * 3,
         )
+        for frame_index in (0, 24, 60, 96, 144, 192, 263):
+            frame = RENDERER.frame_rgb(frame_index)
+            legend_offset = (505 * RENDERER.SPEC.width + 5) * 3
+            self.assertEqual(
+                tuple(frame[legend_offset:legend_offset + 3]),
+                RENDERER.INK_DARK,
+            )
         for frame_index, expected in self.delivery["render"]["frameSamples"].items():
             with self.subTest(frame=frame_index):
                 self.assertEqual(
@@ -880,6 +1032,21 @@ class TestRendererMediaAndDelivery(unittest.TestCase):
         root = ET.fromstring(source)
         self.assertTrue(root.tag.endswith("svg"))
         self.assertEqual(root.attrib["viewBox"], "0 0 960 540")
+        circles = [
+            element
+            for element in root.iter()
+            if element.tag.rsplit("}", 1)[-1].lower() == "circle"
+        ]
+        self.assertEqual(len(circles), 24)
+        self.assertTrue(all(circle.attrib.get("fill") == "#fffaf0" for circle in circles))
+        self.assertTrue(all(circle.attrib.get("stroke-width") == "4" for circle in circles))
+        text_sizes = [
+            int(element.attrib["font-size"])
+            for element in root.iter()
+            if element.tag.rsplit("}", 1)[-1].lower() == "text"
+        ]
+        self.assertTrue(text_sizes)
+        self.assertGreaterEqual(min(text_sizes), 12)
         for element in root.iter():
             tag = element.tag.rsplit("}", 1)[-1].lower()
             self.assertNotIn(
@@ -1136,14 +1303,53 @@ class TestExecutableReleaseChecks(unittest.TestCase):
         timing_skew = payload.pop("maxTimingSkewMs")
         self.assertGreaterEqual(timing_skew, 0)
         self.assertLess(timing_skew, 1000)
+        mobile_layout = payload.pop("mobileLayout")
+        self.assertEqual(
+            mobile_layout["documentWidth"],
+            mobile_layout["clientWidth"],
+        )
+        self.assertGreaterEqual(mobile_layout["clientWidth"], 370)
+        self.assertLessEqual(mobile_layout["clientWidth"], 390)
+        self.assertEqual(mobile_layout["minimumTextPixels"], 12)
+        self.assertGreaterEqual(mobile_layout["exportPixels"], 13)
+        self.assertGreaterEqual(mobile_layout["digestPixels"], 13)
+        self.assertFalse(mobile_layout["overflowClipped"])
         self.assertEqual(
             payload,
             {
-                "actionCount": 24,
+                "actionCount": 25,
                 "manifestActivationChecks": 12,
                 "checkpointVisibilityChecks": 6,
                 "exactTiming": True,
                 "viewports": ["desktop", "mobile-390"],
+                "tabOrder": [
+                    "from-year",
+                    "to-year",
+                    "compare-btn",
+                    "filter-changed-btn",
+                    "filter-all-btn",
+                    "export-btn",
+                    "restore-btn",
+                    "pan-west-btn",
+                    "pan-north-btn",
+                    "pan-south-btn",
+                    "pan-east-btn",
+                    "zoom-out-btn",
+                    "zoom-in-btn",
+                    "record-wl-001",
+                ],
+                "rovingFocus": {
+                    "arrowTarget": "record-wl-002",
+                    "enterSelection": "WL-002",
+                    "spaceSelection": "WL-003",
+                    "tabStops": 1,
+                },
+                "failureLayout": {
+                    "fullWidth": True,
+                    "adjacent": True,
+                    "visibleNotices": 1,
+                },
+                "finalPromptChecks": 2,
                 "recordCount": 24,
                 "changedCount": 7,
                 "changedIds": list(EXPECTED_CHANGED_IDS),

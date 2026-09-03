@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "master": {
-      "bytes": 9458566,
+      "bytes": 9688031,
       "codec": "ffv1",
       "colorRange": "pc",
       "colorSpace": "gbr",
@@ -9,11 +9,11 @@
       "height": 540,
       "path": "masters/explore-archive-map-contrast.mkv",
       "pixelFormat": "bgr0",
-      "sha256": "51dd079d9f0733c7f20d4a0b5d2b0591272bc3802b0f61e3e8e6389052aca9e6",
+      "sha256": "998d4e08645780fdd56a6bd1a494e5646847a1e00d0abe35d705c6060da1d45a",
       "width": 960
     },
     "mp4": {
-      "bytes": 206953,
+      "bytes": 258126,
       "codec": "h264",
       "colorPrimaries": "bt709",
       "colorRange": "tv",
@@ -23,11 +23,11 @@
       "height": 540,
       "path": "media/explore-archive-map-contrast.mp4",
       "pixelFormat": "yuv420p",
-      "sha256": "26e82ba653634581e7d4384e9be5539d2960e29d90eaae2c380bb2db7fe25e25",
+      "sha256": "a0d01b9d6da8b108f9b9a4949ad2f0e23cdd12ac15f4e008eb31926547c41f3c",
       "width": 960
     },
     "webm": {
-      "bytes": 190770,
+      "bytes": 242677,
       "codec": "vp9",
       "colorPrimaries": "bt709",
       "colorRange": "tv",
@@ -37,7 +37,7 @@
       "height": 540,
       "path": "media/explore-archive-map-contrast.webm",
       "pixelFormat": "yuv420p",
-      "sha256": "afd85362921bb81aeb067f0767fdf4f63dc48b8633774dbcbf1234276345b693",
+      "sha256": "3ce3115d8c6a3b63f9f76b5e5bb9bf8792e19a091b86d3d1caef393a9eb7b2ea",
       "width": 960
     }
   },
@@ -65,53 +65,63 @@
   "render": {
     "audio": false,
     "duration": 22.0,
+    "exportHoldSeconds": 4.0,
+    "exportProvenance": "OBSERVED FROM 24 SYNTHETIC RECORDS",
     "fps": 12,
     "frameSamples": {
-      "0": "87768fef3e32141ebf1547a90d4e9e14e2030b73def9ecd6c29ba8144e8bf966",
-      "138": "c40c5e2b890e32bf89452433e4cff1baaf5b82ca1e246f50103fab90b744fb3e",
-      "186": "d59fd08a5d8a0c81d6610c9b29f57130d52089e619c2c347a299d5344d809e28",
-      "263": "200852e11ddf4919a856007a0b503315ee8d35e0d48036aeb6eecea2d391c5d8",
-      "42": "99dbf0ab94007c4eaa00332e3d530a41eea9d0c0da81af3831b23bcb84979f5b",
-      "90": "f4f191e621357b5564264d891e668d8ddbdf2807ed635eb7f749a6c3ab3618d2"
+      "0": "75a8c47788dd551fe6d4c6c34a7fa3f6d7c452545d0c6d71d94d3a656b576655",
+      "138": "c5632471b9c9ffe9e802a90b09fb30fc6fd71f55dc71917ff18436bde4cbf4ce",
+      "186": "bb7de74d0fbd91c045d8600b05151dd18a45386c7856a9af7c7843dfb6dcaa29",
+      "263": "b6179efc63bcc8421b9bf8370b8f837ec17cad320ccccee7794d2587e46986a1",
+      "42": "6f7c76fd6366aefc0bff90b424bcee1eaaa653e1a22f4f317dafffc59cc18627",
+      "90": "7d5cb680b1005d7445fb7d6f3237a1f41055f46ca24d118fcee512ff9eff213c"
     },
     "frames": 264,
     "height": 540,
+    "legend": "RUST RING = CHANGED 1990→2020; DARK RING = UNCHANGED",
     "masterCodec": "ffv1",
+    "openingChanged": "7 of 24 changed",
     "positiveView": {
       "panX": 40,
       "panY": 0,
       "zoom": 1.25
     },
+    "takeover": "YOUR TURN — CHOOSE ANY WL PLOT; ARROWS PAN; −/+ ZOOM; COMPARE RERUNS; EXPORT BINDS THE RESULT.",
     "timeline": [
       {
-        "end": 3.5,
+        "end": 2.0,
         "phase": "opening",
         "start": 0.0
       },
       {
-        "end": 7.0,
+        "end": 5.0,
         "phase": "compare",
-        "start": 3.5
+        "start": 2.0
       },
       {
-        "end": 10.5,
+        "end": 8.0,
         "phase": "inspect",
-        "start": 7.0
+        "start": 5.0
       },
       {
-        "end": 14.0,
+        "end": 12.0,
         "phase": "export",
-        "start": 10.5
+        "start": 8.0
       },
       {
-        "end": 18.0,
+        "end": 16.0,
         "phase": "failure",
-        "start": 14.0
+        "start": 12.0
+      },
+      {
+        "end": 19.0,
+        "phase": "reset",
+        "start": 16.0
       },
       {
         "end": 22.0,
-        "phase": "reset",
-        "start": 18.0
+        "phase": "takeover",
+        "start": 19.0
       }
     ],
     "width": 960
@@ -124,29 +134,29 @@
       "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
     },
     {
-      "bytes": 4906,
+      "bytes": 6192,
       "path": "README.md",
-      "sha256": "ba479ebf1b295273f53122ee3c303d06575ecd6c8e29087dea721b0f7df7849d"
+      "sha256": "c18bb98276cf0790a610084da42db1edf4f837e9f1b0d7a543ea4178c4f6b0d2"
     },
     {
-      "bytes": 51197,
+      "bytes": 56461,
       "path": "apps/explore-archive-map-contrast.html",
-      "sha256": "6c4117754ffcaf3da4b656b7d7d1d1958304265245450e80b3fa41a3a9250474"
+      "sha256": "5a8e5215b7ae47c4d52a70a266e422aa33886c75f7e85c12c09d58c2dbf33426"
     },
     {
-      "bytes": 7526,
+      "bytes": 7762,
       "path": "channel.production.json",
-      "sha256": "ffd07a9e81d18d87115c6bd44b1ca7f23d121f7b646458f2aac0ae661433b2b2"
+      "sha256": "12f3915d14be50e6d80e1cc0262687a362fbf1066e578c950edc1a1de8d28bd7"
     },
     {
-      "bytes": 7680,
+      "bytes": 7916,
       "path": "channel.json",
-      "sha256": "421c31044b0e2b1220ec8a5c355e45d331909fd275558dc31eed3b2b7791c5da"
+      "sha256": "d9549fbf05dc18f2211cc8623e5ffb9ba079ca720702ce3b98713989ceca0d8b"
     },
     {
-      "bytes": 15451,
+      "bytes": 16909,
       "path": "evidence.json",
-      "sha256": "55f112fd2e177369a328b102dfc8193eb6c322e55fe3e4f9667af81fd4a31c89"
+      "sha256": "cb44b128b019522985d9dfc854ab90185fbc95e0b4da38f09f9ca47c113a10da"
     },
     {
       "bytes": 65,
@@ -154,19 +164,19 @@
       "sha256": "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6"
     },
     {
-      "bytes": 39979,
+      "bytes": 42191,
       "path": "render.py",
-      "sha256": "a24028c9cee7da2df9ccee551d731e9153e64bd0353ad5db4c0031c73b9d3214"
+      "sha256": "5c852b60263f646ae900fba235401fbdfd6c35a3f04c2b4fa8b782fe60a7c87e"
     },
     {
-      "bytes": 4857,
+      "bytes": 5768,
       "path": "thumbs/explore-archive-map-contrast.svg",
-      "sha256": "207e2e2e253cf8381b34d7e7e51d5d8859f5ee8a8a050e8d593181272c96471b"
+      "sha256": "55755d1df8f25d92e95b7e8b36e448aa469ceddb57517547242240469d523f65"
     },
     {
-      "bytes": 36660,
+      "bytes": 47356,
       "path": "verify_dom.mjs",
-      "sha256": "21374bb7c042f7bcdccd3a6b700f74405571cdc822b1562db11c129b221743b1"
+      "sha256": "e3d40be113410d1dbbfc6acb7d6c5a36fd03a5450b7d01d453e2165210389d0e"
     }
   ]
 }

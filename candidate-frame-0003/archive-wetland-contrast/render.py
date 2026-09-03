@@ -22,13 +22,20 @@ PUBLICATION_ID = "explore-archive-map-contrast"
 EXPORT_DIGEST = "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6"
 CHANGED_IDS = ("WL-002", "WL-005", "WL-009", "WL-012", "WL-016", "WL-020", "WL-023")
 POSITIVE_VIEW = {"panX": 40, "panY": 0, "zoom": 1.25}
+LEGEND_TEXT = "RUST RING = CHANGED 1990→2020; DARK RING = UNCHANGED"
+EXPORT_PROVENANCE = "OBSERVED FROM 24 SYNTHETIC RECORDS"
+TAKEOVER_TEXT = (
+    "YOUR TURN — CHOOSE ANY WL PLOT; ARROWS PAN; −/+ ZOOM; "
+    "COMPARE RERUNS; EXPORT BINDS THE RESULT."
+)
 FILM_TIMELINE = (
-    ("opening", 0.0, 3.5),
-    ("compare", 3.5, 7.0),
-    ("inspect", 7.0, 10.5),
-    ("export", 10.5, 14.0),
-    ("failure", 14.0, 18.0),
-    ("reset", 18.0, 22.0),
+    ("opening", 0.0, 2.0),
+    ("compare", 2.0, 5.0),
+    ("inspect", 5.0, 8.0),
+    ("export", 8.0, 12.0),
+    ("failure", 12.0, 16.0),
+    ("reset", 16.0, 19.0),
+    ("takeover", 19.0, 22.0),
 )
 RECORDS = (
     ("WL-001", 1060, 2070),
@@ -130,6 +137,10 @@ FONT = {
     "<": ("00001", "00010", "00100", "01000", "00100", "00010", "00001"),
     "=": ("00000", "11111", "00000", "11111", "00000", "00000", "00000"),
     "+": ("00000", "00100", "00100", "11111", "00100", "00100", "00000"),
+    ";": ("00000", "00110", "00110", "00000", "00110", "00100", "01000"),
+    "→": ("00000", "00100", "00010", "11111", "00010", "00100", "00000"),
+    "—": ("00000", "00000", "00000", "11111", "00000", "00000", "00000"),
+    "−": ("00000", "00000", "00000", "11111", "00000", "00000", "00000"),
     "#": ("01010", "11111", "01010", "01010", "11111", "01010", "00000"),
 }
 
@@ -285,7 +296,7 @@ def _panel(canvas: Canvas, x: int, y: int, width: int, height: int) -> None:
 def _header(canvas: Canvas, eyebrow: str, title: str, stamp: str) -> None:
     canvas.rect(0, 0, 960, 83, PAPER)
     canvas.rect(0, 0, 960, 5, RUST)
-    canvas.text(32, 18, eyebrow, RUST, 1)
+    canvas.text(32, 14, eyebrow, RUST, 2)
     canvas.text(32, 41, title, INK_DARK, 3)
     canvas.rect(724, 17, 204, 48, PAPER_DEEP)
     canvas.border(724, 17, 204, 48, RUST, 2)
@@ -358,15 +369,17 @@ def _wetland_map(
         point_x, point_y = _map_point(x, y, zoom=zoom, pan_x=pan_x)
         is_changed = record_id in CHANGED_IDS
         color = RUST if changed and is_changed else INK
-        radius = 9 if record_id == focus else 6
+        radius = 10 if record_id == focus else 7
         if record_id == focus:
-            canvas.circle(point_x, point_y, 13, AMBER)
-            canvas.circle(point_x, point_y, 10, CREAM)
+            canvas.circle(point_x, point_y, 15, AMBER)
+            canvas.circle(point_x, point_y, 12, CREAM)
         canvas.circle(point_x, point_y, radius, color)
+        canvas.circle(point_x, point_y, max(2, radius - 4), (239, 230, 206))
         if filtered or record_id == focus:
-            canvas.text(point_x + 8, point_y - 5, record_id[-3:], color, 1)
+            canvas.text(point_x + 11, point_y - 7, record_id[-3:], color, 2)
 
-    canvas.text(53, 464, "SYN E 1000-1600 / N 2000-2400", MUTED, 1)
+    canvas.text(53, 464, "WEST 1000 > EAST 1600", MUTED, 2)
+    canvas.text(330, 464, "SOUTH 2000 > NORTH 2400", MUTED, 2)
     canvas.text(562, 424, "N", INK, 2)
     canvas.line((568, 416), (568, 388), INK, 2)
     canvas.line((568, 388), (562, 398), INK, 2)
@@ -380,24 +393,24 @@ def _side_metric(
     value: str,
     color: RGB = INK_DARK,
 ) -> None:
-    canvas.text(676, y, label, MUTED, 1)
+    canvas.text(676, y, label, MUTED, 2)
     canvas.text(676, y + 18, value, color, 2)
 
 
 def _render_opening(canvas: Canvas, seconds: float) -> None:
-    _header(canvas, "SYNTHETIC FIELD ARCHIVE", "READ THE WETLAND TWICE", "24 PLOTS / 2 SHEETS")
-    _wetland_map(canvas, changed=False)
+    _header(canvas, "SYNTHETIC FIELD ARCHIVE", "READ THE WETLAND TWICE", "7 OF 24 CHANGED")
+    _wetland_map(canvas, changed=True)
     _panel(canvas, 654, 96, 276, 392)
     _side_metric(canvas, 120, "SNAPSHOTS", "1990 > 2020", WATER_DARK)
-    _side_metric(canvas, 177, "TOTAL RECORDS", "24", INK_DARK)
-    _side_metric(canvas, 234, "SYNTHETIC EXTENT", "600 X 400", MOSS)
-    canvas.rect(674, 294, 236, 76, PAPER_DEEP)
-    canvas.border(674, 294, 236, 76, INK, 2)
-    canvas.text(688, 308, "EVERY STATION IS", MUTED, 1)
-    canvas.text(688, 332, "ORIGINAL + SYNTHETIC", INK, 2)
-    if seconds >= 2.0:
-        canvas.rect(674, 392, 236, 58, INK)
-        canvas.centered_text(792, 410, "COMPARE THE SHEETS", CREAM, 2)
+    _side_metric(canvas, 177, "OBSERVED CHANGE", "7 OF 24", RUST)
+    _side_metric(canvas, 234, "MAP SIZE", "600 WIDE / 400 TALL", MOSS)
+    canvas.rect(674, 305, 236, 72, PAPER_DEEP)
+    canvas.border(674, 305, 236, 72, INK, 2)
+    canvas.text(688, 317, "ALL PLOTS + NAMES", MUTED, 2)
+    canvas.text(688, 344, "ARE SYNTHETIC", INK, 2)
+    if seconds >= 0.7:
+        canvas.rect(674, 398, 236, 54, INK)
+        canvas.centered_text(792, 416, "COMPARE THE SHEETS", CREAM, 2)
 
 
 def _render_compare(canvas: Canvas, seconds: float) -> None:
@@ -406,14 +419,15 @@ def _render_compare(canvas: Canvas, seconds: float) -> None:
     _panel(canvas, 654, 96, 276, 392)
     _side_metric(canvas, 120, "COMPARISON", "SUCCESS", MOSS)
     _side_metric(canvas, 177, "CHANGED", "7", RUST)
-    canvas.text(676, 234, "SORTED IDS", MUTED, 1)
-    reveal = min(len(CHANGED_IDS), max(1, int((seconds - 3.5) * 2.3) + 1))
+    canvas.text(676, 234, "SORTED IDS", MUTED, 2)
+    reveal = min(len(CHANGED_IDS), max(1, int((seconds - 2.0) * 3.0) + 1))
     for index, record_id in enumerate(CHANGED_IDS[:reveal]):
-        row_y = 256 + index * 25
-        canvas.circle(684, row_y + 5, 5, RUST)
-        canvas.text(697, row_y, record_id, INK_DARK, 1)
-    canvas.rect(674, 446, 236, 24, RUST)
-    canvas.centered_text(792, 452, "EXACTLY SEVEN", CREAM, 1)
+        row_y = 258 + index * 25
+        canvas.circle(684, row_y + 7, 7, RUST)
+        canvas.circle(684, row_y + 7, 3, PAPER)
+        canvas.text(700, row_y, record_id, INK_DARK, 2)
+    canvas.rect(674, 446, 236, 28, RUST)
+    canvas.centered_text(792, 452, "EXACTLY SEVEN", CREAM, 2)
 
 
 def _render_inspect(canvas: Canvas) -> None:
@@ -429,51 +443,58 @@ def _render_inspect(canvas: Canvas) -> None:
     _panel(canvas, 654, 96, 276, 392)
     _side_metric(canvas, 120, "VISIBLE / FILTER", "7 / CHANGED", RUST)
     _side_metric(canvas, 177, "FOCUS", "WL-016", WATER_DARK)
-    canvas.rect(674, 235, 236, 112, (217, 231, 226))
-    canvas.border(674, 235, 236, 112, WATER_DARK, 2)
+    canvas.rect(674, 235, 236, 132, (217, 231, 226))
+    canvas.border(674, 235, 236, 132, WATER_DARK, 2)
     canvas.text(688, 250, "QUARTZ REED", INK_DARK, 2)
-    canvas.text(688, 280, "REED-BED", MUTED, 1)
+    canvas.text(688, 280, "REED-BED", MUTED, 2)
     canvas.text(688, 301, "> WILLOW-EDGE", RUST, 2)
-    canvas.text(688, 329, "E 1400 / N 2280", WATER_DARK, 1)
-    _side_metric(canvas, 374, "VIEW", "PAN 40 / ZOOM 1.25", MOSS)
+    canvas.text(688, 322, "EAST POSITION 1400", WATER_DARK, 2)
+    canvas.text(688, 344, "NORTH POSITION 2280", WATER_DARK, 2)
+    _side_metric(canvas, 382, "VIEW", "PAN 40 / ZOOM 1.25", MOSS)
 
 
 def _render_export(canvas: Canvas) -> None:
-    _header(canvas, "CANONICAL SORTED LIST", "EXPORT BOUND TO BYTES", "SHA-256")
-    _panel(canvas, 52, 112, 856, 344)
-    canvas.text(78, 140, "7 CHANGED IDS / UTF-8 / LF", MUTED, 2)
+    _header(canvas, "CANONICAL SORTED LIST", "EXPORT PROOF", "HELD 4 SECONDS")
+    _panel(canvas, 52, 102, 856, 378)
+    canvas.text(78, 126, EXPORT_PROVENANCE, MUTED, 2)
     for index, record_id in enumerate(CHANGED_IDS):
         x = 82 + (index % 4) * 198
-        y = 188 + (index // 4) * 58
+        y = 166 + (index // 4) * 54
         canvas.rect(x, y, 168, 40, CREAM)
         canvas.border(x, y, 168, 40, RUST, 2)
         canvas.centered_text(x + 84, y + 12, record_id, RUST, 2)
-    canvas.rect(78, 321, 804, 92, INK_DARK)
-    canvas.text(96, 339, "FE05F5F52DDD174F2756D865E6E1BAEA", AMBER, 1)
-    canvas.text(96, 367, "3C0AA5497E8052CE430D1C4C8C1761E6", AMBER, 1)
-    canvas.text(96, 394, "SORTED EXPORT COMPLETE", CREAM, 1)
-    canvas.text(52, 474, "THE FILE, APP, EVIDENCE, AND FILM NAME THE SAME SEVEN IDS", MUTED, 1)
+    canvas.text(82, 276, "SHA-256", INK_DARK, 2)
+    canvas.rect(78, 302, 804, 112, INK_DARK)
+    digest_chunks = tuple(
+        EXPORT_DIGEST.upper()[offset : offset + 16]
+        for offset in range(0, len(EXPORT_DIGEST), 16)
+    )
+    for index, chunk in enumerate(digest_chunks):
+        x = 98 + (index % 2) * 386
+        y = 320 + (index // 2) * 36
+        canvas.text(x, y, chunk, AMBER, 2)
+    canvas.text(78, 438, "ALL SEVEN SORTED IDS + READABLE DIGEST", MUTED, 2)
 
 
 def _render_failure(canvas: Canvas, seconds: float) -> None:
-    _header(canvas, "SUPPLIED IMPOSSIBLE RANGE", "1880 > 1885", "QUERY REJECTED")
+    _header(canvas, "SUPPLIED IMPOSSIBLE RANGE", "INVALID: 1880 > 1885", "NOT ZERO CHANGES")
     _panel(canvas, 52, 112, 856, 344)
     canvas.rect(78, 145, 330, 90, PAPER_DEEP)
     canvas.border(78, 145, 330, 90, RUST, 3)
-    canvas.text(100, 163, "FROM", MUTED, 1)
+    canvas.text(100, 160, "FROM", MUTED, 2)
     canvas.text(100, 190, "1880", RUST, 4)
     canvas.rect(552, 145, 330, 90, PAPER_DEEP)
     canvas.border(552, 145, 330, 90, RUST, 3)
-    canvas.text(574, 163, "TO", MUTED, 1)
+    canvas.text(574, 160, "TO", MUTED, 2)
     canvas.text(574, 190, "1885", RUST, 4)
     canvas.rect(78, 264, 804, 84, FAIL_BG)
     canvas.border(78, 264, 804, 84, RUST, 3)
-    canvas.centered_text(480, 282, "EMPTY QUERY REJECTED", RUST, 3)
-    canvas.centered_text(480, 319, "NOT A SUCCESSFUL ZERO", INK_DARK, 2)
-    if seconds >= 16.0:
+    canvas.centered_text(480, 278, "INVALID RANGE", RUST, 3)
+    canvas.centered_text(480, 316, "NO ARCHIVE SHEETS EXIST", INK_DARK, 2)
+    if seconds >= 13.3:
         canvas.rect(78, 371, 804, 52, INK)
-        canvas.centered_text(480, 386, "CANONICAL 7-ID EXPORT PRESERVED", CREAM, 2)
-    canvas.text(52, 474, "RESULT COUNT: NULL / FAILURE IS DISTINCT AND VISIBLE", RUST, 1)
+        canvas.centered_text(480, 386, "VALID SEVEN-ID EXPORT PRESERVED", CREAM, 2)
+    canvas.centered_text(480, 454, "INVALID — NOT A ZERO-CHANGE RESULT", RUST, 2)
 
 
 def _render_reset(canvas: Canvas, seconds: float) -> None:
@@ -481,27 +502,47 @@ def _render_reset(canvas: Canvas, seconds: float) -> None:
     _wetland_map(canvas, changed=True)
     _panel(canvas, 654, 96, 276, 392)
     steps = (
-        ("1990 > 2020", 18.0),
-        ("ALL 24 VISIBLE", 18.7),
-        ("7 CHANGES", 19.4),
-        ("FOCUS NONE", 20.1),
-        ("PAN 0 / ZOOM 1", 20.8),
+        ("1990 > 2020", 16.0),
+        ("ALL 24 VISIBLE", 16.5),
+        ("7 CHANGES", 17.0),
+        ("FOCUS NONE", 17.5),
+        ("PAN 0 / ZOOM 1", 18.0),
     )
     for index, (label, threshold) in enumerate(steps):
         y = 122 + index * 61
         complete = seconds >= threshold
         canvas.circle(684, y + 8, 10, MOSS if complete else PAPER_DEEP)
         if complete:
-            canvas.text(680, y + 3, "+", CREAM, 1)
-        canvas.text(707, y, label, INK_DARK if complete else MUTED, 1)
+            canvas.text(678, y, "+", CREAM, 2)
+        canvas.text(707, y, label, INK_DARK if complete else MUTED, 2)
     canvas.rect(674, 430, 236, 38, INK_DARK)
     canvas.centered_text(
         792,
         442,
-        "DIGEST RESTORED" if seconds >= 21.0 else "RESTORING...",
+        "DIGEST RESTORED" if seconds >= 18.4 else "RESTORING...",
         AMBER,
-        1,
+        2,
     )
+
+
+def _render_takeover(canvas: Canvas) -> None:
+    _header(canvas, "YOUR TURN", "CHOOSE ANY WL PLOT", "TAKE OVER")
+    _wetland_map(canvas, changed=True)
+    _panel(canvas, 654, 96, 276, 392)
+    canvas.text(676, 120, "YOUR TURN —", RUST, 2)
+    canvas.text(676, 154, "CHOOSE ANY WL PLOT;", INK_DARK, 2)
+    canvas.text(676, 198, "ARROWS PAN;", WATER_DARK, 2)
+    canvas.text(676, 232, "−/+ ZOOM;", WATER_DARK, 2)
+    canvas.text(676, 276, "COMPARE RERUNS;", MOSS, 2)
+    canvas.text(676, 320, "EXPORT BINDS", RUST, 2)
+    canvas.text(676, 348, "THE RESULT.", RUST, 2)
+    canvas.rect(674, 398, 236, 54, INK)
+    canvas.centered_text(792, 416, "EXPLORE THE MAP", CREAM, 2)
+
+
+def _legend(canvas: Canvas) -> None:
+    canvas.rect(0, 500, canvas.width, 40, INK_DARK)
+    canvas.centered_text(480, 512, LEGEND_TEXT, CREAM, 2)
 
 
 def film_phase(seconds: float) -> str:
@@ -530,8 +571,11 @@ def frame_rgb(frame_index: int, spec: RenderSpec = SPEC) -> bytes:
         _render_export(canvas)
     elif phase == "failure":
         _render_failure(canvas, seconds)
-    else:
+    elif phase == "reset":
         _render_reset(canvas, seconds)
+    else:
+        _render_takeover(canvas)
+    _legend(canvas)
     frame = canvas.bytes()
     expected_size = spec.width * spec.height * 3
     if len(frame) != expected_size:
@@ -557,7 +601,8 @@ def thumbnail_svg(spec: RenderSpec = SPEC) -> str:
         changed = record_id in CHANGED_IDS
         markers.append(
             f'    <circle cx="{marker_x}" cy="{marker_y}" r="{7 if changed else 5}" '
-            f'fill="{"#a64c32" if changed else "#173c38"}"/>'
+            f'fill="#fffaf0" stroke="{"#a64c32" if changed else "#173c38"}" '
+            f'stroke-width="4"/>'
         )
     marker_source = "\n".join(markers)
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
@@ -594,8 +639,9 @@ def thumbnail_svg(spec: RenderSpec = SPEC) -> str:
   <rect x="676" y="350" width="228" height="78" fill="#173c38"/>
   <text x="692" y="377" fill="#f3ecd8" font-family="monospace" font-size="13">SORTED EXPORT</text>
   <text x="692" y="405" fill="#e0aa45" font-family="monospace" font-size="17" font-weight="800">SHA-256 BOUND</text>
-  <text x="678" y="451" fill="#2d6e72" font-family="monospace" font-size="12">SYN E 1000–1600 / N 2000–2400</text>
-  <text x="480" y="519" text-anchor="middle" fill="#173c38" font-family="monospace" font-size="15" font-weight="800">FILTER · INSPECT · EXPORT · REJECT EMPTY · EXACT RESTORE</text>
+  <text x="678" y="451" fill="#2d6e72" font-family="monospace" font-size="12">WEST 1000 → EAST 1600</text>
+  <text x="678" y="468" fill="#2d6e72" font-family="monospace" font-size="12">SOUTH 2000 → NORTH 2400</text>
+  <text x="480" y="519" text-anchor="middle" fill="#173c38" font-family="monospace" font-size="14" font-weight="800">RUST RING = CHANGED 1990→2020; DARK RING = UNCHANGED</text>
 </svg>
 """
 
@@ -939,6 +985,11 @@ def delivery_document(
                 for name, start, end in FILM_TIMELINE
             ],
             "positiveView": POSITIVE_VIEW,
+            "openingChanged": "7 of 24 changed",
+            "legend": LEGEND_TEXT,
+            "exportProvenance": EXPORT_PROVENANCE,
+            "exportHoldSeconds": 4.0,
+            "takeover": TAKEOVER_TEXT,
         },
         "objective": {
             "records": len(RECORDS),

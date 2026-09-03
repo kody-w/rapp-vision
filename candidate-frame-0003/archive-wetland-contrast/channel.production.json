@@ -12,7 +12,7 @@
     {
       "id": "explore-archive-map-contrast",
       "title": "Read the Wetland Twice",
-      "description": "A tactile synthetic field map compares the 1990 and 2020 archive sheets across exactly 24 records. The guided film and live replay isolate seven changed IDs, inspect WL-016 while it remains visible through zoom and pan, export the deterministic sorted list with SHA-256 fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6, distinctly reject the supplied impossible 1880 to 1885 query while preserving that export, and restore all 24 records, canonical years, no focus, and the original pan and zoom.",
+      "description": "A readable synthetic wetland map compares 24 records from 1990 and 2020. Rust rings mark the seven changed plots and dark rings mark unchanged plots. The film and live replay compare, filter, inspect WL-016, hold all seven sorted IDs with the SHA-256 export proof, unmistakably reject 1880 to 1885 while preserving the valid export, restore the exact archive view, and finish with clear takeover instructions.",
       "published": "2026-09-03",
       "duration": 22,
       "width": 960,
@@ -37,24 +37,28 @@
           "label": "Twenty-four synthetic field records"
         },
         {
-          "t": 4,
+          "t": 2,
           "label": "1990 and 2020 reveal seven changes"
         },
         {
-          "t": 8,
+          "t": 5,
           "label": "Filter and inspect WL-016"
         },
         {
+          "t": 8,
+          "label": "Hold all seven IDs and readable digest"
+        },
+        {
           "t": 12,
-          "label": "Export the sorted canonical IDs"
+          "label": "Reject the impossible range as invalid"
         },
         {
           "t": 16,
-          "label": "Reject the impossible date query"
+          "label": "Restore the exact archive view"
         },
         {
           "t": 19,
-          "label": "Restore the exact archive view"
+          "label": "Your turn to explore the wetland"
         }
       ],
       "live": {
@@ -87,7 +91,7 @@
           },
           {
             "t": 16,
-            "label": "Take over the field map"
+            "label": "YOUR TURN — choose any WL plot"
           }
         ],
         "scenes": [
@@ -102,7 +106,7 @@
             "lower": {
               "title": "Read the Wetland Twice",
               "bench": "The 1990 and 2020 synthetic sheets yield exactly seven sorted changed IDs.",
-              "fix": "Pause, inspect any station, move the paper, or try another available snapshot pair."
+              "fix": "YOUR TURN — choose any WL plot; arrows pan; −/+ zoom; Compare reruns; Export binds the result."
             },
             "actions": [
               {
@@ -247,6 +251,13 @@
                 "do": "scroll",
                 "selector": "#status-message",
                 "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 16,
+                "do": "scroll",
+                "selector": "#takeover-prompt",
+                "block": "center",
                 "behavior": "auto"
               }
             ]
