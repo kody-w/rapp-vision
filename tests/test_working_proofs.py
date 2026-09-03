@@ -167,6 +167,24 @@ class TestWorkingProofsBuild(unittest.TestCase):
         cls.channel = load_json(CHANNEL_PATH)
         cls.evidence_index = load_json(EVIDENCE_INDEX_PATH)
 
+    def test_full_suite_workflows_provision_release_tools(self):
+        for filename in ("publication-policy.yml", "metrics.yml"):
+            with self.subTest(workflow=filename):
+                source = (
+                    ROOT / ".github" / "workflows" / filename
+                ).read_text(encoding="utf-8")
+                self.assertIn("browser-actions/setup-chrome@v2", source)
+                self.assertIn(
+                    "apt-get install -y --no-install-recommends ffmpeg",
+                    source,
+                )
+                self.assertIn(
+                    "RAPP_BROWSER: ${{ steps.setup-chrome.outputs.chrome-path }}",
+                    source,
+                )
+                self.assertIn("RAPP_FFMPEG: /usr/bin/ffmpeg", source)
+                self.assertIn("RAPP_FFPROBE: /usr/bin/ffprobe", source)
+
     def test_builder_output_is_sorted_utf8_lf_and_current(self):
         expected_channel, expected_index = BUILDER.build_documents()
         self.assertEqual(CHANNEL_PATH.read_bytes(), BUILDER.json_bytes(expected_channel))

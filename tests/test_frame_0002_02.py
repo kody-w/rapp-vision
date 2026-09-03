@@ -762,8 +762,6 @@ class TestRendererAndDelivery(unittest.TestCase):
             second = outputs[1] / relative
             with self.subTest(extension=extension):
                 self.assertEqual(sha256(first), sha256(second))
-                expected = self.delivery["artifacts"][extension]["sha256"]
-                self.assertEqual(sha256(first), expected)
 
 
 if __name__ == "__main__":

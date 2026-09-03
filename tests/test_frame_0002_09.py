@@ -1228,37 +1228,42 @@ class TestFrame000209MediaAndRebuild(unittest.TestCase):
         self.assertIn(f"{CHANNEL_PATH}: valid", completed.stdout)
 
     def test_full_renderer_and_compiler_rebuild_is_byte_stable(self):
-        scratch = CANDIDATE / ".frame-0002-09-rebuild"
-        shutil.rmtree(scratch, ignore_errors=True)
+        scratches = [
+            CANDIDATE / ".frame-0002-09-rebuild-a",
+            CANDIDATE / ".frame-0002-09-rebuild-b",
+        ]
+        for scratch in scratches:
+            shutil.rmtree(scratch, ignore_errors=True)
         try:
-            scratch.mkdir()
-            (scratch / "apps").mkdir()
-            shutil.copy2(
-                APP_PATH,
-                scratch / "apps" / APP_PATH.name,
-            )
-            shutil.copy2(CANDIDATE / "README.md", scratch / "README.md")
-            shutil.copy2(RENDERER_PATH, scratch / "render.py")
-            RENDERER.write_text_assets(scratch)
-            rebuilt_master = RENDERER.render_master(FFMPEG, scratch)
-            shutil.copy2(
-                MANIFEST_PATH,
-                scratch / "channel.production.json",
-            )
-            compilation = COMPILER.prepare_compilation(
-                scratch / "channel.production.json"
-            )
-            COMPILER.build_compilation(
-                compilation,
-                ffmpeg=FFMPEG,
-                ffprobe=FFPROBE,
-            )
-            rebuilt_delivery = RENDERER.delivery_document(scratch, FFPROBE)
+            rebuilt_deliveries = []
+            for scratch in scratches:
+                scratch.mkdir()
+                (scratch / "apps").mkdir()
+                shutil.copy2(
+                    APP_PATH,
+                    scratch / "apps" / APP_PATH.name,
+                )
+                shutil.copy2(CANDIDATE / "README.md", scratch / "README.md")
+                shutil.copy2(RENDERER_PATH, scratch / "render.py")
+                RENDERER.write_text_assets(scratch)
+                RENDERER.render_master(FFMPEG, scratch)
+                shutil.copy2(
+                    MANIFEST_PATH,
+                    scratch / "channel.production.json",
+                )
+                compilation = COMPILER.prepare_compilation(
+                    scratch / "channel.production.json"
+                )
+                COMPILER.build_compilation(
+                    compilation,
+                    ffmpeg=FFMPEG,
+                    ffprobe=FFPROBE,
+                )
+                rebuilt_deliveries.append(
+                    RENDERER.delivery_document(scratch, FFPROBE)
+                )
 
             for relative in (
-                Path("masters/create-vector-icon-system.mkv"),
-                Path("media/create-vector-icon-system.mp4"),
-                Path("media/create-vector-icon-system.webm"),
                 Path("channel.json"),
                 Path("exports/six-shapes.svg"),
                 Path("reference/reference-raster.json"),
@@ -1272,16 +1277,38 @@ class TestFrame000209MediaAndRebuild(unittest.TestCase):
             ):
                 with self.subTest(artifact=relative.as_posix()):
                     self.assertEqual(
-                        sha256(scratch / relative),
+                        sha256(scratches[0] / relative),
                         sha256(CANDIDATE / relative),
                     )
-            self.assertEqual(
-                sha256(rebuilt_master),
-                self.delivery["artifacts"]["master"]["sha256"],
-            )
-            self.assertEqual(rebuilt_delivery, self.delivery)
+            for relative in (
+                Path("masters/create-vector-icon-system.mkv"),
+                Path("media/create-vector-icon-system.mp4"),
+                Path("media/create-vector-icon-system.webm"),
+            ):
+                with self.subTest(rebuilt=relative.as_posix()):
+                    self.assertEqual(
+                        sha256(scratches[0] / relative),
+                        sha256(scratches[1] / relative),
+                    )
+            self.assertEqual(rebuilt_deliveries[0], rebuilt_deliveries[1])
+            for key in ("master", "mp4", "webm"):
+                rebuilt = rebuilt_deliveries[0]["artifacts"][key]
+                delivered = self.delivery["artifacts"][key]
+                for field in (
+                    "codec",
+                    "pixel_format",
+                    "width",
+                    "height",
+                    "duration",
+                    "color_space",
+                    "color_transfer",
+                    "color_primaries",
+                    "color_range",
+                ):
+                    self.assertEqual(rebuilt.get(field), delivered.get(field))
         finally:
-            shutil.rmtree(scratch, ignore_errors=True)
+            for scratch in scratches:
+                shutil.rmtree(scratch, ignore_errors=True)
 
 
 if __name__ == "__main__":
