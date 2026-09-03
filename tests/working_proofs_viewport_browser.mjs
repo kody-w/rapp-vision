@@ -212,7 +212,7 @@ const browser = spawn(
 const delay = (milliseconds) =>
   new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds));
 
-async function activePort(timeout = 15_000) {
+async function activePort(timeout = 45_000) {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
     if (browser.exitCode !== null) {

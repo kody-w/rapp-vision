@@ -35,12 +35,20 @@ const browser = spawn(browserPath, [
   `--user-data-dir=${profilePath}`,
   "about:blank",
 ], { stdio: "ignore" });
+let launchError;
+browser.once("error", error => {
+  launchError = error;
+});
 
 const delay = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
 async function waitForActivePort(timeout = 45000) {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
+    if (launchError) throw launchError;
+    if (browser.exitCode !== null) {
+      throw new Error(`browser exited before DevTools was ready: ${browser.exitCode}`);
+    }
     try {
       const response = await fetch(
         `http://127.0.0.1:${debugPort}/json/version`
