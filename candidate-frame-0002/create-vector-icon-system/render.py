@@ -751,6 +751,8 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
             "source": (
                 "channel.production.json#videos[0].live.scenes[0].actions"
             ),
+            "actionCount": 17,
+            "coordinateFree": True,
             "selectors": [
                 "#stroke-15-btn",
                 "#regenerate-btn",
@@ -760,14 +762,44 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
                 "#off-grid-btn",
                 "#restore-btn",
             ],
+            "scrollSelectors": [
+                "#stroke-15-btn",
+                "#regenerate-btn",
+                "#stroke-2-btn",
+                "#regenerate-btn",
+                "#export-btn",
+                "#status-panel",
+                "#off-grid-btn",
+                "#status-panel",
+                "#restore-btn",
+                "#status-panel",
+            ],
+            "checkpoints": [
+                {
+                    "afterAction": 10,
+                    "claim": "positive",
+                    "selector": "#status-panel",
+                },
+                {
+                    "afterAction": 13,
+                    "claim": "rejected",
+                    "selector": "#status-panel",
+                },
+                {
+                    "afterAction": 16,
+                    "claim": "reset",
+                    "selector": "#status-panel",
+                },
+            ],
             "nondefaultSupportedStrokes": [1.0, 1.5, 2.5, 3.0],
             "assertion": (
                 "The test suite launches a real Chromium-family browser, drives "
-                "each selector, captures reducer state and generated SVG geometry "
-                "after every click, independently hashes both the geometry and "
-                "sprite source, and fails unless all six symbols change at 1.5 px "
-                "before returning exactly to 2 px. Console and page exceptions "
-                "also fail the replay."
+                "each activation selector and applies every coordinate-free "
+                "semantic scroll, captures reducer state and generated SVG "
+                "geometry after every click, independently hashes both the "
+                "geometry and sprite source, and fails unless all six symbols "
+                "change at 1.5 px before returning exactly to 2 px. Console and "
+                "page exceptions also fail the replay."
             ),
             "positivePath": {
                 "initialStroke": REFERENCE_STROKE,

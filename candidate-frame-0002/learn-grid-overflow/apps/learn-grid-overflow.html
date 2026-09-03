@@ -404,6 +404,265 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
+
+    @media (max-height: 700px) and (min-width: 700px) {
+      .shell {
+        padding: 10px;
+        align-content: start;
+        gap: 8px;
+      }
+
+      header {
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+        gap: 14px;
+        padding-bottom: 7px;
+      }
+
+      .eyebrow {
+        margin-bottom: 3px;
+        font-size: 0.62rem;
+      }
+
+      h1 {
+        font-size: clamp(1.45rem, 3vw, 2rem);
+        line-height: 1;
+      }
+
+      .rule {
+        max-width: none;
+        font-size: 0.7rem;
+        line-height: 1.3;
+      }
+
+      .workspace {
+        grid-template-columns: minmax(0, 1.05fr) minmax(350px, 0.95fr);
+        gap: 8px;
+      }
+
+      .card {
+        padding: 9px;
+        border-width: 2px;
+        box-shadow: 4px 4px 0 #bfc9ca;
+      }
+
+      .card-heading {
+        margin-bottom: 6px;
+      }
+
+      .preview-stage {
+        height: 150px;
+      }
+
+      #preview-viewport {
+        top: 8px;
+        left: 8px;
+      }
+
+      .measurements {
+        gap: 4px;
+        margin-top: 6px;
+      }
+
+      .measurement {
+        padding: 6px;
+        border-width: 1px;
+      }
+
+      #css-source {
+        min-height: 82px;
+        padding: 8px;
+        font-size: 0.64rem;
+        line-height: 1.3;
+      }
+
+      .source-card {
+        gap: 6px;
+      }
+
+      .diagnosis {
+        min-height: 48px;
+        padding: 7px 9px;
+        font-size: 0.7rem;
+        line-height: 1.25;
+      }
+
+      .check {
+        padding: 6px;
+        border-width: 1px;
+        font-size: 0.62rem;
+      }
+
+      .controls {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 5px;
+      }
+
+      .controls button {
+        min-height: 44px;
+        padding: 5px;
+        font-size: 0.65rem;
+        box-shadow: 2px 2px 0 #0c1522;
+      }
+
+      .reset-note {
+        font-size: 0.65rem;
+        line-height: 1.25;
+      }
+    }
+
+    @media (max-width: 560px), (max-height: 420px) {
+      .shell {
+        min-height: 0;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+      }
+
+      header {
+        display: block;
+        padding: 2px 3px 4px;
+      }
+
+      header .eyebrow,
+      header .rule {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      h1 {
+        font-size: 1rem;
+        line-height: 1.1;
+        letter-spacing: -0.025em;
+      }
+
+      .workspace {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .source-card {
+        order: -1;
+      }
+
+      .card {
+        padding: 4px;
+        border-width: 1px;
+        box-shadow: 2px 2px 0 #bfc9ca;
+      }
+
+      .card-heading {
+        margin-bottom: 3px;
+      }
+
+      .card-heading h2,
+      #mode-badge {
+        font-size: 0.58rem;
+      }
+
+      #css-source {
+        min-height: 0;
+        height: 34px;
+        padding: 4px 5px;
+        font-size: 0.56rem;
+        line-height: 1.2;
+      }
+
+      .source-card {
+        gap: 3px;
+      }
+
+      .diagnosis {
+        min-height: 0;
+        padding: 5px 6px;
+        border-left-width: 4px;
+        font-size: 0.64rem;
+        line-height: 1.18;
+        scroll-margin-top: 3px;
+      }
+
+      .checks {
+        display: flex;
+        gap: 3px;
+        overflow-x: auto;
+        scrollbar-width: thin;
+      }
+
+      .check {
+        flex: 0 0 135px;
+        padding: 4px;
+        border-width: 1px;
+        font-size: 0.58rem;
+      }
+
+      .preview-stage {
+        height: 112px;
+      }
+
+      #preview-viewport {
+        top: 4px;
+        left: 4px;
+      }
+
+      .measurements {
+        display: flex;
+        gap: 3px;
+        margin-top: 3px;
+        overflow-x: auto;
+        scrollbar-width: thin;
+      }
+
+      .measurement {
+        flex: 0 0 88px;
+        padding: 4px;
+        border-width: 1px;
+      }
+
+      .measurement span {
+        font-size: 0.52rem;
+      }
+
+      .measurement output {
+        font-size: 0.72rem;
+      }
+
+      .controls {
+        display: flex;
+        gap: 4px;
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
+        scrollbar-width: thin;
+      }
+
+      .controls button {
+        flex: 0 0 128px;
+        min-height: 44px;
+        padding: 5px;
+        font-size: 0.62rem;
+        box-shadow: 1px 1px 0 #0c1522;
+        scroll-margin: 4px;
+      }
+
+      .reset-note {
+        font-size: 0.6rem;
+        line-height: 1.2;
+      }
+    }
+
+    @media (max-height: 420px) {
+      .shell {
+        padding-bottom: calc(100vh - 48px);
+      }
+    }
   </style>
   <style id="fixture-css"></style>
 </head>

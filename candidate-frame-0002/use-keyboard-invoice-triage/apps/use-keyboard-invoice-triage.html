@@ -439,6 +439,366 @@
         grid-template-columns: 1fr;
       }
     }
+
+    @media (max-height: 700px) and (min-width: 700px) {
+      .shell {
+        padding: 10px;
+        align-content: start;
+        gap: 8px;
+      }
+
+      header {
+        gap: 14px;
+        padding-bottom: 7px;
+      }
+
+      .kicker {
+        margin-bottom: 3px;
+        font-size: 0.62rem;
+      }
+
+      h1 {
+        font-size: clamp(1.45rem, 3vw, 2rem);
+        line-height: 1;
+      }
+
+      .total-card {
+        min-width: 180px;
+        padding: 7px 10px;
+      }
+
+      .total-card strong {
+        font-size: 1.2rem;
+      }
+
+      .workspace {
+        grid-template-columns: minmax(0, 1.28fr) minmax(320px, 0.72fr);
+        gap: 8px;
+      }
+
+      .queue,
+      .side-panel {
+        padding: 9px;
+        border-radius: 11px;
+      }
+
+      .section-heading {
+        margin-bottom: 6px;
+      }
+
+      .invoice-list {
+        gap: 5px;
+      }
+
+      .invoice-row {
+        min-height: 52px;
+        padding: 7px 8px;
+        gap: 7px;
+      }
+
+      .vendor small,
+      .column-label {
+        margin-top: 2px;
+        font-size: 0.57rem;
+      }
+
+      .amount-value {
+        font-size: 0.86rem;
+      }
+
+      .code-value,
+      .state-value,
+      .vendor strong {
+        font-size: 0.72rem;
+      }
+
+      .editor {
+        margin-top: 7px;
+        padding: 8px;
+      }
+
+      .editor-grid {
+        gap: 7px;
+        margin-top: 7px;
+      }
+
+      .editor-actions,
+      .main-actions,
+      .confirmation-actions {
+        gap: 5px;
+        margin-top: 7px;
+      }
+
+      .side-panel {
+        gap: 7px;
+      }
+
+      .metrics {
+        gap: 5px;
+      }
+
+      .metric {
+        min-height: 52px;
+        padding: 7px;
+      }
+
+      .metric strong {
+        font-size: 0.92rem;
+      }
+
+      #status-message,
+      #validation-error {
+        min-height: 0;
+        padding: 7px;
+        font-size: 0.7rem;
+        line-height: 1.25;
+      }
+
+      .export-output,
+      .focus-path,
+      .confirmation {
+        padding: 7px;
+      }
+
+      .export-output strong {
+        margin-bottom: 3px;
+      }
+
+      .export-output code,
+      .focus-path,
+      .footnote,
+      .confirmation p {
+        font-size: 0.64rem;
+        line-height: 1.25;
+      }
+    }
+
+    @media (max-width: 590px), (max-height: 420px) {
+      .shell {
+        min-height: 0;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+      }
+
+      header {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 6px;
+        padding: 2px 3px 4px;
+      }
+
+      .kicker,
+      .total-card span,
+      .focus-path,
+      .footnote {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      h1 {
+        font-size: 1rem;
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+      }
+
+      .total-card {
+        min-width: 0;
+        padding: 3px 6px;
+        border-radius: 7px;
+      }
+
+      .total-card strong {
+        font-size: 0.82rem;
+      }
+
+      .workspace {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .side-panel {
+        order: -1;
+      }
+
+      .queue,
+      .side-panel {
+        padding: 4px;
+        border-radius: 8px;
+      }
+
+      .section-heading {
+        margin-bottom: 3px;
+      }
+
+      .section-heading h2,
+      .side-panel h2,
+      .editor h2,
+      .confirmation h2,
+      .key-help {
+        font-size: 0.58rem;
+      }
+
+      .side-panel {
+        gap: 4px;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr 1fr;
+        gap: 3px;
+      }
+
+      .metric {
+        min-height: 34px;
+        padding: 4px;
+        border-radius: 6px;
+      }
+
+      .metric span {
+        margin-bottom: 1px;
+        font-size: 0.52rem;
+      }
+
+      .metric strong {
+        font-size: 0.76rem;
+      }
+
+      #status-message,
+      #validation-error {
+        min-height: 0;
+        padding: 5px 6px;
+        font-size: 0.63rem;
+        line-height: 1.16;
+        scroll-margin-top: 3px;
+      }
+
+      .export-output {
+        padding: 5px 6px;
+        border-width: 1px;
+        border-radius: 6px;
+        scroll-margin-top: 3px;
+      }
+
+      .export-output strong {
+        margin-bottom: 2px;
+        font-size: 0.62rem;
+      }
+
+      .export-output code {
+        font-size: 0.6rem;
+        line-height: 1.18;
+      }
+
+      .main-actions,
+      .confirmation-actions {
+        margin-top: 0;
+        flex-wrap: nowrap;
+        gap: 4px;
+        overflow-x: auto;
+        scrollbar-width: thin;
+      }
+
+      .main-actions button,
+      .confirmation-actions button {
+        flex: 0 0 142px;
+        min-height: 44px;
+        padding: 5px;
+        font-size: 0.62rem;
+        scroll-margin: 4px;
+      }
+
+      .confirmation {
+        padding: 5px;
+        border-radius: 7px;
+        scroll-margin-top: 3px;
+      }
+
+      .confirmation p {
+        margin-top: 3px;
+        font-size: 0.61rem;
+        line-height: 1.16;
+      }
+
+      .invoice-list {
+        gap: 4px;
+      }
+
+      .invoice-row {
+        min-height: 48px;
+        padding: 5px;
+        grid-template-columns: minmax(96px, 1.15fr) 0.68fr 0.76fr 0.66fr;
+        gap: 4px;
+        border-radius: 7px;
+        scroll-margin-top: 3px;
+      }
+
+      .vendor strong,
+      .amount-value,
+      .code-value,
+      .state-value {
+        font-size: 0.66rem;
+      }
+
+      .vendor small,
+      .column-label {
+        margin-top: 1px;
+        font-size: 0.48rem;
+      }
+
+      .editor {
+        margin-top: 4px;
+        padding: 5px;
+        border-radius: 7px;
+      }
+
+      .editor-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 5px;
+        margin-top: 5px;
+      }
+
+      label {
+        gap: 3px;
+        font-size: 0.58rem;
+      }
+
+      .editor-actions {
+        flex-wrap: nowrap;
+        gap: 4px;
+        margin-top: 5px;
+        overflow-x: auto;
+        scrollbar-width: thin;
+      }
+
+      .editor-actions button {
+        flex: 0 0 132px;
+        min-height: 44px;
+        padding: 5px;
+        font-size: 0.62rem;
+        scroll-margin: 4px;
+      }
+
+      input,
+      select {
+        min-height: 44px;
+        padding: 5px;
+      }
+    }
+
+    @media (max-height: 420px) {
+      .shell {
+        padding-bottom: calc(100vh - 48px);
+      }
+    }
   </style>
 </head>
 <body>

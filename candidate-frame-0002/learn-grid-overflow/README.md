@@ -25,6 +25,11 @@ Measurements in those snapshots come from `scrollWidth`, `clientWidth`,
 `scrollLeft`, computed `min-width`, and element widths in the browser—not from
 a hard-coded sizing model.
 
+Short and narrow live-player iframes use a compact presentation that keeps the
+diagnosis, measurements, and 44 px controls usable. The replay uses stable-ID
+semantic `scroll` actions before controls and after each success, failure, and
+reset transition; no coordinate action is used.
+
 ## Rebuild
 
 Run from the repository root. Candidate scripts and tests discover tools from

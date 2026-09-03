@@ -27,3 +27,9 @@ python3 -m unittest tests.test_working_proofs -v
 The source candidates remain the authority for their behavior, evidence, and
 media. The builder only deep-copies the selected publication metadata, removes
 review-only fields, and rebases relative URLs for this channel.
+
+`screenshots/` contains real Edge captures of the exact aggregate live actions
+at the 960 px desktop player stage and the 390 px iframe stage. Every
+success/failure/reset capture includes the player lower third, and
+`manifest.json` records screenshot hashes plus the measured visible
+intersection for the stable result selector.

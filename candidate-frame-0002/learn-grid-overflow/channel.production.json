@@ -69,9 +69,23 @@
           {
             "actions": [
               {
+                "at": 0.3,
+                "do": "scroll",
+                "selector": "#inspect-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 0.8,
                 "do": "click",
                 "selector": "#inspect-btn"
+              },
+              {
+                "at": 2.1,
+                "do": "scroll",
+                "selector": "#apply-fix-btn",
+                "block": "start",
+                "behavior": "auto"
               },
               {
                 "at": 2.6,
@@ -79,9 +93,30 @@
                 "selector": "#apply-fix-btn"
               },
               {
+                "at": 4.9,
+                "do": "scroll",
+                "selector": "#viewport-1280-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 5.4,
                 "do": "click",
                 "selector": "#viewport-1280-btn"
+              },
+              {
+                "at": 5.7,
+                "do": "scroll",
+                "selector": "#status-message",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 8.0,
+                "do": "scroll",
+                "selector": "#restore-broken-btn",
+                "block": "start",
+                "behavior": "auto"
               },
               {
                 "at": 8.4,
@@ -89,9 +124,23 @@
                 "selector": "#restore-broken-btn"
               },
               {
+                "at": 9.6,
+                "do": "scroll",
+                "selector": "#viewport-320-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 10,
                 "do": "click",
                 "selector": "#viewport-320-btn"
+              },
+              {
+                "at": 11.2,
+                "do": "scroll",
+                "selector": "#scroll-end-btn",
+                "block": "start",
+                "behavior": "auto"
               },
               {
                 "at": 11.6,
@@ -99,9 +148,30 @@
                 "selector": "#scroll-end-btn"
               },
               {
+                "at": 11.9,
+                "do": "scroll",
+                "selector": "#status-message",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 13.6,
+                "do": "scroll",
+                "selector": "#restore-broken-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 14,
                 "do": "click",
                 "selector": "#restore-broken-btn"
+              },
+              {
+                "at": 14.8,
+                "do": "scroll",
+                "selector": "#viewport-320-btn",
+                "block": "start",
+                "behavior": "auto"
               },
               {
                 "at": 15.2,
@@ -109,9 +179,23 @@
                 "selector": "#viewport-320-btn"
               },
               {
+                "at": 16.1,
+                "do": "scroll",
+                "selector": "#scroll-zero-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 16.5,
                 "do": "click",
                 "selector": "#scroll-zero-btn"
+              },
+              {
+                "at": 16.8,
+                "do": "scroll",
+                "selector": "#status-message",
+                "block": "start",
+                "behavior": "auto"
               }
             ],
             "app": "apps/learn-grid-overflow.html",

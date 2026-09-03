@@ -42,6 +42,12 @@ The rejected edit then moves one Pulse anchor from `(12,18)` to `(13,17)`. The
 changed pixels are highlighted, while the accepted paths, rules, six names,
 sprite hash, and last export remain unchanged.
 
+Short and narrow live-player iframes use a compact, horizontally scrollable
+control and evidence layout while preserving 44 px controls, focus treatment,
+and live status semantics. Stable-ID semantic `scroll` actions frame every
+driven control and the accepted, rejected, and restored status; the replay
+never relies on coordinates.
+
 All supported inputs (`1`, `1.5`, `2`, `2.5`, and `3` px) have deterministic
 sprite hashes and independently recomputed raster measurements. In particular,
 the former 1.5 px reset differs from the immutable 2 px reference by

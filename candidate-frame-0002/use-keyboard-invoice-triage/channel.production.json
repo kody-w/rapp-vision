@@ -91,6 +91,13 @@
             },
             "actions": [
               {
+                "at": 0.2,
+                "do": "scroll",
+                "selector": "#invoice-syn-001",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 0.5,
                 "do": "key",
                 "code": "Enter"
@@ -99,6 +106,13 @@
                 "at": 1.1,
                 "do": "key",
                 "code": "ArrowDown"
+              },
+              {
+                "at": 1.3,
+                "do": "scroll",
+                "selector": "#invoice-syn-002",
+                "block": "start",
+                "behavior": "auto"
               },
               {
                 "at": 1.7,
@@ -111,9 +125,23 @@
                 "code": "ArrowDown"
               },
               {
+                "at": 2.5,
+                "do": "scroll",
+                "selector": "#invoice-syn-003",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 2.9,
                 "do": "key",
                 "code": "Enter"
+              },
+              {
+                "at": 3.1,
+                "do": "scroll",
+                "selector": "#code-select",
+                "block": "start",
+                "behavior": "auto"
               },
               {
                 "at": 3.5,
@@ -131,9 +159,23 @@
                 "code": "Tab"
               },
               {
+                "at": 5.0,
+                "do": "scroll",
+                "selector": "#export-button",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 5.4,
                 "do": "key",
                 "code": "Enter"
+              },
+              {
+                "at": 5.7,
+                "do": "scroll",
+                "selector": "#export-output",
+                "block": "start",
+                "behavior": "auto"
               },
               {
                 "at": 6.4,
@@ -151,9 +193,23 @@
                 "code": "ShiftLeft"
               },
               {
+                "at": 7.2,
+                "do": "scroll",
+                "selector": "#invoice-syn-003",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 7.4,
                 "do": "key",
                 "code": "Enter"
+              },
+              {
+                "at": 7.7,
+                "do": "scroll",
+                "selector": "#amount-input",
+                "block": "start",
+                "behavior": "auto"
               },
               {
                 "at": 8.2,
@@ -164,6 +220,13 @@
                 "at": 9.2,
                 "do": "key",
                 "code": "Enter"
+              },
+              {
+                "at": 9.5,
+                "do": "scroll",
+                "selector": "#validation-error",
+                "block": "start",
+                "behavior": "auto"
               },
               {
                 "at": 10.0,
@@ -186,14 +249,35 @@
                 "code": "Tab"
               },
               {
+                "at": 11.8,
+                "do": "scroll",
+                "selector": "#restore-button",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 12.3,
                 "do": "key",
                 "code": "Enter"
               },
               {
+                "at": 12.6,
+                "do": "scroll",
+                "selector": "#confirm-restore-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 14.3,
                 "do": "key",
                 "code": "Enter"
+              },
+              {
+                "at": 14.6,
+                "do": "scroll",
+                "selector": "#status-message",
+                "block": "start",
+                "behavior": "auto"
               }
             ]
           }

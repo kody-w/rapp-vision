@@ -13,8 +13,19 @@ if (!browserExecutable || !appUrl || !actionsBase64 || !profileDirectory) {
 }
 
 const actions = JSON.parse(Buffer.from(actionsBase64, "base64").toString("utf8"));
-if (!Array.isArray(actions) || actions.some((action) => action.do !== "click")) {
-  throw new Error("browser replay only accepts authored click actions");
+if (
+  !Array.isArray(actions) ||
+  actions.some((action) => !["click", "scroll"].includes(action.do))
+) {
+  throw new Error("browser replay only accepts authored click and scroll actions");
+}
+for (const action of actions) {
+  if (typeof action.selector !== "string" || !action.selector.startsWith("#")) {
+    throw new Error("browser replay actions require stable id selectors");
+  }
+  if ("from" in action || "to" in action) {
+    throw new Error("browser replay actions cannot use coordinates");
+  }
 }
 
 class CdpClient {
@@ -412,20 +423,52 @@ try {
     'document.querySelector("#restore-btn").click()',
   );
   const steps = [];
-  for (const action of actions) {
+  const framing = [];
+  for (let actionIndex = 0; actionIndex < actions.length; actionIndex += 1) {
+    const action = actions[actionIndex];
+    if (action.do === "scroll") {
+      const result = await evaluate(
+        client,
+        sessionId,
+        `(() => {
+          const target = document.querySelector(${JSON.stringify(action.selector)});
+          if (!target) throw new Error("missing replay selector");
+          target.scrollIntoView({
+            block: ${JSON.stringify(action.block || "center")},
+            inline: "nearest",
+            behavior: "auto"
+          });
+          const bounds = target.getBoundingClientRect();
+          return {
+            top: bounds.top,
+            bottom: bounds.bottom,
+            width: bounds.width,
+            height: bounds.height,
+            viewportWidth: innerWidth,
+            viewportHeight: innerHeight
+          };
+        })()`,
+      );
+      framing.push({
+        actionIndex,
+        selector: action.selector,
+        ...result,
+      });
+      continue;
+    }
     const result = summarizeCapture(
       await evaluate(
         client,
         sessionId,
         `(() => {
-        const target = document.querySelector(${JSON.stringify(action.selector)});
-        if (!target) throw new Error("missing replay selector");
-        target.click();
-        return ${captureExpression};
-      })()`,
+          const target = document.querySelector(${JSON.stringify(action.selector)});
+          if (!target) throw new Error("missing replay selector");
+          target.click();
+          return ${captureExpression};
+        })()`,
       ),
     );
-    steps.push({ selector: action.selector, ...result });
+    steps.push({ actionIndex, selector: action.selector, ...result });
   }
   const positivePath = assertPositivePath(initial, steps);
 
@@ -434,6 +477,8 @@ try {
       browser: version.product,
       initial,
       nondefault,
+      actionCount: actions.length,
+      framing,
       steps,
       positivePath,
       consoleErrors,

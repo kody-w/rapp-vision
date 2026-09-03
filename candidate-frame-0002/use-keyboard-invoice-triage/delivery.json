@@ -64,29 +64,29 @@
       "sha256": "cf302113fe57517bb72baa467c14d4f9bbdec8e8f0bab9f4b5dd1f2ffe4470d6"
     },
     {
-      "bytes": 2897,
+      "bytes": 3199,
       "path": "README.md",
-      "sha256": "a0923ec7535932a18652484c2bbcc8e45c994bccc00c960784630f9e1a8aebc3"
+      "sha256": "a39db8336cccf86ed066f3620322f2c6f63f52fef81a038d609d668796097339"
     },
     {
-      "bytes": 40683,
+      "bytes": 47082,
       "path": "apps/use-keyboard-invoice-triage.html",
-      "sha256": "cc9beaff0437fd2bc74a05099411abae6d68ef3926526688bd5103caeb6e8d8a"
+      "sha256": "28209ac77188e48a22545252a7db8403d2070ce1750c3b06d138c066831d6bf2"
     },
     {
-      "bytes": 5423,
+      "bytes": 7926,
       "path": "channel.production.json",
-      "sha256": "b6898b609fb624975e13e53572363ad653d271b97a1fdc1fc22236d90dc81d92"
+      "sha256": "f0040d9e1f12168645b590a4e2433197e2982122038dfdacbcb137eed5ab4693"
     },
     {
-      "bytes": 5576,
+      "bytes": 8079,
       "path": "channel.json",
-      "sha256": "157b61c1f6c3a5e57769a961fef99100d81c1a489fc27cec1e9cf6f2718a353a"
+      "sha256": "9b2d6aa9b42279874614d486615fb3ecd097909c8836b734f072db0eda95481b"
     },
     {
-      "bytes": 8273,
+      "bytes": 9123,
       "path": "evidence.json",
-      "sha256": "7d45c16b4f90c98d455c48c7f843d17824ec42bbf907adc8e4e3efad02bf46a6"
+      "sha256": "e97712e3cbb0d9a4da22de7eaee27a18dd5d4f3fbe3f33a8da3af62a22e7145f"
     },
     {
       "bytes": 32324,
@@ -99,9 +99,9 @@
       "sha256": "8117ec27f3e42c688bd0b61cd9290f71104fe61fb5eb77e37bb27eb112282636"
     },
     {
-      "bytes": 16479,
+      "bytes": 17972,
       "path": "verify_dom.mjs",
-      "sha256": "f1010b7e0ba4469180307db82dd0792cb960c4fcfe31e044fba6f74e5c2c0a7d"
+      "sha256": "a7c61eea79a7c5bff17dce67b2f67bd01a596f76a6472ae4704556f4140fa535"
     }
   ]
 }

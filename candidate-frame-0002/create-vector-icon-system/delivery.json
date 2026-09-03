@@ -1,24 +1,24 @@
 {
   "artifacts": {
     "app": {
-      "bytes": 38697,
+      "bytes": 45128,
       "path": "apps/create-vector-icon-system.html",
-      "sha256": "2c24dbdefada7d9252e8d1d55afd8be27c01e8ba000e170b08a8d07bcd7f01a4"
+      "sha256": "fbe8b11a4294ef8fa557e1b87192f846cacf95b65358bcc8acb23f78c5dd9569"
     },
     "channel": {
-      "bytes": 4233,
+      "bytes": 6297,
       "path": "channel.json",
-      "sha256": "0446a058a34dbd518e5236b5137dec3132bc8fdf0687edacccb5635ddc2c5397"
+      "sha256": "966c85f43ce482e98e2abd1bce64a3d3c80d59f646b4d1413bcea8b3d4329f5e"
     },
     "documentation": {
-      "bytes": 6563,
+      "bytes": 6897,
       "path": "README.md",
-      "sha256": "86546a31ff3388b54d7612e2419fc3b0259c320a8297131ab9b346cc150d8b0f"
+      "sha256": "9f5844ae39a5952b84879c7b99821af85cad63bec498dc375435d02071c1471d"
     },
     "evidence": {
-      "bytes": 22528,
+      "bytes": 23254,
       "path": "evidence.json",
-      "sha256": "8250620000766657d8bfa172a0191ea5184802ae68dd6869222b3ed08364d735"
+      "sha256": "6becaa4f9c5595b4081d8d479e6b610ac0c88e78091452e2b9289950ff7c0da2"
     },
     "master": {
       "bytes": 4879229,
@@ -49,9 +49,9 @@
       "width": 960
     },
     "production": {
-      "bytes": 4082,
+      "bytes": 6146,
       "path": "channel.production.json",
-      "sha256": "386aedf08b6d10c32c46d38fcbc7ce9aa70cb1662882ceccf7b66c5740bc58c5"
+      "sha256": "7a17ce44a42a3b6b8490192e748c0eab997f7fff2ab66fba70aa2766755c4b70"
     },
     "reference": {
       "bytes": 6116,
@@ -59,9 +59,9 @@
       "sha256": "61744b14a3c1e4f360d77207712e12f33e626259e1ff9eaca7cd46dd5ebd2d46"
     },
     "renderer": {
-      "bytes": 59034,
+      "bytes": 60100,
       "path": "render.py",
-      "sha256": "a5f3638c1f34b2a82e4f91d17e8e05e917f3e57c4dce69e1ac5456bb222aa92e"
+      "sha256": "97e1213a9e3dc873779af469a90bbe79290265a51e6a4f8b025346781c40a8aa"
     },
     "snapshot": {
       "bytes": 3468,

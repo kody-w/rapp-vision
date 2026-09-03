@@ -51,28 +51,66 @@ EXPECTED_FOCUS_ORDER = (
 )
 EXPECTED_CONTROLS = set(EXPECTED_FOCUS_ORDER)
 
+
+def framing_scroll(at: float, selector: str) -> dict:
+    return {
+        "at": at,
+        "do": "scroll",
+        "selector": selector,
+        "block": "start",
+        "behavior": "auto",
+    }
+
+
+EXPECTED_SCROLL_SELECTORS = [
+    "#invoice-syn-001",
+    "#invoice-syn-002",
+    "#invoice-syn-003",
+    "#code-select",
+    "#export-button",
+    "#export-output",
+    "#invoice-syn-003",
+    "#amount-input",
+    "#validation-error",
+    "#restore-button",
+    "#confirm-restore-btn",
+    "#status-message",
+]
+
 EXPECTED_MANIFEST_ACTIONS = [
+    framing_scroll(0.2, "#invoice-syn-001"),
     {"at": 0.5, "do": "key", "code": "Enter"},
     {"at": 1.1, "do": "key", "code": "ArrowDown"},
+    framing_scroll(1.3, "#invoice-syn-002"),
     {"at": 1.7, "do": "key", "code": "Enter"},
     {"at": 2.3, "do": "key", "code": "ArrowDown"},
+    framing_scroll(2.5, "#invoice-syn-003"),
     {"at": 2.9, "do": "key", "code": "Enter"},
+    framing_scroll(3.1, "#code-select"),
     {"at": 3.5, "do": "key", "code": "ArrowDown"},
     {"at": 4.1, "do": "key", "code": "Enter"},
     {"at": 4.8, "do": "key", "code": "Tab"},
+    framing_scroll(5.0, "#export-button"),
     {"at": 5.4, "do": "key", "code": "Enter"},
+    framing_scroll(5.7, "#export-output"),
     {"at": 6.4, "do": "keydown", "code": "ShiftLeft"},
     {"at": 6.7, "do": "key", "code": "Tab"},
     {"at": 7.0, "do": "keyup", "code": "ShiftLeft"},
+    framing_scroll(7.2, "#invoice-syn-003"),
     {"at": 7.4, "do": "key", "code": "Enter"},
+    framing_scroll(7.7, "#amount-input"),
     {"at": 8.2, "do": "type", "text": "-1.00"},
     {"at": 9.2, "do": "key", "code": "Enter"},
+    framing_scroll(9.5, "#validation-error"),
     {"at": 10.0, "do": "key", "code": "Tab"},
     {"at": 10.5, "do": "key", "code": "Tab"},
     {"at": 11.0, "do": "key", "code": "Tab"},
     {"at": 11.5, "do": "key", "code": "Tab"},
+    framing_scroll(11.8, "#restore-button"),
     {"at": 12.3, "do": "key", "code": "Enter"},
+    framing_scroll(12.6, "#confirm-restore-btn"),
     {"at": 14.3, "do": "key", "code": "Enter"},
+    framing_scroll(14.6, "#status-message"),
 ]
 
 
@@ -308,7 +346,7 @@ class TestCandidateManifest(unittest.TestCase):
             [],
         )
 
-    def test_live_replay_is_exactly_keyboard_only(self):
+    def test_live_replay_uses_keyboard_activation_and_semantic_framing(self):
         live = self.video["live"]
         self.assertEqual(live["kind"], "rapp-vision-live/1.0")
         self.assertEqual(live["duration"], 18)
@@ -321,7 +359,10 @@ class TestCandidateManifest(unittest.TestCase):
 
         self.assertEqual(scene["actions"], EXPECTED_MANIFEST_ACTIONS)
         action_types = {action["do"] for action in scene["actions"]}
-        self.assertEqual(action_types, {"key", "keydown", "keyup", "type"})
+        self.assertEqual(
+            action_types,
+            {"key", "keydown", "keyup", "type", "scroll"},
+        )
         codes = [action["code"] for action in scene["actions"] if action["do"] == "key"]
         for required in ("Tab", "ArrowDown", "Enter"):
             self.assertIn(required, codes)
@@ -334,9 +375,17 @@ class TestCandidateManifest(unittest.TestCase):
         self.assertTrue(all(0 <= value < scene["dur"] for value in times))
         for action in scene["actions"]:
             with self.subTest(action=action):
-                self.assertNotIn("selector", action)
                 self.assertNotIn("from", action)
                 self.assertNotIn("to", action)
+                if action["do"] == "scroll":
+                    self.assertRegex(
+                        action["selector"],
+                        r"^#[A-Za-z][A-Za-z0-9_-]*$",
+                    )
+                    self.assertEqual(action["block"], "start")
+                    self.assertEqual(action["behavior"], "auto")
+                else:
+                    self.assertNotIn("selector", action)
 
         source = APP_PATH.read_text(encoding="utf-8")
         index = AppIndex()
@@ -394,12 +443,20 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
         normalized = [
             {key: value for key, value in action.items() if key != "at"}
             for action in manifest_actions
+            if action["do"] != "scroll"
         ]
         self.assertEqual(self.claims["positive"]["actions"], normalized[:9])
         self.assertEqual(self.claims["rejected"]["actions"], normalized[:15])
         self.assertEqual(self.claims["reset"]["actions"], normalized[15:])
         replay = self.evidence["manifestReplay"]
         self.assertEqual(replay["actionCount"], len(manifest_actions))
+        self.assertTrue(replay["coordinateFree"])
+        self.assertEqual(replay["framingAction"], "scroll")
+        self.assertEqual(replay["scrollSelectors"], EXPECTED_SCROLL_SELECTORS)
+        self.assertEqual(
+            replay["activationActions"],
+            ["key", "keydown", "keyup", "type"],
+        )
         self.assertEqual(replay["declaredFocusOrder"], list(EXPECTED_FOCUS_ORDER))
         self.assertEqual(
             len(replay["focusAfterEachAction"]),
@@ -408,9 +465,21 @@ class TestFixtureEvidenceAndApp(unittest.TestCase):
         self.assertEqual(
             replay["checkpoints"],
             [
-                {"afterAction": 8, "claim": "positive"},
-                {"afterAction": 14, "claim": "rejected"},
-                {"afterAction": 20, "claim": "reset"},
+                {
+                    "afterAction": 14,
+                    "claim": "positive",
+                    "selector": "#export-output",
+                },
+                {
+                    "afterAction": 23,
+                    "claim": "rejected",
+                    "selector": "#validation-error",
+                },
+                {
+                    "afterAction": 32,
+                    "claim": "reset",
+                    "selector": "#status-message",
+                },
             ],
         )
 
@@ -532,7 +601,7 @@ class TestRealBrowserReplay(unittest.TestCase):
         self.assertEqual(
             payload,
             {
-                "actionCount": 21,
+                "actionCount": 33,
                 "fixtureTotal": "196.25",
                 "acceptedTotal": "196.25",
                 "negativeAmount": "-1.00",

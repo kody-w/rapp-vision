@@ -12,6 +12,42 @@
   "publications": [
     {
       "app": "apps/learn-grid-overflow.html",
+      "liveFraming": {
+        "actionCount": 21,
+        "coordinateFree": true,
+        "source": "channel.production.json#videos[0].live.scenes[0].actions",
+        "scrollSelectors": [
+          "#inspect-btn",
+          "#apply-fix-btn",
+          "#viewport-1280-btn",
+          "#status-message",
+          "#restore-broken-btn",
+          "#viewport-320-btn",
+          "#scroll-end-btn",
+          "#status-message",
+          "#restore-broken-btn",
+          "#viewport-320-btn",
+          "#scroll-zero-btn",
+          "#status-message"
+        ],
+        "checkpoints": [
+          {
+            "afterAction": 6,
+            "claim": "positive",
+            "selector": "#status-message"
+          },
+          {
+            "afterAction": 13,
+            "claim": "failure",
+            "selector": "#status-message"
+          },
+          {
+            "afterAction": 20,
+            "claim": "reset",
+            "selector": "#status-message"
+          }
+        ]
+      },
       "claims": [
         {
           "actions": [

@@ -368,21 +368,40 @@ async function dispatchKey(type, action) {
 
 async function replayAction(action) {
   assert.ok(
-    !("selector" in action) && !("from" in action) && !("to" in action),
-    "keyboard-only manifest action cannot target pointer coordinates or selectors"
+    !("from" in action) && !("to" in action),
+    "invoice replay actions cannot target pointer coordinates"
   );
-  if (action.do === "type") {
+  if (action.do === "scroll") {
+    assert.equal(typeof action.selector, "string", "scroll action requires selector");
+    assert.ok(action.selector.startsWith("#"), "scroll selector must be a stable id");
+    const selector = JSON.stringify(action.selector);
+    const block = JSON.stringify(action.block || "center");
+    await evaluate(`(() => {
+      const target = document.querySelector(${selector});
+      if (!target) throw new Error("missing scroll selector " + ${selector});
+      target.scrollIntoView({
+        block: ${block},
+        inline: "nearest",
+        behavior: "auto"
+      });
+      return true;
+    })()`);
+  } else if (action.do === "type") {
+    assert.ok(!("selector" in action), "typing follows the declared focus path");
     assert.equal(typeof action.text, "string", "type action requires text");
     await cdp.command("Input.insertText", { text: action.text });
   } else if (action.do === "keydown") {
+    assert.ok(!("selector" in action), "keydown follows the declared focus path");
     await dispatchKey("keyDown", action);
   } else if (action.do === "keyup") {
+    assert.ok(!("selector" in action), "keyup follows the declared focus path");
     await dispatchKey("keyUp", action);
   } else if (action.do === "key") {
+    assert.ok(!("selector" in action), "key action follows the declared focus path");
     await dispatchKey("keyDown", action);
     await dispatchKey("keyUp", action);
   } else {
-    throw new Error(`non-keyboard manifest action: ${action.do}`);
+    throw new Error(`unsupported invoice manifest action: ${action.do}`);
   }
   await delay(45);
 }
@@ -427,9 +446,26 @@ try {
   assert.equal(replay.focusAfterEachAction.length, scene.actions.length);
   const actionKinds = [...new Set(scene.actions.map(action => action.do))].sort();
   assert.deepEqual(actionKinds, [...replay.allowedActions].sort());
+  assert.deepEqual(
+    scene.actions
+      .filter(action => action.do === replay.framingAction)
+      .map(action => action.selector),
+    replay.scrollSelectors
+  );
+  assert.deepEqual(
+    [...new Set(scene.actions
+      .filter(action => action.do !== replay.framingAction)
+      .map(action => action.do))].sort(),
+    [...replay.activationActions].sort()
+  );
   for (const action of scene.actions) {
     assert.ok(replay.allowedActions.includes(action.do));
     assert.ok(action.at >= 0 && action.at < scene.dur);
+    if (action.do === "scroll") {
+      assert.match(action.selector, /^#[A-Za-z][A-Za-z0-9_-]*$/);
+      assert.equal(action.block, "start");
+      assert.equal(action.behavior, "auto");
+    }
   }
 
   const appUrl = pathToFileURL(appPath).href;

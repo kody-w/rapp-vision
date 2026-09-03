@@ -44,6 +44,20 @@ EXPECTED_ACTION_SELECTORS = [
     "#viewport-320-btn",
     "#scroll-zero-btn",
 ]
+EXPECTED_SCROLL_SELECTORS = [
+    "#inspect-btn",
+    "#apply-fix-btn",
+    "#viewport-1280-btn",
+    "#status-message",
+    "#restore-broken-btn",
+    "#viewport-320-btn",
+    "#scroll-end-btn",
+    "#status-message",
+    "#restore-broken-btn",
+    "#viewport-320-btn",
+    "#scroll-zero-btn",
+    "#status-message",
+]
 REQUIRED_IDS = {
     "preview-stage",
     "preview-viewport",
@@ -275,9 +289,26 @@ class TestFrame000204AlwaysOn(unittest.TestCase):
         self.assertEqual(self.video["live"]["duration"], 18)
         scene = self.video["live"]["scenes"][0]
         self.assertEqual(
-            [action["selector"] for action in scene["actions"]],
+            [
+                action["selector"]
+                for action in scene["actions"]
+                if action["do"] == "click"
+            ],
             EXPECTED_ACTION_SELECTORS,
         )
+        self.assertEqual(
+            [
+                action["selector"]
+                for action in scene["actions"]
+                if action["do"] == "scroll"
+            ],
+            EXPECTED_SCROLL_SELECTORS,
+        )
+        for action in scene["actions"]:
+            if action["do"] == "scroll":
+                self.assertEqual(action["block"], "start")
+                self.assertEqual(action["behavior"], "auto")
+                self.assertNotIn("to", action)
         self.assertTrue(all(action["at"] < scene["dur"] for action in scene["actions"]))
         self.assertIn("scrollWidth 612 > clientWidth 320", self.video["description"])
         self.assertIn("min-width: auto", self.video["description"])
@@ -290,6 +321,30 @@ class TestFrame000204AlwaysOn(unittest.TestCase):
         )
         self.assertEqual(self.evidence["commission"]["id"], "learn-grid-overflow")
         self.assertEqual(set(self.claims), {"positive", "failure", "reset"})
+        framing = self.publication["liveFraming"]
+        self.assertEqual(framing["actionCount"], 21)
+        self.assertTrue(framing["coordinateFree"])
+        self.assertEqual(framing["scrollSelectors"], EXPECTED_SCROLL_SELECTORS)
+        self.assertEqual(
+            framing["checkpoints"],
+            [
+                {
+                    "afterAction": 6,
+                    "claim": "positive",
+                    "selector": "#status-message",
+                },
+                {
+                    "afterAction": 13,
+                    "claim": "failure",
+                    "selector": "#status-message",
+                },
+                {
+                    "afterAction": 20,
+                    "claim": "reset",
+                    "selector": "#status-message",
+                },
+            ],
+        )
         embedded = embedded_contract_states(self.source)
         self.assertEqual(
             embedded,

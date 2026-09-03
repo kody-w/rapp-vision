@@ -95,9 +95,23 @@
             },
             "actions": [
               {
+                "at": 0.3,
+                "do": "scroll",
+                "selector": "#stroke-15-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 0.8,
                 "do": "click",
                 "selector": "#stroke-15-btn"
+              },
+              {
+                "at": 1.8,
+                "do": "scroll",
+                "selector": "#regenerate-btn",
+                "block": "start",
+                "behavior": "auto"
               },
               {
                 "at": 2.2,
@@ -105,9 +119,23 @@
                 "selector": "#regenerate-btn"
               },
               {
+                "at": 3.7,
+                "do": "scroll",
+                "selector": "#stroke-2-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 4.1,
                 "do": "click",
                 "selector": "#stroke-2-btn"
+              },
+              {
+                "at": 5.1,
+                "do": "scroll",
+                "selector": "#regenerate-btn",
+                "block": "start",
+                "behavior": "auto"
               },
               {
                 "at": 5.5,
@@ -115,9 +143,30 @@
                 "selector": "#regenerate-btn"
               },
               {
+                "at": 6.2,
+                "do": "scroll",
+                "selector": "#export-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 6.6,
                 "do": "click",
                 "selector": "#export-btn"
+              },
+              {
+                "at": 6.9,
+                "do": "scroll",
+                "selector": "#status-panel",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 8.2,
+                "do": "scroll",
+                "selector": "#off-grid-btn",
+                "block": "start",
+                "behavior": "auto"
               },
               {
                 "at": 8.6,
@@ -125,9 +174,30 @@
                 "selector": "#off-grid-btn"
               },
               {
+                "at": 8.9,
+                "do": "scroll",
+                "selector": "#status-panel",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
+                "at": 11.4,
+                "do": "scroll",
+                "selector": "#restore-btn",
+                "block": "start",
+                "behavior": "auto"
+              },
+              {
                 "at": 11.8,
                 "do": "click",
                 "selector": "#restore-btn"
+              },
+              {
+                "at": 12.1,
+                "do": "scroll",
+                "selector": "#status-panel",
+                "block": "start",
+                "behavior": "auto"
               }
             ]
           }

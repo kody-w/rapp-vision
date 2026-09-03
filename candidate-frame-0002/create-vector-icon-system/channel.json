@@ -69,9 +69,23 @@
           {
             "actions": [
               {
+                "at": 0.3,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#stroke-15-btn"
+              },
+              {
                 "at": 0.8,
                 "do": "click",
                 "selector": "#stroke-15-btn"
+              },
+              {
+                "at": 1.8,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#regenerate-btn"
               },
               {
                 "at": 2.2,
@@ -79,9 +93,23 @@
                 "selector": "#regenerate-btn"
               },
               {
+                "at": 3.7,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#stroke-2-btn"
+              },
+              {
                 "at": 4.1,
                 "do": "click",
                 "selector": "#stroke-2-btn"
+              },
+              {
+                "at": 5.1,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#regenerate-btn"
               },
               {
                 "at": 5.5,
@@ -89,9 +117,30 @@
                 "selector": "#regenerate-btn"
               },
               {
+                "at": 6.2,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#export-btn"
+              },
+              {
                 "at": 6.6,
                 "do": "click",
                 "selector": "#export-btn"
+              },
+              {
+                "at": 6.9,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#status-panel"
+              },
+              {
+                "at": 8.2,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#off-grid-btn"
               },
               {
                 "at": 8.6,
@@ -99,9 +148,30 @@
                 "selector": "#off-grid-btn"
               },
               {
+                "at": 8.9,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#status-panel"
+              },
+              {
+                "at": 11.4,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#restore-btn"
+              },
+              {
                 "at": 11.8,
                 "do": "click",
                 "selector": "#restore-btn"
+              },
+              {
+                "at": 12.1,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#status-panel"
               }
             ],
             "app": "apps/create-vector-icon-system.html",

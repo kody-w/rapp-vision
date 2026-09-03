@@ -65,6 +65,13 @@
           {
             "actions": [
               {
+                "at": 0.2,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#invoice-syn-001"
+              },
+              {
                 "at": 0.5,
                 "code": "Enter",
                 "do": "key"
@@ -73,6 +80,13 @@
                 "at": 1.1,
                 "code": "ArrowDown",
                 "do": "key"
+              },
+              {
+                "at": 1.3,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#invoice-syn-002"
               },
               {
                 "at": 1.7,
@@ -85,9 +99,23 @@
                 "do": "key"
               },
               {
+                "at": 2.5,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#invoice-syn-003"
+              },
+              {
                 "at": 2.9,
                 "code": "Enter",
                 "do": "key"
+              },
+              {
+                "at": 3.1,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#code-select"
               },
               {
                 "at": 3.5,
@@ -105,9 +133,23 @@
                 "do": "key"
               },
               {
+                "at": 5.0,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#export-button"
+              },
+              {
                 "at": 5.4,
                 "code": "Enter",
                 "do": "key"
+              },
+              {
+                "at": 5.7,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#export-output"
               },
               {
                 "at": 6.4,
@@ -125,9 +167,23 @@
                 "do": "keyup"
               },
               {
+                "at": 7.2,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#invoice-syn-003"
+              },
+              {
                 "at": 7.4,
                 "code": "Enter",
                 "do": "key"
+              },
+              {
+                "at": 7.7,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#amount-input"
               },
               {
                 "at": 8.2,
@@ -138,6 +194,13 @@
                 "at": 9.2,
                 "code": "Enter",
                 "do": "key"
+              },
+              {
+                "at": 9.5,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#validation-error"
               },
               {
                 "at": 10.0,
@@ -160,14 +223,35 @@
                 "do": "key"
               },
               {
+                "at": 11.8,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#restore-button"
+              },
+              {
                 "at": 12.3,
                 "code": "Enter",
                 "do": "key"
               },
               {
+                "at": 12.6,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#confirm-restore-btn"
+              },
+              {
                 "at": 14.3,
                 "code": "Enter",
                 "do": "key"
+              },
+              {
+                "at": 14.6,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#status-message"
               }
             ],
             "app": "apps/use-keyboard-invoice-triage.html",

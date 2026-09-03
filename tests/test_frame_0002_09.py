@@ -405,6 +405,7 @@ class TestFrame000209CommissionAndManifest(unittest.TestCase):
             action["selector"]
             for scene in video["live"]["scenes"]
             for action in scene["actions"]
+            if action["do"] == "click"
         ]
         self.assertEqual(
             selectors,
@@ -418,6 +419,32 @@ class TestFrame000209CommissionAndManifest(unittest.TestCase):
                 "#restore-btn",
             ],
         )
+        self.assertEqual(
+            [
+                action["selector"]
+                for scene in video["live"]["scenes"]
+                for action in scene["actions"]
+                if action["do"] == "scroll"
+            ],
+            [
+                "#stroke-15-btn",
+                "#regenerate-btn",
+                "#stroke-2-btn",
+                "#regenerate-btn",
+                "#export-btn",
+                "#status-panel",
+                "#off-grid-btn",
+                "#status-panel",
+                "#restore-btn",
+                "#status-panel",
+            ],
+        )
+        for scene in video["live"]["scenes"]:
+            for action in scene["actions"]:
+                if action["do"] == "scroll":
+                    self.assertEqual(action["block"], "start")
+                    self.assertEqual(action["behavior"], "auto")
+                    self.assertNotIn("to", action)
 
     def test_compiled_channel_is_exact_compiler_output_and_validator_clean(self):
         compilation = COMPILER.prepare_compilation(MANIFEST_PATH)
@@ -631,6 +658,43 @@ class TestFrame000209SpriteAndEvidence(unittest.TestCase):
             self.evidence["browserReplay"]["selectors"],
             positive_selectors + ["#off-grid-btn", "#restore-btn"],
         )
+        self.assertEqual(self.evidence["browserReplay"]["actionCount"], 17)
+        self.assertTrue(self.evidence["browserReplay"]["coordinateFree"])
+        self.assertEqual(
+            self.evidence["browserReplay"]["scrollSelectors"],
+            [
+                "#stroke-15-btn",
+                "#regenerate-btn",
+                "#stroke-2-btn",
+                "#regenerate-btn",
+                "#export-btn",
+                "#status-panel",
+                "#off-grid-btn",
+                "#status-panel",
+                "#restore-btn",
+                "#status-panel",
+            ],
+        )
+        self.assertEqual(
+            self.evidence["browserReplay"]["checkpoints"],
+            [
+                {
+                    "afterAction": 10,
+                    "claim": "positive",
+                    "selector": "#status-panel",
+                },
+                {
+                    "afterAction": 13,
+                    "claim": "rejected",
+                    "selector": "#status-panel",
+                },
+                {
+                    "afterAction": 16,
+                    "claim": "reset",
+                    "selector": "#status-panel",
+                },
+            ],
+        )
         positive_path = self.evidence["browserReplay"]["positivePath"]
         self.assertEqual(
             (
@@ -843,7 +907,20 @@ class TestFrame000209BrowserLiveReplay(unittest.TestCase):
         self.assertEqual(self.result["initial"]["state"], self.states["reset"])
         self.assertEqual(
             [step["selector"] for step in self.result["steps"]],
-            [action["selector"] for action in self.actions],
+            [
+                action["selector"]
+                for action in self.actions
+                if action["do"] == "click"
+            ],
+        )
+        self.assertEqual(self.result["actionCount"], len(self.actions))
+        self.assertEqual(
+            [step["selector"] for step in self.result["framing"]],
+            [
+                action["selector"]
+                for action in self.actions
+                if action["do"] == "scroll"
+            ],
         )
         steps = self.result["steps"]
         edited = steps[1]

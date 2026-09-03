@@ -8,6 +8,7 @@ import importlib.util
 import json
 import os
 import shutil
+import struct
 import subprocess
 import sys
 import unittest
@@ -22,7 +23,9 @@ CHANNEL_PATH = WORKING_ROOT / "channel.json"
 EVIDENCE_INDEX_PATH = WORKING_ROOT / "evidence-index.json"
 BUILDER_PATH = ROOT / "scripts" / "build_working_proofs.py"
 VALIDATOR_PATH = ROOT / "scripts" / "validate_publications.py"
+VIEWPORT_RUNNER_PATH = ROOT / "tests" / "working_proofs_viewport_browser.mjs"
 CANDIDATE_ROOT = ROOT / "candidate-frame-0002"
+SCREENSHOT_ROOT = WORKING_ROOT / "screenshots"
 
 PUBLICATIONS = (
     (
@@ -57,6 +60,13 @@ def sha256(path: Path) -> str:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def png_dimensions(path: Path) -> tuple[int, int]:
+    header = path.read_bytes()[:24]
+    if len(header) != 24 or header[:8] != b"\x89PNG\r\n\x1a\n":
+        raise AssertionError(f"{path}: not a PNG")
+    return struct.unpack(">II", header[16:24])
 
 
 def load_module(name: str, path: Path):
@@ -628,7 +638,7 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
             keyboard_profile,
         )
         self.assertEqual(keyboard["browserErrors"], 0)
-        self.assertEqual(keyboard["actionCount"], 21)
+        self.assertEqual(keyboard["actionCount"], 33)
         self.assertEqual(
             keyboard["checkpoints"],
             ["positive", "rejected", "reset"],
@@ -657,10 +667,145 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
         self.assertEqual(vector["pageErrors"], [])
         self.assertEqual(
             [step["selector"] for step in vector["steps"]],
-            [action["selector"] for action in actions],
+            [
+                action["selector"]
+                for action in actions
+                if action["do"] == "click"
+            ],
+        )
+        self.assertEqual(vector["actionCount"], len(actions))
+        self.assertEqual(
+            [step["selector"] for step in vector["framing"]],
+            [
+                action["selector"]
+                for action in actions
+                if action["do"] == "scroll"
+            ],
         )
         self.assertEqual(vector["steps"][-1]["state"], vector["initial"]["state"])
         self.assertEqual(vector["positivePath"]["changedIconCount"], 6)
+
+    def test_desktop_and_390_player_stage_evidence_is_visible(self):
+        profile = WORKING_ROOT / ".browser-viewports"
+        scratch = WORKING_ROOT / ".viewport-captures"
+        shutil.rmtree(scratch, ignore_errors=True)
+        try:
+            result = self.run_json(
+                [
+                    NODE,
+                    str(VIEWPORT_RUNNER_PATH),
+                    BROWSER,
+                    str(CHANNEL_PATH),
+                    str(EVIDENCE_INDEX_PATH),
+                    str(scratch),
+                    str(profile),
+                ],
+                profile,
+            )
+            self.assertEqual(result["errors"], [])
+            self.assertEqual(result["captures"], 18)
+            self.assertEqual(len(result["runs"]), 6)
+
+            expected_counts = {
+                "learn-grid-overflow": 21,
+                "use-keyboard-invoice-triage": 33,
+                "create-vector-icon-system": 17,
+            }
+            for run in result["runs"]:
+                with self.subTest(
+                    publication=run["publication"],
+                    viewport=run["viewport"],
+                ):
+                    self.assertEqual(
+                        run["actionCount"],
+                        expected_counts[run["publication"]],
+                    )
+                    self.assertEqual(
+                        run["checkpoints"],
+                        (
+                            ["positive", "failure", "reset"]
+                            if run["publication"] == "learn-grid-overflow"
+                            else ["positive", "rejected", "reset"]
+                        ),
+                    )
+                    self.assertGreater(run["activationsChecked"], 0)
+                    self.assertAlmostEqual(
+                        run["frameWidth"],
+                        960 if run["viewport"] == "desktop" else 390,
+                        delta=1,
+                    )
+                    self.assertTrue(all(height >= 90 for height in run["safeHeight"]))
+
+            generated_manifest = load_json(scratch / "manifest.json")
+            self.assertEqual(
+                generated_manifest["schema"],
+                "working-proofs-viewport-evidence/1.0",
+            )
+            self.assertEqual(generated_manifest["channel"], "working-proofs")
+            self.assertEqual(len(generated_manifest["captures"]), 18)
+            for capture in generated_manifest["captures"]:
+                screenshot = scratch / capture["screenshot"]["path"]
+                with self.subTest(
+                    publication=capture["publication"],
+                    viewport=capture["viewport"],
+                    checkpoint=capture["checkpoint"],
+                ):
+                    self.assertTrue(capture["metrics"]["visible"])
+                    self.assertGreaterEqual(
+                        capture["metrics"]["visibleHeight"],
+                        capture["metrics"]["requiredHeight"],
+                    )
+                    self.assertEqual(
+                        png_dimensions(screenshot),
+                        (
+                            capture["screenshot"]["width"],
+                            capture["screenshot"]["height"],
+                        ),
+                    )
+
+            committed_manifest = load_json(SCREENSHOT_ROOT / "manifest.json")
+            self.assertEqual(
+                {
+                    (
+                        item["publication"],
+                        item["viewport"],
+                        item["checkpoint"],
+                        item["resultSelector"],
+                    )
+                    for item in committed_manifest["captures"]
+                },
+                {
+                    (
+                        item["publication"],
+                        item["viewport"],
+                        item["checkpoint"],
+                        item["resultSelector"],
+                    )
+                    for item in generated_manifest["captures"]
+                },
+            )
+            self.assertEqual(len(committed_manifest["captures"]), 18)
+            for capture in committed_manifest["captures"]:
+                screenshot = SCREENSHOT_ROOT / capture["screenshot"]["path"]
+                with self.subTest(committed=capture["screenshot"]["path"]):
+                    self.assertTrue(screenshot.is_file())
+                    self.assertEqual(
+                        capture["screenshot"]["sha256"],
+                        sha256(screenshot),
+                    )
+                    self.assertEqual(
+                        capture["screenshot"]["bytes"],
+                        screenshot.stat().st_size,
+                    )
+                    self.assertEqual(
+                        png_dimensions(screenshot),
+                        (
+                            capture["screenshot"]["width"],
+                            capture["screenshot"]["height"],
+                        ),
+                    )
+        finally:
+            shutil.rmtree(scratch, ignore_errors=True)
 
 
 if __name__ == "__main__":

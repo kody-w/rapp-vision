@@ -22,6 +22,11 @@ deterministic reducer contract as both `window.invoiceTriage` and
 `window.tinySystem`. `evidence.json` binds the positive, rejected, and exact
 reset snapshots.
 
+The live app compacts its queue and evidence panels in short or narrow player
+iframes without shrinking focus targets below 44 px. Coordinate-free semantic
+`scroll` actions frame the focused control and each exported, rejected, and
+reset result; every state-changing activation remains keyboard-only.
+
 ## Reproduce
 
 From this directory in PowerShell:
