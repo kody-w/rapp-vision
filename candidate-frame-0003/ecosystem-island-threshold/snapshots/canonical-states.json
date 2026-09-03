@@ -1,11 +1,14 @@
 {
   "collapse": {
     "collapseCrossingTick": 134,
+    "exportPointCount": 0,
+    "exportPrepared": false,
+    "exportTraceDigest": null,
     "grazingRate": 0.6,
     "initialPopulation": 104,
     "initialResources": 146,
     "inspectionOpen": false,
-    "message": "Collapse observed: population first falls below 10 at tick 134.",
+    "message": "Prediction: collapse. Observed outcome: collapse below 10 at tick 134.",
     "outcome": "collapse",
     "population": 8,
     "prediction": "collapse",
@@ -30,9 +33,46 @@
     "traceDigest": "8bb46765",
     "traceLength": 601
   },
+  "export": {
+    "collapseCrossingTick": 134,
+    "exportPointCount": 601,
+    "exportPrepared": true,
+    "exportTraceDigest": "8bb46765",
+    "grazingRate": 0.6,
+    "initialPopulation": 104,
+    "initialResources": 146,
+    "inspectionOpen": false,
+    "message": "Export prepared from the observed collapse outcome: 601 points · digest 8bb46765.",
+    "outcome": "collapse",
+    "population": 8,
+    "prediction": "collapse",
+    "predictionHistory": [
+      {
+        "choice": "band",
+        "grazingRate": 0.24
+      },
+      {
+        "choice": "collapse",
+        "grazingRate": 0.6
+      }
+    ],
+    "predictionRevision": 1,
+    "resources": 84.088,
+    "running": false,
+    "seed": 31415,
+    "speed": 2,
+    "status": "exported",
+    "support": 8,
+    "tick": 600,
+    "traceDigest": "8bb46765",
+    "traceLength": 601
+  },
   "model": "seeded-island-herd/1.0",
   "opening": {
     "collapseCrossingTick": null,
+    "exportPointCount": 0,
+    "exportPrepared": false,
+    "exportTraceDigest": null,
     "grazingRate": 0.24,
     "initialPopulation": 104,
     "initialResources": 146,
@@ -55,6 +95,9 @@
   },
   "reset": {
     "collapseCrossingTick": null,
+    "exportPointCount": 0,
+    "exportPrepared": false,
+    "exportTraceDigest": null,
     "grazingRate": 0.24,
     "initialPopulation": 104,
     "initialResources": 146,
@@ -78,11 +121,14 @@
   "schema": "island-herd-canonical-states/1.0",
   "stable": {
     "collapseCrossingTick": null,
+    "exportPointCount": 0,
+    "exportPrepared": false,
+    "exportTraceDigest": null,
     "grazingRate": 0.24,
     "initialPopulation": 104,
     "initialResources": 146,
     "inspectionOpen": true,
-    "message": "Inspected: the herd stays inside the 80–120 band through tick 600.",
+    "message": "Prediction: stable band. Observed outcome: inspected stable band through tick 600.",
     "outcome": "band",
     "population": 112,
     "prediction": "band",
@@ -101,6 +147,36 @@
     "support": 112,
     "tick": 600,
     "traceDigest": "81d44b16",
+    "traceLength": 601
+  },
+  "transition": {
+    "collapseCrossingTick": null,
+    "exportPointCount": 0,
+    "exportPrepared": false,
+    "exportTraceDigest": null,
+    "grazingRate": 0.45,
+    "initialPopulation": 104,
+    "initialResources": 146,
+    "inspectionOpen": false,
+    "message": "Prediction: transition. Observed outcome: transition outside the stable band, ending at 45.117.",
+    "outcome": "transition",
+    "population": 45.117,
+    "prediction": "transition",
+    "predictionHistory": [
+      {
+        "choice": "transition",
+        "grazingRate": 0.45
+      }
+    ],
+    "predictionRevision": 0,
+    "resources": 108.088,
+    "running": false,
+    "seed": 31415,
+    "speed": 4,
+    "status": "transition",
+    "support": 45.806,
+    "tick": 600,
+    "traceDigest": "761aa190",
     "traceLength": 601
   }
 }

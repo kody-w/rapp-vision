@@ -53,6 +53,7 @@ EXPECTED_CLICK_SELECTORS = [
     "#predict-collapse-btn",
     "#speed-2-btn",
     "#run-btn",
+    "#export-series-btn",
     "#reset-btn",
 ]
 EXPECTED_SCROLL_SELECTORS = [
@@ -65,8 +66,11 @@ EXPECTED_SCROLL_SELECTORS = [
     "#speed-2-btn",
     "#run-btn",
     "#collapse-result",
+    "#export-series-btn",
+    "#series-export",
     "#reset-btn",
     "#reset-proof",
+    "#your-turn",
 ]
 REQUIRED_IDS = {
     "app-ready",
@@ -77,6 +81,7 @@ REQUIRED_IDS = {
     "rate-45-btn",
     "rate-60-btn",
     "predict-band-btn",
+    "predict-transition-btn",
     "predict-collapse-btn",
     "speed-1-btn",
     "speed-2-btn",
@@ -86,22 +91,29 @@ REQUIRED_IDS = {
     "status-message",
     "reset-proof",
     "population-chart",
+    "population-axis-title",
+    "tick-axis-title",
     "trace-path",
     "stable-result",
+    "transition-result",
     "collapse-result",
     "inspect-trace-btn",
     "export-series-btn",
     "series-export",
+    "export-proof",
+    "export-point-count",
+    "export-digest",
+    "your-turn",
     "model-contract",
     "fixture-expectations",
 }
 FRAME_SAMPLES = {
-    0: "0122320a8deb0d7d2da75390675d57f4c855b0c4b7387d70944f773d16e0bd37",
-    48: "d3fac41b7465aba0797ca4c2ef086702fc7989f509a6ed85b389f8e4044318b9",
-    120: "afbd69d2376eec53e1f0390488f4fba5fc5df0ba883342443444ed31693e5aa1",
-    156: "e6c94da9559b4520ed3c1a7c6bdd29e58c9d22919a304e6aae0ae15c1c4898e6",
-    221: "fa190466336dbfe6a7d6e5669264d11d815172566e25577baf9ba91b19360c5c",
-    263: "c41e6ce3bf01b5dd296e335e5b4e82ddb25ba916df38c75571d7636d109889d1",
+    0: "1e3b0e05a5dbc99561c4c050b87d57a7f565ad67d93ab0209066438184520de1",
+    48: "b604f7e55f3903e7a65df1953501776528d1306c252083e7af8901e585f69b69",
+    120: "8ca9c4b98d212dd5177196e1dac66aef226910e9e638b573fba97ca649f5c6ac",
+    156: "a20b0b7f33d3871cc9b5300c6078c3634ef25cc121a4b21a0440ba76b4f17c54",
+    221: "0eafe95546ce24dba0b5984f37e981a611b23b2217f42b81656e59e3d4b29a6d",
+    263: "fa0148b019af84bf9f17698973ee8234012c2cab2d99bcec6e0c506cef14b25f",
 }
 EXPECTED_EVIDENCE_BINDINGS = {
     "README.md",
@@ -546,22 +558,39 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
                 },
                 {
                     "afterAction": 18,
+                    "claim": "export",
+                    "selector": "#series-export",
+                },
+                {
+                    "afterAction": 21,
                     "claim": "reset",
                     "selector": "#reset-proof",
+                },
+                {
+                    "afterAction": 22,
+                    "claim": "your-turn",
+                    "selector": "#your-turn",
                 },
             ],
         )
 
     def test_seeded_model_exactly_meets_both_fixture_thresholds(self):
         stable_points = RENDERER.simulate(0.24)
+        transition_points = RENDERER.simulate(0.45)
         collapse_points = RENDERER.simulate(0.60)
         stable_oracle = independent_simulate(240)
+        transition_oracle = independent_simulate(450)
         collapse_oracle = independent_simulate(600)
         self.assertEqual(len(stable_points), 601)
+        self.assertEqual(len(transition_points), 601)
         self.assertEqual(len(collapse_points), 601)
         self.assertEqual(
             [point.compact() for point in stable_points],
             stable_oracle,
+        )
+        self.assertEqual(
+            [point.compact() for point in transition_points],
+            transition_oracle,
         )
         self.assertEqual(
             [point.compact() for point in collapse_points],
@@ -588,6 +617,16 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
         )
         self.assertIsNone(RENDERER.collapse_crossing(stable_points))
 
+        self.assertTrue(
+            any(point.population_milli < 80000 for point in transition_points)
+        )
+        self.assertTrue(
+            all(point.population_milli >= 10000 for point in transition_points)
+        )
+        self.assertEqual(transition_points[-1].population_milli, 45117)
+        self.assertEqual(transition_points[-1].resources_milli, 108088)
+        self.assertIsNone(RENDERER.collapse_crossing(transition_points))
+
         crossing = RENDERER.collapse_crossing(collapse_points)
         self.assertEqual(crossing, 134)
         self.assertLess(crossing, 300)
@@ -598,8 +637,10 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
         self.assertEqual(collapse_points[-1].population_milli, 8000)
         self.assertEqual(collapse_points[-1].resources_milli, 84088)
         self.assertEqual(RENDERER.trace_digest(stable_points), "81d44b16")
+        self.assertEqual(RENDERER.trace_digest(transition_points), "761aa190")
         self.assertEqual(RENDERER.trace_digest(collapse_points), "8bb46765")
         self.assertEqual(independent_digest(stable_oracle), "81d44b16")
+        self.assertEqual(independent_digest(transition_oracle), "761aa190")
         self.assertEqual(independent_digest(collapse_oracle), "8bb46765")
 
     def test_arbitrary_rates_seeds_and_invalid_inputs_are_behavioral(self):
@@ -659,8 +700,15 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
         self.assertEqual(
             self.evidence["model"], RENDERER.model_contract()
         )
-        self.assertEqual(set(self.fixtures), {"stable-band", "collapse"})
-        for fixture_id, rate in (("stable-band", 0.24), ("collapse", 0.60)):
+        self.assertEqual(
+            set(self.fixtures),
+            {"stable-band", "transition", "collapse"},
+        )
+        for fixture_id, rate in (
+            ("stable-band", 0.24),
+            ("transition", 0.45),
+            ("collapse", 0.60),
+        ):
             points = RENDERER.simulate(rate)
             oracle = independent_simulate(round(rate * 1000))
             fixture = self.fixtures[fixture_id]
@@ -686,13 +734,22 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
         self.assertEqual(
             self.fixtures["collapse"]["collapseCrossingTick"], 134
         )
+        self.assertEqual(
+            self.fixtures["transition"]["final"]["population"], 45.117
+        )
+        self.assertIsNone(
+            self.fixtures["transition"]["collapseCrossingTick"]
+        )
         self.assertEqual(self.fixtures["collapse"]["final"]["population"], 8)
 
     def test_canonical_window_states_and_exact_reset_are_self_checking(self):
         self.assertEqual(
             self.snapshots, RENDERER.canonical_states_document()
         )
-        self.assertEqual(set(self.claims), {"stable", "collapse", "reset"})
+        self.assertEqual(
+            set(self.claims),
+            {"stable", "transition", "collapse", "export", "reset", "your-turn"},
+        )
         self.assertEqual(
             self.claims["reset"]["expectedState"],
             self.snapshots["opening"],
@@ -722,7 +779,19 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
                 "status": "ready",
                 "message": "Choose what happens before the trace is revealed.",
                 "inspectionOpen": False,
+                "exportPrepared": False,
+                "exportPointCount": 0,
+                "exportTraceDigest": None,
             },
+        )
+        self.assertEqual(self.snapshots["transition"]["prediction"], "transition")
+        self.assertEqual(self.snapshots["transition"]["outcome"], "transition")
+        self.assertEqual(self.snapshots["transition"]["population"], 45.117)
+        self.assertTrue(self.snapshots["export"]["exportPrepared"])
+        self.assertEqual(self.snapshots["export"]["exportPointCount"], 601)
+        self.assertEqual(
+            self.snapshots["export"]["exportTraceDigest"],
+            "8bb46765",
         )
         for claim in self.claims.values():
             for assertion in claim["assertions"]:
@@ -749,16 +818,26 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
         expectations = embedded_json(self.source, "fixture-expectations")
         self.assertEqual(expectations["stable"]["traceDigest"], "81d44b16")
         self.assertEqual(
+            expectations["transition"]["traceDigest"], "761aa190"
+        )
+        self.assertEqual(
             expectations["collapse"]["collapseCrossingTick"], 134
         )
         contract = embedded_json(self.source, "model-contract")
         self.assertEqual(contract["limits"]["minimumSeed"], 1)
         self.assertEqual(contract["limits"]["maximumSeed"], 0xFFFFFFFF)
+        self.assertEqual(
+            set(contract["outcomes"]),
+            {"band", "transition", "collapse"},
+        )
         for fragment in (
-            "Make a prediction before the deterministic trace appears.",
+            "Choose one of three predictions before the deterministic trace appears:",
             'data-reset="exact"',
             "Reset ecosystem",
             "Prepare full JSON export",
+            "Observed outcome: intermediate transition.",
+            "computed series digest",
+            "YOUR TURN",
             "@media (max-width: 430px)",
             "min-height: 44px",
         ):
@@ -895,10 +974,45 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
 
         with mock.patch.object(RENDERER, "simulate", side_effect=altered_simulate):
             with mock.patch.object(RENDERER.Canvas, "text", new=record_text):
-                RENDERER.frame_rgb(RENDERER.SPEC, 9 * RENDERER.SPEC.fps)
-                RENDERER.frame_rgb(RENDERER.SPEC, 18 * RENDERER.SPEC.fps)
+                RENDERER.frame_rgb(RENDERER.SPEC, 8 * RENDERER.SPEC.fps)
+                RENDERER.frame_rgb(RENDERER.SPEC, 15 * RENDERER.SPEC.fps)
         self.assertIn("TICK 600 / HERD 111 / BAND HELD", labels)
         self.assertIn("BELOW 10 AT TICK 134 / FINAL 9", labels)
+        self.assertIn("PREDICTION", labels)
+        self.assertIn("OBSERVED OUTCOME", labels)
+
+        labels.clear()
+        with mock.patch.object(RENDERER.Canvas, "text", new=record_text):
+            RENDERER.frame_rgb(RENDERER.SPEC, 3 * RENDERER.SPEC.fps)
+            RENDERER.frame_rgb(RENDERER.SPEC, 4 * RENDERER.SPEC.fps)
+            RENDERER.frame_rgb(RENDERER.SPEC, 17 * RENDERER.SPEC.fps)
+            RENDERER.frame_rgb(RENDERER.SPEC, 21 * RENDERER.SPEC.fps)
+        self.assertIn("GRAZING RATE .24", labels)
+        self.assertIn("TRANSITION 10-80", labels)
+        self.assertIn("FULL SERIES EXPORT READY", labels)
+        self.assertIn("601", labels)
+        self.assertIn("8bb46765", labels)
+        self.assertIn("YOUR TURN", labels)
+        self.assertIn("5 / EXPORT ALL 601 POINTS", labels)
+        self.assertNotIn("TRACE HIDDEN", labels)
+
+        axis_calls: list[tuple[int, int, str, int]] = []
+
+        def record_axis(canvas, x, y, value, color, scale=2, spacing=1):
+            axis_calls.append((x, y, value, scale))
+            return original_text(canvas, x, y, value, color, scale, spacing)
+
+        with mock.patch.object(RENDERER.Canvas, "text", new=record_axis):
+            RENDERER.frame_rgb(RENDERER.SPEC, 8 * RENDERER.SPEC.fps)
+        self.assertIn((420, 108, "POPULATION / TICK", 3), axis_calls)
+        numeric_axis_scales = [
+            scale
+            for x, y, value, scale in axis_calls
+            if (y == 426 or x == 378)
+            and value in {"0", "40", "80", "120", "150", "300", "450", "600"}
+        ]
+        self.assertTrue(numeric_axis_scales)
+        self.assertTrue(all(scale >= 2 for scale in numeric_axis_scales))
 
     def test_evidence_and_delivery_sha_bindings_are_complete(self):
         series_record = self.evidence["seriesExport"]
@@ -906,6 +1020,7 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
         self.assertEqual(series_record["bytes"], FIXTURE_EXPORT_PATH.stat().st_size)
         self.assertEqual(series_record["sha256"], sha256(FIXTURE_EXPORT_PATH))
         self.assertTrue(series_record["containsEveryTick"])
+        self.assertEqual(series_record["fixtureCount"], 3)
         self.assertEqual(series_record["pointCountPerFixture"], 601)
 
         self.assertEqual(
@@ -1042,7 +1157,7 @@ class TestFrame000303AlwaysOn(unittest.TestCase):
             RENDERER.validate_evidence(bad_tick)
 
         bad_crossing = copy.deepcopy(evidence)
-        bad_crossing["fixtures"][1]["collapseCrossingTick"] = 135
+        bad_crossing["fixtures"][2]["collapseCrossingTick"] = 135
         with self.assertRaisesRegex(RuntimeError, "crossing"):
             RENDERER.validate_evidence(bad_crossing)
 
@@ -1112,22 +1227,25 @@ class TestFrame000303BrowserExecution(unittest.TestCase):
             self.assertEqual(completed.returncode, 0, completed.stderr)
             result = json.loads(completed.stdout)
             self.assertRegex(result["browser"], r"(Chrome|Chromium|Edge|Edg)/")
-            self.assertEqual(result["actionCount"], 19)
+            self.assertEqual(result["actionCount"], 23)
             self.assertEqual(result["replayedWidths"], [1120, 390])
             self.assertEqual(
                 result["activatedClicks"],
-                {"desktop": 8, "responsive": 8},
+                {"desktop": 9, "responsive": 9},
             )
             self.assertEqual(
-                result["checkpoints"], ["stable", "collapse", "reset"]
+                result["checkpoints"],
+                ["stable", "collapse", "export", "reset", "your-turn"],
             )
             self.assertEqual(
                 result["responsiveCheckpoints"],
-                ["stable", "collapse", "reset"],
+                ["stable", "collapse", "export", "reset", "your-turn"],
             )
             self.assertEqual(result["stableFinal"], 112)
             self.assertEqual(result["collapseCrossingTick"], 134)
             self.assertEqual(result["collapseFinal"], 8)
+            self.assertEqual(result["canonicalExportPointCount"], 601)
+            self.assertEqual(result["canonicalExportDigest"], "8bb46765")
             self.assertEqual(result["resetTraceLength"], 0)
             self.assertEqual(result["responsiveWidth"], 390)
             self.assertEqual(result["browserErrors"], 0)
@@ -1151,6 +1269,9 @@ class TestFrame000303BrowserExecution(unittest.TestCase):
                 result["predictionDigest"],
                 independent_digest(independent_simulate(450)),
             )
+            self.assertEqual(result["transitionFinal"], 45.117)
+            self.assertEqual(result["transitionOutcome"], "transition")
+            self.assertTrue(result["traceOverlayHidden"])
             self.assertEqual(result["exportPointCount"], 601)
             self.assertEqual(result["invalidInputCount"], 10)
             self.assertTrue(result["exportCleanedOnReset"])

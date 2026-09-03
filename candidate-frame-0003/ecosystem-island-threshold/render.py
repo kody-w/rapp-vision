@@ -32,6 +32,7 @@ STABLE_HIGH_MILLI = 120_000
 COLLAPSE_MILLI = 10_000
 HORIZON = 600
 RATE_STABLE_MILLI = 240
+RATE_TRANSITION_MILLI = 450
 RATE_COLLAPSE_MILLI = 600
 FPS = 12
 DURATION = 22
@@ -330,6 +331,9 @@ def state_summary(
     status: str,
     message: str,
     inspection_open: bool,
+    export_prepared: bool = False,
+    export_point_count: int = 0,
+    export_trace_digest: str | None = None,
 ) -> dict[str, Any]:
     point = points[-1] if points else initial_point()
     return {
@@ -353,11 +357,15 @@ def state_summary(
         "status": status,
         "message": message,
         "inspectionOpen": inspection_open,
+        "exportPrepared": export_prepared,
+        "exportPointCount": export_point_count,
+        "exportTraceDigest": export_trace_digest,
     }
 
 
 def canonical_states_document() -> dict[str, Any]:
     stable_points = simulate(RATE_STABLE_MILLI, rate_is_milli=True)
+    transition_points = simulate(RATE_TRANSITION_MILLI, rate_is_milli=True)
     collapse_points = simulate(RATE_COLLAPSE_MILLI, rate_is_milli=True)
     opening = state_summary(
         rate_milli=RATE_STABLE_MILLI,
@@ -381,8 +389,23 @@ def canonical_states_document() -> dict[str, Any]:
         points=stable_points,
         outcome="band",
         status="stable-inspected",
-        message="Inspected: the herd stays inside the 80–120 band through tick 600.",
+        message="Prediction: stable band. Observed outcome: inspected stable band through tick 600.",
         inspection_open=True,
+    )
+    transition_history = [
+        prediction_history(RATE_TRANSITION_MILLI, "transition")
+    ]
+    transition = state_summary(
+        rate_milli=RATE_TRANSITION_MILLI,
+        speed=4,
+        prediction="transition",
+        prediction_revision=0,
+        history=transition_history,
+        points=transition_points,
+        outcome="transition",
+        status="transition",
+        message="Prediction: transition. Observed outcome: transition outside the stable band, ending at 45.117.",
+        inspection_open=False,
     )
     collapse_history = [
         prediction_history(RATE_STABLE_MILLI, "band"),
@@ -397,15 +420,32 @@ def canonical_states_document() -> dict[str, Any]:
         points=collapse_points,
         outcome="collapse",
         status="collapse",
-        message="Collapse observed: population first falls below 10 at tick 134.",
+        message="Prediction: collapse. Observed outcome: collapse below 10 at tick 134.",
         inspection_open=False,
+    )
+    export = state_summary(
+        rate_milli=RATE_COLLAPSE_MILLI,
+        speed=2,
+        prediction="collapse",
+        prediction_revision=1,
+        history=collapse_history,
+        points=collapse_points,
+        outcome="collapse",
+        status="exported",
+        message="Export prepared from the observed collapse outcome: 601 points · digest 8bb46765.",
+        inspection_open=False,
+        export_prepared=True,
+        export_point_count=HORIZON + 1,
+        export_trace_digest=trace_digest(collapse_points),
     )
     return {
         "schema": "island-herd-canonical-states/1.0",
         "model": MODEL_ID,
         "opening": opening,
         "stable": stable,
+        "transition": transition,
         "collapse": collapse,
+        "export": export,
         "reset": opening,
     }
 
@@ -431,6 +471,11 @@ def model_contract() -> dict[str, Any]:
             "minimumSeed": MINIMUM_SEED,
             "maximumSeed": MAXIMUM_SEED,
         },
+        "outcomes": {
+            "band": "Population stays between 80 and 120 through tick 600.",
+            "transition": "Population leaves the stable band without falling below 10.",
+            "collapse": "Population falls below 10 before tick 600.",
+        },
         "rules": [
             "Advance xorshift32 once per tick from the selected seed.",
             "Convert the low ten random bits into a weather pulse from -0.275 to +0.274 resource units.",
@@ -445,6 +490,7 @@ def fixture_export_document() -> dict[str, Any]:
     fixtures = []
     for rate_milli, label in (
         (RATE_STABLE_MILLI, "stable-band"),
+        (RATE_TRANSITION_MILLI, "transition"),
         (RATE_COLLAPSE_MILLI, "collapse"),
     ):
         points = simulate(rate_milli, rate_is_milli=True)
@@ -752,14 +798,14 @@ def draw_chart(
     for tick in (0, 150, 300, 450, 600):
         x, _ = chart_xy(tick, 0)
         canvas.rect(x, y0, 1, height, GRID)
-        canvas.text(x - 10, 426, str(tick), MUTED, 1)
+        canvas.text(x - 18, 426, str(tick), MUTED, 2)
     for population in (0, 40, 80, 120):
         _, y = chart_xy(0, population * 1000)
         canvas.rect(x0, y, width, 1, GRID)
-        canvas.text(390, y - 3, str(population), MUTED, 1)
+        canvas.text(378, y - 6, str(population), MUTED, 2)
     canvas.border(x0, y0, width, height, MUTED, 2)
-    canvas.text(420, 116, "POPULATION / TICK", PAPER, 2)
-    if not points or progress <= 0:
+    canvas.text(420, 108, "POPULATION / TICK", PAPER, 3)
+    if not points:
         canvas.text(520, 265, empty_label or "TRACE HIDDEN", MUTED, 3)
         return
     visible_tick = max(0, min(HORIZON, int(HORIZON * clamp(progress))))
@@ -784,8 +830,8 @@ def draw_chart(
 
 def draw_header(canvas: Canvas, rate_label: str, phase_label: str) -> None:
     canvas.text(42, 28, "ISLAND HERD PREDICTION LAB", PAPER, 3)
-    draw_pill(canvas, 650, 24, 124, f"SEED {SEED}")
-    draw_pill(canvas, 784, 24, 132, rate_label)
+    draw_pill(canvas, 574, 24, 126, f"SEED {SEED}")
+    draw_pill(canvas, 710, 24, 206, f"GRAZING RATE {rate_label}")
     canvas.rect(42, 79, 874, 2, SEA_LIGHT)
     canvas.text(42, 94, phase_label, MINT, 2)
 
@@ -802,27 +848,46 @@ def frame_rgb(spec: RenderSpec, frame_index: int) -> bytes:
     crossing = collapse_crossing(collapse)
 
     if seconds < 4:
-        draw_header(canvas, "GRAZE .24", "1 / PREDICT BEFORE THE TRACE")
-        canvas.text(42, 145, "WILL THE HERD", WHITE, 5)
-        canvas.text(42, 188, "STAY IN BAND?", WHITE, 5)
-        canvas.rect(42, 262, 396, 82, (28, 83, 84))
-        canvas.border(42, 262, 396, 82, HERD if seconds >= 1.6 else MUTED, 4)
-        canvas.text(66, 292, "STAYS 80-120", PAPER, 3)
-        canvas.rect(462, 262, 396, 82, (28, 68, 77))
-        canvas.border(462, 262, 396, 82, MUTED, 2)
-        canvas.text(486, 292, "COLLAPSES < 10", PAPER, 3)
-        canvas.text(42, 382, "SEED 31415 / POP 104 / GRASS 146", MUTED, 2)
-        canvas.text(42, 420, "THE MODEL WAITS FOR YOUR CALL.", HERD, 3)
-        canvas.rect(42, 478, 816, 12, INK)
-        canvas.rect(42, 478, int(816 * clamp(seconds / 4)), 12, HERD)
-    elif seconds < 10:
-        progress = smooth((seconds - 4.4) / 3.1)
-        draw_header(canvas, "GRAZE .24", "2 / REVEAL THE STABLE RUN")
+        draw_header(canvas, ".24", "1 / PREDICT BEFORE THE TRACE")
+        canvas.text(42, 132, "PREDICT THE OUTCOME", WHITE, 4)
+        canvas.text(42, 170, "BY TICK 600", WHITE, 4)
+        choices = (
+            (42, "STABLE 80-120", (28, 83, 84), HERD),
+            (332, "TRANSITION 10-80", (24, 76, 86), MUTED),
+            (622, "COLLAPSE < 10", (74, 48, 55), MUTED),
+        )
+        for x, label, fill, border in choices:
+            canvas.rect(x, 242, 270, 76, fill)
+            canvas.border(
+                x,
+                242,
+                270,
+                76,
+                border if label.startswith("STABLE") and seconds >= 1.6 else MUTED,
+                4 if label.startswith("STABLE") and seconds >= 1.6 else 2,
+            )
+            canvas.text(x + 18, 270, label, PAPER, 2)
+        canvas.text(42, 356, "GRAZING RATE 0.24 / SEED 31415", HERD, 3)
+        canvas.text(42, 400, "PREDICTION IS A FORECAST.", MUTED, 2)
+        canvas.text(42, 430, "THE OBSERVED OUTCOME COMES AFTER REVEAL.", PAPER, 2)
+        canvas.rect(42, 478, 850, 12, INK)
+        canvas.rect(42, 478, int(850 * clamp(seconds / 4)), 12, HERD)
+    elif seconds < 8.5:
+        progress = smooth((seconds - 4.3) / 2.5)
+        draw_header(canvas, ".24", "2 / REVEAL THE STABLE RUN")
         point = stable[min(HORIZON, int(progress * HORIZON))]
         draw_island(canvas, point.population_milli, point.resources_milli)
         draw_chart(canvas, stable, progress, HERD)
-        canvas.text(72, 145, "PREDICTION", MUTED, 2)
-        canvas.text(72, 171, "STAYS IN BAND", HERD, 3)
+        canvas.text(72, 142, "PREDICTION", MUTED, 2)
+        canvas.text(72, 168, "STABLE BAND", HERD, 3)
+        canvas.text(72, 210, "OBSERVED OUTCOME", MUTED, 2)
+        canvas.text(
+            72,
+            236,
+            "STABLE BAND" if progress >= 0.99 else "OBSERVING",
+            MINT if progress >= 0.99 else PAPER,
+            3,
+        )
         if progress >= 0.99:
             canvas.rect(414, 458, 481, 58, (30, 104, 78))
             canvas.text(
@@ -837,23 +902,24 @@ def frame_rgb(spec: RenderSpec, frame_index: int) -> bytes:
             )
         else:
             canvas.text(420, 458, f"RUNNING TICK {point.tick}", PAPER, 2)
-    elif seconds < 13:
-        reveal = smooth((seconds - 10) / 2.2)
-        draw_header(canvas, "GRAZE .60", "3 / CHANGE THE RATE. REVISE THE CALL.")
-        canvas.text(42, 145, "GRAZING", MUTED, 2)
+    elif seconds < 11.5:
+        reveal = smooth((seconds - 8.5) / 2.2)
+        draw_header(canvas, ".60", "3 / CHANGE THE RATE. REVISE THE CALL.")
+        canvas.text(42, 145, "GRAZING RATE", MUTED, 3)
         canvas.rect(42, 178, 650, 18, INK)
         canvas.rect(42, 178, int(650 * (0.24 + 0.36 * reveal) / 0.75), 18, CORAL)
         canvas.circle(42 + int(650 * (0.24 + 0.36 * reveal) / 0.75), 187, 12, WHITE)
         canvas.text(720, 174, f"{0.24 + 0.36 * reveal:.2f}", WHITE, 3)
-        canvas.rect(42, 250, 816, 94, (32, 70, 77))
-        canvas.border(42, 250, 816, 94, CORAL if reveal > 0.55 else MUTED, 4)
-        canvas.text(68, 280, "REVISED PREDICTION: COLLAPSE", PAPER, 3)
-        canvas.text(42, 391, "TRACE HIDDEN AGAIN UNTIL THE NEW CALL.", HERD, 3)
-        canvas.text(42, 440, "SAME SEED. ONE RATE CHANGED.", MUTED, 2)
-    elif seconds < 18.5:
-        progress = smooth((seconds - 13.3) / 3.1)
+        canvas.rect(42, 246, 850, 94, (32, 70, 77))
+        canvas.border(42, 246, 850, 94, CORAL if reveal > 0.55 else MUTED, 4)
+        canvas.text(68, 274, "PREDICTION", MUTED, 2)
+        canvas.text(68, 302, "COLLAPSE", CORAL, 4)
+        canvas.text(42, 382, "OBSERVED OUTCOME: NOT REVEALED YET", PAPER, 2)
+        canvas.text(42, 424, "SAME SEED. ONLY THE GRAZING RATE CHANGED.", MUTED, 2)
+    elif seconds < 16:
+        progress = smooth((seconds - 11.8) / 2.5)
         point = collapse[min(HORIZON, int(progress * HORIZON))]
-        draw_header(canvas, "GRAZE .60", "4 / WATCH FOR THE CROSSING")
+        draw_header(canvas, ".60", "4 / WATCH FOR THE CROSSING")
         draw_island(canvas, point.population_milli, point.resources_milli)
         draw_chart(
             canvas,
@@ -862,8 +928,16 @@ def frame_rgb(spec: RenderSpec, frame_index: int) -> bytes:
             CORAL,
             crossing_tick=crossing,
         )
-        canvas.text(72, 145, "PREDICTION", MUTED, 2)
-        canvas.text(72, 171, "COLLAPSES", CORAL, 3)
+        canvas.text(72, 142, "PREDICTION", MUTED, 2)
+        canvas.text(72, 168, "COLLAPSE", CORAL, 3)
+        canvas.text(72, 210, "OBSERVED OUTCOME", MUTED, 2)
+        canvas.text(
+            72,
+            236,
+            "COLLAPSE" if crossing is not None and progress >= crossing / HORIZON else "OBSERVING",
+            CORAL if crossing is not None and progress >= crossing / HORIZON else PAPER,
+            3,
+        )
         if crossing is not None and progress >= crossing / HORIZON:
             canvas.rect(414, 458, 481, 58, (124, 48, 45))
             canvas.text(
@@ -878,28 +952,56 @@ def frame_rgb(spec: RenderSpec, frame_index: int) -> bytes:
             )
         else:
             canvas.text(420, 458, f"RUNNING TICK {point.tick}", PAPER, 2)
-    else:
-        draw_header(canvas, "GRAZE .24", "5 / EXACT RESET")
-        canvas.text(42, 142, "BACK TO THE OPENING QUESTION", WHITE, 4)
+    elif seconds < 18.5:
+        draw_header(canvas, ".60", "5 / EXPORT THE OBSERVED COLLAPSE")
+        canvas.text(42, 132, "FULL SERIES EXPORT READY", WHITE, 4)
+        canvas.rect(42, 190, 850, 250, (11, 42, 52))
+        canvas.border(42, 190, 850, 250, HERD, 3)
+        canvas.text(72, 220, "OBSERVED OUTCOME", MUTED, 2)
+        canvas.text(360, 220, "COLLAPSE", CORAL, 3)
+        canvas.text(72, 264, "POINTS", MUTED, 2)
+        canvas.text(360, 258, str(HORIZON + 1), HERD, 4)
+        canvas.text(72, 310, "SERIES DIGEST", MUTED, 2)
+        canvas.text(360, 304, trace_digest(collapse) or "", HERD, 4)
+        canvas.text(72, 356, "GRAZING RATE", MUTED, 2)
+        canvas.text(360, 350, "0.60", PAPER, 3)
+        canvas.text(72, 398, "TICKS", MUTED, 2)
+        canvas.text(360, 392, "0 THROUGH 600", PAPER, 3)
+        canvas.text(42, 474, "EXPORT PROOF IS VISIBLE BEFORE RESET.", MINT, 2)
+    elif seconds < 20:
+        draw_header(canvas, ".24", "6 / EXACT RESET")
+        canvas.text(42, 128, "BACK TO THE OPENING STATE", WHITE, 3)
         rows = (
             ("SEED", "31415"),
-            ("GRAZING", ".24"),
+            ("GRAZING RATE", ".24"),
             ("SPEED", "1X"),
             ("POP / GRASS", "104 / 146"),
             ("TICK", "0"),
             ("PREDICTION", "NONE"),
             ("TRACE", "EMPTY"),
+            ("EXPORT", "NONE"),
         )
         for index, (label, value) in enumerate(rows):
-            y = 211 + index * 39
+            y = 178 + index * 37
             canvas.text(72, y, label, MUTED, 2)
             canvas.text(330, y, value, MINT if index < 4 else HERD, 2)
-            canvas.rect(560, y + 5, 280, 2, SEA_LIGHT)
-        canvas.rect(560, 208, 280, 264, (11, 42, 52))
-        canvas.border(560, 208, 280, 264, MUTED, 2)
-        canvas.text(608, 314, "NO TRACE", MUTED, 4)
-        canvas.text(608, 357, "PREDICT", HERD, 4)
-        canvas.text(608, 400, "AGAIN", HERD, 4)
+            canvas.rect(600, y + 5, 240, 2, SEA_LIGHT)
+        canvas.rect(600, 174, 240, 288, (11, 42, 52))
+        canvas.border(600, 174, 240, 288, MUTED, 2)
+        canvas.text(630, 292, "NO TRACE", MUTED, 3)
+        canvas.text(630, 336, "NO EXPORT", MUTED, 3)
+        canvas.text(630, 380, "READY", HERD, 3)
+    else:
+        draw_header(canvas, ".24", "7 / YOUR TURN")
+        canvas.text(42, 130, "YOUR TURN", HERD, 6)
+        canvas.text(42, 190, "1 / CHOOSE A GRAZING RATE", PAPER, 3)
+        canvas.text(42, 230, "2 / PREDICT STABLE, TRANSITION, OR COLLAPSE", PAPER, 2)
+        canvas.text(42, 270, "3 / REVEAL THE TRACE", PAPER, 3)
+        canvas.text(42, 310, "4 / INSPECT THE OBSERVED OUTCOME", PAPER, 2)
+        canvas.text(42, 350, "5 / EXPORT ALL 601 POINTS", PAPER, 3)
+        canvas.rect(42, 402, 850, 70, (24, 76, 86))
+        canvas.border(42, 402, 850, 70, HERD, 3)
+        canvas.text(70, 426, "TRY 0.45: TRANSITION ENDS NEAR 45", MINT, 3)
     return canvas.bytes()
 
 
@@ -910,19 +1012,21 @@ def frame_digest(frame_index: int) -> str:
 def thumbnail_svg() -> str:
     return """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title description">
   <title id="title">Will the Island Herd Hold?</title>
-  <desc id="description">A prediction-first island herd model asks whether grazing point two four stays in band before any trace is shown.</desc>
+  <desc id="description">A prediction-first island herd model offers stable, transition, and collapse outcomes before any trace is shown.</desc>
   <rect width="960" height="540" fill="#113847"/>
   <rect x="36" y="32" width="888" height="476" rx="28" fill="#0c1f2b" stroke="#52ad7d" stroke-width="3"/>
   <text x="72" y="92" fill="#99e2b1" font-family="Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="2">ISLAND HERD PREDICTION LAB</text>
   <text x="72" y="174" fill="#fffdf6" font-family="Arial, sans-serif" font-size="58" font-weight="800">Will the herd hold?</text>
-  <text x="72" y="220" fill="#abbfbf" font-family="Arial, sans-serif" font-size="24">Seed 31415 · grazing 0.24 · trace hidden</text>
-  <rect x="72" y="270" width="376" height="104" rx="18" fill="#1d534f" stroke="#ffba54" stroke-width="6"/>
-  <text x="102" y="333" fill="#fffdf6" font-family="Arial, sans-serif" font-size="30" font-weight="800">STAYS 80–120</text>
-  <rect x="474" y="270" width="376" height="104" rx="18" fill="#20464d" stroke="#abbfbf" stroke-width="3"/>
-  <text x="504" y="333" fill="#fffdf6" font-family="Arial, sans-serif" font-size="30" font-weight="800">COLLAPSES &lt; 10</text>
+  <text x="72" y="220" fill="#abbfbf" font-family="Arial, sans-serif" font-size="24">Seed 31415 · grazing rate 0.24 · predict first</text>
+  <rect x="72" y="270" width="240" height="104" rx="18" fill="#1d534f" stroke="#ffba54" stroke-width="6"/>
+  <text x="92" y="333" fill="#fffdf6" font-family="Arial, sans-serif" font-size="22" font-weight="800">STABLE 80–120</text>
+  <rect x="330" y="270" width="240" height="104" rx="18" fill="#174c56" stroke="#77d6e3" stroke-width="3"/>
+  <text x="346" y="333" fill="#fffdf6" font-family="Arial, sans-serif" font-size="21" font-weight="800">TRANSITION 10–80</text>
+  <rect x="588" y="270" width="240" height="104" rx="18" fill="#572f30" stroke="#f25f4c" stroke-width="3"/>
+  <text x="614" y="333" fill="#fffdf6" font-family="Arial, sans-serif" font-size="22" font-weight="800">COLLAPSE &lt; 10</text>
   <rect x="72" y="418" width="778" height="14" rx="7" fill="#113847"/>
   <rect x="72" y="418" width="286" height="14" rx="7" fill="#ffba54"/>
-  <text x="72" y="473" fill="#ffba54" font-family="Arial, sans-serif" font-size="24" font-weight="700">PREDICT FIRST. THEN REVEAL THE SAME SEEDED RUN.</text>
+  <text x="72" y="473" fill="#ffba54" font-family="Arial, sans-serif" font-size="24" font-weight="700">YOUR TURN: PREDICT, REVEAL, INSPECT, EXPORT.</text>
 </svg>
 """
 
@@ -1111,6 +1215,7 @@ def render_master(
 
 def evidence_document() -> dict[str, Any]:
     stable = fixture_summary(RATE_STABLE_MILLI)
+    transition = fixture_summary(RATE_TRANSITION_MILLI)
     collapse = fixture_summary(RATE_COLLAPSE_MILLI)
     states = canonical_states_document()
     binding_paths = (
@@ -1139,8 +1244,11 @@ def evidence_document() -> dict[str, Any]:
             "canonicalFlow": [
                 "Predict that 0.24 stays in band before revealing a trace.",
                 "Run to tick 600 and inspect the stable band result.",
+                "Offer transition as a distinct prediction for intermediate rates such as 0.45.",
                 "Choose 0.60, revise the prediction to collapse, and observe the marked crossing.",
+                "Export all 601 collapse points and show digest 8bb46765.",
                 "Reset seed, rate, speed, population, resources, tick, prediction, and trace exactly.",
+                "Invite the viewer to choose a rate, predict, reveal, inspect, and export.",
             ],
         },
         "model": model_contract(),
@@ -1149,6 +1257,11 @@ def evidence_document() -> dict[str, Any]:
                 "id": "stable-band",
                 "prediction": "band",
                 **stable,
+            },
+            {
+                "id": "transition",
+                "prediction": "transition",
+                **transition,
             },
             {
                 "id": "collapse",
@@ -1170,6 +1283,18 @@ def evidence_document() -> dict[str, Any]:
                 ],
             },
             {
+                "id": "transition",
+                "claim": "The three-outcome model classifies grazing 0.45 as a transition: it leaves the stable band, never crosses below 10, and ends at 45.117.",
+                "expectedState": states["transition"],
+                "assertions": [
+                    {"path": "grazingRate", "equals": 0.45},
+                    {"path": "prediction", "equals": "transition"},
+                    {"path": "collapseCrossingTick", "equals": None},
+                    {"path": "population", "equals": 45.117},
+                    {"path": "outcome", "equals": "transition"},
+                ],
+            },
+            {
                 "id": "collapse",
                 "claim": "After the rate changes to 0.60 and the prediction is revised, the herd crosses below 10 at tick 134 and ends at population 8.",
                 "expectedState": states["collapse"],
@@ -1182,6 +1307,18 @@ def evidence_document() -> dict[str, Any]:
                 ],
             },
             {
+                "id": "export",
+                "claim": "After the collapse result, the canonical replay visibly prepares all 601 points and computed digest 8bb46765 before reset.",
+                "expectedState": states["export"],
+                "assertions": [
+                    {"path": "status", "equals": "exported"},
+                    {"path": "exportPrepared", "equals": True},
+                    {"path": "exportPointCount", "equals": HORIZON + 1},
+                    {"path": "exportTraceDigest", "equals": "8bb46765"},
+                    {"path": "traceLength", "equals": HORIZON + 1},
+                ],
+            },
+            {
                 "id": "reset",
                 "claim": "Reset returns the exact opening model snapshot while a separate visible banner confirms the activation.",
                 "expectedState": states["reset"],
@@ -1190,6 +1327,17 @@ def evidence_document() -> dict[str, Any]:
                     {"path": "grazingRate", "equals": 0.24},
                     {"path": "speed", "equals": 1},
                     {"path": "tick", "equals": 0},
+                    {"path": "prediction", "equals": None},
+                    {"path": "traceLength", "equals": 0},
+                    {"path": "exportPrepared", "equals": False},
+                ],
+            },
+            {
+                "id": "your-turn",
+                "claim": "The live replay ends on a visible invitation to choose a grazing rate, predict, reveal, inspect, and export.",
+                "expectedState": states["reset"],
+                "assertions": [
+                    {"path": "status", "equals": "ready"},
                     {"path": "prediction", "equals": None},
                     {"path": "traceLength", "equals": 0},
                 ],
@@ -1215,14 +1363,25 @@ def evidence_document() -> dict[str, Any]:
                 },
                 {
                     "afterAction": 18,
+                    "claim": "export",
+                    "selector": "#series-export",
+                },
+                {
+                    "afterAction": 21,
                     "claim": "reset",
                     "selector": "#reset-proof",
+                },
+                {
+                    "afterAction": 22,
+                    "claim": "your-turn",
+                    "selector": "#your-turn",
                 },
             ],
         },
         "seriesExport": {
             **artifact_record("exports/fixture-series.json"),
             "containsEveryTick": True,
+            "fixtureCount": 3,
             "pointCountPerFixture": HORIZON + 1,
         },
         "canonicalSnapshots": artifact_record(
@@ -1256,12 +1415,14 @@ def validate_evidence(document: dict[str, Any]) -> None:
     if document.get("model") != model_contract():
         raise RuntimeError("evidence model contract is stale")
     fixtures = {fixture["id"]: fixture for fixture in document["fixtures"]}
-    if set(fixtures) != {"stable-band", "collapse"}:
-        raise RuntimeError("evidence must contain exactly both canonical fixtures")
+    if set(fixtures) != {"stable-band", "transition", "collapse"}:
+        raise RuntimeError("evidence must contain all three outcome fixtures")
     stable = fixtures["stable-band"]
+    transition = fixtures["transition"]
     collapse = fixtures["collapse"]
     for fixture, rate_milli in (
         (stable, RATE_STABLE_MILLI),
+        (transition, RATE_TRANSITION_MILLI),
         (collapse, RATE_COLLAPSE_MILLI),
     ):
         series = fixture.get("series")
@@ -1311,6 +1472,17 @@ def validate_evidence(document: dict[str, Any]) -> None:
         raise RuntimeError("stable fixture leaves the commission band")
     if stable["collapseCrossingTick"] is not None:
         raise RuntimeError("stable fixture unexpectedly crosses below ten")
+    if transition["collapseCrossingTick"] is not None:
+        raise RuntimeError("transition fixture unexpectedly crosses below ten")
+    transition_populations = [point[1] for point in transition["series"]]
+    if (
+        all(
+            STABLE_LOW_MILLI <= population <= STABLE_HIGH_MILLI
+            for population in transition_populations
+        )
+        or transition["final"]["populationMilli"] < COLLAPSE_MILLI
+    ):
+        raise RuntimeError("transition fixture does not demonstrate an intermediate outcome")
     crossing = collapse["collapseCrossingTick"]
     if not isinstance(crossing, int) or crossing >= 300:
         raise RuntimeError("collapse fixture does not cross before tick 300")

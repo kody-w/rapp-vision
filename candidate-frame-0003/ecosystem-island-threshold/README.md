@@ -3,28 +3,35 @@
 **Will the Island Herd Hold?** answers commission
 `explore-ecosystem-threshold` with one prediction-first paired publication.
 The 22-second 960×540 film and standalone live lab use the same seeded model,
-the same two canonical traces, and the same exact reset.
+the same three-outcome model, the same canonical traces, and the same exact
+reset.
 
 ## Editorial flow
 
-The opening does not reveal a graph. It asks the viewer to predict whether the
-herd stays in the 80–120 band or collapses below 10.
+The opening does not reveal a graph. It asks the viewer to predict one of three
+outcomes: stable band (80–120), transition (outside the band but never below
+10), or collapse (below 10).
 
 1. With seed **31415** and grazing **0.24**, predict “stays in band.”
 2. Reveal all 600 ticks and inspect the result: population **112**, resources
    **141.688**, and no collapse crossing.
-3. Change grazing to **0.60**. The old trace is cleared and a new prediction is
-   required.
-4. Revise the prediction to “collapses,” select 2× viewing speed, and reveal
+3. A custom grazing rate such as **0.45** can be predicted as “transition”; it
+   leaves the stable band, never crosses below 10, and ends at **45.117**.
+4. Change grazing to **0.60**. The old trace is cleared and a new prediction is
+   required. Revise the prediction to “collapse,” select 2× viewing speed, and reveal
    the same model. Population first falls below 10 at tick **134** and ends at
    **8** on tick 600.
-5. Activate **Reset ecosystem**. Seed 31415, grazing 0.24, speed 1×,
+5. Prepare the canonical collapse export. The live replay visibly shows
+   **601 points** and computed digest **8bb46765** before reset.
+6. Activate **Reset ecosystem**. Seed 31415, grazing 0.24, speed 1×,
    population 104, resources 146, tick zero, no prediction, and an empty trace
-   return exactly.
+   return exactly, with no prepared export.
+7. End on **YOUR TURN**: choose a grazing rate, predict, reveal, inspect, and
+   export.
 
-The live range accepts every hundredth from 0.00 through 0.75. Either
-prediction can be chosen for any rate. The committed evidence remains fixed to
-0.24 and 0.60 so review does not depend on an arbitrary interactive choice.
+The live range accepts every hundredth from 0.00 through 0.75. Any of the three
+predictions can be chosen for any rate. The committed evidence includes 0.24,
+0.45, and 0.60 so each observed outcome remains reproducible.
 The pure Python and browser simulation APIs additionally accept thousandth
 rate increments and any nonzero 32-bit seed. They reject non-finite,
 off-grid, out-of-range, or over-horizon inputs before starting a run.
@@ -64,7 +71,7 @@ change. `render.py`, the browser app, `exports/fixture-series.json`, and
 | `channel.json` | Compiler-produced paired channel |
 | `thumbs/ecosystem-island-threshold.svg` | Original self-contained thumbnail |
 | `exports/fixture-series.json` | Every tick, population, resources, support, weather, and random state for both fixtures |
-| `snapshots/canonical-states.json` | Opening, stable, collapse, and exact-reset window summaries |
+| `snapshots/canonical-states.json` | Opening, stable, transition, collapse, export, and exact-reset window summaries |
 | `evidence.json` | Model, full compact series, final values, crossing proof, live checkpoints, rights/privacy, and SHA-256 bindings |
 | `delivery.json` | SHA-256/byte bindings and fresh codec, color, size, and duration probes |
 | `verify_dom.mjs` | Dependency-free real-browser replay and responsive DOM verifier |

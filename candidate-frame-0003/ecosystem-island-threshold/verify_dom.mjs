@@ -703,7 +703,7 @@ async function elementState(selector) {
     const box = element.getBoundingClientRect();
     return {
       missing: false,
-      hidden: element.hidden,
+      hidden: element.hasAttribute("hidden") || element.hidden === true,
       display: style.display,
       visibility: style.visibility,
       opacity: Number(style.opacity),
@@ -714,7 +714,8 @@ async function elementState(selector) {
         box.top < innerHeight &&
         box.right > 0 &&
         box.left < innerWidth,
-      text: element.textContent.replace(/\\s+/g, " ").trim()
+      text: element.textContent.replace(/\\s+/g, " ").trim(),
+      value: "value" in element ? element.value : null
     };
   })()`);
 }
@@ -729,6 +730,36 @@ function assertVisible(state, selector) {
   assert.equal(state.inViewport, true, `${selector} is outside the viewport`);
 }
 
+async function assertTraceOverlayHidden(hidden) {
+  const overlay = await elementState("#hidden-trace-label");
+  assert.equal(overlay.missing, false);
+  assert.equal(overlay.hidden, hidden);
+  if (hidden) {
+    assert.equal(overlay.display, "none", "TRACE HIDDEN overlay remained visible");
+  } else {
+    assert.notEqual(overlay.display, "none", "opening TRACE HIDDEN label is absent");
+  }
+}
+
+async function assertLargeAxisLabels() {
+  const labels = await evaluate(`[
+    "#population-axis-title",
+    "#tick-axis-title"
+  ].map(selector => {
+    const element = document.querySelector(selector);
+    const style = getComputedStyle(element);
+    const box = element.getBoundingClientRect();
+    return { selector, fontSize: parseFloat(style.fontSize), width: box.width, height: box.height };
+  })`);
+  for (const label of labels) {
+    assert.ok(label.fontSize >= 18, `${label.selector} is not enlarged`);
+    assert.ok(
+      label.width > 8 && label.height > 4,
+      `${label.selector} is not legible: ${JSON.stringify(label)}`
+    );
+  }
+}
+
 async function assertClickEffect(index, opening) {
   const summary = await evaluate("window.islandLab.summary()");
   if (index === 1) {
@@ -738,6 +769,7 @@ async function assertClickEffect(index, opening) {
   } else if (index === 3) {
     assert.equal(summary.running, true);
     assert.ok(summary.traceLength >= 1);
+    await assertTraceOverlayHidden(true);
   } else if (index === 5) {
     assert.equal(summary.inspectionOpen, true);
     assert.equal(summary.status, "stable-inspected");
@@ -753,7 +785,13 @@ async function assertClickEffect(index, opening) {
   } else if (index === 14) {
     assert.equal(summary.running, true);
     assert.ok(summary.traceLength >= 1);
+    await assertTraceOverlayHidden(true);
   } else if (index === 17) {
+    assert.equal(summary.status, "exported");
+    assert.equal(summary.exportPrepared, true);
+    assert.equal(summary.exportPointCount, 601);
+    assert.equal(summary.exportTraceDigest, "8bb46765");
+  } else if (index === 20) {
     assert.deepEqual(summary, opening);
     assert.equal(await evaluate("document.querySelector('#reset-proof').hidden"), false);
   }
@@ -774,11 +812,15 @@ async function runManifestReplay(width, scene, replay, claims, fixtures, oracleF
   assert.deepEqual(opening.predictionHistory, []);
   assert.equal(opening.traceLength, 0);
   assert.equal(opening.traceDigest, null);
+  assert.equal(opening.exportPrepared, false);
+  assert.equal(opening.exportPointCount, 0);
+  assert.equal(opening.exportTraceDigest, null);
   assert.deepEqual(await evaluate("window.islandLab.snapshot().trace"), []);
   assert.equal(await evaluate("document.querySelector('#run-btn').disabled"), true);
-  assert.equal(await evaluate("document.querySelector('#hidden-trace-label').hidden"), false);
+  await assertTraceOverlayHidden(false);
+  await assertLargeAxisLabels();
   await assertLegible(
-    ["#predict-band-btn", "#predict-collapse-btn", "#run-btn", "#reset-btn"],
+    ["#predict-band-btn", "#predict-transition-btn", "#predict-collapse-btn", "#run-btn", "#reset-btn"],
     width
   );
 
@@ -814,6 +856,7 @@ async function runManifestReplay(width, scene, replay, claims, fixtures, oracleF
       const trace = await evaluate("window.islandLab.snapshot().trace");
       assert.deepEqual(trace, fixtures.get("stable-band").series);
       assert.deepEqual(trace, oracleFixtures.stable);
+      await assertTraceOverlayHidden(true);
       assert.equal(
         await evaluate("document.querySelector('#predict-band-btn').getAttribute('aria-pressed')"),
         "true"
@@ -828,13 +871,37 @@ async function runManifestReplay(width, scene, replay, claims, fixtures, oracleF
       const trace = await evaluate("window.islandLab.snapshot().trace");
       assert.deepEqual(trace, fixtures.get("collapse").series);
       assert.deepEqual(trace, oracleFixtures.collapse);
-      assert.equal(await evaluate("document.querySelector('#crossing-line').hidden"), false);
-      assert.equal(await evaluate("document.querySelector('#crossing-dot').hidden"), false);
+      await assertTraceOverlayHidden(true);
+      assert.equal(
+        await evaluate("document.querySelector('#crossing-line').hasAttribute('hidden')"),
+        false
+      );
+      assert.equal(
+        await evaluate("document.querySelector('#crossing-dot').hasAttribute('hidden')"),
+        false
+      );
       assert.equal(
         await evaluate("document.querySelector('#speed-2-btn').getAttribute('aria-pressed')"),
         "true"
       );
       await assertLegible(["#collapse-result", "#reset-btn"], width);
+    } else if (checkpoint.claim === "export") {
+      const payload = JSON.parse(visible.value);
+      assert.equal(payload.schema, "island-herd-run-export/1.0");
+      assert.equal(payload.seed, ORACLE.seed);
+      assert.equal(payload.grazingRate, 0.6);
+      assert.equal(payload.collapseCrossingTick, 134);
+      assert.equal(payload.traceDigest, oracleDigest(oracleFixtures.collapse));
+      assert.deepEqual(payload.series, oracleExport(oracleFixtures.collapse));
+      const proof = await elementState("#export-proof");
+      assertVisible(proof, "#export-proof");
+      assert.match(proof.text, /601 points/i);
+      assert.match(proof.text, /8bb46765/i);
+      assert.match(
+        await evaluate("document.querySelector('#download-series-link').href"),
+        /^blob:/
+      );
+      await assertTraceOverlayHidden(true);
     } else if (checkpoint.claim === "reset") {
       assert.match(visible.text, /Exact reset complete/i);
       assert.deepEqual(actual, opening);
@@ -850,11 +917,16 @@ async function runManifestReplay(width, scene, replay, claims, fixtures, oracleF
         "false"
       );
       assert.equal(
+        await evaluate("document.querySelector('#predict-transition-btn').getAttribute('aria-pressed')"),
+        "false"
+      );
+      assert.equal(
         await evaluate("document.querySelector('#predict-collapse-btn').getAttribute('aria-pressed')"),
         "false"
       );
       assert.equal(await evaluate("document.querySelector('#run-btn').disabled"), true);
       assert.equal(await evaluate("document.querySelector('#stable-result').hidden"), true);
+      assert.equal(await evaluate("document.querySelector('#transition-result').hidden"), true);
       assert.equal(await evaluate("document.querySelector('#collapse-result').hidden"), true);
       assert.equal(await evaluate("document.querySelector('#trace-inspection').hidden"), true);
       assert.equal(await evaluate("document.querySelector('#trace-table-body').childElementCount"), 0);
@@ -864,14 +936,29 @@ async function runManifestReplay(width, scene, replay, claims, fixtures, oracleF
         await evaluate("document.querySelector('#download-series-link').hasAttribute('href')"),
         false
       );
-      assert.equal(await evaluate("document.querySelector('#crossing-line').hidden"), true);
-      assert.equal(await evaluate("document.querySelector('#crossing-dot').hidden"), true);
+      assert.equal(
+        await evaluate("document.querySelector('#crossing-line').hasAttribute('hidden')"),
+        true
+      );
+      assert.equal(
+        await evaluate("document.querySelector('#crossing-dot').hasAttribute('hidden')"),
+        true
+      );
+      await assertTraceOverlayHidden(false);
       await assertLegible(["#reset-proof", "#predict-band-btn"], width);
+    } else if (checkpoint.claim === "your-turn") {
+      assert.deepEqual(actual, opening);
+      assert.match(visible.text, /YOUR TURN/i);
+      assert.match(visible.text, /choose a grazing rate/i);
+      assert.match(visible.text, /predict stable band, transition, or collapse/i);
+      assert.match(visible.text, /reveal the trace/i);
+      assert.match(visible.text, /inspect the observed outcome/i);
+      assert.match(visible.text, /export all 601 points/i);
     }
     observed.push(checkpoint.claim);
   }
 
-  assert.deepEqual(observed, ["stable", "collapse", "reset"]);
+  assert.deepEqual(observed, ["stable", "collapse", "export", "reset", "your-turn"]);
   return { activatedClicks, checkpoints: observed, opening };
 }
 
@@ -901,7 +988,7 @@ async function semanticScroll(selector) {
   await scrollTo(selector, { block: "start", behavior: "auto" });
 }
 
-async function runSupplementalBehavior(opening, oracleFixtures) {
+async function runSupplementalBehavior(opening, oracleFixtures, transitionExpected) {
   await setViewport(1120);
   await navigate(pathToFileURL(appPath).href);
   assert.deepEqual(await compactAppSeries(0.24, 600, ORACLE.seed), oracleFixtures.stable);
@@ -935,8 +1022,8 @@ async function runSupplementalBehavior(opening, oracleFixtures) {
   await navigate(pathToFileURL(appPath).href);
   await semanticScroll("#rate-45-btn");
   await click("#rate-45-btn");
-  await semanticScroll("#predict-band-btn");
-  await click("#predict-band-btn");
+  await semanticScroll("#predict-transition-btn");
+  await click("#predict-transition-btn");
   await semanticScroll("#speed-4-btn");
   await click("#speed-4-btn");
   await semanticScroll("#run-btn");
@@ -944,17 +1031,34 @@ async function runSupplementalBehavior(opening, oracleFixtures) {
   await waitFor(
     "window.islandLab.summary().running === false && window.islandLab.summary().tick === 600"
   );
-  const bandPredictionTrace = await evaluate("window.islandLab.snapshot().trace");
-  await semanticScroll("#predict-collapse-btn");
-  await click("#predict-collapse-btn");
+  const transitionSummary = await evaluate("window.islandLab.summary()");
+  assert.deepEqual(transitionSummary, transitionExpected);
+  await semanticScroll("#transition-result");
+  const transitionResult = await elementState("#transition-result");
+  assertVisible(transitionResult, "#transition-result");
+  assert.match(transitionResult.text, /Prediction: transition/i);
+  assert.match(transitionResult.text, /Observed outcome: intermediate transition/i);
+  await assertTraceOverlayHidden(true);
+  const transitionPredictionTrace = await evaluate("window.islandLab.snapshot().trace");
+  await semanticScroll("#predict-band-btn");
+  await click("#predict-band-btn");
   await semanticScroll("#run-btn");
   await click("#run-btn");
   await waitFor(
     "window.islandLab.summary().running === false && window.islandLab.summary().tick === 600"
   );
-  const collapsePredictionTrace = await evaluate("window.islandLab.snapshot().trace");
-  assert.deepEqual(collapsePredictionTrace, bandPredictionTrace);
-  assert.deepEqual(collapsePredictionTrace, oracleSimulate(450));
+  const bandPredictionTrace = await evaluate("window.islandLab.snapshot().trace");
+  assert.deepEqual(bandPredictionTrace, transitionPredictionTrace);
+  assert.deepEqual(bandPredictionTrace, oracleFixtures.transition);
+  await semanticScroll("#transition-result");
+  const mismatchedPredictionResult = await elementState("#transition-result");
+  assertVisible(mismatchedPredictionResult, "#transition-result");
+  assert.match(mismatchedPredictionResult.text, /Prediction: stable band/i);
+  assert.match(
+    mismatchedPredictionResult.text,
+    /Observed outcome: intermediate transition/i
+  );
+  await assertTraceOverlayHidden(true);
 
   await navigate(pathToFileURL(appPath).href);
   await semanticScroll("#predict-band-btn");
@@ -966,6 +1070,7 @@ async function runSupplementalBehavior(opening, oracleFixtures) {
   await waitFor(
     "window.islandLab.summary().running === false && window.islandLab.summary().tick === 600"
   );
+  await assertTraceOverlayHidden(true);
   await semanticScroll("#export-series-btn");
   await click("#export-series-btn");
   const exported = await evaluate(
@@ -1000,6 +1105,7 @@ async function runSupplementalBehavior(opening, oracleFixtures) {
     false
   );
   assert.equal(await evaluate("document.querySelector('#export-panel').hidden"), true);
+  await assertTraceOverlayHidden(false);
   assert.deepEqual(
     await evaluate("window.__revokedObjectUrls"),
     [downloadUrl]
@@ -1008,7 +1114,10 @@ async function runSupplementalBehavior(opening, oracleFixtures) {
   return {
     arbitraryRateDigest: oracleDigest(arbitraryRate),
     seedDigests: [oracleDigest(seedOne), oracleDigest(seedTwo)],
-    predictionDigest: oracleDigest(bandPredictionTrace),
+    predictionDigest: oracleDigest(transitionPredictionTrace),
+    transitionFinal: transitionSummary.population,
+    transitionOutcome: transitionSummary.outcome,
+    traceOverlayHidden: true,
     exportPointCount: exported.series.length,
     invalidInputCount: invalidInputs.length,
     exportCleanedOnReset: true,
@@ -1106,6 +1215,7 @@ try {
 
   const oracleFixtures = {
     stable: oracleSimulate(240),
+    transition: oracleSimulate(450),
     collapse: oracleSimulate(600),
   };
   assert.ok(
@@ -1116,6 +1226,15 @@ try {
     )
   );
   assert.equal(oracleFixtures.stable.at(-1)[1], 112000);
+  assert.equal(oracleFixtures.transition.at(-1)[1], 45117);
+  assert.equal(
+    oracleFixtures.transition.some(point => point[1] < ORACLE.stableLowMilli),
+    true
+  );
+  assert.equal(
+    oracleFixtures.transition.some(point => point[1] < ORACLE.collapseMilli),
+    false
+  );
   const collapseCrossing = oracleFixtures.collapse.find(
     point => point[0] > 0 && point[1] < ORACLE.collapseMilli
   )?.[0];
@@ -1123,6 +1242,7 @@ try {
   assert.ok(collapseCrossing < 300);
   assert.equal(oracleFixtures.collapse.at(-1)[1], 8000);
   assert.deepEqual(fixtures.get("stable-band").series, oracleFixtures.stable);
+  assert.deepEqual(fixtures.get("transition").series, oracleFixtures.transition);
   assert.deepEqual(fixtures.get("collapse").series, oracleFixtures.collapse);
 
   const desktop = await runManifestReplay(
@@ -1143,7 +1263,8 @@ try {
   );
   const supplemental = await runSupplementalBehavior(
     desktop.opening,
-    oracleFixtures
+    oracleFixtures,
+    claims.get("transition").expectedState
   );
 
   assert.deepEqual(browserErrors, []);
@@ -1167,6 +1288,8 @@ try {
     stableFinal: oracleFixtures.stable.at(-1)[1] / 1000,
     collapseCrossingTick: collapseCrossing,
     collapseFinal: oracleFixtures.collapse.at(-1)[1] / 1000,
+    canonicalExportPointCount: oracleFixtures.collapse.length,
+    canonicalExportDigest: oracleDigest(oracleFixtures.collapse),
     resetTraceLength: desktop.opening.traceLength,
     responsiveWidth: 390,
     browserErrors: browserErrors.length,
