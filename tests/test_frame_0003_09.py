@@ -51,6 +51,67 @@ EXPECTED_EXPORT = (
 EXPECTED_EXPORT_DIGEST = (
     "fe05f5f52ddd174f2756d865e6e1baea3c0aa5497e8052ce430d1c4c8c1761e6"
 )
+EXPECTED_COMMISSION_GATES = {
+    "paired_delivery": {
+        "mp4": True,
+        "webm": True,
+        "live": True,
+        "same_publication": True,
+    },
+    "objective_evidence": {
+        "required": True,
+        "criterion": (
+            "Comparing the fixture's 1990 and 2020 snapshots yields exactly "
+            "seven changed record ids, and the exported sorted id list "
+            "matches the embedded expected list."
+        ),
+        "acceptance": (
+            "Snapshot labels, total record count, changed count, sorted ids, "
+            "spatial extent, and export digest are inspectable."
+        ),
+    },
+    "positive_path": {
+        "required": True,
+        "demonstration": (
+            "Compare the two snapshots, filter to the seven changed records, "
+            "inspect one record, and export the sorted id list."
+        ),
+    },
+    "visible_failure": {
+        "required": True,
+        "demonstration": (
+            "Select the supplied impossible date range and show a clear empty "
+            "state that is not rendered as a successful zero-change comparison."
+        ),
+    },
+    "exact_reset": {
+        "required": True,
+        "steps": [
+            "Activate Restore archive view.",
+            "Set snapshots to 1990 and 2020.",
+            "Reset filters, selection, pan, and zoom.",
+        ],
+        "restored_state": (
+            "All 24 records are visible at the original extent, the "
+            "seven-change comparison is selected, no record is focused, and "
+            "the expected export digest is restored."
+        ),
+    },
+    "rights_privacy": {
+        "rights_attestation": True,
+        "privacy_attestation": True,
+        "no_secrets": True,
+        "scope": (
+            "Records, coordinates, names, images, and dates must be synthetic "
+            "or cleared for public redistribution."
+        ),
+    },
+    "review_quorum": {
+        "minimum_approvals": 2,
+        "required_roles": ["technical", "curation"],
+        "independent_reviewers": True,
+    },
+}
 UNICODE_DIGEST_TEXT = "wetland · marsh"
 UNICODE_DIGEST = (
     "64ab66483871ac72d1c8f8ab01df762469d56247d8aad98fbb2100c49a58492e"
@@ -226,13 +287,23 @@ class TestCommissionAndPairedManifest(unittest.TestCase):
         cls.video = cls.manifest["videos"][0]
         cls.evidence = load_json(EVIDENCE_PATH)
 
-    def test_exact_open_commission_and_gates_are_bound(self):
+    def test_closed_commission_fulfillment_and_original_gates_are_bound(self):
         commissions = load_json(ROOT / "commissions.json")["commissions"]
         commission = next(
             item for item in commissions
             if item["id"] == "explore-archive-map-contrast"
         )
-        self.assertEqual(commission["status"], "open")
+        self.assertEqual(commission["status"], "closed")
+        self.assertEqual(
+            commission["fulfillment"],
+            {
+                "result_channel": "working-proofs",
+                "publication_id": PUBLICATION_ID,
+                "source_candidate": (
+                    "candidate-frame-0003/archive-wetland-contrast"
+                ),
+            },
+        )
         self.assertEqual(
             commission["brief"],
             (
@@ -240,6 +311,11 @@ class TestCommissionAndPairedManifest(unittest.TestCase):
                 "where the viewer can isolate changed records, trigger an empty "
                 "query, and return to the same view."
             ),
+        )
+        self.assertEqual(commission["gates"], EXPECTED_COMMISSION_GATES)
+        self.assertEqual(
+            self.evidence["commission"]["id"],
+            commission["id"],
         )
         self.assertEqual(
             self.evidence["commission"]["criterion"],
@@ -1171,55 +1247,97 @@ class TestRendererMediaAndDelivery(unittest.TestCase):
         FFMPEG and FFPROBE,
         "ffmpeg/ffprobe not found via RAPP_FFMPEG, RAPP_FFPROBE, or portable locations",
     )
-    def test_clean_rebuild_is_byte_identical_to_committed_bundle(self):
-        scratch = CANDIDATE / ".frame-0003-09-rebuild"
-        shutil.rmtree(scratch, ignore_errors=True)
-        self.addCleanup(lambda: shutil.rmtree(scratch, ignore_errors=True))
-        scratch.mkdir(parents=True)
-        for relative in (
-            ".gitattributes",
-            "README.md",
-            "apps/explore-archive-map-contrast.html",
-            "channel.production.json",
-            "evidence.json",
-            "exports/changed-record-ids.json",
-            "render.py",
-            "verify_dom.mjs",
-        ):
-            source = CANDIDATE / relative
-            target = scratch / relative
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, target)
-
-        rebuilt_master, rebuilt_thumb = RENDERER.render(
-            scratch,
-            str(FFMPEG),
-        )
-        compilation = COMPILER.prepare_compilation(
-            scratch / "channel.production.json",
-            scratch,
-        )
-        COMPILER.build_compilation(
-            compilation,
-            ffmpeg=str(FFMPEG),
-            ffprobe=str(FFPROBE),
+    def test_two_fresh_rebuilds_are_byte_identical_with_same_toolchain(self):
+        scratches = [
+            CANDIDATE / ".frame-0003-09-rebuild-a",
+            CANDIDATE / ".frame-0003-09-rebuild-b",
+        ]
+        for scratch in scratches:
+            shutil.rmtree(scratch, ignore_errors=True)
+        self.addCleanup(
+            lambda: [
+                shutil.rmtree(scratch, ignore_errors=True)
+                for scratch in scratches
+            ]
         )
 
-        comparisons = (
-            (MASTER_PATH, rebuilt_master),
-            (THUMB_PATH, rebuilt_thumb),
-            (CHANNEL_PATH, scratch / "channel.json"),
-            (MP4_PATH, scratch / "media" / f"{PUBLICATION_ID}.mp4"),
-            (WEBM_PATH, scratch / "media" / f"{PUBLICATION_ID}.webm"),
-        )
-        for committed, rebuilt in comparisons:
-            with self.subTest(artifact=committed.name):
-                self.assertEqual(committed.read_bytes(), rebuilt.read_bytes())
-                self.assertEqual(sha256(committed), sha256(rebuilt))
+        rebuilt_deliveries = []
+        for scratch in scratches:
+            scratch.mkdir(parents=True)
+            for relative in (
+                ".gitattributes",
+                "README.md",
+                "apps/explore-archive-map-contrast.html",
+                "channel.production.json",
+                "evidence.json",
+                "exports/changed-record-ids.json",
+                "render.py",
+                "verify_dom.mjs",
+            ):
+                source = CANDIDATE / relative
+                target = scratch / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, target)
+
+            RENDERER.render(scratch, str(FFMPEG))
+            compilation = COMPILER.prepare_compilation(
+                scratch / "channel.production.json",
+                scratch,
+            )
+            COMPILER.build_compilation(
+                compilation,
+                ffmpeg=str(FFMPEG),
+                ffprobe=str(FFPROBE),
+            )
+            rebuilt_deliveries.append(
+                RENDERER.delivery_document(scratch, str(FFPROBE))
+            )
+
         self.assertEqual(
-            RENDERER.delivery_document(scratch, str(FFPROBE)),
-            self.delivery,
+            (scratches[0] / "channel.json").read_bytes(),
+            CHANNEL_PATH.read_bytes(),
         )
+        self.assertEqual(
+            (
+                scratches[0]
+                / "thumbs"
+                / f"{PUBLICATION_ID}.svg"
+            ).read_bytes(),
+            THUMB_PATH.read_bytes(),
+        )
+        for relative in (
+            Path("masters") / f"{PUBLICATION_ID}.mkv",
+            Path("media") / f"{PUBLICATION_ID}.mp4",
+            Path("media") / f"{PUBLICATION_ID}.webm",
+            Path("thumbs") / f"{PUBLICATION_ID}.svg",
+            Path("channel.json"),
+        ):
+            with self.subTest(rebuilt=relative.as_posix()):
+                self.assertEqual(
+                    sha256(scratches[0] / relative),
+                    sha256(scratches[1] / relative),
+                )
+
+        self.assertEqual(rebuilt_deliveries[0], rebuilt_deliveries[1])
+        for kind in ("master", "mp4", "webm"):
+            rebuilt = rebuilt_deliveries[0]["artifacts"][kind]
+            delivered = self.delivery["artifacts"][kind]
+            for field in (
+                "codec",
+                "pixelFormat",
+                "width",
+                "height",
+                "duration",
+                "colorSpace",
+                "colorTransfer",
+                "colorPrimaries",
+                "colorRange",
+            ):
+                with self.subTest(kind=kind, field=field):
+                    self.assertEqual(
+                        rebuilt.get(field),
+                        delivered.get(field),
+                    )
 
     def test_tool_discovery_rejects_missing_and_accepts_quoted_explicit_path(self):
         with self.assertRaises(RuntimeError):

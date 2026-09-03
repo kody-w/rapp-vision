@@ -1433,39 +1433,89 @@ class TestFrame000303MediaExecution(unittest.TestCase):
                 ["video"],
             )
 
-    def test_clean_renderer_and_compiler_rebuild_is_byte_stable(self):
+    def test_two_fresh_rebuilds_are_byte_stable_with_same_toolchain(self):
         require_tools(self, FFmpeg=FFMPEG, FFprobe=FFPROBE)
-        scratch = CANDIDATE / "_test-rebuild"
-        remove_tree(scratch)
-        try:
-            rebuilt_master = (
-                scratch / "masters" / f"{PUBLICATION_ID}.mkv"
-            )
-            RENDERER.render_master(FFMPEG, rebuilt_master)
-            self.assertEqual(sha256(rebuilt_master), sha256(MASTER_PATH))
-
-            scratch.mkdir(parents=True, exist_ok=True)
-            scratch_manifest = scratch / "channel.production.json"
-            scratch_manifest.write_bytes(MANIFEST_PATH.read_bytes())
-            compilation = COMPILER.prepare_compilation(scratch_manifest)
-            rebuilt_channel = COMPILER.build_compilation(
-                compilation,
-                ffmpeg=FFMPEG,
-                ffprobe=FFPROBE,
-            )
-            self.assertEqual(
-                rebuilt_channel.read_bytes(), CHANNEL_PATH.read_bytes()
-            )
-            self.assertEqual(
-                sha256(scratch / "media" / f"{PUBLICATION_ID}.mp4"),
-                sha256(MP4_PATH),
-            )
-            self.assertEqual(
-                sha256(scratch / "media" / f"{PUBLICATION_ID}.webm"),
-                sha256(WEBM_PATH),
-            )
-        finally:
+        delivery = load_json(DELIVERY_PATH)
+        scratches = [
+            CANDIDATE / "_test-rebuild-a",
+            CANDIDATE / "_test-rebuild-b",
+        ]
+        for scratch in scratches:
             remove_tree(scratch)
+        try:
+            for kind, path in (
+                ("master", MASTER_PATH),
+                ("mp4", MP4_PATH),
+                ("webm", WEBM_PATH),
+            ):
+                self.assertEqual(
+                    delivery["media"][kind]["sha256"],
+                    sha256(path),
+                )
+
+            for scratch in scratches:
+                rebuilt_master = (
+                    scratch / "masters" / f"{PUBLICATION_ID}.mkv"
+                )
+                RENDERER.render_master(FFMPEG, rebuilt_master)
+                scratch.mkdir(parents=True, exist_ok=True)
+                scratch_manifest = scratch / "channel.production.json"
+                scratch_manifest.write_bytes(MANIFEST_PATH.read_bytes())
+                compilation = COMPILER.prepare_compilation(scratch_manifest)
+                COMPILER.build_compilation(
+                    compilation,
+                    ffmpeg=FFMPEG,
+                    ffprobe=FFPROBE,
+                )
+
+            self.assertEqual(
+                (scratches[0] / "channel.json").read_bytes(),
+                CHANNEL_PATH.read_bytes(),
+            )
+            self.assertEqual(
+                (scratches[0] / "channel.json").read_bytes(),
+                (scratches[1] / "channel.json").read_bytes(),
+            )
+            for relative in (
+                Path("masters") / f"{PUBLICATION_ID}.mkv",
+                Path("media") / f"{PUBLICATION_ID}.mp4",
+                Path("media") / f"{PUBLICATION_ID}.webm",
+            ):
+                with self.subTest(rebuilt=relative.as_posix()):
+                    self.assertEqual(
+                        sha256(scratches[0] / relative),
+                        sha256(scratches[1] / relative),
+                    )
+
+            for kind, relative in (
+                ("master", f"masters/{PUBLICATION_ID}.mkv"),
+                ("mp4", f"media/{PUBLICATION_ID}.mp4"),
+                ("webm", f"media/{PUBLICATION_ID}.webm"),
+            ):
+                with mock.patch.object(RENDERER, "ROOT", scratches[0]):
+                    rebuilt = RENDERER.probe_media(FFPROBE, relative)
+                delivered = delivery["media"][kind]
+                for field in (
+                    "codec",
+                    "duration",
+                    "height",
+                    "pixelFormat",
+                    "streamCount",
+                    "audioStreamCount",
+                    "width",
+                    "colorPrimaries",
+                    "colorRange",
+                    "colorSpace",
+                    "colorTransfer",
+                ):
+                    with self.subTest(kind=kind, field=field):
+                        self.assertEqual(
+                            rebuilt.get(field),
+                            delivered.get(field),
+                        )
+        finally:
+            for scratch in scratches:
+                remove_tree(scratch)
 
 
 if __name__ == "__main__":
