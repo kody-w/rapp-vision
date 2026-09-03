@@ -12,43 +12,51 @@
     {
       "chapters": [
         {
-          "label": "Six shapes, one grid",
+          "label": "Immutable 2 px opening",
           "t": 0
         },
         {
-          "label": "Shared stroke regenerated",
-          "t": 3
+          "label": "Six symbols regenerated at 1.5 px",
+          "t": 2
+        },
+        {
+          "label": "Returned to 2 px and exported",
+          "t": 5
         },
         {
           "label": "Off-grid anchor rejected",
-          "t": 7
+          "t": 8
         },
         {
           "label": "Exact 2 px reference restore",
           "t": 11
         }
       ],
-      "description": "A tiny vector bench starts from an immutable 2 px raster reference, regenerates six original 24 by 24 symbols from one shared stroke token, exports a hash-bound sprite, rejects an off-grid pulse anchor while preserving the accepted system, then restores the exact reference geometry and controls.",
+      "description": "A tiny vector bench starts from an immutable 2 px raster reference, changes the shared stroke to 1.5 px and regenerates all six original 24 by 24 symbols with new geometry and sprite hashes, deliberately returns to 2 px to regenerate and export the passing reference, rejects an off-grid pulse anchor without mutating that export, then restores the exact opening state.",
       "duration": 15,
       "height": 540,
       "id": "create-vector-icon-system",
       "live": {
         "chapters": [
           {
-            "label": "Edit the shared stroke token",
+            "label": "Edit shared stroke from 2 to 1.5",
             "t": 0
           },
           {
-            "label": "Regenerate all six symbols",
+            "label": "Regenerate all six at 1.5",
             "t": 2
           },
           {
-            "label": "Export the passing sprite",
+            "label": "Return the shared token to 2",
             "t": 4
           },
           {
+            "label": "Regenerate and export the passing reference",
+            "t": 6
+          },
+          {
             "label": "Reject one off-grid anchor",
-            "t": 7
+            "t": 8
           },
           {
             "label": "Restore immutable 2 px reference",
@@ -63,7 +71,7 @@
               {
                 "at": 0.8,
                 "do": "click",
-                "selector": "#stroke-2-btn"
+                "selector": "#stroke-15-btn"
               },
               {
                 "at": 2.2,
@@ -71,17 +79,27 @@
                 "selector": "#regenerate-btn"
               },
               {
-                "at": 4.2,
+                "at": 4.1,
+                "do": "click",
+                "selector": "#stroke-2-btn"
+              },
+              {
+                "at": 5.5,
+                "do": "click",
+                "selector": "#regenerate-btn"
+              },
+              {
+                "at": 6.6,
                 "do": "click",
                 "selector": "#export-btn"
               },
               {
-                "at": 7.4,
+                "at": 8.6,
                 "do": "click",
                 "selector": "#off-grid-btn"
               },
               {
-                "at": 11.4,
+                "at": 11.8,
                 "do": "click",
                 "selector": "#restore-btn"
               }
@@ -89,12 +107,12 @@
             "app": "apps/create-vector-icon-system.html",
             "dur": 15,
             "lower": {
-              "bench": "Exactly six named 24 × 24 symbols; the 2 px fixture differs from its immutable raster by 0 pixels.",
-              "fix": "Pause to inspect supported-stroke hashes, changed pixels, and the exact 2 px reset.",
+              "bench": "The authored 2 → 1.5 → 2 path regenerates all six symbols; only the returned 2 px fixture passes at 0 pixels.",
+              "fix": "Pause to inspect the changed geometry and sprite hashes, off-grid rejection, and exact 2 px reset.",
               "title": "Six Shapes, One Grid"
             },
             "ready": {
-              "selector": "#stroke-2-btn"
+              "selector": "#stroke-15-btn"
             },
             "t": 0
           }

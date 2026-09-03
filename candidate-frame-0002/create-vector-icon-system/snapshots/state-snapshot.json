@@ -2,6 +2,7 @@
   "positive": {
     "accepted": {
       "fixture": "reference-stroke-2",
+      "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
       "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
       "rules": {
         "grid": 2,
@@ -40,9 +41,84 @@
     "status": "accepted",
     "zoom": 800
   },
+  "positiveEdit": {
+    "accepted": {
+      "fixture": "shared-stroke-1.5",
+      "generatedGeometrySha256": "623ba0ea4f9357fc04e406edbf48d301aa26b4a943db98364e4ee9fc09d858bc",
+      "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+      "rules": {
+        "grid": 2,
+        "linecap": "round",
+        "linejoin": "round",
+        "stroke": 1.5,
+        "viewBox": "0 0 24 24"
+      },
+      "spriteSha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+      "symbols": [
+        "bloom",
+        "cairn",
+        "hinge",
+        "orbit",
+        "pulse",
+        "weave"
+      ]
+    },
+    "comparison": {
+      "differingPercent": 24.3345,
+      "differingPixels": 841,
+      "overlay": [],
+      "status": "fail",
+      "totalPixels": 3456
+    },
+    "draftStroke": 1.5,
+    "invalidEdit": null,
+    "lastExport": null,
+    "message": "Regenerated all 6 symbols with shared stroke 1.5 px; 841 pixels differ (24.3345%), so export remains blocked.",
+    "selection": "bloom",
+    "status": "rejected",
+    "zoom": 800
+  },
+  "positiveReturn": {
+    "accepted": {
+      "fixture": "reference-stroke-2",
+      "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+      "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+      "rules": {
+        "grid": 2,
+        "linecap": "round",
+        "linejoin": "round",
+        "stroke": 2,
+        "viewBox": "0 0 24 24"
+      },
+      "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+      "symbols": [
+        "bloom",
+        "cairn",
+        "hinge",
+        "orbit",
+        "pulse",
+        "weave"
+      ]
+    },
+    "comparison": {
+      "differingPercent": 0,
+      "differingPixels": 0,
+      "overlay": [],
+      "status": "pass",
+      "totalPixels": 3456
+    },
+    "draftStroke": 2,
+    "invalidEdit": null,
+    "lastExport": null,
+    "message": "Regenerated all 6 symbols with shared stroke 2 px; immutable reference difference is 0.0000%.",
+    "selection": "bloom",
+    "status": "accepted",
+    "zoom": 800
+  },
   "rejected": {
     "accepted": {
       "fixture": "reference-stroke-2",
+      "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
       "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
       "rules": {
         "grid": 2,
@@ -301,6 +377,7 @@
   "reset": {
     "accepted": {
       "fixture": "reference-stroke-2",
+      "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
       "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
       "rules": {
         "grid": 2,

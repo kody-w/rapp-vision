@@ -32,6 +32,7 @@ VIEW_BOX = "0 0 24 24"
 GRID = 2
 REFERENCE_STROKE = 2.0
 BASE_STROKE = REFERENCE_STROKE
+EDIT_STROKE = 1.5
 EXPORT_STROKE = REFERENCE_STROKE
 SUPPORTED_STROKES = (1.0, 1.5, 2.0, 2.5, 3.0)
 RASTER_THRESHOLD_PERCENT = 0.5
@@ -460,6 +461,7 @@ def stroke_records() -> dict[str, object]:
         sprite = sprite_svg(stroke)
         records[_number(stroke)] = {
             "bytes": len(sprite.encode("utf-8")),
+            "geometrySha256": generated_geometry_sha256(stroke),
             "sha256": sha256_text(sprite),
             "comparison": {
                 "differingPixels": comparison["differingPixels"],
@@ -503,6 +505,26 @@ def geometry_sha256() -> str:
     return sha256_text(canonical)
 
 
+def generated_geometry_signature(stroke: float) -> str:
+    return "\n".join(
+        "|".join(
+            (
+                icon.name,
+                VIEW_BOX,
+                _number(stroke),
+                "round",
+                "round",
+                ";".join(path_data(path) for path in icon.paths),
+            )
+        )
+        for icon in ICONS
+    )
+
+
+def generated_geometry_sha256(stroke: float) -> str:
+    return sha256_text(generated_geometry_signature(stroke))
+
+
 def contract_states(output_root: Path = ROOT) -> dict[str, object]:
     app = output_root / "apps" / f"{PUBLICATION_ID}.html"
     source = app.read_text(encoding="utf-8")
@@ -515,8 +537,18 @@ def contract_states(output_root: Path = ROOT) -> dict[str, object]:
     if not match:
         raise RuntimeError(f"contract states are missing from {app}")
     states = json.loads(match.group(1))
-    if set(states) != {"positive", "rejected", "reset"}:
-        raise RuntimeError("contract states must contain positive, rejected, and reset")
+    expected = {
+        "positiveEdit",
+        "positiveReturn",
+        "positive",
+        "rejected",
+        "reset",
+    }
+    if set(states) != expected:
+        raise RuntimeError(
+            "contract states must contain positiveEdit, positiveReturn, "
+            "positive, rejected, and reset"
+        )
     return states
 
 
@@ -526,7 +558,7 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
     comparison = reference["comparison"]
     supported = stroke_records()
     return {
-        "schema": "candidate-frame-0002-create-vector-icon-system-evidence/1.0",
+        "schema": "candidate-frame-0002-create-vector-icon-system-evidence/2.0",
         "commission": {
             "id": "create-vector-icon-system",
             "criterion": (
@@ -546,6 +578,9 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
                 "viewBox": VIEW_BOX,
                 "sharedStroke": EXPORT_STROKE,
                 "pathSetSha256": geometry_sha256(),
+                "generatedGeometrySha256": generated_geometry_sha256(
+                    EXPORT_STROKE
+                ),
             },
             "rasterComparison": {
                 "reference": "reference/reference-raster.json",
@@ -566,6 +601,7 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
                     {
                         "stroke": float(stroke),
                         "spriteSha256": record["sha256"],
+                        "generatedGeometrySha256": record["geometrySha256"],
                         "spriteBytes": record["bytes"],
                         **record["comparison"],
                     }
@@ -577,18 +613,75 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
             {
                 "id": "positive",
                 "claim": (
-                    "Editing the shared stroke token to 2 px regenerates all six "
-                    "symbols and exports the exact passing sprite."
+                    "The authored path changes the shared stroke from 2 px to "
+                    "1.5 px and regenerates all six symbols with different "
+                    "generated geometry and sprite hashes, then deliberately "
+                    "returns to 2 px, regenerates, and exports the exact passing "
+                    "reference sprite."
                 ),
                 "actions": [
+                    {"type": "SET_STROKE", "selector": "#stroke-15-btn"},
+                    {"type": "REGENERATE", "selector": "#regenerate-btn"},
                     {"type": "SET_STROKE", "selector": "#stroke-2-btn"},
                     {"type": "REGENERATE", "selector": "#regenerate-btn"},
                     {"type": "EXPORT", "selector": "#export-btn"},
+                ],
+                "checkpoints": [
+                    {
+                        "id": "edited",
+                        "afterAction": 2,
+                        "expectedState": states["positiveEdit"],
+                        "assertions": [
+                            {
+                                "path": "accepted.rules.stroke",
+                                "equals": EDIT_STROKE,
+                            },
+                            {
+                                "path": "accepted.generatedGeometrySha256",
+                                "equals": generated_geometry_sha256(EDIT_STROKE),
+                            },
+                            {
+                                "path": "accepted.spriteSha256",
+                                "equals": sha256_text(sprite_svg(EDIT_STROKE)),
+                            },
+                            {
+                                "path": "accepted.symbols",
+                                "equals": list(ICON_NAMES),
+                            },
+                        ],
+                    },
+                    {
+                        "id": "returned",
+                        "afterAction": 4,
+                        "expectedState": states["positiveReturn"],
+                        "assertions": [
+                            {
+                                "path": "accepted.rules.stroke",
+                                "equals": EXPORT_STROKE,
+                            },
+                            {
+                                "path": "accepted.generatedGeometrySha256",
+                                "equals": generated_geometry_sha256(EXPORT_STROKE),
+                            },
+                            {
+                                "path": "accepted.spriteSha256",
+                                "equals": sha256_text(sprite_svg(EXPORT_STROKE)),
+                            },
+                            {
+                                "path": "lastExport",
+                                "equals": None,
+                            },
+                        ],
+                    },
                 ],
                 "expectedState": states["positive"],
                 "assertions": [
                     {"path": "accepted.rules.stroke", "equals": 2},
                     {"path": "accepted.symbols", "equals": list(ICON_NAMES)},
+                    {
+                        "path": "accepted.generatedGeometrySha256",
+                        "equals": generated_geometry_sha256(EXPORT_STROKE),
+                    },
                     {"path": "comparison.status", "equals": "pass"},
                     {"path": "comparison.differingPercent", "equals": 0},
                     {
@@ -605,6 +698,8 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
                     "the accepted icon system or export."
                 ),
                 "actions": [
+                    {"type": "SET_STROKE", "selector": "#stroke-15-btn"},
+                    {"type": "REGENERATE", "selector": "#regenerate-btn"},
                     {"type": "SET_STROKE", "selector": "#stroke-2-btn"},
                     {"type": "REGENERATE", "selector": "#regenerate-btn"},
                     {"type": "EXPORT", "selector": "#export-btn"},
@@ -657,6 +752,8 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
                 "channel.production.json#videos[0].live.scenes[0].actions"
             ),
             "selectors": [
+                "#stroke-15-btn",
+                "#regenerate-btn",
                 "#stroke-2-btn",
                 "#regenerate-btn",
                 "#export-btn",
@@ -666,9 +763,24 @@ def evidence_document(output_root: Path = ROOT) -> dict[str, object]:
             "nondefaultSupportedStrokes": [1.0, 1.5, 2.5, 3.0],
             "assertion": (
                 "The test suite launches a real Chromium-family browser, drives "
-                "each selector, captures reducer state after every click, and "
-                "fails on console or page exceptions."
+                "each selector, captures reducer state and generated SVG geometry "
+                "after every click, independently hashes both the geometry and "
+                "sprite source, and fails unless all six symbols change at 1.5 px "
+                "before returning exactly to 2 px. Console and page exceptions "
+                "also fail the replay."
             ),
+            "positivePath": {
+                "initialStroke": REFERENCE_STROKE,
+                "editedStroke": EDIT_STROKE,
+                "returnedStroke": EXPORT_STROKE,
+                "editedGeometrySha256": generated_geometry_sha256(EDIT_STROKE),
+                "returnedGeometrySha256": generated_geometry_sha256(
+                    EXPORT_STROKE
+                ),
+                "editedSpriteSha256": sha256_text(sprite_svg(EDIT_STROKE)),
+                "returnedSpriteSha256": sha256_text(sprite_svg(EXPORT_STROKE)),
+                "generatedSymbolCount": len(ICONS),
+            },
         },
         "renderer": {
             "path": "render.py",
@@ -763,8 +875,9 @@ def snapshot_svg() -> str:
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" '
         'role="img" aria-labelledby="title desc">\n'
         '  <title id="title">Vector icon system deterministic state snapshot</title>\n'
-        '  <desc id="desc">Accepted six-icon sprite beside the visibly rejected '
-        'off-grid pulse candidate and exact reset state.</desc>\n'
+        '  <desc id="desc">The authored positive path regenerates all six icons '
+        'at 1.5 pixels, returns to the passing 2 pixel reference, then demonstrates '
+        'the rejected off-grid pulse and exact reset.</desc>\n'
         '  <rect width="960" height="540" fill="#0a0e17"/>\n'
         '  <rect x="34" y="32" width="892" height="476" rx="24" fill="#101827" '
         'stroke="#34445f"/>\n'
@@ -772,19 +885,21 @@ def snapshot_svg() -> str:
         'font-size="30" font-weight="700">VECTOR TOKEN BENCH / SNAPSHOT</text>\n'
         '  <text x="66" y="116" fill="#9fb0c8" font-family="monospace" '
         'font-size="16">GRID 2 · VIEWBOX 0 0 24 24 · SIX NAMED SYMBOLS</text>\n'
-        '  <rect x="66" y="150" width="522" height="230" rx="18" fill="#0b1220" '
-        'stroke="#4ade80"/>\n'
-        '  <text x="90" y="184" fill="#4ade80" font-family="monospace" '
-        'font-size="16" font-weight="700">ACCEPTED / SHARED STROKE 2</text>\n'
+        '  <rect x="66" y="150" width="522" height="230" rx="18" fill="#15130d" '
+        'stroke="#fbbf24"/>\n'
+        '  <text x="90" y="184" fill="#fbbf24" font-family="monospace" '
+        'font-size="16" font-weight="700">LIVE EDIT / 2 → 1.5 / SIX REGENERATED</text>\n'
         + "".join(
             (
                 f'<g transform="translate({86 + (index % 3) * 164} '
                 f'{204 + (index // 3) * 88}) scale(2.8)" fill="none" '
-                'stroke="#d9f99d" stroke-width="2" stroke-linecap="round" '
+                'stroke="#fde68a" stroke-width="1.5" stroke-linecap="round" '
                 f'stroke-linejoin="round">{_svg_paths(icon)}</g>'
             )
             for index, icon in enumerate(ICONS)
         )
+        + '\n  <text x="90" y="368" fill="#fde68a" font-family="monospace" '
+        'font-size="11">GEOMETRY 623BA0EA · SPRITE 0DD372E6 · 24.3345% VS REF</text>\n'
         + '\n  <rect x="614" y="150" width="280" height="230" rx="18" '
         'fill="#1b1019" stroke="#fb7185"/>\n'
         '  <text x="638" y="184" fill="#fb7185" font-family="monospace" '
@@ -796,9 +911,9 @@ def snapshot_svg() -> str:
         f'font-size="15">{invalid_percent:.4f}% PIXELS DIFFER</text>\n'
         '  <rect x="66" y="410" width="828" height="66" rx="12" fill="#102b25"/>\n'
         '  <text x="90" y="438" fill="#86efac" font-family="monospace" '
-        'font-size="16">RESET: IMMUTABLE REFERENCE · STROKE 2 · BLOOM SELECTED</text>\n'
+        'font-size="16">RETURN: STROKE 2 · REGENERATE · EXPORT 6C32A2CE</text>\n'
         '  <text x="90" y="463" fill="#86efac" font-family="monospace" '
-        'font-size="16">ZOOM 800% · OVERLAYS CLEAR · REFERENCE PASS</text>\n'
+        'font-size="16">RESET: EXACT 2 PX · BLOOM · 800% · OVERLAYS CLEAR</text>\n'
         "</svg>\n"
     )
 
@@ -923,27 +1038,59 @@ def frame_rgb(frame_index: int) -> bytes:
     if frame_index < 0 or frame_index >= FRAME_COUNT:
         raise ValueError(f"frame index must be in 0..{FRAME_COUNT - 1}")
     second = frame_index / FPS
-    if second < 2.8:
-        phase = "baseline"
+    if second < 0.8:
+        phase = "initial"
         stroke = BASE_STROKE
+        draft_stroke = BASE_STROKE
         accent = (96, 165, 250)
         status = "IMMUTABLE REFERENCE / GRID 2"
         detail = "STROKE 2 / ZERO DIFF"
-    elif second < 6.8:
+    elif second < 2.2:
+        phase = "draft-edit"
+        stroke = BASE_STROKE
+        draft_stroke = EDIT_STROKE
+        accent = (251, 191, 36)
+        status = "DRAFT TOKEN / 2 TO 1.5"
+        detail = "ACCEPTED 2 / REGENERATE NEXT"
+    elif second < 4.1:
+        phase = "edited"
+        stroke = EDIT_STROKE
+        draft_stroke = EDIT_STROKE
+        accent = (251, 191, 36)
+        status = "6 SYMBOLS / 24.3345% DIFFER"
+        detail = "GEOMETRY 623BA0EA / CHANGED"
+    elif second < 5.5:
+        phase = "draft-return"
+        stroke = EDIT_STROKE
+        draft_stroke = EXPORT_STROKE
+        accent = (96, 165, 250)
+        status = "RETURN TOKEN / DRAFT 2"
+        detail = "ACCEPTED 1.5 / REGENERATE NEXT"
+    elif second < 6.6:
+        phase = "returned"
+        stroke = EXPORT_STROKE
+        draft_stroke = EXPORT_STROKE
+        accent = (45, 212, 191)
+        status = "6 SYMBOLS / 0.0000% PASS"
+        detail = "RETURNED 2 / EXPORT NEXT"
+    elif second < 8.6:
         phase = "accepted"
         stroke = EXPORT_STROKE
+        draft_stroke = EXPORT_STROKE
         accent = (74, 222, 128)
-        status = "6 SYMBOLS / 0.00% PASS"
-        detail = "STROKE 2 / EXPORT BOUND"
-    elif second < 10.8:
+        status = "6 SYMBOLS / 0.0000% PASS"
+        detail = "RETURNED 2 / EXPORT 6C32A2CE"
+    elif second < 11.8:
         phase = "rejected"
         stroke = EXPORT_STROKE
+        draft_stroke = EXPORT_STROKE
         accent = (251, 113, 133)
         status = "OFF GRID 13,17 / REJECT"
         detail = "ACCEPTED EXPORT UNCHANGED"
     else:
         phase = "reset"
         stroke = BASE_STROKE
+        draft_stroke = BASE_STROKE
         accent = (167, 139, 250)
         status = "RESTORE FIXTURE / EXACT"
         detail = "2PX / 800% / BLOOM / CLEAR"
@@ -957,13 +1104,15 @@ def frame_rgb(frame_index: int) -> bytes:
     canvas.text(36, 28, "SIX SHAPES / ONE GRID", (241, 245, 249), 4)
     canvas.text(36, 60, "24 X 24 / GRID 2 / ROUND JOIN", (148, 163, 184), 2)
     canvas.rect(36, 92, 888, 2, (51, 65, 85))
-    token_width = 190 if phase == "baseline" else 278
-    if phase == "rejected":
-        token_width = 278
-    if phase == "reset":
-        token_width = 190
+    token_width = round(95 * draft_stroke)
     canvas.rect(36, 106, token_width, 8, accent)
-    canvas.text(326, 103, f"SHARED STROKE {_number(stroke)}", accent, 2)
+    canvas.text(
+        326,
+        103,
+        f"DRAFT {_number(draft_stroke)} / GENERATED {_number(stroke)}",
+        accent,
+        2,
+    )
 
     card_width = 188
     card_height = 150
@@ -1041,6 +1190,28 @@ def frame_rgb(frame_index: int) -> bytes:
             (241, 245, 249),
             1,
         )
+    elif phase == "returned":
+        canvas.rect(panel_x + 22, 282, 230, 96, (10, 43, 42))
+        canvas.text(panel_x + 40, 298, "REGENERATED 6", (153, 246, 228), 2)
+        canvas.text(panel_x + 40, 324, "STROKE 2 / PASS", (153, 246, 228), 2)
+        canvas.text(panel_x + 40, 352, "GEOM C3DF9DA9", (241, 245, 249), 1)
+        canvas.text(panel_x + 40, 366, "EXPORT NEXT", (241, 245, 249), 1)
+    elif phase == "edited":
+        canvas.rect(panel_x + 22, 282, 230, 96, (52, 38, 10))
+        canvas.text(panel_x + 40, 298, "REGENERATED 6", (253, 230, 138), 2)
+        canvas.text(panel_x + 40, 324, "STROKE 1.5", (253, 230, 138), 2)
+        canvas.text(panel_x + 40, 350, "GEOM 623BA0EA", (241, 245, 249), 1)
+        canvas.text(panel_x + 40, 364, "SPRITE 0DD372E6", (241, 245, 249), 1)
+    elif phase == "draft-edit":
+        canvas.rect(panel_x + 22, 282, 230, 96, (52, 38, 10))
+        canvas.text(panel_x + 40, 302, "EDIT TOKEN", (253, 230, 138), 2)
+        canvas.text(panel_x + 40, 328, "2 TO 1.5", (253, 230, 138), 2)
+        canvas.text(panel_x + 40, 354, "REGENERATE NEXT", (241, 245, 249), 1)
+    elif phase == "draft-return":
+        canvas.rect(panel_x + 22, 282, 230, 96, (16, 30, 51))
+        canvas.text(panel_x + 40, 302, "RETURN TOKEN", (147, 197, 253), 2)
+        canvas.text(panel_x + 40, 328, "1.5 TO 2", (147, 197, 253), 2)
+        canvas.text(panel_x + 40, 354, "REGENERATE NEXT", (241, 245, 249), 1)
     elif phase == "reset":
         canvas.rect(panel_x + 22, 282, 230, 96, (34, 25, 62))
         canvas.text(panel_x + 40, 302, "ZOOM 800%", (221, 214, 254), 2)

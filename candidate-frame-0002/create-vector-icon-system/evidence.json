@@ -1,14 +1,26 @@
 {
   "browserReplay": {
-    "assertion": "The test suite launches a real Chromium-family browser, drives each selector, captures reducer state after every click, and fails on console or page exceptions.",
+    "assertion": "The test suite launches a real Chromium-family browser, drives each selector, captures reducer state and generated SVG geometry after every click, independently hashes both the geometry and sprite source, and fails unless all six symbols change at 1.5 px before returning exactly to 2 px. Console and page exceptions also fail the replay.",
     "nondefaultSupportedStrokes": [
       1.0,
       1.5,
       2.5,
       3.0
     ],
+    "positivePath": {
+      "editedGeometrySha256": "623ba0ea4f9357fc04e406edbf48d301aa26b4a943db98364e4ee9fc09d858bc",
+      "editedSpriteSha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+      "editedStroke": 1.5,
+      "generatedSymbolCount": 6,
+      "initialStroke": 2.0,
+      "returnedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+      "returnedSpriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+      "returnedStroke": 2.0
+    },
     "runner": "tests/frame_0002_09_browser.mjs",
     "selectors": [
+      "#stroke-15-btn",
+      "#regenerate-btn",
       "#stroke-2-btn",
       "#regenerate-btn",
       "#export-btn",
@@ -20,6 +32,14 @@
   "claims": [
     {
       "actions": [
+        {
+          "selector": "#stroke-15-btn",
+          "type": "SET_STROKE"
+        },
+        {
+          "selector": "#regenerate-btn",
+          "type": "REGENERATE"
+        },
         {
           "selector": "#stroke-2-btn",
           "type": "SET_STROKE"
@@ -50,6 +70,10 @@
           "path": "accepted.symbols"
         },
         {
+          "equals": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+          "path": "accepted.generatedGeometrySha256"
+        },
+        {
           "equals": "pass",
           "path": "comparison.status"
         },
@@ -62,10 +86,138 @@
           "path": "lastExport.sha256"
         }
       ],
-      "claim": "Editing the shared stroke token to 2 px regenerates all six symbols and exports the exact passing sprite.",
+      "checkpoints": [
+        {
+          "afterAction": 2,
+          "assertions": [
+            {
+              "equals": 1.5,
+              "path": "accepted.rules.stroke"
+            },
+            {
+              "equals": "623ba0ea4f9357fc04e406edbf48d301aa26b4a943db98364e4ee9fc09d858bc",
+              "path": "accepted.generatedGeometrySha256"
+            },
+            {
+              "equals": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+              "path": "accepted.spriteSha256"
+            },
+            {
+              "equals": [
+                "bloom",
+                "cairn",
+                "hinge",
+                "orbit",
+                "pulse",
+                "weave"
+              ],
+              "path": "accepted.symbols"
+            }
+          ],
+          "expectedState": {
+            "accepted": {
+              "fixture": "shared-stroke-1.5",
+              "generatedGeometrySha256": "623ba0ea4f9357fc04e406edbf48d301aa26b4a943db98364e4ee9fc09d858bc",
+              "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+              "rules": {
+                "grid": 2,
+                "linecap": "round",
+                "linejoin": "round",
+                "stroke": 1.5,
+                "viewBox": "0 0 24 24"
+              },
+              "spriteSha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+              "symbols": [
+                "bloom",
+                "cairn",
+                "hinge",
+                "orbit",
+                "pulse",
+                "weave"
+              ]
+            },
+            "comparison": {
+              "differingPercent": 24.3345,
+              "differingPixels": 841,
+              "overlay": [],
+              "status": "fail",
+              "totalPixels": 3456
+            },
+            "draftStroke": 1.5,
+            "invalidEdit": null,
+            "lastExport": null,
+            "message": "Regenerated all 6 symbols with shared stroke 1.5 px; 841 pixels differ (24.3345%), so export remains blocked.",
+            "selection": "bloom",
+            "status": "rejected",
+            "zoom": 800
+          },
+          "id": "edited"
+        },
+        {
+          "afterAction": 4,
+          "assertions": [
+            {
+              "equals": 2.0,
+              "path": "accepted.rules.stroke"
+            },
+            {
+              "equals": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+              "path": "accepted.generatedGeometrySha256"
+            },
+            {
+              "equals": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+              "path": "accepted.spriteSha256"
+            },
+            {
+              "equals": null,
+              "path": "lastExport"
+            }
+          ],
+          "expectedState": {
+            "accepted": {
+              "fixture": "reference-stroke-2",
+              "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+              "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+              "rules": {
+                "grid": 2,
+                "linecap": "round",
+                "linejoin": "round",
+                "stroke": 2,
+                "viewBox": "0 0 24 24"
+              },
+              "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+              "symbols": [
+                "bloom",
+                "cairn",
+                "hinge",
+                "orbit",
+                "pulse",
+                "weave"
+              ]
+            },
+            "comparison": {
+              "differingPercent": 0,
+              "differingPixels": 0,
+              "overlay": [],
+              "status": "pass",
+              "totalPixels": 3456
+            },
+            "draftStroke": 2,
+            "invalidEdit": null,
+            "lastExport": null,
+            "message": "Regenerated all 6 symbols with shared stroke 2 px; immutable reference difference is 0.0000%.",
+            "selection": "bloom",
+            "status": "accepted",
+            "zoom": 800
+          },
+          "id": "returned"
+        }
+      ],
+      "claim": "The authored path changes the shared stroke from 2 px to 1.5 px and regenerates all six symbols with different generated geometry and sprite hashes, then deliberately returns to 2 px, regenerates, and exports the exact passing reference sprite.",
       "expectedState": {
         "accepted": {
           "fixture": "reference-stroke-2",
+          "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
           "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
           "rules": {
             "grid": 2,
@@ -109,6 +261,14 @@
     {
       "actions": [
         {
+          "selector": "#stroke-15-btn",
+          "type": "SET_STROKE"
+        },
+        {
+          "selector": "#regenerate-btn",
+          "type": "REGENERATE"
+        },
+        {
           "selector": "#stroke-2-btn",
           "type": "SET_STROKE"
         },
@@ -129,6 +289,7 @@
         {
           "equals": {
             "fixture": "reference-stroke-2",
+            "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
             "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
             "rules": {
               "grid": 2,
@@ -178,6 +339,7 @@
       "expectedState": {
         "accepted": {
           "fixture": "reference-stroke-2",
+          "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
           "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
           "rules": {
             "grid": 2,
@@ -484,6 +646,7 @@
       "expectedState": {
         "accepted": {
           "fixture": "reference-stroke-2",
+          "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
           "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
           "rules": {
             "grid": 2,
@@ -542,6 +705,7 @@
         {
           "differingPercent": 27.2859,
           "differingPixels": 943,
+          "generatedGeometrySha256": "a02d1be226192fab3fd111837688ce55fe4aef7f26805bafb74738cdfd7932b7",
           "spriteBytes": 2234,
           "spriteSha256": "c8ca7d61b74ac74269f5878c4edbb939153d3bc845e29aa6e087f6ffefc80e88",
           "status": "fail",
@@ -551,6 +715,7 @@
         {
           "differingPercent": 24.3345,
           "differingPixels": 841,
+          "generatedGeometrySha256": "623ba0ea4f9357fc04e406edbf48d301aa26b4a943db98364e4ee9fc09d858bc",
           "spriteBytes": 2246,
           "spriteSha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
           "status": "fail",
@@ -560,6 +725,7 @@
         {
           "differingPercent": 0.0,
           "differingPixels": 0,
+          "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
           "spriteBytes": 2234,
           "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
           "status": "pass",
@@ -569,6 +735,7 @@
         {
           "differingPercent": 26.1574,
           "differingPixels": 904,
+          "generatedGeometrySha256": "842f482325b9c296fff49c103bce66a3d5055669f186a62f0f1b0be30294ddd8",
           "spriteBytes": 2246,
           "spriteSha256": "019cd1a5234d86972d7ee16f38074b15893532c56db07a31b66d75fb6d445e85",
           "status": "fail",
@@ -578,6 +745,7 @@
         {
           "differingPercent": 27.3727,
           "differingPixels": 946,
+          "generatedGeometrySha256": "f67480dfae7e089bb930b61c8ace0d9af39a7d1b92df98d634a7e9cb7ae86df7",
           "spriteBytes": 2234,
           "spriteSha256": "be4e159c82e877643862a0bc53ee2590dc1305ec843b0c97679144f4e273b223",
           "status": "fail",
@@ -590,6 +758,7 @@
     },
     "sprite": {
       "bytes": 2234,
+      "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
       "names": [
         "bloom",
         "cairn",
@@ -611,11 +780,11 @@
     "duration": 15.0,
     "fps": 12,
     "frameSamples": {
-      "0": "cb7cc7e11396cd56ba42b95b4f3f502645eebd7af5da52b5192de20a92e1a09d",
-      "132": "e0f6d1b4f29e91442b6fce862d7aa06bb6048a2d7bf2637d3f041bf21bc54c81",
-      "179": "3f8f31dc2cffcff1ba4c838a70eed5e228fd6a9f4153304f7095464cbb10c0c1",
-      "42": "0dcc2fde27029b5d84aca5cdcda9be139280f187a04238bfd9acc9019a9e0ae8",
-      "84": "17cfb18dc5db6ddfa3bfa5cd2490ebcd9543b413bac27f88bc0d6bce9af75c3b"
+      "0": "50706739cd9bbd4173256b44bb11cfc1f95e2fcd7f1db25c9bd30fb59b19748d",
+      "132": "dcaebb247c6e49652ef79d7e9a33d70cc6825de23a70348f584331ad29296858",
+      "179": "dd2d48c46eee43ceda36ad7b0eeb7e6c2e23ff5a5cfafe108b359a315ba8dfe9",
+      "42": "886d0c810bcad4dfc678cf32f0ad79c601d4ae752a0246e69501ad38b4ecb6ab",
+      "84": "eb017ca7b7e8427e825363eb77ef760e2e2090d08feda98bbdfda0805f20015f"
     },
     "frames": 180,
     "height": 540,
@@ -629,5 +798,5 @@
     "rightsAttestation": true,
     "statement": "All icon geometry, interface code, immutable raster reference, thumbnail, snapshot, and renderer graphics are original to this candidate; no logos, copied icons, external fonts, or network assets are used."
   },
-  "schema": "candidate-frame-0002-create-vector-icon-system-evidence/1.0"
+  "schema": "candidate-frame-0002-create-vector-icon-system-evidence/2.0"
 }

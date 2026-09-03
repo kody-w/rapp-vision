@@ -504,7 +504,8 @@
               <label for="stroke-rule">Shared stroke width in pixels</label>
               <input id="stroke-rule" name="stroke-rule" type="number" min="1" max="3" step="0.5" value="2" inputmode="decimal">
             </div>
-            <button id="stroke-2-btn" type="button" data-action="SET_STROKE">Set stroke 2</button>
+            <button id="stroke-15-btn" type="button" data-action="SET_STROKE">Set stroke 1.5</button>
+            <button id="stroke-2-btn" type="button" data-action="SET_STROKE">Return stroke 2</button>
             <button id="regenerate-btn" type="button" data-action="REGENERATE">Regenerate six</button>
             <button id="export-btn" type="button" data-action="EXPORT">Export SVG sprite</button>
             <button id="off-grid-btn" type="button" data-action="OFF_GRID">Try anchor 13,17</button>
@@ -559,9 +560,84 @@
 
   <script type="application/json" id="contract-states">
 {
+  "positiveEdit": {
+    "accepted": {
+      "fixture": "shared-stroke-1.5",
+      "generatedGeometrySha256": "623ba0ea4f9357fc04e406edbf48d301aa26b4a943db98364e4ee9fc09d858bc",
+      "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+      "rules": {
+        "grid": 2,
+        "linecap": "round",
+        "linejoin": "round",
+        "stroke": 1.5,
+        "viewBox": "0 0 24 24"
+      },
+      "spriteSha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+      "symbols": [
+        "bloom",
+        "cairn",
+        "hinge",
+        "orbit",
+        "pulse",
+        "weave"
+      ]
+    },
+    "comparison": {
+      "differingPercent": 24.3345,
+      "differingPixels": 841,
+      "overlay": [],
+      "status": "fail",
+      "totalPixels": 3456
+    },
+    "draftStroke": 1.5,
+    "invalidEdit": null,
+    "lastExport": null,
+    "message": "Regenerated all 6 symbols with shared stroke 1.5 px; 841 pixels differ (24.3345%), so export remains blocked.",
+    "selection": "bloom",
+    "status": "rejected",
+    "zoom": 800
+  },
+  "positiveReturn": {
+    "accepted": {
+      "fixture": "reference-stroke-2",
+      "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+      "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+      "rules": {
+        "grid": 2,
+        "linecap": "round",
+        "linejoin": "round",
+        "stroke": 2,
+        "viewBox": "0 0 24 24"
+      },
+      "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+      "symbols": [
+        "bloom",
+        "cairn",
+        "hinge",
+        "orbit",
+        "pulse",
+        "weave"
+      ]
+    },
+    "comparison": {
+      "differingPercent": 0,
+      "differingPixels": 0,
+      "overlay": [],
+      "status": "pass",
+      "totalPixels": 3456
+    },
+    "draftStroke": 2,
+    "invalidEdit": null,
+    "lastExport": null,
+    "message": "Regenerated all 6 symbols with shared stroke 2 px; immutable reference difference is 0.0000%.",
+    "selection": "bloom",
+    "status": "accepted",
+    "zoom": 800
+  },
   "positive": {
     "accepted": {
       "fixture": "reference-stroke-2",
+      "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
       "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
       "rules": {
         "grid": 2,
@@ -603,6 +679,7 @@
   "rejected": {
     "accepted": {
       "fixture": "reference-stroke-2",
+      "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
       "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
       "rules": {
         "grid": 2,
@@ -660,6 +737,7 @@
   "reset": {
     "accepted": {
       "fixture": "reference-stroke-2",
+      "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
       "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
       "rules": {
         "grid": 2,
@@ -706,6 +784,7 @@
       "status": "fail",
       "totalPixels": 3456
     },
+    "geometrySha256": "a02d1be226192fab3fd111837688ce55fe4aef7f26805bafb74738cdfd7932b7",
     "sha256": "c8ca7d61b74ac74269f5878c4edbb939153d3bc845e29aa6e087f6ffefc80e88"
   },
   "1.5": {
@@ -716,6 +795,7 @@
       "status": "fail",
       "totalPixels": 3456
     },
+    "geometrySha256": "623ba0ea4f9357fc04e406edbf48d301aa26b4a943db98364e4ee9fc09d858bc",
     "sha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61"
   },
   "2": {
@@ -726,6 +806,7 @@
       "status": "pass",
       "totalPixels": 3456
     },
+    "geometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
     "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2"
   },
   "2.5": {
@@ -736,6 +817,7 @@
       "status": "fail",
       "totalPixels": 3456
     },
+    "geometrySha256": "842f482325b9c296fff49c103bce66a3d5055669f186a62f0f1b0be30294ddd8",
     "sha256": "019cd1a5234d86972d7ee16f38074b15893532c56db07a31b66d75fb6d445e85"
   },
   "3": {
@@ -746,6 +828,7 @@
       "status": "fail",
       "totalPixels": 3456
     },
+    "geometrySha256": "f67480dfae7e089bb930b61c8ace0d9af39a7d1b92df98d634a7e9cb7ae86df7",
     "sha256": "be4e159c82e877643862a0bc53ee2590dc1305ec843b0c97679144f4e273b223"
   }
 }
@@ -851,6 +934,7 @@
         fixture: stroke === 2
           ? "reference-stroke-2"
           : `shared-stroke-${strokeKey(stroke)}`,
+        generatedGeometrySha256: record.geometrySha256,
         pathSetSha256: "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
         rules: {
           grid: 2,
@@ -881,13 +965,15 @@
 
     function reduce(state, action) {
       switch (action.type) {
-        case "SET_STROKE":
+        case "SET_STROKE": {
+          const draftStroke = Number(action.value);
           return {
             ...clone(state),
-            draftStroke: 2,
+            draftStroke,
             status: "ready",
-            message: "Draft shared stroke set to 2 px. Regenerate to apply it to all six symbols."
+            message: `Draft shared stroke set to ${draftStroke} px. Regenerate to apply it to all six symbols.`
           };
+        }
         case "EDIT_STROKE": {
           const draftStroke = Number(action.value);
           return {
@@ -1089,8 +1175,11 @@
       render();
     }
 
+    document.getElementById("stroke-15-btn").addEventListener("click", () => {
+      dispatch({ type: "SET_STROKE", value: 1.5 });
+    });
     document.getElementById("stroke-2-btn").addEventListener("click", () => {
-      dispatch({ type: "SET_STROKE" });
+      dispatch({ type: "SET_STROKE", value: 2 });
     });
     document.getElementById("stroke-rule").addEventListener("change", (event) => {
       dispatch({ type: "EDIT_STROKE", value: event.currentTarget.value });

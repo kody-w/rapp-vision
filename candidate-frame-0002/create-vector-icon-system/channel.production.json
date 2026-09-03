@@ -12,7 +12,7 @@
     {
       "id": "create-vector-icon-system",
       "title": "Six Shapes, One Grid",
-      "description": "A tiny vector bench starts from an immutable 2 px raster reference, regenerates six original 24 by 24 symbols from one shared stroke token, exports a hash-bound sprite, rejects an off-grid pulse anchor while preserving the accepted system, then restores the exact reference geometry and controls.",
+      "description": "A tiny vector bench starts from an immutable 2 px raster reference, changes the shared stroke to 1.5 px and regenerates all six original 24 by 24 symbols with new geometry and sprite hashes, deliberately returns to 2 px to regenerate and export the passing reference, rejects an off-grid pulse anchor without mutating that export, then restores the exact opening state.",
       "published": "2026-09-02",
       "duration": 15,
       "width": 960,
@@ -32,14 +32,18 @@
       "chapters": [
         {
           "t": 0,
-          "label": "Six shapes, one grid"
+          "label": "Immutable 2 px opening"
         },
         {
-          "t": 3,
-          "label": "Shared stroke regenerated"
+          "t": 2,
+          "label": "Six symbols regenerated at 1.5 px"
         },
         {
-          "t": 7,
+          "t": 5,
+          "label": "Returned to 2 px and exported"
+        },
+        {
+          "t": 8,
           "label": "Off-grid anchor rejected"
         },
         {
@@ -53,18 +57,22 @@
         "chapters": [
           {
             "t": 0,
-            "label": "Edit the shared stroke token"
+            "label": "Edit shared stroke from 2 to 1.5"
           },
           {
             "t": 2,
-            "label": "Regenerate all six symbols"
+            "label": "Regenerate all six at 1.5"
           },
           {
             "t": 4,
-            "label": "Export the passing sprite"
+            "label": "Return the shared token to 2"
           },
           {
-            "t": 7,
+            "t": 6,
+            "label": "Regenerate and export the passing reference"
+          },
+          {
+            "t": 8,
             "label": "Reject one off-grid anchor"
           },
           {
@@ -78,18 +86,18 @@
             "dur": 15,
             "app": "apps/create-vector-icon-system.html",
             "ready": {
-              "selector": "#stroke-2-btn"
+              "selector": "#stroke-15-btn"
             },
             "lower": {
               "title": "Six Shapes, One Grid",
-              "bench": "Exactly six named 24 × 24 symbols; the 2 px fixture differs from its immutable raster by 0 pixels.",
-              "fix": "Pause to inspect supported-stroke hashes, changed pixels, and the exact 2 px reset."
+              "bench": "The authored 2 → 1.5 → 2 path regenerates all six symbols; only the returned 2 px fixture passes at 0 pixels.",
+              "fix": "Pause to inspect the changed geometry and sprite hashes, off-grid rejection, and exact 2 px reset."
             },
             "actions": [
               {
                 "at": 0.8,
                 "do": "click",
-                "selector": "#stroke-2-btn"
+                "selector": "#stroke-15-btn"
               },
               {
                 "at": 2.2,
@@ -97,17 +105,27 @@
                 "selector": "#regenerate-btn"
               },
               {
-                "at": 4.2,
+                "at": 4.1,
+                "do": "click",
+                "selector": "#stroke-2-btn"
+              },
+              {
+                "at": 5.5,
+                "do": "click",
+                "selector": "#regenerate-btn"
+              },
+              {
+                "at": 6.6,
                 "do": "click",
                 "selector": "#export-btn"
               },
               {
-                "at": 7.4,
+                "at": 8.6,
                 "do": "click",
                 "selector": "#off-grid-btn"
               },
               {
-                "at": 11.4,
+                "at": 11.8,
                 "do": "click",
                 "selector": "#restore-btn"
               }

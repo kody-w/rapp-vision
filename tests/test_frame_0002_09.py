@@ -42,15 +42,24 @@ EXPECTED_NAMES = ("bloom", "cairn", "hinge", "orbit", "pulse", "weave")
 EXPECTED_SPRITE_HASH = (
     "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2"
 )
+EXPECTED_EDIT_SPRITE_HASH = (
+    "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61"
+)
+EXPECTED_GENERATED_GEOMETRY_HASH = (
+    "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca"
+)
+EXPECTED_EDIT_GENERATED_GEOMETRY_HASH = (
+    "623ba0ea4f9357fc04e406edbf48d301aa26b4a943db98364e4ee9fc09d858bc"
+)
 EXPECTED_REFERENCE_HASH = (
     "61744b14a3c1e4f360d77207712e12f33e626259e1ff9eaca7cd46dd5ebd2d46"
 )
 EXPECTED_FRAME_SAMPLES = {
-    0: "cb7cc7e11396cd56ba42b95b4f3f502645eebd7af5da52b5192de20a92e1a09d",
-    42: "0dcc2fde27029b5d84aca5cdcda9be139280f187a04238bfd9acc9019a9e0ae8",
-    84: "17cfb18dc5db6ddfa3bfa5cd2490ebcd9543b413bac27f88bc0d6bce9af75c3b",
-    132: "e0f6d1b4f29e91442b6fce862d7aa06bb6048a2d7bf2637d3f041bf21bc54c81",
-    179: "3f8f31dc2cffcff1ba4c838a70eed5e228fd6a9f4153304f7095464cbb10c0c1",
+    0: "50706739cd9bbd4173256b44bb11cfc1f95e2fcd7f1db25c9bd30fb59b19748d",
+    42: "886d0c810bcad4dfc678cf32f0ad79c601d4ae752a0246e69501ad38b4ecb6ab",
+    84: "eb017ca7b7e8427e825363eb77ef760e2e2090d08feda98bbdfda0805f20015f",
+    132: "dcaebb247c6e49652ef79d7e9a33d70cc6825de23a70348f584331ad29296858",
+    179: "dd2d48c46eee43ceda36ad7b0eeb7e6c2e23ff5a5cfafe108b359a315ba8dfe9",
 }
 
 
@@ -400,6 +409,8 @@ class TestFrame000209CommissionAndManifest(unittest.TestCase):
         self.assertEqual(
             selectors,
             [
+                "#stroke-15-btn",
+                "#regenerate-btn",
                 "#stroke-2-btn",
                 "#regenerate-btn",
                 "#export-btn",
@@ -493,6 +504,10 @@ class TestFrame000209SpriteAndEvidence(unittest.TestCase):
         self.assertEqual(tuple(objective["names"]), EXPECTED_NAMES)
         self.assertEqual(objective["viewBox"], "0 0 24 24")
         self.assertEqual(objective["pathSetSha256"], RENDERER.geometry_sha256())
+        self.assertEqual(
+            objective["generatedGeometrySha256"],
+            EXPECTED_GENERATED_GEOMETRY_HASH,
+        )
 
     def test_objective_raster_uses_an_independent_immutable_reference(self):
         self.assertEqual(sha256(REFERENCE_PATH), EXPECTED_REFERENCE_HASH)
@@ -582,13 +597,66 @@ class TestFrame000209SpriteAndEvidence(unittest.TestCase):
                 )
                 self.assertEqual(record["comparison"], comparison)
                 self.assertEqual(len(record["sha256"]), 64)
+                self.assertEqual(
+                    record["geometrySha256"],
+                    RENDERER.generated_geometry_sha256(stroke),
+                )
+                self.assertEqual(len(record["geometrySha256"]), 64)
 
     def test_evidence_claims_are_exact_and_self_checking(self):
+        self.assertEqual(
+            self.evidence["schema"],
+            "candidate-frame-0002-create-vector-icon-system-evidence/2.0",
+        )
         claims = {
             claim["id"]: claim
             for claim in self.evidence["claims"]
         }
         self.assertEqual(set(claims), {"positive", "rejected", "reset"})
+        positive_selectors = [
+            action["selector"]
+            for action in claims["positive"]["actions"]
+        ]
+        self.assertEqual(
+            positive_selectors,
+            [
+                "#stroke-15-btn",
+                "#regenerate-btn",
+                "#stroke-2-btn",
+                "#regenerate-btn",
+                "#export-btn",
+            ],
+        )
+        self.assertEqual(
+            self.evidence["browserReplay"]["selectors"],
+            positive_selectors + ["#off-grid-btn", "#restore-btn"],
+        )
+        positive_path = self.evidence["browserReplay"]["positivePath"]
+        self.assertEqual(
+            (
+                positive_path["initialStroke"],
+                positive_path["editedStroke"],
+                positive_path["returnedStroke"],
+                positive_path["generatedSymbolCount"],
+            ),
+            (2, 1.5, 2, 6),
+        )
+        self.assertEqual(
+            positive_path["editedGeometrySha256"],
+            EXPECTED_EDIT_GENERATED_GEOMETRY_HASH,
+        )
+        self.assertEqual(
+            positive_path["returnedGeometrySha256"],
+            EXPECTED_GENERATED_GEOMETRY_HASH,
+        )
+        self.assertEqual(
+            positive_path["editedSpriteSha256"],
+            EXPECTED_EDIT_SPRITE_HASH,
+        )
+        self.assertEqual(
+            positive_path["returnedSpriteSha256"],
+            EXPECTED_SPRITE_HASH,
+        )
         app_states = embedded_states(APP_PATH.read_text(encoding="utf-8"))
         self.assertEqual(load_json(STATE_SNAPSHOT_PATH), app_states)
         for claim_id, claim in claims.items():
@@ -603,8 +671,50 @@ class TestFrame000209SpriteAndEvidence(unittest.TestCase):
                 )
 
         positive = claims["positive"]["expectedState"]
+        positive_edit = app_states["positiveEdit"]
+        positive_return = app_states["positiveReturn"]
         rejected = claims["rejected"]["expectedState"]
         reset = claims["reset"]["expectedState"]
+        checkpoints = {
+            checkpoint["id"]: checkpoint
+            for checkpoint in claims["positive"]["checkpoints"]
+        }
+        self.assertEqual(set(checkpoints), {"edited", "returned"})
+        self.assertEqual(checkpoints["edited"]["expectedState"], positive_edit)
+        self.assertEqual(
+            checkpoints["returned"]["expectedState"],
+            positive_return,
+        )
+        for checkpoint in checkpoints.values():
+            for assertion in checkpoint["assertions"]:
+                self.assertEqual(
+                    resolve(checkpoint["expectedState"], assertion["path"]),
+                    assertion["equals"],
+                )
+        self.assertEqual(positive_edit["accepted"]["rules"]["stroke"], 1.5)
+        self.assertEqual(
+            positive_edit["accepted"]["generatedGeometrySha256"],
+            EXPECTED_EDIT_GENERATED_GEOMETRY_HASH,
+        )
+        self.assertEqual(
+            positive_edit["accepted"]["spriteSha256"],
+            EXPECTED_EDIT_SPRITE_HASH,
+        )
+        self.assertNotEqual(
+            positive_edit["accepted"]["generatedGeometrySha256"],
+            reset["accepted"]["generatedGeometrySha256"],
+        )
+        self.assertNotEqual(
+            positive_edit["accepted"]["spriteSha256"],
+            reset["accepted"]["spriteSha256"],
+        )
+        self.assertEqual(
+            positive_edit["accepted"]["pathSetSha256"],
+            reset["accepted"]["pathSetSha256"],
+        )
+        self.assertEqual(positive_return["accepted"], reset["accepted"])
+        self.assertIsNone(positive_return["lastExport"])
+        self.assertEqual(positive_return["status"], "accepted")
         self.assertEqual(rejected["accepted"], positive["accepted"])
         self.assertEqual(rejected["lastExport"], positive["lastExport"])
         self.assertEqual(rejected["status"], "rejected")
@@ -655,6 +765,7 @@ class TestFrame000209StandaloneApp(unittest.TestCase):
         self.assertEqual(self.index.resources, [])
         required = {
             "stroke-rule",
+            "stroke-15-btn",
             "stroke-2-btn",
             "regenerate-btn",
             "export-btn",
@@ -734,29 +845,73 @@ class TestFrame000209BrowserLiveReplay(unittest.TestCase):
             [step["selector"] for step in self.result["steps"]],
             [action["selector"] for action in self.actions],
         )
-        by_selector = {
-            step["selector"]: step
-            for step in self.result["steps"]
-        }
+        steps = self.result["steps"]
+        edited = steps[1]
+        returned = steps[3]
+        exported = steps[4]
+        off_grid = steps[5]
+        restored = steps[6]
         self.assertEqual(
-            by_selector["#export-btn"]["state"],
+            edited["state"],
+            self.states["positiveEdit"],
+        )
+        self.assertEqual(
+            returned["state"],
+            self.states["positiveReturn"],
+        )
+        self.assertEqual(
+            exported["state"],
             self.states["positive"],
         )
         self.assertEqual(
-            by_selector["#off-grid-btn"]["state"],
+            off_grid["state"],
             self.states["rejected"],
         )
         self.assertEqual(
-            by_selector["#restore-btn"]["state"],
+            restored["state"],
             self.states["reset"],
         )
         self.assertEqual(
-            by_selector["#restore-btn"]["diffText"],
+            restored["diffText"],
             "0.0000%",
         )
         self.assertEqual(
-            by_selector["#restore-btn"]["hashText"],
+            restored["hashText"],
             f"{EXPECTED_SPRITE_HASH[:12]}…",
+        )
+        positive_path = self.result["positivePath"]
+        self.assertEqual(
+            (
+                positive_path["initialStroke"],
+                positive_path["editedStroke"],
+                positive_path["returnedStroke"],
+            ),
+            (2, 1.5, 2),
+        )
+        self.assertEqual(positive_path["changedIconCount"], 6)
+        self.assertEqual(
+            positive_path["initialGeometrySha256"],
+            EXPECTED_GENERATED_GEOMETRY_HASH,
+        )
+        self.assertEqual(
+            positive_path["editedGeometrySha256"],
+            EXPECTED_EDIT_GENERATED_GEOMETRY_HASH,
+        )
+        self.assertEqual(
+            positive_path["returnedGeometrySha256"],
+            EXPECTED_GENERATED_GEOMETRY_HASH,
+        )
+        self.assertEqual(
+            positive_path["initialSpriteSha256"],
+            EXPECTED_SPRITE_HASH,
+        )
+        self.assertEqual(
+            positive_path["editedSpriteSha256"],
+            EXPECTED_EDIT_SPRITE_HASH,
+        )
+        self.assertEqual(
+            positive_path["returnedSpriteSha256"],
+            EXPECTED_SPRITE_HASH,
         )
 
     def test_nondefault_supported_inputs_render_hashes_without_exceptions(self):
@@ -771,6 +926,25 @@ class TestFrame000209BrowserLiveReplay(unittest.TestCase):
                 self.assertEqual(
                     result["state"]["accepted"]["spriteSha256"],
                     record["sha256"],
+                )
+                self.assertEqual(
+                    result["state"]["accepted"]["generatedGeometrySha256"],
+                    record["geometrySha256"],
+                )
+                self.assertEqual(
+                    result["generatedGeometrySha256"],
+                    record["geometrySha256"],
+                )
+                self.assertEqual(
+                    result["spriteTextSha256"],
+                    record["sha256"],
+                )
+                self.assertEqual(result["generatedIconCount"], 6)
+                self.assertTrue(
+                    all(
+                        width == key
+                        for width in result["generatedStrokeWidths"]
+                    )
                 )
                 self.assertEqual(
                     result["state"]["comparison"]["differingPixels"],
@@ -833,6 +1007,7 @@ class TestFrame000209RendererAndSnapshots(unittest.TestCase):
             EXPECTED_REFERENCE_HASH,
         )
         self.assertEqual(RENDERER.BASE_STROKE, 2.0)
+        self.assertEqual(RENDERER.EDIT_STROKE, 1.5)
         self.assertEqual(RENDERER.REFERENCE_STROKE, 2.0)
 
     def test_distinctive_frame_samples_are_stable(self):
