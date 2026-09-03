@@ -101,6 +101,18 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Set up Chrome
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@v2
+        with:
+          chrome-version: stable
+          install-dependencies: true
+
+      - name: Install media tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+
       # stdlib unittest, not pytest, and no `pip install` step. tests/ is written
       # against unittest (its own docstring says "python3 -m unittest discover -s
       # tests -v") and it patches urllib.request.urlopen for the whole module so
@@ -117,6 +129,10 @@ jobs:
             exit 1
           fi
           python -m unittest discover -s tests -v
+        env:
+          RAPP_BROWSER: ${{ steps.setup-chrome.outputs.chrome-path }}
+          RAPP_FFMPEG: /usr/bin/ffmpeg
+          RAPP_FFPROBE: /usr/bin/ffprobe
 
       # `subjects` walks channels.json -> each channel.json -> videos[] straight
       # off the filesystem, with no token and no network, so it is a free

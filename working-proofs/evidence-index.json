@@ -1,0 +1,60 @@
+{
+  "channel": "working-proofs",
+  "publications": [
+    {
+      "commission_id": "learn-grid-overflow",
+      "delivery": {
+        "path": "../candidate-frame-0002/learn-grid-overflow/delivery.json",
+        "sha256": "ffd50168d838a0ea4740ae9b62ffe19d609cb3d87e55dfa65d9ceab0da070100"
+      },
+      "evidence": {
+        "path": "../candidate-frame-0002/learn-grid-overflow/evidence.json",
+        "sha256": "500b6674104c2b359ba77e85197d83657e602893d9628ffedf4498dbf0c7dae4"
+      },
+      "publication_id": "learn-grid-overflow",
+      "source_candidate": "../candidate-frame-0002/learn-grid-overflow",
+      "source_channel": {
+        "id": "candidate-frame-0002-04",
+        "path": "../candidate-frame-0002/learn-grid-overflow/channel.json",
+        "sha256": "410582bd2d6088ffa70aabceb4f8a2fcdd02f2015333725cdd43d30ab116b8c9"
+      }
+    },
+    {
+      "commission_id": "use-keyboard-invoice-triage",
+      "delivery": {
+        "path": "../candidate-frame-0002/use-keyboard-invoice-triage/delivery.json",
+        "sha256": "6959d02160bdeae20d26fe15f4fec0a783eaa8a084517a582cb38a5b1c003237"
+      },
+      "evidence": {
+        "path": "../candidate-frame-0002/use-keyboard-invoice-triage/evidence.json",
+        "sha256": "e97712e3cbb0d9a4da22de7eaee27a18dd5d4f3fbe3f33a8da3af62a22e7145f"
+      },
+      "publication_id": "use-keyboard-invoice-triage",
+      "source_candidate": "../candidate-frame-0002/use-keyboard-invoice-triage",
+      "source_channel": {
+        "id": "use-keyboard-invoice-triage",
+        "path": "../candidate-frame-0002/use-keyboard-invoice-triage/channel.json",
+        "sha256": "9b2d6aa9b42279874614d486615fb3ecd097909c8836b734f072db0eda95481b"
+      }
+    },
+    {
+      "commission_id": "create-vector-icon-system",
+      "delivery": {
+        "path": "../candidate-frame-0002/create-vector-icon-system/delivery.json",
+        "sha256": "ff6fd3a4d2ef433b84e2d9236d8d5ccdbba149cacf89d0599ad75afed9e3c873"
+      },
+      "evidence": {
+        "path": "../candidate-frame-0002/create-vector-icon-system/evidence.json",
+        "sha256": "6becaa4f9c5595b4081d8d479e6b610ac0c88e78091452e2b9289950ff7c0da2"
+      },
+      "publication_id": "create-vector-icon-system",
+      "source_candidate": "../candidate-frame-0002/create-vector-icon-system",
+      "source_channel": {
+        "id": "candidate-frame-0002-create-vector-icon-system",
+        "path": "../candidate-frame-0002/create-vector-icon-system/channel.json",
+        "sha256": "966c85f43ce482e98e2abd1bce64a3d3c80d59f646b4d1413bcea8b3d4329f5e"
+      }
+    }
+  ],
+  "schema": "working-proofs-evidence-index/1.0"
+}

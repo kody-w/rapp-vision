@@ -1,0 +1,215 @@
+{
+  "avatar": "◇",
+  "creator": {
+    "identity": "machine-produced, artifact-reviewed",
+    "name": "RAPP Vision autonomous studio"
+  },
+  "id": "candidate-frame-0002-create-vector-icon-system",
+  "name": "Candidate Frame 0002 · Vector Token Bench",
+  "schema": "rapp-vision-channel/2.0",
+  "tagline": "Six original shapes, one geometric grammar, and a rejection that cannot mutate the accepted sprite.",
+  "videos": [
+    {
+      "chapters": [
+        {
+          "label": "Immutable 2 px opening",
+          "t": 0
+        },
+        {
+          "label": "Six symbols regenerated at 1.5 px",
+          "t": 2
+        },
+        {
+          "label": "Returned to 2 px and exported",
+          "t": 5
+        },
+        {
+          "label": "Off-grid anchor rejected",
+          "t": 8
+        },
+        {
+          "label": "Exact 2 px reference restore",
+          "t": 11
+        }
+      ],
+      "description": "A tiny vector bench starts from an immutable 2 px raster reference, changes the shared stroke to 1.5 px and regenerates all six original 24 by 24 symbols with new geometry and sprite hashes, deliberately returns to 2 px to regenerate and export the passing reference, rejects an off-grid pulse anchor without mutating that export, then restores the exact opening state.",
+      "duration": 15,
+      "height": 540,
+      "id": "create-vector-icon-system",
+      "live": {
+        "chapters": [
+          {
+            "label": "Edit shared stroke from 2 to 1.5",
+            "t": 0
+          },
+          {
+            "label": "Regenerate all six at 1.5",
+            "t": 2
+          },
+          {
+            "label": "Return the shared token to 2",
+            "t": 4
+          },
+          {
+            "label": "Regenerate and export the passing reference",
+            "t": 6
+          },
+          {
+            "label": "Reject one off-grid anchor",
+            "t": 8
+          },
+          {
+            "label": "Restore immutable 2 px reference",
+            "t": 11
+          }
+        ],
+        "duration": 15,
+        "kind": "rapp-vision-live/1.0",
+        "scenes": [
+          {
+            "actions": [
+              {
+                "at": 0.3,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#stroke-15-btn"
+              },
+              {
+                "at": 0.8,
+                "do": "click",
+                "selector": "#stroke-15-btn"
+              },
+              {
+                "at": 1.8,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#regenerate-btn"
+              },
+              {
+                "at": 2.2,
+                "do": "click",
+                "selector": "#regenerate-btn"
+              },
+              {
+                "at": 3.7,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#stroke-2-btn"
+              },
+              {
+                "at": 4.1,
+                "do": "click",
+                "selector": "#stroke-2-btn"
+              },
+              {
+                "at": 5.1,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#regenerate-btn"
+              },
+              {
+                "at": 5.5,
+                "do": "click",
+                "selector": "#regenerate-btn"
+              },
+              {
+                "at": 6.2,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#export-btn"
+              },
+              {
+                "at": 6.6,
+                "do": "click",
+                "selector": "#export-btn"
+              },
+              {
+                "at": 6.9,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#status-panel"
+              },
+              {
+                "at": 8.2,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#off-grid-btn"
+              },
+              {
+                "at": 8.6,
+                "do": "click",
+                "selector": "#off-grid-btn"
+              },
+              {
+                "at": 8.9,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#status-panel"
+              },
+              {
+                "at": 11.4,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#restore-btn"
+              },
+              {
+                "at": 11.8,
+                "do": "click",
+                "selector": "#restore-btn"
+              },
+              {
+                "at": 12.1,
+                "behavior": "auto",
+                "block": "start",
+                "do": "scroll",
+                "selector": "#status-panel"
+              }
+            ],
+            "app": "apps/create-vector-icon-system.html",
+            "dur": 15,
+            "lower": {
+              "bench": "The authored 2 → 1.5 → 2 path regenerates all six symbols; only the returned 2 px fixture passes at 0 pixels.",
+              "fix": "Pause to inspect the changed geometry and sprite hashes, off-grid rejection, and exact 2 px reset.",
+              "title": "Six Shapes, One Grid"
+            },
+            "ready": {
+              "selector": "#stroke-15-btn"
+            },
+            "t": 0
+          }
+        ]
+      },
+      "orientation": "landscape",
+      "published": "2026-09-02",
+      "sources": [
+        {
+          "src": "media/create-vector-icon-system.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "media/create-vector-icon-system.webm",
+          "type": "video/webm"
+        }
+      ],
+      "tags": [
+        "vector",
+        "svg",
+        "design-system",
+        "deterministic",
+        "live-replay"
+      ],
+      "thumb": "thumbs/create-vector-icon-system.svg",
+      "title": "Six Shapes, One Grid",
+      "width": 960
+    }
+  ]
+}

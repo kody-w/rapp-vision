@@ -1,0 +1,1727 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="tiny-system-reset" content="exact">
+  <title>Keyboard Invoice Triage</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: ui-monospace, "Cascadia Mono", "Segoe UI Mono", monospace;
+      background: #07131d;
+      color: #f4f7f8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background:
+        linear-gradient(135deg, #07131d 0 55%, #0d2330 55% 100%);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button:focus,
+    input:focus,
+    select:focus,
+    .has-focus {
+      outline: 4px solid #7df9ff;
+      outline-offset: 4px;
+      box-shadow: 0 0 0 8px #7df9ff26;
+    }
+
+    button:focus:not(:focus-visible),
+    input:focus:not(:focus-visible),
+    select:focus:not(:focus-visible) {
+      outline: 4px solid #7df9ff;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.42;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .shell {
+      width: min(100%, 1080px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: clamp(18px, 4vw, 42px);
+      display: grid;
+      align-content: center;
+      gap: 18px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 24px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #315160;
+    }
+
+    .kicker {
+      margin: 0 0 6px;
+      color: #8cdbe5;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: -0.065em;
+      line-height: 0.95;
+    }
+
+    .total-card {
+      min-width: 220px;
+      padding: 13px 16px;
+      border: 1px solid #4f7688;
+      border-radius: 13px;
+      background: #0b202d;
+      text-align: right;
+    }
+
+    .total-card span,
+    .metric span {
+      display: block;
+      margin-bottom: 4px;
+      color: #98b8c5;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .total-card strong {
+      color: #ffd166;
+      font-size: 1.75rem;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+      gap: 18px;
+    }
+
+    .queue,
+    .side-panel {
+      border: 1px solid #315160;
+      border-radius: 18px;
+      background: #091c28e8;
+      box-shadow: 0 20px 55px #0005;
+    }
+
+    .queue {
+      padding: 18px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 13px;
+    }
+
+    .section-heading h2,
+    .side-panel h2,
+    .editor h2,
+    .confirmation h2 {
+      margin: 0;
+      color: #8cdbe5;
+      font-size: 0.76rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .key-help {
+      margin: 0;
+      color: #9db7c2;
+      font-size: 0.72rem;
+    }
+
+    .invoice-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .invoice-row {
+      width: 100%;
+      min-height: 74px;
+      padding: 13px 14px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) 0.72fr 0.82fr 0.7fr;
+      align-items: center;
+      gap: 12px;
+      border: 2px solid #284958;
+      border-radius: 13px;
+      background: #0e2937;
+      color: #f4f7f8;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .invoice-row:hover {
+      border-color: #5d91a5;
+      background: #123344;
+    }
+
+    .invoice-row[data-state="accepted"] {
+      border-color: #3f8f6b;
+      background: #0d3029;
+    }
+
+    .invoice-row[data-needs-correction="true"] .code-value {
+      color: #ffbd6b;
+    }
+
+    .vendor {
+      min-width: 0;
+    }
+
+    .vendor strong,
+    .amount-value,
+    .code-value,
+    .state-value {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .vendor small,
+    .column-label {
+      display: block;
+      margin-top: 4px;
+      color: #98b8c5;
+      font-size: 0.67rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .amount-value {
+      color: #ffd166;
+      font-size: 1.05rem;
+      font-weight: 900;
+    }
+
+    .code-value {
+      color: #c8e6ef;
+      font-weight: 800;
+    }
+
+    .state-value {
+      color: #9db7c2;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .invoice-row[data-state="accepted"] .state-value {
+      color: #74e1ad;
+    }
+
+    .editor {
+      margin-top: 15px;
+      padding: 16px;
+      border: 2px solid #ffbd6b;
+      border-radius: 14px;
+      background: #302417;
+    }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 13px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: #d9e7ec;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 46px;
+      padding: 9px 10px;
+      border: 2px solid #5e7480;
+      border-radius: 9px;
+      background: #081821;
+      color: #fff;
+    }
+
+    input[aria-invalid="true"] {
+      border-color: #ff6b6b;
+      background: #35191e;
+    }
+
+    .editor-actions,
+    .main-actions,
+    .confirmation-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 13px;
+    }
+
+    .editor-actions button,
+    .main-actions button,
+    .confirmation-actions button {
+      min-height: 44px;
+      padding: 9px 13px;
+      border: 1px solid #5d8191;
+      border-radius: 9px;
+      background: #153647;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    #save-editor-btn,
+    #export-button,
+    #confirm-restore-btn {
+      border-color: #ffd166;
+      background: #ffd166;
+      color: #17212a;
+    }
+
+    #restore-button,
+    #cancel-editor-btn,
+    #cancel-restore-btn {
+      background: transparent;
+    }
+
+    .side-panel {
+      padding: 18px;
+      display: grid;
+      align-content: start;
+      gap: 14px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .metric {
+      min-height: 84px;
+      padding: 12px;
+      border-radius: 11px;
+      background: #102b3a;
+    }
+
+    .metric strong {
+      font-size: 1.25rem;
+    }
+
+    #status-message {
+      min-height: 52px;
+      margin: 0;
+      padding: 12px;
+      border-left: 4px solid #7df9ff;
+      background: #102b3a;
+      line-height: 1.45;
+    }
+
+    #validation-error {
+      margin: 0;
+      padding: 12px;
+      border: 2px solid #ff6b6b;
+      border-radius: 10px;
+      background: #3b1920;
+      color: #ffd7d7;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .export-output {
+      padding: 13px;
+      border: 2px solid #4dd397;
+      border-radius: 11px;
+      background: #0d3029;
+    }
+
+    .export-output strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #74e1ad;
+    }
+
+    .export-output code {
+      display: block;
+      overflow-wrap: anywhere;
+      color: #f4fff9;
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    .focus-path {
+      margin: 0;
+      padding: 11px 12px;
+      border: 1px dashed #5d8191;
+      border-radius: 9px;
+      color: #c7dce4;
+      font-size: 0.76rem;
+      line-height: 1.45;
+    }
+
+    #focus-readout {
+      color: #7df9ff;
+      font-weight: 900;
+    }
+
+    .confirmation {
+      padding: 14px;
+      border: 2px solid #ffbd6b;
+      border-radius: 12px;
+      background: #302417;
+    }
+
+    .confirmation p {
+      margin: 9px 0 0;
+      color: #f4dfbf;
+      line-height: 1.45;
+    }
+
+    .footnote {
+      margin: 0;
+      color: #92adb8;
+      font-size: 0.72rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 820px) {
+      header,
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .total-card {
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 590px) {
+      .invoice-row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .editor-grid,
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-height: 700px) and (min-width: 700px) {
+      .shell {
+        padding: 10px;
+        align-content: start;
+        gap: 8px;
+      }
+
+      header {
+        gap: 14px;
+        padding-bottom: 7px;
+      }
+
+      .kicker {
+        margin-bottom: 3px;
+        font-size: 0.62rem;
+      }
+
+      h1 {
+        font-size: clamp(1.45rem, 3vw, 2rem);
+        line-height: 1;
+      }
+
+      .total-card {
+        min-width: 180px;
+        padding: 7px 10px;
+      }
+
+      .total-card strong {
+        font-size: 1.2rem;
+      }
+
+      .workspace {
+        grid-template-columns: minmax(0, 1.28fr) minmax(320px, 0.72fr);
+        gap: 8px;
+      }
+
+      .queue,
+      .side-panel {
+        padding: 9px;
+        border-radius: 11px;
+      }
+
+      .section-heading {
+        margin-bottom: 6px;
+      }
+
+      .invoice-list {
+        gap: 5px;
+      }
+
+      .invoice-row {
+        min-height: 52px;
+        padding: 7px 8px;
+        gap: 7px;
+      }
+
+      .vendor small,
+      .column-label {
+        margin-top: 2px;
+        font-size: 0.57rem;
+      }
+
+      .amount-value {
+        font-size: 0.86rem;
+      }
+
+      .code-value,
+      .state-value,
+      .vendor strong {
+        font-size: 0.72rem;
+      }
+
+      .editor {
+        margin-top: 7px;
+        padding: 8px;
+      }
+
+      .editor-grid {
+        gap: 7px;
+        margin-top: 7px;
+      }
+
+      .editor-actions,
+      .main-actions,
+      .confirmation-actions {
+        gap: 5px;
+        margin-top: 7px;
+      }
+
+      .side-panel {
+        gap: 7px;
+      }
+
+      .metrics {
+        gap: 5px;
+      }
+
+      .metric {
+        min-height: 52px;
+        padding: 7px;
+      }
+
+      .metric strong {
+        font-size: 0.92rem;
+      }
+
+      #status-message,
+      #validation-error {
+        min-height: 0;
+        padding: 7px;
+        font-size: 0.7rem;
+        line-height: 1.25;
+      }
+
+      .export-output,
+      .focus-path,
+      .confirmation {
+        padding: 7px;
+      }
+
+      .export-output strong {
+        margin-bottom: 3px;
+      }
+
+      .export-output code,
+      .focus-path,
+      .footnote,
+      .confirmation p {
+        font-size: 0.64rem;
+        line-height: 1.25;
+      }
+    }
+
+    @media (max-width: 590px), (max-height: 420px) {
+      .shell {
+        min-height: 0;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+      }
+
+      header {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 6px;
+        padding: 2px 3px 4px;
+      }
+
+      .kicker,
+      .total-card span,
+      .focus-path,
+      .footnote {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      h1 {
+        font-size: 1rem;
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+      }
+
+      .total-card {
+        min-width: 0;
+        padding: 3px 6px;
+        border-radius: 7px;
+      }
+
+      .total-card strong {
+        font-size: 0.82rem;
+      }
+
+      .workspace {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .side-panel {
+        order: -1;
+      }
+
+      .queue,
+      .side-panel {
+        padding: 4px;
+        border-radius: 8px;
+      }
+
+      .section-heading {
+        margin-bottom: 3px;
+      }
+
+      .section-heading h2,
+      .side-panel h2,
+      .editor h2,
+      .confirmation h2,
+      .key-help {
+        font-size: 0.58rem;
+      }
+
+      .side-panel {
+        gap: 4px;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr 1fr;
+        gap: 3px;
+      }
+
+      .metric {
+        min-height: 34px;
+        padding: 4px;
+        border-radius: 6px;
+      }
+
+      .metric span {
+        margin-bottom: 1px;
+        font-size: 0.52rem;
+      }
+
+      .metric strong {
+        font-size: 0.76rem;
+      }
+
+      #status-message,
+      #validation-error {
+        min-height: 0;
+        padding: 5px 6px;
+        font-size: 0.63rem;
+        line-height: 1.16;
+        scroll-margin-top: 3px;
+      }
+
+      .export-output {
+        padding: 5px 6px;
+        border-width: 1px;
+        border-radius: 6px;
+        scroll-margin-top: 3px;
+      }
+
+      .export-output strong {
+        margin-bottom: 2px;
+        font-size: 0.62rem;
+      }
+
+      .export-output code {
+        font-size: 0.6rem;
+        line-height: 1.18;
+      }
+
+      .main-actions,
+      .confirmation-actions {
+        margin-top: 0;
+        flex-wrap: nowrap;
+        gap: 4px;
+        overflow-x: auto;
+        scrollbar-width: thin;
+      }
+
+      .main-actions button,
+      .confirmation-actions button {
+        flex: 0 0 142px;
+        min-height: 44px;
+        padding: 5px;
+        font-size: 0.62rem;
+        scroll-margin: 4px;
+      }
+
+      .confirmation {
+        padding: 5px;
+        border-radius: 7px;
+        scroll-margin-top: 3px;
+      }
+
+      .confirmation p {
+        margin-top: 3px;
+        font-size: 0.61rem;
+        line-height: 1.16;
+      }
+
+      .invoice-list {
+        gap: 4px;
+      }
+
+      .invoice-row {
+        min-height: 48px;
+        padding: 5px;
+        grid-template-columns: minmax(96px, 1.15fr) 0.68fr 0.76fr 0.66fr;
+        gap: 4px;
+        border-radius: 7px;
+        scroll-margin-top: 3px;
+      }
+
+      .vendor strong,
+      .amount-value,
+      .code-value,
+      .state-value {
+        font-size: 0.66rem;
+      }
+
+      .vendor small,
+      .column-label {
+        margin-top: 1px;
+        font-size: 0.48rem;
+      }
+
+      .editor {
+        margin-top: 4px;
+        padding: 5px;
+        border-radius: 7px;
+      }
+
+      .editor-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 5px;
+        margin-top: 5px;
+      }
+
+      label {
+        gap: 3px;
+        font-size: 0.58rem;
+      }
+
+      .editor-actions {
+        flex-wrap: nowrap;
+        gap: 4px;
+        margin-top: 5px;
+        overflow-x: auto;
+        scrollbar-width: thin;
+      }
+
+      .editor-actions button {
+        flex: 0 0 132px;
+        min-height: 44px;
+        padding: 5px;
+        font-size: 0.62rem;
+        scroll-margin: 4px;
+      }
+
+      input,
+      select {
+        min-height: 44px;
+        padding: 5px;
+      }
+    }
+
+    @media (max-height: 420px) {
+      .shell {
+        padding-bottom: calc(100vh - 48px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <p class="kicker">Synthetic queue · keyboard path only</p>
+        <h1>Invoice Triage</h1>
+      </div>
+      <div class="total-card" aria-label="Expected fixture total">
+        <span>Three-invoice fixture</span>
+        <strong id="queue-total">$196.25</strong>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <section class="queue" aria-labelledby="queue-heading">
+        <div class="section-heading">
+          <h2 id="queue-heading">Pending review</h2>
+          <p class="key-help">Tab · ↑/↓ · Enter</p>
+        </div>
+
+        <ol class="invoice-list" aria-label="Synthetic invoices">
+          <li>
+            <button id="invoice-syn-001" class="invoice-row" type="button"
+              data-action="ACTIVATE_INVOICE" data-invoice-id="SYN-001">
+              <span class="vendor">
+                <strong>Paper Kite Supplies</strong>
+                <small>SYN-001</small>
+              </span>
+              <span>
+                <span class="column-label">Amount</span>
+                <strong class="amount-value" data-amount-for="SYN-001">$64.75</strong>
+              </span>
+              <span>
+                <span class="column-label">Category</span>
+                <strong class="code-value" data-code-for="SYN-001">Office</strong>
+              </span>
+              <span>
+                <span class="column-label">State</span>
+                <strong class="state-value" data-state-for="SYN-001">Pending</strong>
+              </span>
+            </button>
+          </li>
+          <li>
+            <button id="invoice-syn-002" class="invoice-row" type="button"
+              data-action="ACTIVATE_INVOICE" data-invoice-id="SYN-002">
+              <span class="vendor">
+                <strong>Metro Moth Transit</strong>
+                <small>SYN-002</small>
+              </span>
+              <span>
+                <span class="column-label">Amount</span>
+                <strong class="amount-value" data-amount-for="SYN-002">$82.50</strong>
+              </span>
+              <span>
+                <span class="column-label">Category</span>
+                <strong class="code-value" data-code-for="SYN-002">Transit</strong>
+              </span>
+              <span>
+                <span class="column-label">State</span>
+                <strong class="state-value" data-state-for="SYN-002">Pending</strong>
+              </span>
+            </button>
+          </li>
+          <li>
+            <button id="invoice-syn-003" class="invoice-row" type="button"
+              data-action="ACTIVATE_INVOICE" data-invoice-id="SYN-003">
+              <span class="vendor">
+                <strong>Copper Comet Repairs</strong>
+                <small>SYN-003</small>
+              </span>
+              <span>
+                <span class="column-label">Amount</span>
+                <strong class="amount-value" data-amount-for="SYN-003">$49.00</strong>
+              </span>
+              <span>
+                <span class="column-label">Category</span>
+                <strong class="code-value" data-code-for="SYN-003">Uncoded</strong>
+              </span>
+              <span>
+                <span class="column-label">State</span>
+                <strong class="state-value" data-state-for="SYN-003">Pending</strong>
+              </span>
+            </button>
+          </li>
+        </ol>
+
+        <section id="editor-panel" class="editor" aria-labelledby="editor-heading" hidden>
+          <h2 id="editor-heading">Correct <span id="editor-invoice-id">SYN-003</span></h2>
+          <div class="editor-grid">
+            <label for="amount-input">
+              Amount
+              <input id="amount-input" name="amount" inputmode="decimal"
+                autocomplete="off" aria-describedby="validation-error">
+            </label>
+            <label for="code-select">
+              Category
+              <select id="code-select" name="category">
+                <option value="Uncoded">Uncoded</option>
+                <option value="Facilities">Facilities</option>
+                <option value="Office">Office</option>
+                <option value="Transit">Transit</option>
+              </select>
+            </label>
+          </div>
+          <div class="editor-actions">
+            <button id="save-editor-btn" type="button" data-action="SAVE_EDITOR">Save correction</button>
+            <button id="cancel-editor-btn" type="button" data-action="CANCEL_EDITOR">Cancel edit</button>
+          </div>
+        </section>
+      </section>
+
+      <aside class="side-panel" aria-labelledby="summary-heading">
+        <h2 id="summary-heading">Accepted queue</h2>
+        <div class="metrics">
+          <div class="metric">
+            <span>Accepted</span>
+            <strong id="accepted-count">0 / 3</strong>
+          </div>
+          <div class="metric">
+            <span>Accepted total</span>
+            <strong id="accepted-total">$0.00</strong>
+          </div>
+        </div>
+
+        <p id="status-message" role="status" aria-live="polite">Three pending invoices total $196.25.</p>
+        <p id="validation-error" role="alert" hidden></p>
+
+        <section id="export-output" class="export-output" aria-labelledby="export-heading" hidden>
+          <strong id="export-heading">Export complete</strong>
+          <code id="export-json">{"acceptedTotal":"196.25","invoiceCount":3}</code>
+        </section>
+
+        <p class="focus-path">
+          Visible focus path:
+          <span id="focus-readout">SYN-001 invoice row</span>
+        </p>
+
+        <div class="main-actions">
+          <button id="export-button" type="button" data-action="EXPORT" disabled>Export accepted queue</button>
+          <button id="restore-button" type="button" data-action="REQUEST_RESTORE" data-reset="exact">Restore invoice fixture</button>
+        </div>
+
+        <section id="restore-confirmation" class="confirmation"
+          aria-labelledby="restore-heading" hidden>
+          <h2 id="restore-heading">Replace local edits?</h2>
+          <p>All three synthetic invoices return to pending and focus returns to the first row.</p>
+          <div class="confirmation-actions">
+            <button id="confirm-restore-btn" type="button" data-action="RESET">Confirm restore</button>
+            <button id="cancel-restore-btn" type="button" data-action="CANCEL_RESTORE">Keep edits</button>
+          </div>
+        </section>
+
+        <p class="footnote">No customer records, account numbers, or network resources are used. Every vendor and value is synthetic.</p>
+      </aside>
+    </div>
+  </main>
+
+  <script type="application/json" id="invoice-fixture">
+{
+  "expectedTotalCents": 19625,
+  "invoices": [
+    {
+      "id": "SYN-001",
+      "vendor": "Paper Kite Supplies",
+      "amountCents": 6475,
+      "code": "Office",
+      "expectedCode": "Office"
+    },
+    {
+      "id": "SYN-002",
+      "vendor": "Metro Moth Transit",
+      "amountCents": 8250,
+      "code": "Transit",
+      "expectedCode": "Transit"
+    },
+    {
+      "id": "SYN-003",
+      "vendor": "Copper Comet Repairs",
+      "amountCents": 4900,
+      "code": "Uncoded",
+      "expectedCode": "Facilities"
+    }
+  ]
+}
+  </script>
+
+  <script type="application/json" id="contract-states">
+{
+  "positive": {
+    "invoices": [
+      {"id": "SYN-001", "vendor": "Paper Kite Supplies", "amount": "64.75", "code": "Office", "status": "accepted"},
+      {"id": "SYN-002", "vendor": "Metro Moth Transit", "amount": "82.50", "code": "Transit", "status": "accepted"},
+      {"id": "SYN-003", "vendor": "Copper Comet Repairs", "amount": "49.00", "code": "Facilities", "status": "accepted"}
+    ],
+    "fixtureTotal": "196.25",
+    "acceptedTotal": "196.25",
+    "canExport": true,
+    "editor": null,
+    "exported": {
+      "acceptedTotal": "196.25",
+      "invoiceCount": 3,
+      "invoiceIds": ["SYN-001", "SYN-002", "SYN-003"]
+    },
+    "status": "exported",
+    "message": "Export complete: acceptedTotal is 196.25.",
+    "error": null,
+    "restorePending": false,
+    "focus": "export-button"
+  },
+  "rejected": {
+    "invoices": [
+      {"id": "SYN-001", "vendor": "Paper Kite Supplies", "amount": "64.75", "code": "Office", "status": "accepted"},
+      {"id": "SYN-002", "vendor": "Metro Moth Transit", "amount": "82.50", "code": "Transit", "status": "accepted"},
+      {"id": "SYN-003", "vendor": "Copper Comet Repairs", "amount": "49.00", "code": "Facilities", "status": "accepted"}
+    ],
+    "fixtureTotal": "196.25",
+    "acceptedTotal": "196.25",
+    "canExport": false,
+    "editor": {
+      "invoiceId": "SYN-003",
+      "amountText": "-1.00",
+      "code": "Facilities"
+    },
+    "exported": {
+      "acceptedTotal": "196.25",
+      "invoiceCount": 3,
+      "invoiceIds": ["SYN-001", "SYN-002", "SYN-003"]
+    },
+    "status": "invalid",
+    "message": "Negative amounts are not allowed. Export is disabled.",
+    "error": "Amount must be zero or greater.",
+    "restorePending": false,
+    "focus": "amount-input"
+  },
+  "reset": {
+    "invoices": [
+      {"id": "SYN-001", "vendor": "Paper Kite Supplies", "amount": "64.75", "code": "Office", "status": "pending"},
+      {"id": "SYN-002", "vendor": "Metro Moth Transit", "amount": "82.50", "code": "Transit", "status": "pending"},
+      {"id": "SYN-003", "vendor": "Copper Comet Repairs", "amount": "49.00", "code": "Uncoded", "status": "pending"}
+    ],
+    "fixtureTotal": "196.25",
+    "acceptedTotal": "0.00",
+    "canExport": false,
+    "editor": null,
+    "exported": null,
+    "status": "ready",
+    "message": "Three pending invoices total $196.25.",
+    "error": null,
+    "restorePending": false,
+    "focus": "invoice-syn-001"
+  }
+}
+  </script>
+
+  <script>
+    "use strict";
+
+    const FIXTURE = JSON.parse(
+      document.querySelector("#invoice-fixture").textContent
+    );
+    const CONTRACT_STATES = JSON.parse(
+      document.querySelector("#contract-states").textContent
+    );
+    const CODE_OPTIONS = Object.freeze(["Uncoded", "Facilities", "Office", "Transit"]);
+    const FOCUS_ORDER = Object.freeze([
+      "invoice-syn-001",
+      "invoice-syn-002",
+      "invoice-syn-003",
+      "amount-input",
+      "code-select",
+      "save-editor-btn",
+      "cancel-editor-btn",
+      "export-button",
+      "restore-button",
+      "confirm-restore-btn",
+      "cancel-restore-btn"
+    ]);
+
+    function money(cents) {
+      return (cents / 100).toFixed(2);
+    }
+
+    function rowId(invoiceId) {
+      return `invoice-${invoiceId.toLowerCase()}`;
+    }
+
+    function cloneInvoice(invoice, status = "pending") {
+      return {
+        id: invoice.id,
+        vendor: invoice.vendor,
+        amountCents: invoice.amountCents,
+        code: invoice.code,
+        expectedCode: invoice.expectedCode,
+        status
+      };
+    }
+
+    function freezeState(value) {
+      const invoices = value.invoices.map((invoice) => Object.freeze({ ...invoice }));
+      const fixtureTotalCents = invoices.reduce(
+        (sum, invoice) => sum + invoice.amountCents,
+        0
+      );
+      const acceptedTotalCents = invoices.reduce(
+        (sum, invoice) => sum + (invoice.status === "accepted" ? invoice.amountCents : 0),
+        0
+      );
+      const allAccepted = invoices.every((invoice) => invoice.status === "accepted");
+      const editor = value.editor ? Object.freeze({ ...value.editor }) : null;
+      const exported = value.exported
+        ? Object.freeze({
+            acceptedTotal: value.exported.acceptedTotal,
+            invoiceCount: value.exported.invoiceCount,
+            invoiceIds: Object.freeze([...value.exported.invoiceIds])
+          })
+        : null;
+      return Object.freeze({
+        invoices: Object.freeze(invoices),
+        fixtureTotalCents,
+        acceptedTotalCents,
+        canExport:
+          allAccepted &&
+          fixtureTotalCents === FIXTURE.expectedTotalCents &&
+          editor === null &&
+          value.error === null,
+        editor,
+        exported,
+        status: value.status,
+        message: value.message,
+        error: value.error,
+        restorePending: Boolean(value.restorePending),
+        focus: value.focus
+      });
+    }
+
+    function initialState() {
+      return freezeState({
+        invoices: FIXTURE.invoices.map((invoice) => cloneInvoice(invoice)),
+        editor: null,
+        exported: null,
+        status: "ready",
+        message: "Three pending invoices total $196.25.",
+        error: null,
+        restorePending: false,
+        focus: "invoice-syn-001"
+      });
+    }
+
+    function replaceInvoice(invoices, invoiceId, update) {
+      return invoices.map((invoice) =>
+        invoice.id === invoiceId ? { ...invoice, ...update } : invoice
+      );
+    }
+
+    function parsedCents(value) {
+      const text = String(value).trim();
+      if (!/^-?\d+(?:\.\d{1,2})?$/.test(text)) {
+        return null;
+      }
+      const negative = text.startsWith("-");
+      const unsigned = negative ? text.slice(1) : text;
+      const [whole, fraction = ""] = unsigned.split(".");
+      const cents = Number(whole) * 100 + Number(fraction.padEnd(2, "0"));
+      return negative ? -cents : cents;
+    }
+
+    function reduce(state, action) {
+      switch (action.type) {
+        case "FOCUS":
+          return freezeState({ ...state, focus: action.target });
+
+        case "MOVE_ROW": {
+          const rows = state.invoices.map((invoice) => rowId(invoice.id));
+          const current = Math.max(0, rows.indexOf(state.focus));
+          const next = Math.max(0, Math.min(rows.length - 1, current + action.delta));
+          return freezeState({ ...state, focus: rows[next] });
+        }
+
+        case "ACTIVATE_INVOICE": {
+          const invoice = state.invoices.find((item) => item.id === action.invoiceId);
+          if (!invoice) {
+            return state;
+          }
+          if (invoice.status === "pending" && invoice.code === invoice.expectedCode) {
+            const invoices = replaceInvoice(state.invoices, invoice.id, {
+              status: "accepted"
+            });
+            const accepted = invoices.reduce(
+              (sum, item) => sum + (item.status === "accepted" ? item.amountCents : 0),
+              0
+            );
+            return freezeState({
+              ...state,
+              invoices,
+              editor: null,
+              status: "accepted",
+              message: `${invoice.id} accepted. $${money(accepted)} accepted.`,
+              error: null,
+              restorePending: false,
+              focus: rowId(invoice.id)
+            });
+          }
+          const correctionNeeded = invoice.code !== invoice.expectedCode;
+          return freezeState({
+            ...state,
+            editor: {
+              invoiceId: invoice.id,
+              amountText: money(invoice.amountCents),
+              code: invoice.code
+            },
+            status: "editing",
+            message: correctionNeeded
+              ? `${invoice.id} needs a category correction.`
+              : `Editing ${invoice.id}. Export paused until this edit is saved.`,
+            error: null,
+            restorePending: false,
+            focus: correctionNeeded ? "code-select" : "amount-input"
+          });
+        }
+
+        case "SET_AMOUNT_TEXT":
+          if (!state.editor) {
+            return state;
+          }
+          return freezeState({
+            ...state,
+            editor: { ...state.editor, amountText: String(action.value) },
+            status: "editing",
+            message: "Editing amount. Press Enter to validate.",
+            error: null,
+            focus: "amount-input"
+          });
+
+        case "SET_CODE":
+          if (!state.editor || !CODE_OPTIONS.includes(action.value)) {
+            return state;
+          }
+          return freezeState({
+            ...state,
+            editor: { ...state.editor, code: action.value },
+            status: "editing",
+            message: `Category set to ${action.value}. Press Enter to save.`,
+            error: null,
+            focus: "code-select"
+          });
+
+        case "SAVE_EDITOR": {
+          if (!state.editor) {
+            return state;
+          }
+          const invoice = state.invoices.find(
+            (item) => item.id === state.editor.invoiceId
+          );
+          const cents = parsedCents(state.editor.amountText);
+          if (cents === null) {
+            return freezeState({
+              ...state,
+              status: "invalid",
+              message: "Enter a dollars-and-cents amount. Export is disabled.",
+              error: "Amount must use at most two decimal places.",
+              focus: "amount-input"
+            });
+          }
+          if (cents < 0) {
+            return freezeState({
+              ...state,
+              status: "invalid",
+              message: "Negative amounts are not allowed. Export is disabled.",
+              error: "Amount must be zero or greater.",
+              focus: "amount-input"
+            });
+          }
+          if (!invoice || state.editor.code !== invoice.expectedCode) {
+            return freezeState({
+              ...state,
+              status: "invalid",
+              message: "Choose the fixture category before exporting.",
+              error: `${invoice ? invoice.id : "Invoice"} requires ${
+                invoice ? invoice.expectedCode : "a valid category"
+              }.`,
+              focus: "code-select"
+            });
+          }
+          const invoices = replaceInvoice(state.invoices, invoice.id, {
+            amountCents: cents,
+            code: state.editor.code,
+            status: "accepted"
+          });
+          const total = invoices.reduce((sum, item) => sum + item.amountCents, 0);
+          return freezeState({
+            ...state,
+            invoices,
+            editor: null,
+            exported: null,
+            status: "accepted",
+            message: `${invoice.id} corrected and accepted. Queue total $${money(total)}.`,
+            error: null,
+            restorePending: false,
+            focus: rowId(invoice.id)
+          });
+        }
+
+        case "CANCEL_EDITOR":
+          if (!state.editor) {
+            return state;
+          }
+          return freezeState({
+            ...state,
+            editor: null,
+            status: "ready",
+            message: "Correction cancelled. Accepted invoice values are unchanged.",
+            error: null,
+            focus: rowId(state.editor.invoiceId)
+          });
+
+        case "EXPORT":
+          if (!state.canExport) {
+            return freezeState({
+              ...state,
+              status: "invalid",
+              message: "Export remains disabled until all three invoices are valid.",
+              error: state.error || "Review and accept every invoice first.",
+              focus: state.error ? state.focus : "invoice-syn-001"
+            });
+          }
+          return freezeState({
+            ...state,
+            exported: {
+              acceptedTotal: money(state.acceptedTotalCents),
+              invoiceCount: state.invoices.length,
+              invoiceIds: state.invoices.map((invoice) => invoice.id)
+            },
+            status: "exported",
+            message: `Export complete: acceptedTotal is ${money(state.acceptedTotalCents)}.`,
+            error: null,
+            focus: "export-button"
+          });
+
+        case "REQUEST_RESTORE":
+          return freezeState({
+            ...state,
+            restorePending: true,
+            status: "confirm-reset",
+            message: "Confirm replacement of local edits.",
+            focus: "confirm-restore-btn"
+          });
+
+        case "CANCEL_RESTORE":
+          return freezeState({
+            ...state,
+            restorePending: false,
+            status: state.error ? "invalid" : "ready",
+            message: state.error
+              ? "Restore cancelled. Correct the invalid amount to continue."
+              : "Restore cancelled. Local edits are unchanged.",
+            focus: "restore-button"
+          });
+
+        case "RESET":
+          return initialState();
+
+        default:
+          return state;
+      }
+    }
+
+    function snapshot(state) {
+      return {
+        invoices: state.invoices.map((invoice) => ({
+          id: invoice.id,
+          vendor: invoice.vendor,
+          amount: money(invoice.amountCents),
+          code: invoice.code,
+          status: invoice.status
+        })),
+        fixtureTotal: money(state.fixtureTotalCents),
+        acceptedTotal: money(state.acceptedTotalCents),
+        canExport: state.canExport,
+        editor: state.editor ? { ...state.editor } : null,
+        exported: state.exported
+          ? {
+              acceptedTotal: state.exported.acceptedTotal,
+              invoiceCount: state.exported.invoiceCount,
+              invoiceIds: [...state.exported.invoiceIds]
+            }
+          : null,
+        status: state.status,
+        message: state.message,
+        error: state.error,
+        restorePending: state.restorePending,
+        focus: state.focus
+      };
+    }
+
+    function verifyClaim(claim, value) {
+      const actual = JSON.stringify(snapshot(value));
+      const expected = JSON.stringify(CONTRACT_STATES[claim]);
+      if (actual !== expected) {
+        throw new Error(`Reducer contract mismatch for ${claim}`);
+      }
+    }
+
+    let state = initialState();
+    let applyingFocus = false;
+    let replaceAmountOnNextKey = false;
+    let shiftPressed = false;
+
+    const elements = {
+      rows: [...document.querySelectorAll(".invoice-row")],
+      queueTotal: document.querySelector("#queue-total"),
+      acceptedCount: document.querySelector("#accepted-count"),
+      acceptedTotal: document.querySelector("#accepted-total"),
+      status: document.querySelector("#status-message"),
+      error: document.querySelector("#validation-error"),
+      editor: document.querySelector("#editor-panel"),
+      editorId: document.querySelector("#editor-invoice-id"),
+      amount: document.querySelector("#amount-input"),
+      code: document.querySelector("#code-select"),
+      exportButton: document.querySelector("#export-button"),
+      restoreButton: document.querySelector("#restore-button"),
+      exportOutput: document.querySelector("#export-output"),
+      exportJson: document.querySelector("#export-json"),
+      confirmation: document.querySelector("#restore-confirmation"),
+      focusReadout: document.querySelector("#focus-readout")
+    };
+
+    function focusLabel(id) {
+      const labels = {
+        "invoice-syn-001": "SYN-001 invoice row",
+        "invoice-syn-002": "SYN-002 invoice row",
+        "invoice-syn-003": "SYN-003 invoice row",
+        "amount-input": "Amount field",
+        "code-select": "Category field",
+        "save-editor-btn": "Save correction",
+        "cancel-editor-btn": "Cancel edit",
+        "export-button": "Export accepted queue",
+        "restore-button": "Restore invoice fixture",
+        "confirm-restore-btn": "Confirm restore",
+        "cancel-restore-btn": "Keep edits"
+      };
+      return labels[id] || id;
+    }
+
+    function applyFocus() {
+      const target = document.getElementById(state.focus);
+      if (!target || target.hidden || target.closest("[hidden]")) {
+        return;
+      }
+      const changed = document.activeElement !== target;
+      applyingFocus = true;
+      try {
+        if (changed) {
+          target.focus({ preventScroll: true });
+        }
+        if (changed && target === elements.amount) {
+          target.select();
+          replaceAmountOnNextKey = true;
+        }
+      } finally {
+        applyingFocus = false;
+      }
+    }
+
+    function render(shouldFocus = true) {
+      const accepted = state.invoices.filter(
+        (invoice) => invoice.status === "accepted"
+      ).length;
+      elements.queueTotal.textContent = `$${money(state.fixtureTotalCents)}`;
+      elements.acceptedCount.textContent = `${accepted} / ${state.invoices.length}`;
+      elements.acceptedTotal.textContent = `$${money(state.acceptedTotalCents)}`;
+      elements.status.textContent = state.message;
+      elements.error.hidden = state.error === null;
+      elements.error.textContent = state.error || "";
+
+      for (const invoice of state.invoices) {
+        const row = document.getElementById(rowId(invoice.id));
+        row.dataset.state = invoice.status;
+        row.dataset.needsCorrection = String(
+          invoice.code !== invoice.expectedCode
+        );
+        row.setAttribute(
+          "aria-label",
+          `${invoice.id}, ${invoice.vendor}, $${money(invoice.amountCents)}, ${
+            invoice.code
+          }, ${invoice.status}`
+        );
+        document.querySelector(`[data-amount-for="${invoice.id}"]`).textContent =
+          `$${money(invoice.amountCents)}`;
+        document.querySelector(`[data-code-for="${invoice.id}"]`).textContent =
+          invoice.code;
+        document.querySelector(`[data-state-for="${invoice.id}"]`).textContent =
+          invoice.status;
+      }
+
+      elements.editor.hidden = state.editor === null;
+      if (state.editor) {
+        elements.editorId.textContent = state.editor.invoiceId;
+        elements.amount.value = state.editor.amountText;
+        elements.amount.setAttribute(
+          "aria-invalid",
+          String(state.error !== null && state.focus === "amount-input")
+        );
+        elements.code.value = state.editor.code;
+      } else {
+        elements.amount.removeAttribute("aria-invalid");
+      }
+
+      elements.exportButton.disabled = !state.canExport;
+      elements.exportButton.setAttribute(
+        "aria-describedby",
+        state.error ? "validation-error" : "status-message"
+      );
+      elements.exportOutput.hidden = state.exported === null;
+      if (state.exported) {
+        elements.exportJson.textContent = JSON.stringify(state.exported);
+      }
+      elements.confirmation.hidden = !state.restorePending;
+      elements.focusReadout.textContent = focusLabel(state.focus);
+
+      for (const element of document.querySelectorAll(".has-focus")) {
+        element.classList.remove("has-focus");
+      }
+      const focused = document.getElementById(state.focus);
+      if (focused) {
+        focused.classList.add("has-focus");
+      }
+
+      if (shouldFocus) {
+        applyFocus();
+      }
+    }
+
+    function dispatch(action, claim = null) {
+      state = reduce(state, action);
+      if (claim) {
+        verifyClaim(claim, state);
+      }
+      render();
+    }
+
+    function focusableOrder() {
+      return FOCUS_ORDER.filter((id) => {
+        const element = document.getElementById(id);
+        return element && !element.disabled && !element.closest("[hidden]");
+      });
+    }
+
+    function moveTab(backward) {
+      const order = focusableOrder();
+      const current = order.indexOf(state.focus);
+      const offset = backward ? -1 : 1;
+      const next = current < 0
+        ? 0
+        : (current + offset + order.length) % order.length;
+      dispatch({ type: "FOCUS", target: order[next] });
+    }
+
+    function activateFocused() {
+      if (state.focus.startsWith("invoice-")) {
+        const row = document.getElementById(state.focus);
+        dispatch({
+          type: "ACTIVATE_INVOICE",
+          invoiceId: row.dataset.invoiceId
+        });
+      } else if (
+        state.focus === "amount-input" ||
+        state.focus === "code-select" ||
+        state.focus === "save-editor-btn"
+      ) {
+        const expectedClaim =
+          state.editor &&
+          state.editor.invoiceId === "SYN-003" &&
+          state.editor.amountText === "49.00" &&
+          state.editor.code === "Facilities" &&
+          state.invoices[0].status === "accepted" &&
+          state.invoices[1].status === "accepted"
+            ? null
+            : state.editor && state.editor.amountText === "-1.00"
+              ? "rejected"
+              : null;
+        dispatch({ type: "SAVE_EDITOR" }, expectedClaim);
+      } else if (state.focus === "cancel-editor-btn") {
+        dispatch({ type: "CANCEL_EDITOR" });
+      } else if (state.focus === "export-button") {
+        dispatch({ type: "EXPORT" }, "positive");
+      } else if (state.focus === "restore-button") {
+        dispatch({ type: "REQUEST_RESTORE" });
+      } else if (state.focus === "confirm-restore-btn") {
+        dispatch({ type: "RESET" }, "reset");
+      } else if (state.focus === "cancel-restore-btn") {
+        dispatch({ type: "CANCEL_RESTORE" });
+      }
+    }
+
+    for (const row of elements.rows) {
+      row.addEventListener("click", () => {
+        dispatch({
+          type: "ACTIVATE_INVOICE",
+          invoiceId: row.dataset.invoiceId
+        });
+      });
+    }
+
+    elements.amount.addEventListener("input", (event) => {
+      let value = elements.amount.value;
+      if (replaceAmountOnNextKey && typeof event.data === "string") {
+        value = event.data;
+        elements.amount.value = value;
+      }
+      replaceAmountOnNextKey = false;
+      dispatch({ type: "SET_AMOUNT_TEXT", value });
+    });
+    elements.amount.addEventListener("focus", () => {
+      elements.amount.select();
+      replaceAmountOnNextKey = true;
+    });
+    elements.amount.addEventListener("click", () => {
+      elements.amount.select();
+      replaceAmountOnNextKey = true;
+    });
+    elements.code.addEventListener("change", () => {
+      dispatch({ type: "SET_CODE", value: elements.code.value });
+    });
+    document.querySelector("#save-editor-btn").addEventListener("click", () => {
+      dispatch({ type: "SAVE_EDITOR" });
+    });
+    document.querySelector("#cancel-editor-btn").addEventListener("click", () => {
+      dispatch({ type: "CANCEL_EDITOR" });
+    });
+    elements.exportButton.addEventListener("click", () => {
+      dispatch({ type: "EXPORT" }, "positive");
+    });
+    elements.restoreButton.addEventListener("click", () => {
+      dispatch({ type: "REQUEST_RESTORE" });
+    });
+    document.querySelector("#confirm-restore-btn").addEventListener("click", () => {
+      dispatch({ type: "RESET" }, "reset");
+    });
+    document.querySelector("#cancel-restore-btn").addEventListener("click", () => {
+      dispatch({ type: "CANCEL_RESTORE" });
+    });
+
+    document.addEventListener("focusin", (event) => {
+      if (applyingFocus || !event.target.id || event.target.id === state.focus) {
+        return;
+      }
+      state = reduce(state, { type: "FOCUS", target: event.target.id });
+      render(false);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      const key = event.key;
+      if (key === "Shift") {
+        shiftPressed = true;
+        return;
+      }
+      if (key === "Tab") {
+        event.preventDefault();
+        moveTab(event.shiftKey || shiftPressed);
+        return;
+      }
+
+      if (
+        (key === "ArrowDown" || key === "ArrowUp") &&
+        state.focus.startsWith("invoice-")
+      ) {
+        event.preventDefault();
+        dispatch({
+          type: "MOVE_ROW",
+          delta: key === "ArrowDown" ? 1 : -1
+        });
+        return;
+      }
+
+      if (
+        (key === "ArrowDown" || key === "ArrowUp") &&
+        state.focus === "code-select"
+      ) {
+        event.preventDefault();
+        const current = CODE_OPTIONS.indexOf(state.editor.code);
+        const offset = key === "ArrowDown" ? 1 : -1;
+        const next = Math.max(
+          0,
+          Math.min(CODE_OPTIONS.length - 1, current + offset)
+        );
+        dispatch({ type: "SET_CODE", value: CODE_OPTIONS[next] });
+        return;
+      }
+
+      if (key === "Enter") {
+        event.preventDefault();
+        activateFocused();
+      }
+    });
+
+    document.addEventListener("keyup", (event) => {
+      if (event.key === "Shift") {
+        shiftPressed = false;
+      }
+    });
+    window.addEventListener("blur", () => {
+      shiftPressed = false;
+    });
+
+    const contract = Object.freeze({
+      fixture: Object.freeze({
+        expectedTotalCents: FIXTURE.expectedTotalCents,
+        invoices: Object.freeze(
+          FIXTURE.invoices.map((invoice) => Object.freeze({ ...invoice }))
+        )
+      }),
+      focusOrder: FOCUS_ORDER,
+      currentFocusOrder: () => Object.freeze([...focusableOrder()]),
+      initialState,
+      reduce,
+      snapshot: () => snapshot(state)
+    });
+    window.invoiceTriage = contract;
+    window.tinySystem = contract;
+
+    render();
+  </script>
+</body>
+</html>

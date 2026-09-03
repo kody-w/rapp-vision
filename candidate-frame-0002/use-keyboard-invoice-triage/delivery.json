@@ -1,0 +1,107 @@
+{
+  "artifacts": {
+    "master": {
+      "bytes": 5625823,
+      "codec": "ffv1",
+      "colorRange": "pc",
+      "colorSpace": "gbr",
+      "duration": 18.0,
+      "height": 540,
+      "path": "masters/use-keyboard-invoice-triage.mkv",
+      "pixelFormat": "bgr0",
+      "sha256": "cc2109cc1007670c6cf4d3ce61e594bdfcfb0f2c1992130095d6a6adcdaac101",
+      "width": 960
+    },
+    "mp4": {
+      "bytes": 100673,
+      "codec": "h264",
+      "colorPrimaries": "bt709",
+      "colorRange": "tv",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "duration": 18.0,
+      "height": 540,
+      "path": "media/use-keyboard-invoice-triage.mp4",
+      "pixelFormat": "yuv420p",
+      "sha256": "7db0bdc8f7681649f1250b4af026115989a1540d74346464ca964313d20a6847",
+      "width": 960
+    },
+    "webm": {
+      "bytes": 98691,
+      "codec": "vp9",
+      "colorPrimaries": "bt709",
+      "colorRange": "tv",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "duration": 18.0,
+      "height": 540,
+      "path": "media/use-keyboard-invoice-triage.webm",
+      "pixelFormat": "yuv420p",
+      "sha256": "1124a7fb8ace9e6bbd693c4873ec583275d39ace45d21b2ec92da46c25a9aa34",
+      "width": 960
+    }
+  },
+  "publication": "use-keyboard-invoice-triage",
+  "render": {
+    "audio": false,
+    "duration": 18.0,
+    "fps": 12,
+    "frameSamples": {
+      "0": "301b5c40a6eb8cbc724dacad5e27b579b3103c39224680cae5171bebb872ca7b",
+      "108": "1b3a33a1e3846f67ad7e75836aae35830ac23b16a0ec1a84f33d99da91927a09",
+      "215": "a01cf6f06ea7d51211a883b7f47f6556010d33896119632e0d121e6ba8f6250f"
+    },
+    "frames": 216,
+    "height": 540,
+    "masterCodec": "ffv1",
+    "width": 960
+  },
+  "schema": "keyboard-invoice-triage-delivery/1.0",
+  "sourceArtifacts": [
+    {
+      "bytes": 54,
+      "path": ".gitattributes",
+      "sha256": "cf302113fe57517bb72baa467c14d4f9bbdec8e8f0bab9f4b5dd1f2ffe4470d6"
+    },
+    {
+      "bytes": 3199,
+      "path": "README.md",
+      "sha256": "a39db8336cccf86ed066f3620322f2c6f63f52fef81a038d609d668796097339"
+    },
+    {
+      "bytes": 47082,
+      "path": "apps/use-keyboard-invoice-triage.html",
+      "sha256": "28209ac77188e48a22545252a7db8403d2070ce1750c3b06d138c066831d6bf2"
+    },
+    {
+      "bytes": 7926,
+      "path": "channel.production.json",
+      "sha256": "f0040d9e1f12168645b590a4e2433197e2982122038dfdacbcb137eed5ab4693"
+    },
+    {
+      "bytes": 8079,
+      "path": "channel.json",
+      "sha256": "9b2d6aa9b42279874614d486615fb3ecd097909c8836b734f072db0eda95481b"
+    },
+    {
+      "bytes": 9123,
+      "path": "evidence.json",
+      "sha256": "e97712e3cbb0d9a4da22de7eaee27a18dd5d4f3fbe3f33a8da3af62a22e7145f"
+    },
+    {
+      "bytes": 32324,
+      "path": "render.py",
+      "sha256": "3a39e76b151333dd417220f39dae6f8040e6557d158d40f18dfe83a8d8a56ec2"
+    },
+    {
+      "bytes": 3461,
+      "path": "thumbs/use-keyboard-invoice-triage.svg",
+      "sha256": "8117ec27f3e42c688bd0b61cd9290f71104fe61fb5eb77e37bb27eb112282636"
+    },
+    {
+      "bytes": 18429,
+      "path": "verify_dom.mjs",
+      "sha256": "bbb00117961a75b258e1db9cae4c96a7a9397cee7205357c21d25bec5d2c42a5"
+    }
+  ]
+}

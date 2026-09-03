@@ -1,0 +1,833 @@
+{
+  "browserReplay": {
+    "actionCount": 17,
+    "assertion": "The test suite launches a real Chromium-family browser, drives each activation selector and applies every coordinate-free semantic scroll, captures reducer state and generated SVG geometry after every click, independently hashes both the geometry and sprite source, and fails unless all six symbols change at 1.5 px before returning exactly to 2 px. Console and page exceptions also fail the replay.",
+    "checkpoints": [
+      {
+        "afterAction": 10,
+        "claim": "positive",
+        "selector": "#status-panel"
+      },
+      {
+        "afterAction": 13,
+        "claim": "rejected",
+        "selector": "#status-panel"
+      },
+      {
+        "afterAction": 16,
+        "claim": "reset",
+        "selector": "#status-panel"
+      }
+    ],
+    "coordinateFree": true,
+    "nondefaultSupportedStrokes": [
+      1.0,
+      1.5,
+      2.5,
+      3.0
+    ],
+    "positivePath": {
+      "editedGeometrySha256": "623ba0ea4f9357fc04e406edbf48d301aa26b4a943db98364e4ee9fc09d858bc",
+      "editedSpriteSha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+      "editedStroke": 1.5,
+      "generatedSymbolCount": 6,
+      "initialStroke": 2.0,
+      "returnedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+      "returnedSpriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+      "returnedStroke": 2.0
+    },
+    "runner": "tests/frame_0002_09_browser.mjs",
+    "scrollSelectors": [
+      "#stroke-15-btn",
+      "#regenerate-btn",
+      "#stroke-2-btn",
+      "#regenerate-btn",
+      "#export-btn",
+      "#status-panel",
+      "#off-grid-btn",
+      "#status-panel",
+      "#restore-btn",
+      "#status-panel"
+    ],
+    "selectors": [
+      "#stroke-15-btn",
+      "#regenerate-btn",
+      "#stroke-2-btn",
+      "#regenerate-btn",
+      "#export-btn",
+      "#off-grid-btn",
+      "#restore-btn"
+    ],
+    "source": "channel.production.json#videos[0].live.scenes[0].actions"
+  },
+  "claims": [
+    {
+      "actions": [
+        {
+          "selector": "#stroke-15-btn",
+          "type": "SET_STROKE"
+        },
+        {
+          "selector": "#regenerate-btn",
+          "type": "REGENERATE"
+        },
+        {
+          "selector": "#stroke-2-btn",
+          "type": "SET_STROKE"
+        },
+        {
+          "selector": "#regenerate-btn",
+          "type": "REGENERATE"
+        },
+        {
+          "selector": "#export-btn",
+          "type": "EXPORT"
+        }
+      ],
+      "assertions": [
+        {
+          "equals": 2,
+          "path": "accepted.rules.stroke"
+        },
+        {
+          "equals": [
+            "bloom",
+            "cairn",
+            "hinge",
+            "orbit",
+            "pulse",
+            "weave"
+          ],
+          "path": "accepted.symbols"
+        },
+        {
+          "equals": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+          "path": "accepted.generatedGeometrySha256"
+        },
+        {
+          "equals": "pass",
+          "path": "comparison.status"
+        },
+        {
+          "equals": 0,
+          "path": "comparison.differingPercent"
+        },
+        {
+          "equals": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+          "path": "lastExport.sha256"
+        }
+      ],
+      "checkpoints": [
+        {
+          "afterAction": 2,
+          "assertions": [
+            {
+              "equals": 1.5,
+              "path": "accepted.rules.stroke"
+            },
+            {
+              "equals": "623ba0ea4f9357fc04e406edbf48d301aa26b4a943db98364e4ee9fc09d858bc",
+              "path": "accepted.generatedGeometrySha256"
+            },
+            {
+              "equals": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+              "path": "accepted.spriteSha256"
+            },
+            {
+              "equals": [
+                "bloom",
+                "cairn",
+                "hinge",
+                "orbit",
+                "pulse",
+                "weave"
+              ],
+              "path": "accepted.symbols"
+            }
+          ],
+          "expectedState": {
+            "accepted": {
+              "fixture": "shared-stroke-1.5",
+              "generatedGeometrySha256": "623ba0ea4f9357fc04e406edbf48d301aa26b4a943db98364e4ee9fc09d858bc",
+              "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+              "rules": {
+                "grid": 2,
+                "linecap": "round",
+                "linejoin": "round",
+                "stroke": 1.5,
+                "viewBox": "0 0 24 24"
+              },
+              "spriteSha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+              "symbols": [
+                "bloom",
+                "cairn",
+                "hinge",
+                "orbit",
+                "pulse",
+                "weave"
+              ]
+            },
+            "comparison": {
+              "differingPercent": 24.3345,
+              "differingPixels": 841,
+              "overlay": [],
+              "status": "fail",
+              "totalPixels": 3456
+            },
+            "draftStroke": 1.5,
+            "invalidEdit": null,
+            "lastExport": null,
+            "message": "Regenerated all 6 symbols with shared stroke 1.5 px; 841 pixels differ (24.3345%), so export remains blocked.",
+            "selection": "bloom",
+            "status": "rejected",
+            "zoom": 800
+          },
+          "id": "edited"
+        },
+        {
+          "afterAction": 4,
+          "assertions": [
+            {
+              "equals": 2.0,
+              "path": "accepted.rules.stroke"
+            },
+            {
+              "equals": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+              "path": "accepted.generatedGeometrySha256"
+            },
+            {
+              "equals": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+              "path": "accepted.spriteSha256"
+            },
+            {
+              "equals": null,
+              "path": "lastExport"
+            }
+          ],
+          "expectedState": {
+            "accepted": {
+              "fixture": "reference-stroke-2",
+              "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+              "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+              "rules": {
+                "grid": 2,
+                "linecap": "round",
+                "linejoin": "round",
+                "stroke": 2,
+                "viewBox": "0 0 24 24"
+              },
+              "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+              "symbols": [
+                "bloom",
+                "cairn",
+                "hinge",
+                "orbit",
+                "pulse",
+                "weave"
+              ]
+            },
+            "comparison": {
+              "differingPercent": 0,
+              "differingPixels": 0,
+              "overlay": [],
+              "status": "pass",
+              "totalPixels": 3456
+            },
+            "draftStroke": 2,
+            "invalidEdit": null,
+            "lastExport": null,
+            "message": "Regenerated all 6 symbols with shared stroke 2 px; immutable reference difference is 0.0000%.",
+            "selection": "bloom",
+            "status": "accepted",
+            "zoom": 800
+          },
+          "id": "returned"
+        }
+      ],
+      "claim": "The authored path changes the shared stroke from 2 px to 1.5 px and regenerates all six symbols with different generated geometry and sprite hashes, then deliberately returns to 2 px, regenerates, and exports the exact passing reference sprite.",
+      "expectedState": {
+        "accepted": {
+          "fixture": "reference-stroke-2",
+          "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+          "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+          "rules": {
+            "grid": 2,
+            "linecap": "round",
+            "linejoin": "round",
+            "stroke": 2,
+            "viewBox": "0 0 24 24"
+          },
+          "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+          "symbols": [
+            "bloom",
+            "cairn",
+            "hinge",
+            "orbit",
+            "pulse",
+            "weave"
+          ]
+        },
+        "comparison": {
+          "differingPercent": 0,
+          "differingPixels": 0,
+          "overlay": [],
+          "status": "pass",
+          "totalPixels": 3456
+        },
+        "draftStroke": 2,
+        "invalidEdit": null,
+        "lastExport": {
+          "bytes": 2234,
+          "path": "exports/six-shapes.svg",
+          "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+          "symbolCount": 6
+        },
+        "message": "Exported 6 named 24 × 24 symbols; raster difference 0.0000% passes the 0.50% gate.",
+        "selection": "bloom",
+        "status": "accepted",
+        "zoom": 800
+      },
+      "id": "positive"
+    },
+    {
+      "actions": [
+        {
+          "selector": "#stroke-15-btn",
+          "type": "SET_STROKE"
+        },
+        {
+          "selector": "#regenerate-btn",
+          "type": "REGENERATE"
+        },
+        {
+          "selector": "#stroke-2-btn",
+          "type": "SET_STROKE"
+        },
+        {
+          "selector": "#regenerate-btn",
+          "type": "REGENERATE"
+        },
+        {
+          "selector": "#export-btn",
+          "type": "EXPORT"
+        },
+        {
+          "selector": "#off-grid-btn",
+          "type": "OFF_GRID"
+        }
+      ],
+      "assertions": [
+        {
+          "equals": {
+            "fixture": "reference-stroke-2",
+            "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+            "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+            "rules": {
+              "grid": 2,
+              "linecap": "round",
+              "linejoin": "round",
+              "stroke": 2,
+              "viewBox": "0 0 24 24"
+            },
+            "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+            "symbols": [
+              "bloom",
+              "cairn",
+              "hinge",
+              "orbit",
+              "pulse",
+              "weave"
+            ]
+          },
+          "path": "accepted"
+        },
+        {
+          "equals": {
+            "bytes": 2234,
+            "path": "exports/six-shapes.svg",
+            "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+            "symbolCount": 6
+          },
+          "path": "lastExport"
+        },
+        {
+          "equals": "fail",
+          "path": "comparison.status"
+        },
+        {
+          "equals": 51,
+          "path": "comparison.differingPixels"
+        },
+        {
+          "equals": [
+            13,
+            17
+          ],
+          "path": "invalidEdit.to"
+        }
+      ],
+      "claim": "Moving the Pulse anchor from 12,18 to off-grid 13,17 fails the comparison and highlights changed pixels without changing the accepted icon system or export.",
+      "expectedState": {
+        "accepted": {
+          "fixture": "reference-stroke-2",
+          "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+          "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+          "rules": {
+            "grid": 2,
+            "linecap": "round",
+            "linejoin": "round",
+            "stroke": 2,
+            "viewBox": "0 0 24 24"
+          },
+          "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+          "symbols": [
+            "bloom",
+            "cairn",
+            "hinge",
+            "orbit",
+            "pulse",
+            "weave"
+          ]
+        },
+        "comparison": {
+          "differingPercent": 1.4757,
+          "differingPixels": 51,
+          "overlay": [
+            [
+              9,
+              6
+            ],
+            [
+              9,
+              7
+            ],
+            [
+              14,
+              7
+            ],
+            [
+              8,
+              8
+            ],
+            [
+              9,
+              8
+            ],
+            [
+              10,
+              8
+            ],
+            [
+              14,
+              8
+            ],
+            [
+              8,
+              9
+            ],
+            [
+              10,
+              9
+            ],
+            [
+              13,
+              9
+            ],
+            [
+              15,
+              9
+            ],
+            [
+              8,
+              10
+            ],
+            [
+              10,
+              10
+            ],
+            [
+              11,
+              10
+            ],
+            [
+              13,
+              10
+            ],
+            [
+              15,
+              10
+            ],
+            [
+              8,
+              11
+            ],
+            [
+              9,
+              11
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              11
+            ],
+            [
+              13,
+              11
+            ],
+            [
+              15,
+              11
+            ],
+            [
+              9,
+              12
+            ],
+            [
+              11,
+              12
+            ],
+            [
+              12,
+              12
+            ],
+            [
+              13,
+              12
+            ],
+            [
+              14,
+              12
+            ],
+            [
+              15,
+              12
+            ],
+            [
+              9,
+              13
+            ],
+            [
+              10,
+              13
+            ],
+            [
+              11,
+              13
+            ],
+            [
+              14,
+              13
+            ],
+            [
+              9,
+              14
+            ],
+            [
+              10,
+              14
+            ],
+            [
+              11,
+              14
+            ],
+            [
+              12,
+              14
+            ],
+            [
+              14,
+              14
+            ],
+            [
+              10,
+              15
+            ],
+            [
+              11,
+              15
+            ],
+            [
+              13,
+              15
+            ],
+            [
+              14,
+              15
+            ],
+            [
+              10,
+              16
+            ],
+            [
+              11,
+              16
+            ],
+            [
+              13,
+              16
+            ],
+            [
+              14,
+              16
+            ],
+            [
+              10,
+              17
+            ],
+            [
+              11,
+              17
+            ],
+            [
+              12,
+              17
+            ],
+            [
+              13,
+              17
+            ],
+            [
+              11,
+              18
+            ],
+            [
+              12,
+              18
+            ]
+          ],
+          "status": "fail",
+          "totalPixels": 3456
+        },
+        "draftStroke": 2,
+        "invalidEdit": {
+          "anchorIndex": 3,
+          "from": [
+            12,
+            18
+          ],
+          "icon": "pulse",
+          "reason": "13,17 is off the shared 2 px grid.",
+          "to": [
+            13,
+            17
+          ]
+        },
+        "lastExport": {
+          "bytes": 2234,
+          "path": "exports/six-shapes.svg",
+          "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+          "symbolCount": 6
+        },
+        "message": "Rejected Pulse anchor 13,17: 51 pixels differ (1.4757%). The accepted 6-symbol export is unchanged.",
+        "selection": "pulse",
+        "status": "rejected",
+        "zoom": 800
+      },
+      "id": "rejected",
+      "preserves": "positive"
+    },
+    {
+      "actions": [
+        {
+          "selector": "#restore-btn",
+          "type": "RESTORE"
+        }
+      ],
+      "assertions": [
+        {
+          "equals": "reference-stroke-2",
+          "path": "accepted.fixture"
+        },
+        {
+          "equals": 2.0,
+          "path": "accepted.rules.stroke"
+        },
+        {
+          "equals": [
+            "bloom",
+            "cairn",
+            "hinge",
+            "orbit",
+            "pulse",
+            "weave"
+          ],
+          "path": "accepted.symbols"
+        },
+        {
+          "equals": "bloom",
+          "path": "selection"
+        },
+        {
+          "equals": 800,
+          "path": "zoom"
+        },
+        {
+          "equals": [],
+          "path": "comparison.overlay"
+        },
+        {
+          "equals": "pass",
+          "path": "comparison.status"
+        }
+      ],
+      "claim": "Restore icon fixture returns the immutable 2 px reference geometry, selects Bloom, sets 800% zoom, and clears every overlay.",
+      "expectedState": {
+        "accepted": {
+          "fixture": "reference-stroke-2",
+          "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+          "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+          "rules": {
+            "grid": 2,
+            "linecap": "round",
+            "linejoin": "round",
+            "stroke": 2,
+            "viewBox": "0 0 24 24"
+          },
+          "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+          "symbols": [
+            "bloom",
+            "cairn",
+            "hinge",
+            "orbit",
+            "pulse",
+            "weave"
+          ]
+        },
+        "comparison": {
+          "differingPercent": 0,
+          "differingPixels": 0,
+          "overlay": [],
+          "status": "pass",
+          "totalPixels": 3456
+        },
+        "draftStroke": 2,
+        "invalidEdit": null,
+        "lastExport": null,
+        "message": "Immutable 2 px reference fixture restored: six paths are on the 2 px grid at 800% zoom.",
+        "selection": "bloom",
+        "status": "reset",
+        "zoom": 800
+      },
+      "id": "reset"
+    }
+  ],
+  "commission": {
+    "criterion": "The export contains exactly six named 24 by 24 SVG symbols and the reference raster comparison remains below 0.50 percent differing pixels.",
+    "id": "create-vector-icon-system"
+  },
+  "objective": {
+    "rasterComparison": {
+      "acceptedDifferingPercent": 0.0,
+      "acceptedDifferingPixels": 0,
+      "acceptedStatus": "pass",
+      "highlightCount": 51,
+      "immutable": true,
+      "invalidDifferingPercent": 1.4757,
+      "invalidDifferingPixels": 51,
+      "invalidStatus": "fail",
+      "method": "Independent frozen 2.0 px round-polyline coverage sampled at 4x4 fixed subpixel centers.",
+      "reference": "reference/reference-raster.json",
+      "referenceSha256": "61744b14a3c1e4f360d77207712e12f33e626259e1ff9eaca7cd46dd5ebd2d46",
+      "referenceStroke": 2.0,
+      "supportedStrokes": [
+        {
+          "differingPercent": 27.2859,
+          "differingPixels": 943,
+          "generatedGeometrySha256": "a02d1be226192fab3fd111837688ce55fe4aef7f26805bafb74738cdfd7932b7",
+          "spriteBytes": 2234,
+          "spriteSha256": "c8ca7d61b74ac74269f5878c4edbb939153d3bc845e29aa6e087f6ffefc80e88",
+          "status": "fail",
+          "stroke": 1.0,
+          "totalPixels": 3456
+        },
+        {
+          "differingPercent": 24.3345,
+          "differingPixels": 841,
+          "generatedGeometrySha256": "623ba0ea4f9357fc04e406edbf48d301aa26b4a943db98364e4ee9fc09d858bc",
+          "spriteBytes": 2246,
+          "spriteSha256": "0dd372e6f87d6e78d6386dcb4b19444e2221e9afef0a9034af4a97d2882edd61",
+          "status": "fail",
+          "stroke": 1.5,
+          "totalPixels": 3456
+        },
+        {
+          "differingPercent": 0.0,
+          "differingPixels": 0,
+          "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+          "spriteBytes": 2234,
+          "spriteSha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+          "status": "pass",
+          "stroke": 2.0,
+          "totalPixels": 3456
+        },
+        {
+          "differingPercent": 26.1574,
+          "differingPixels": 904,
+          "generatedGeometrySha256": "842f482325b9c296fff49c103bce66a3d5055669f186a62f0f1b0be30294ddd8",
+          "spriteBytes": 2246,
+          "spriteSha256": "019cd1a5234d86972d7ee16f38074b15893532c56db07a31b66d75fb6d445e85",
+          "status": "fail",
+          "stroke": 2.5,
+          "totalPixels": 3456
+        },
+        {
+          "differingPercent": 27.3727,
+          "differingPixels": 946,
+          "generatedGeometrySha256": "f67480dfae7e089bb930b61c8ace0d9af39a7d1b92df98d634a7e9cb7ae86df7",
+          "spriteBytes": 2234,
+          "spriteSha256": "be4e159c82e877643862a0bc53ee2590dc1305ec843b0c97679144f4e273b223",
+          "status": "fail",
+          "stroke": 3.0,
+          "totalPixels": 3456
+        }
+      ],
+      "thresholdPercent": 0.5,
+      "totalPixels": 3456
+    },
+    "sprite": {
+      "bytes": 2234,
+      "generatedGeometrySha256": "c3df9da99bac96f2876087271bfd278f4f8dde093ed8d0f72b8ef3bad90099ca",
+      "names": [
+        "bloom",
+        "cairn",
+        "hinge",
+        "orbit",
+        "pulse",
+        "weave"
+      ],
+      "path": "exports/six-shapes.svg",
+      "pathSetSha256": "a7ae6c02e52a11a0b4c6b0b3c7e1fcbbff12be6cb234e3acceb5ce4363582325",
+      "sha256": "6c32a2cef1a3ee29d398ae4070ec3a92961bb1625b4c5aa98b92e1c9318474f2",
+      "sharedStroke": 2.0,
+      "symbolCount": 6,
+      "viewBox": "0 0 24 24"
+    }
+  },
+  "publication": "create-vector-icon-system",
+  "renderer": {
+    "duration": 15.0,
+    "fps": 12,
+    "frameSamples": {
+      "0": "50706739cd9bbd4173256b44bb11cfc1f95e2fcd7f1db25c9bd30fb59b19748d",
+      "132": "dcaebb247c6e49652ef79d7e9a33d70cc6825de23a70348f584331ad29296858",
+      "179": "dd2d48c46eee43ceda36ad7b0eeb7e6c2e23ff5a5cfafe108b359a315ba8dfe9",
+      "42": "886d0c810bcad4dfc678cf32f0ad79c601d4ae752a0246e69501ad38b4ecb6ab",
+      "84": "eb017ca7b7e8427e825363eb77ef760e2e2090d08feda98bbdfda0805f20015f"
+    },
+    "frames": 180,
+    "height": 540,
+    "masterCodec": "ffv1",
+    "path": "render.py",
+    "width": 960
+  },
+  "rightsPrivacy": {
+    "noSecrets": true,
+    "privacyAttestation": true,
+    "rightsAttestation": true,
+    "statement": "All icon geometry, interface code, immutable raster reference, thumbnail, snapshot, and renderer graphics are original to this candidate; no logos, copied icons, external fonts, or network assets are used."
+  },
+  "schema": "candidate-frame-0002-create-vector-icon-system-evidence/2.0"
+}
