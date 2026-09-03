@@ -5,15 +5,39 @@ import { createServer as createHttpServer } from "node:http";
 import { createServer as createNetServer } from "node:net";
 import { extname, resolve, sep } from "node:path";
 
-const [browserExecutable, rootArgument, profileArgument] = process.argv.slice(2);
+const [
+  browserExecutable,
+  rootArgument,
+  profileArgument,
+  foglineArgument = "-",
+  rootwayArgument = "-",
+] = process.argv.slice(2);
 if (!browserExecutable || !rootArgument || !profileArgument) {
   throw new Error(
-    "usage: node paired_player_takeover_browser.mjs <browser> <root> <profile>",
+    "usage: node paired_player_takeover_browser.mjs <browser> <root> <profile> [fogline-root] [rootway-root]",
   );
 }
 
 const ROOT = resolve(rootArgument);
 const profilePath = resolve(profileArgument);
+const criticalFixtures = [
+  {
+    name: "fogline",
+    root: foglineArgument === "-" ? null : resolve(foglineArgument),
+    channelId: "candidate-frame-0004-01-maze-fogline",
+    publicationId: "maze-fogline",
+    ready: "#maze-board",
+    targets: ["#restart-btn", "#load-seed-btn", "#maze-board"],
+  },
+  {
+    name: "rootway",
+    root: rootwayArgument === "-" ? null : resolve(rootwayArgument),
+    channelId: "candidate-frame-0004-05-maze-rootway",
+    publicationId: "maze-rootway",
+    ready: "#rootway-ready",
+    targets: ["#step-value", "#maze-svg"],
+  },
+].filter(fixture => fixture.root);
 const registry = {
   schema: "rapp-vision-network/1.0",
   id: "takeover-test",
@@ -31,6 +55,13 @@ const registry = {
     },
   ],
 };
+for (const fixture of criticalFixtures) {
+  registry.channels.push({
+    id: fixture.channelId,
+    url: `fixtures/${fixture.name}/channel.json`,
+    contract: "rapp-vision-channel/2.0",
+  });
+}
 const types = new Map([
   [".css", "text/css; charset=utf-8"],
   [".html", "text/html; charset=utf-8"],
@@ -55,13 +86,21 @@ const httpServer = createHttpServer(async (request, response) => {
       return;
     }
 
-    const pathname =
+    let pathname =
       requestUrl.pathname === "/" ? "/index.html" : requestUrl.pathname;
+    let contentRoot = ROOT;
+    for (const fixture of criticalFixtures) {
+      const prefix = `/fixtures/${fixture.name}/`;
+      if (!pathname.startsWith(prefix)) continue;
+      pathname = pathname.slice(prefix.length);
+      contentRoot = fixture.root;
+      break;
+    }
     const relative = decodeURIComponent(pathname)
       .replace(/^[/\\]+/, "")
       .replaceAll("/", sep);
-    const filePath = resolve(ROOT, relative);
-    if (filePath !== ROOT && !filePath.startsWith(ROOT + sep)) {
+    const filePath = resolve(contentRoot, relative);
+    if (filePath !== contentRoot && !filePath.startsWith(contentRoot + sep)) {
       response.writeHead(403).end();
       return;
     }
@@ -348,7 +387,10 @@ const captureExpression = `(() => {
       height: rect(lower).height
     } : null,
     lbarDisplay: lbar ? getComputedStyle(lbar).display : null,
-    takebarDisplay: takebar ? getComputedStyle(takebar).display : null,
+    takebar: takebar ? {
+      display: getComputedStyle(takebar).display,
+      rect: rect(takebar)
+    } : null,
     button: button ? {
       hidden: button.hidden,
       display: buttonStyle.display,
@@ -401,6 +443,226 @@ function assertNoHorizontalOverflow(captureValue, label) {
     Math.abs(captureValue.frame.heightDelta) <= 0.5,
     `${label}: iframe height does not exactly match the stage`,
   );
+}
+
+function rectanglesIntersect(a, b) {
+  return a.left < b.right && a.right > b.left &&
+    a.top < b.bottom && a.bottom > b.top;
+}
+
+async function captureChrome() {
+  return evaluate(`(() => {
+    const stage = document.querySelector("#stage");
+    const frame = stage.querySelector("iframe");
+    const toolbar = document.querySelector("#takebar");
+    const button = document.querySelector("#b-take-control");
+    const rect = element => {
+      const value = element.getBoundingClientRect();
+      const round = number => Math.round(number * 100) / 100;
+      return {
+        left: round(value.left),
+        top: round(value.top),
+        right: round(value.right),
+        bottom: round(value.bottom),
+        width: round(value.width),
+        height: round(value.height)
+      };
+    };
+    return {
+      stage: rect(stage),
+      frame: rect(frame),
+      toolbar: rect(toolbar),
+      button: rect(button),
+      buttonText: button.textContent.trim(),
+      takeover: document.querySelector("#host").classList.contains("live-takeover"),
+      pageInnerHeight: innerHeight,
+      pageClientWidth: document.documentElement.clientWidth,
+      pageScrollWidth: document.documentElement.scrollWidth
+    };
+  })()`);
+}
+
+function assertReservedChrome(chrome, label) {
+  assert.ok(chrome.button.height >= 44, `${label}: exit target is below 44px`);
+  assert.ok(chrome.toolbar.height >= 52, `${label}: exit toolbar is below 52px`);
+  assert.equal(
+    rectanglesIntersect(chrome.button, chrome.frame),
+    false,
+    `${label}: exit button overlaps the iframe`,
+  );
+  assert.equal(
+    rectanglesIntersect(chrome.toolbar, chrome.frame),
+    false,
+    `${label}: exit toolbar overlaps the iframe`,
+  );
+  assert.ok(
+    chrome.toolbar.top >= chrome.frame.bottom,
+    `${label}: exit toolbar is not reserved below the iframe`,
+  );
+  assert.ok(
+    chrome.toolbar.bottom <= chrome.pageInnerHeight + 0.5,
+    `${label}: exit toolbar escaped the bounded viewport`,
+  );
+  assert.ok(
+    chrome.pageScrollWidth <= chrome.pageClientWidth,
+    `${label}: reserved chrome caused horizontal page overflow`,
+  );
+}
+
+async function captureCriticalTarget(selector) {
+  await evaluate(`(() => {
+    const frame = document.querySelector("#stage iframe");
+    const target = frame.contentDocument.querySelector(${JSON.stringify(selector)});
+    if (!target) throw new Error("missing critical target: ${selector}");
+    target.scrollIntoView({ block: "center", inline: "nearest", behavior: "auto" });
+  })()`);
+  await delay(40);
+  return evaluate(`(() => {
+    const frame = document.querySelector("#stage iframe");
+    const button = document.querySelector("#b-take-control");
+    const target = frame.contentDocument.querySelector(${JSON.stringify(selector)});
+    const frameRect = frame.getBoundingClientRect();
+    const buttonRect = button.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const left = Math.max(0, targetRect.left);
+    const top = Math.max(0, targetRect.top);
+    const right = Math.min(frame.clientWidth, targetRect.right);
+    const bottom = Math.min(frame.clientHeight, targetRect.bottom);
+    const pointX = (left + right) / 2;
+    const pointY = (top + bottom) / 2;
+    const hit = right > left && bottom > top
+      ? frame.contentDocument.elementFromPoint(pointX, pointY)
+      : null;
+    const round = number => Math.round(number * 100) / 100;
+    const visibleRect = {
+      left: round(frameRect.left + left),
+      top: round(frameRect.top + top),
+      right: round(frameRect.left + right),
+      bottom: round(frameRect.top + bottom),
+      width: round(Math.max(0, right - left)),
+      height: round(Math.max(0, bottom - top))
+    };
+    const chromeRect = {
+      left: round(buttonRect.left),
+      top: round(buttonRect.top),
+      right: round(buttonRect.right),
+      bottom: round(buttonRect.bottom),
+      width: round(buttonRect.width),
+      height: round(buttonRect.height)
+    };
+    return {
+      selector: ${JSON.stringify(selector)},
+      visibleRect,
+      chromeRect,
+      visible: visibleRect.width > 0 && visibleRect.height > 0,
+      hit: Boolean(hit && (hit === target || target.contains(hit))),
+      overlapsChrome:
+        visibleRect.left < chromeRect.right &&
+        visibleRect.right > chromeRect.left &&
+        visibleRect.top < chromeRect.bottom &&
+        visibleRect.bottom > chromeRect.top
+    };
+  })()`);
+}
+
+async function inspectCriticalFixture(fixture, viewport) {
+  const key = encodeURIComponent(
+    `${fixture.channelId}/${fixture.publicationId}`,
+  );
+  await client.send(
+    "Page.navigate",
+    { url: `${origin}/index.html#/watch/${key}` },
+    sessionId,
+  );
+  await waitFor(
+    'document.readyState === "complete" && document.querySelector("#b-switch")?.textContent.includes("Try live replay")',
+  );
+  await waitFor('document.querySelector("video")?.readyState >= 2');
+  await evaluate('document.querySelector("#b-switch").click()');
+  await waitFor(`Boolean(
+    document.querySelector("#stage iframe")?.contentDocument?.querySelector(
+      ${JSON.stringify(fixture.ready)}
+    )
+  )`);
+  await evaluate(`(() => {
+    const frame = document.querySelector("#stage iframe");
+    frame.contentWindow.__reservedChromeMarker = ${JSON.stringify(
+      `${fixture.name}-${viewport.name}`,
+    )};
+  })()`);
+  const appSuffix = `/apps/maze-${fixture.name}.html`;
+  const appRequestsBefore = requests.filter(url => url.endsWith(appSuffix)).length;
+
+  await activate("#b-take-control");
+  await waitFor('document.querySelector("#host").classList.contains("live-takeover")');
+  const activeChrome = await captureChrome();
+  assert.equal(activeChrome.buttonText, "Show captions");
+  assertReservedChrome(activeChrome, `${viewport.name} ${fixture.name} takeover`);
+  const activeTargets = [];
+  for (const selector of fixture.targets) {
+    const geometry = await captureCriticalTarget(selector);
+    assert.equal(
+      geometry.visible,
+      true,
+      `${viewport.name} ${fixture.name} ${selector} is not visible in takeover`,
+    );
+    assert.equal(
+      geometry.hit,
+      true,
+      `${viewport.name} ${fixture.name} ${selector} is occluded in takeover`,
+    );
+    assert.equal(
+      geometry.overlapsChrome,
+      false,
+      `${viewport.name} ${fixture.name} ${selector} intersects exit chrome`,
+    );
+    activeTargets.push(geometry);
+  }
+
+  await activate("#b-take-control");
+  await waitFor('!document.querySelector("#host").classList.contains("live-takeover")');
+  const restoredChrome = await captureChrome();
+  assert.equal(restoredChrome.buttonText, "Take control");
+  assert.equal(
+    rectanglesIntersect(restoredChrome.button, restoredChrome.frame),
+    false,
+    `${viewport.name} ${fixture.name}: restored control overlaps iframe`,
+  );
+  const restoredTargets = [];
+  for (const selector of fixture.targets) {
+    const geometry = await captureCriticalTarget(selector);
+    assert.equal(
+      geometry.visible,
+      true,
+      `${viewport.name} ${fixture.name} ${selector} disappeared after restore`,
+    );
+    assert.equal(
+      geometry.overlapsChrome,
+      false,
+      `${viewport.name} ${fixture.name} ${selector} intersects restored chrome`,
+    );
+    restoredTargets.push(geometry);
+  }
+  assert.equal(
+    await evaluate(
+      'document.querySelector("#stage iframe").contentWindow.__reservedChromeMarker',
+    ),
+    `${fixture.name}-${viewport.name}`,
+    `${viewport.name} ${fixture.name}: iframe reloaded during restore`,
+  );
+  const appRequestsAfter = requests.filter(url => url.endsWith(appSuffix)).length;
+  assert.equal(
+    appRequestsAfter,
+    appRequestsBefore,
+    `${viewport.name} ${fixture.name}: iframe was requested again`,
+  );
+  return {
+    name: fixture.name,
+    active: { chrome: activeChrome, targets: activeTargets },
+    restored: { chrome: restoredChrome, targets: restoredTargets },
+    appRequestsBefore,
+    appRequestsAfter,
+  };
 }
 
 const viewports = [
@@ -538,10 +800,26 @@ try {
     assert.equal(takeover.button.hidden, false);
     assert.notEqual(takeover.button.display, "none");
     assert.ok(
-      takeover.button.rect.top >= takeover.stage.top &&
-      takeover.button.rect.bottom <= takeover.stage.bottom &&
-      takeover.button.rect.right <= takeover.stage.right,
-      `${viewport.name}: Show captions control is not visible over the stage`,
+      takeover.button.rect.height >= 44,
+      `${viewport.name}: Show captions target is below 44px`,
+    );
+    assert.ok(
+      takeover.takebar.rect.height >= 52,
+      `${viewport.name}: takeover toolbar did not reserve 52px`,
+    );
+    assert.ok(
+      takeover.button.rect.top >= takeover.frame.bottom &&
+      takeover.takebar.rect.top >= takeover.frame.bottom,
+      `${viewport.name}: Show captions chrome overlaps the live iframe`,
+    );
+    assert.ok(
+      takeover.takebar.rect.bottom <= takeover.page.innerHeight + 0.5,
+      `${viewport.name}: takeover toolbar escaped the viewport`,
+    );
+    assert.equal(
+      rectanglesIntersect(takeover.button.rect, takeover.frame),
+      false,
+      `${viewport.name}: Show captions button intersects the live iframe`,
     );
     assert.equal(takeover.topFocus, "IFRAME");
     assert.equal(takeover.childHasFocus, true);
@@ -678,21 +956,30 @@ try {
     });
     await waitFor('document.querySelector("#host video").readyState >= 2');
 
+    const criticalRuns = [];
+    for (const fixture of criticalFixtures) {
+      criticalRuns.push(await inspectCriticalFixture(fixture, viewport));
+    }
+
     runs.push({
       viewport,
       normal: {
         stage: normal.stage,
         frame: normal.frame,
+        button: normal.button.rect,
         lowerHeight: normal.lower.height,
       },
       takeover: {
         stage: takeover.stage,
         frame: takeover.frame,
+        toolbar: takeover.takebar.rect,
+        button: takeover.button.rect,
         lowerDisplay: takeover.lower.display,
       },
       restored: {
         stage: restored.stage,
         frame: restored.frame,
+        button: restored.button.rect,
         lowerHeight: restored.lower.height,
       },
       clock: {
@@ -705,6 +992,7 @@ try {
       escapeFocus,
       modeCleanup,
       publicationCleanup,
+      criticalFixtures: criticalRuns,
     });
   }
 

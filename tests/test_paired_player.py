@@ -74,6 +74,34 @@ def resolve_browser():
 BROWSER = resolve_browser()
 
 
+def resolve_candidate_fixture(slug, environment_name):
+    configured = os.environ.get(environment_name)
+    candidates = []
+    if configured:
+        candidates.append(Path(configured))
+    candidates.append(ROOT / "candidate-frame-0004" / slug)
+    candidates.extend(
+        sorted(ROOT.parent.glob(f"frame4-*/candidate-frame-0004/{slug}"))
+    )
+    for candidate in candidates:
+        if (
+            (candidate / "channel.json").is_file()
+            and (candidate / "apps" / f"{slug}.html").is_file()
+        ):
+            return candidate.resolve()
+    return None
+
+
+FOGLINE_FIXTURE = resolve_candidate_fixture(
+    "maze-fogline",
+    "RAPP_FOGLINE_FIXTURE",
+)
+ROOTWAY_FIXTURE = resolve_candidate_fixture(
+    "maze-rootway",
+    "RAPP_ROOTWAY_FIXTURE",
+)
+
+
 def source_block(start_marker, end_marker):
     start = INDEX.index(start_marker)
     end = INDEX.index(end_marker, start)
@@ -508,6 +536,7 @@ class TestPairedPlayer(unittest.TestCase):
         live = source_block("function mountLive(", "function bindCommon(")
         render = source_block("  function renderScene(", "  /* A real click")
         self.assertIn('id="b-take-control"', live)
+        self.assertIn('role="toolbar" aria-label="Live application controls"', live)
         self.assertIn('aria-controls="stage"', live)
         self.assertIn('aria-pressed="false">Take control</button>', live)
         self.assertIn('"Show captions"', live)
@@ -534,7 +563,16 @@ class TestPairedPlayer(unittest.TestCase):
             live,
         )
         self.assertIn(
-            "height:clamp(420px,calc(100dvh - 180px),820px)",
+            "height:clamp(420px,calc(100dvh - 236px),820px)",
+            INDEX,
+        )
+        self.assertIn(".takebar .tbtn{min-height:44px}", INDEX)
+        self.assertIn(
+            "#host.live-takeover .takebar{min-height:52px",
+            INDEX,
+        )
+        self.assertNotIn(
+            "#host.live-takeover .takebar{position:absolute",
             INDEX,
         )
         self.assertIn(
@@ -614,6 +652,8 @@ class TestPairedPlayerTakeoverBrowser(unittest.TestCase):
                     BROWSER,
                     str(ROOT),
                     str(profile),
+                    str(FOGLINE_FIXTURE or "-"),
+                    str(ROOTWAY_FIXTURE or "-"),
                 ],
                 cwd=ROOT,
                 text=True,
@@ -644,12 +684,20 @@ class TestPairedPlayerTakeoverBrowser(unittest.TestCase):
         mobile = runs["mobile-390"]
         self.assertAlmostEqual(mobile["normal"]["stage"]["width"], 362, delta=0.5)
         self.assertAlmostEqual(mobile["normal"]["stage"]["height"], 226.25, delta=0.5)
+        self.assertGreaterEqual(mobile["takeover"]["frame"]["height"], 600)
         for name, run in runs.items():
             normal = run["normal"]
             takeover = run["takeover"]
             restored = run["restored"]
             self.assertEqual(takeover["lowerDisplay"], "none")
             self.assertGreaterEqual(takeover["frame"]["height"], 520, name)
+            self.assertGreaterEqual(takeover["button"]["height"], 44, name)
+            self.assertGreaterEqual(takeover["toolbar"]["height"], 52, name)
+            self.assertGreaterEqual(
+                takeover["button"]["top"],
+                takeover["frame"]["bottom"],
+                name,
+            )
             self.assertAlmostEqual(
                 takeover["frame"]["width"],
                 normal["frame"]["width"],
@@ -679,6 +727,44 @@ class TestPairedPlayerTakeoverBrowser(unittest.TestCase):
             self.assertFalse(run["modeCleanup"]["takeoverButton"])
             self.assertEqual(run["publicationCleanup"]["takeoverNodes"], 0)
             self.assertFalse(run["publicationCleanup"]["takeoverButton"])
+
+    def test_fogline_and_rootway_controls_stay_unobscured(self):
+        if not FOGLINE_FIXTURE or not ROOTWAY_FIXTURE:
+            self.skipTest("Fogline and Rootway candidate fixtures are unavailable")
+        expected = {
+            "fogline": {"#restart-btn", "#load-seed-btn", "#maze-board"},
+            "rootway": {"#step-value", "#maze-svg"},
+        }
+        for run in self.result["runs"]:
+            fixtures = {
+                fixture["name"]: fixture
+                for fixture in run["criticalFixtures"]
+            }
+            self.assertEqual(set(fixtures), set(expected))
+            for name, selectors in expected.items():
+                fixture = fixtures[name]
+                active = fixture["active"]
+                self.assertGreaterEqual(active["chrome"]["button"]["height"], 44)
+                self.assertGreaterEqual(active["chrome"]["toolbar"]["height"], 52)
+                self.assertGreaterEqual(
+                    active["chrome"]["button"]["top"],
+                    active["chrome"]["frame"]["bottom"],
+                )
+                self.assertEqual(
+                    {target["selector"] for target in active["targets"]},
+                    selectors,
+                )
+                for target in active["targets"]:
+                    self.assertTrue(target["visible"])
+                    self.assertTrue(target["hit"])
+                    self.assertFalse(target["overlapsChrome"])
+                for target in fixture["restored"]["targets"]:
+                    self.assertTrue(target["visible"])
+                    self.assertFalse(target["overlapsChrome"])
+                self.assertEqual(
+                    fixture["appRequestsBefore"],
+                    fixture["appRequestsAfter"],
+                )
 
 
 if __name__ == "__main__":
