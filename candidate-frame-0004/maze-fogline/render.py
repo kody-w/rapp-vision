@@ -23,6 +23,7 @@ CHANNEL_ID = "candidate-frame-0004-01-maze-fogline"
 TITLE = "Fogline Survey"
 CANONICAL_SEED = "RAPP-42"
 HANDOFF_SEED = "FOG-7"
+ALTERNATE_AUDIT_SEEDS = ("FOG-7", "MIST-Δ", "A|B;C")
 WIDTH = 960
 HEIGHT = 540
 FPS = 12
@@ -1216,6 +1217,10 @@ def evidence_document(root: Path = ROOT) -> dict[str, object]:
         "fixtures": {
             "canonical": fixture_document(CANONICAL),
             "handoff": fixture_document(HANDOFF),
+            "alternateAudit": [
+                fixture_document(build_fixture(seed))
+                for seed in ALTERNATE_AUDIT_SEEDS
+            ],
         },
         "claims": claims,
         "manifestReplay": {
@@ -1225,6 +1230,8 @@ def evidence_document(root: Path = ROOT) -> dict[str, object]:
             "allowedActions": ["scroll", "click", "key", "type"],
             "individualSemanticKeyEvents": True,
             "autoSolveApi": False,
+            "publicFixtureApi": False,
+            "actualInputVerification": "CDP mouse and keyboard events",
             "exactTiming": True,
             "activationVisibilityRequired": True,
             "checkpointVisibilityRequired": True,
@@ -1243,6 +1250,12 @@ def evidence_document(root: Path = ROOT) -> dict[str, object]:
                 "expectedExternalRequests": 0,
                 "httpBlocked": True,
                 "webSocketBlocked": True,
+            },
+            "routePrivacy": {
+                "visibleTextChecked": True,
+                "renderedDomChecked": True,
+                "accessibilityTreeChecked": True,
+                "fullRouteBeforeAttempt": False,
             },
             "geometry": {
                 "perAction": True,
@@ -2175,6 +2188,19 @@ def delivery_document(
             "handoffSeed": HANDOFF.seed,
             "handoffDigest": HANDOFF.topology_digest,
             "handoffReferenceLength": len(HANDOFF.shortest_route),
+            "alternateSeeds": [
+                {
+                    "seed": fixture.seed,
+                    "topologyDigest": fixture.topology_digest,
+                    "referenceLength": len(fixture.shortest_route),
+                    "trap": list(fixture.trap.cell),
+                    "detourLength": len(fixture.detour_route),
+                }
+                for fixture in (
+                    build_fixture(seed)
+                    for seed in ALTERNATE_AUDIT_SEEDS
+                )
+            ],
         },
         "render": {
             "width": SPEC.width,

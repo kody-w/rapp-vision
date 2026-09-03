@@ -28,6 +28,12 @@
       "httpBlocked": true,
       "webSocketBlocked": true
     },
+    "routePrivacy": {
+      "accessibilityTreeChecked": true,
+      "fullRouteBeforeAttempt": false,
+      "renderedDomChecked": true,
+      "visibleTextChecked": true
+    },
     "startupTimeoutSeconds": 45,
     "viewports": [
       {
@@ -1247,6 +1253,802 @@
     "width": 960
   },
   "fixtures": {
+    "alternateAudit": [
+      {
+        "cells": [
+          {
+            "openings": "E",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "openings": "EW",
+            "x": 1,
+            "y": 0
+          },
+          {
+            "openings": "SW",
+            "x": 2,
+            "y": 0
+          },
+          {
+            "openings": "ES",
+            "x": 3,
+            "y": 0
+          },
+          {
+            "openings": "SW",
+            "x": 4,
+            "y": 0
+          },
+          {
+            "openings": "S",
+            "x": 5,
+            "y": 0
+          },
+          {
+            "openings": "ES",
+            "x": 0,
+            "y": 1
+          },
+          {
+            "openings": "W",
+            "x": 1,
+            "y": 1
+          },
+          {
+            "openings": "NE",
+            "x": 2,
+            "y": 1
+          },
+          {
+            "openings": "NW",
+            "x": 3,
+            "y": 1
+          },
+          {
+            "openings": "NE",
+            "x": 4,
+            "y": 1
+          },
+          {
+            "openings": "NSW",
+            "x": 5,
+            "y": 1
+          },
+          {
+            "openings": "NES",
+            "x": 0,
+            "y": 2
+          },
+          {
+            "openings": "EW",
+            "x": 1,
+            "y": 2
+          },
+          {
+            "openings": "EW",
+            "x": 2,
+            "y": 2
+          },
+          {
+            "openings": "ESW",
+            "x": 3,
+            "y": 2
+          },
+          {
+            "openings": "SW",
+            "x": 4,
+            "y": 2
+          },
+          {
+            "openings": "NS",
+            "x": 5,
+            "y": 2
+          },
+          {
+            "openings": "NS",
+            "x": 0,
+            "y": 3
+          },
+          {
+            "openings": "S",
+            "x": 1,
+            "y": 3
+          },
+          {
+            "openings": "ES",
+            "x": 2,
+            "y": 3
+          },
+          {
+            "openings": "NW",
+            "x": 3,
+            "y": 3
+          },
+          {
+            "openings": "N",
+            "x": 4,
+            "y": 3
+          },
+          {
+            "openings": "NS",
+            "x": 5,
+            "y": 3
+          },
+          {
+            "openings": "NE",
+            "x": 0,
+            "y": 4
+          },
+          {
+            "openings": "NSW",
+            "x": 1,
+            "y": 4
+          },
+          {
+            "openings": "NS",
+            "x": 2,
+            "y": 4
+          },
+          {
+            "openings": "ES",
+            "x": 3,
+            "y": 4
+          },
+          {
+            "openings": "EW",
+            "x": 4,
+            "y": 4
+          },
+          {
+            "openings": "NW",
+            "x": 5,
+            "y": 4
+          },
+          {
+            "openings": "E",
+            "x": 0,
+            "y": 5
+          },
+          {
+            "openings": "NW",
+            "x": 1,
+            "y": 5
+          },
+          {
+            "openings": "NE",
+            "x": 2,
+            "y": 5
+          },
+          {
+            "openings": "NEW",
+            "x": 3,
+            "y": 5
+          },
+          {
+            "openings": "EW",
+            "x": 4,
+            "y": 5
+          },
+          {
+            "openings": "W",
+            "x": 5,
+            "y": 5
+          }
+        ],
+        "detourLength": 12,
+        "detourRoute": [
+          "E",
+          "E",
+          "S",
+          "E",
+          "N",
+          "E",
+          "S",
+          "E",
+          "N",
+          "S",
+          "S",
+          "S"
+        ],
+        "entrance": [
+          0,
+          0
+        ],
+        "exit": [
+          5,
+          3
+        ],
+        "generator": {
+          "algorithm": "recursive-backtracker",
+          "candidateOrder": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "prng": "Mulberry32 unsigned integer output",
+          "seedHash": "FNV-1a 32-bit over UTF-8",
+          "start": [
+            0,
+            0
+          ]
+        },
+        "grid": {
+          "height": 6,
+          "width": 6
+        },
+        "seed": "FOG-7",
+        "shortestLength": 10,
+        "shortestRoute": [
+          "E",
+          "E",
+          "S",
+          "E",
+          "N",
+          "E",
+          "S",
+          "E",
+          "S",
+          "S"
+        ],
+        "topologyDigest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
+        "topologySerialization": "seed|6x6| then row-major x,y:NESW-openings cells joined by ;",
+        "topologySignature": "FOG-7|6x6|0,0:E;1,0:EW;2,0:SW;3,0:ES;4,0:SW;5,0:S;0,1:ES;1,1:W;2,1:NE;3,1:NW;4,1:NE;5,1:NSW;0,2:NES;1,2:EW;2,2:EW;3,2:ESW;4,2:SW;5,2:NS;0,3:NS;1,3:S;2,3:ES;3,3:NW;4,3:N;5,3:NS;0,4:NE;1,4:NSW;2,4:NS;3,4:ES;4,4:EW;5,4:NW;0,5:E;1,5:NW;2,5:NE;3,5:NEW;4,5:EW;5,5:W",
+        "trap": {
+          "approach": [
+            5,
+            1
+          ],
+          "approachStep": 8,
+          "cell": [
+            5,
+            0
+          ],
+          "enteredStep": 9,
+          "return": "S",
+          "selection": "latest off-route branch before exit; NESW tie-break",
+          "turn": "N"
+        }
+      },
+      {
+        "cells": [
+          {
+            "openings": "S",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "openings": "ES",
+            "x": 1,
+            "y": 0
+          },
+          {
+            "openings": "EW",
+            "x": 2,
+            "y": 0
+          },
+          {
+            "openings": "EW",
+            "x": 3,
+            "y": 0
+          },
+          {
+            "openings": "SW",
+            "x": 4,
+            "y": 0
+          },
+          {
+            "openings": "S",
+            "x": 5,
+            "y": 0
+          },
+          {
+            "openings": "NE",
+            "x": 0,
+            "y": 1
+          },
+          {
+            "openings": "NW",
+            "x": 1,
+            "y": 1
+          },
+          {
+            "openings": "ES",
+            "x": 2,
+            "y": 1
+          },
+          {
+            "openings": "EW",
+            "x": 3,
+            "y": 1
+          },
+          {
+            "openings": "NW",
+            "x": 4,
+            "y": 1
+          },
+          {
+            "openings": "NS",
+            "x": 5,
+            "y": 1
+          },
+          {
+            "openings": "ES",
+            "x": 0,
+            "y": 2
+          },
+          {
+            "openings": "W",
+            "x": 1,
+            "y": 2
+          },
+          {
+            "openings": "NS",
+            "x": 2,
+            "y": 2
+          },
+          {
+            "openings": "ES",
+            "x": 3,
+            "y": 2
+          },
+          {
+            "openings": "EW",
+            "x": 4,
+            "y": 2
+          },
+          {
+            "openings": "NSW",
+            "x": 5,
+            "y": 2
+          },
+          {
+            "openings": "NE",
+            "x": 0,
+            "y": 3
+          },
+          {
+            "openings": "SW",
+            "x": 1,
+            "y": 3
+          },
+          {
+            "openings": "NS",
+            "x": 2,
+            "y": 3
+          },
+          {
+            "openings": "N",
+            "x": 3,
+            "y": 3
+          },
+          {
+            "openings": "ES",
+            "x": 4,
+            "y": 3
+          },
+          {
+            "openings": "NSW",
+            "x": 5,
+            "y": 3
+          },
+          {
+            "openings": "ES",
+            "x": 0,
+            "y": 4
+          },
+          {
+            "openings": "NW",
+            "x": 1,
+            "y": 4
+          },
+          {
+            "openings": "NE",
+            "x": 2,
+            "y": 4
+          },
+          {
+            "openings": "SW",
+            "x": 3,
+            "y": 4
+          },
+          {
+            "openings": "NS",
+            "x": 4,
+            "y": 4
+          },
+          {
+            "openings": "NS",
+            "x": 5,
+            "y": 4
+          },
+          {
+            "openings": "NE",
+            "x": 0,
+            "y": 5
+          },
+          {
+            "openings": "EW",
+            "x": 1,
+            "y": 5
+          },
+          {
+            "openings": "EW",
+            "x": 2,
+            "y": 5
+          },
+          {
+            "openings": "NEW",
+            "x": 3,
+            "y": 5
+          },
+          {
+            "openings": "NW",
+            "x": 4,
+            "y": 5
+          },
+          {
+            "openings": "N",
+            "x": 5,
+            "y": 5
+          }
+        ],
+        "detourLength": 20,
+        "detourRoute": [
+          "S",
+          "E",
+          "N",
+          "E",
+          "E",
+          "E",
+          "S",
+          "W",
+          "W",
+          "S",
+          "S",
+          "S",
+          "E",
+          "S",
+          "W",
+          "E",
+          "E",
+          "N",
+          "N",
+          "E"
+        ],
+        "entrance": [
+          0,
+          0
+        ],
+        "exit": [
+          5,
+          3
+        ],
+        "generator": {
+          "algorithm": "recursive-backtracker",
+          "candidateOrder": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "prng": "Mulberry32 unsigned integer output",
+          "seedHash": "FNV-1a 32-bit over UTF-8",
+          "start": [
+            0,
+            0
+          ]
+        },
+        "grid": {
+          "height": 6,
+          "width": 6
+        },
+        "seed": "MIST-Δ",
+        "shortestLength": 18,
+        "shortestRoute": [
+          "S",
+          "E",
+          "N",
+          "E",
+          "E",
+          "E",
+          "S",
+          "W",
+          "W",
+          "S",
+          "S",
+          "S",
+          "E",
+          "S",
+          "E",
+          "N",
+          "N",
+          "E"
+        ],
+        "topologyDigest": "0e52d0e94088913486496953dd57eaf1d5a4991e1125ea4f97ad13ad6b9b558c",
+        "topologySerialization": "seed|6x6| then row-major x,y:NESW-openings cells joined by ;",
+        "topologySignature": "MIST-Δ|6x6|0,0:S;1,0:ES;2,0:EW;3,0:EW;4,0:SW;5,0:S;0,1:NE;1,1:NW;2,1:ES;3,1:EW;4,1:NW;5,1:NS;0,2:ES;1,2:W;2,2:NS;3,2:ES;4,2:EW;5,2:NSW;0,3:NE;1,3:SW;2,3:NS;3,3:N;4,3:ES;5,3:NSW;0,4:ES;1,4:NW;2,4:NE;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:EW;2,5:EW;3,5:NEW;4,5:NW;5,5:N",
+        "trap": {
+          "approach": [
+            3,
+            5
+          ],
+          "approachStep": 14,
+          "cell": [
+            2,
+            5
+          ],
+          "enteredStep": 15,
+          "return": "E",
+          "selection": "latest off-route branch before exit; NESW tie-break",
+          "turn": "W"
+        }
+      },
+      {
+        "cells": [
+          {
+            "openings": "S",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "openings": "ES",
+            "x": 1,
+            "y": 0
+          },
+          {
+            "openings": "EW",
+            "x": 2,
+            "y": 0
+          },
+          {
+            "openings": "EW",
+            "x": 3,
+            "y": 0
+          },
+          {
+            "openings": "EW",
+            "x": 4,
+            "y": 0
+          },
+          {
+            "openings": "SW",
+            "x": 5,
+            "y": 0
+          },
+          {
+            "openings": "NS",
+            "x": 0,
+            "y": 1
+          },
+          {
+            "openings": "NS",
+            "x": 1,
+            "y": 1
+          },
+          {
+            "openings": "E",
+            "x": 2,
+            "y": 1
+          },
+          {
+            "openings": "EW",
+            "x": 3,
+            "y": 1
+          },
+          {
+            "openings": "ESW",
+            "x": 4,
+            "y": 1
+          },
+          {
+            "openings": "NW",
+            "x": 5,
+            "y": 1
+          },
+          {
+            "openings": "NS",
+            "x": 0,
+            "y": 2
+          },
+          {
+            "openings": "NE",
+            "x": 1,
+            "y": 2
+          },
+          {
+            "openings": "EW",
+            "x": 2,
+            "y": 2
+          },
+          {
+            "openings": "SW",
+            "x": 3,
+            "y": 2
+          },
+          {
+            "openings": "NE",
+            "x": 4,
+            "y": 2
+          },
+          {
+            "openings": "W",
+            "x": 5,
+            "y": 2
+          },
+          {
+            "openings": "NE",
+            "x": 0,
+            "y": 3
+          },
+          {
+            "openings": "EW",
+            "x": 1,
+            "y": 3
+          },
+          {
+            "openings": "SW",
+            "x": 2,
+            "y": 3
+          },
+          {
+            "openings": "NE",
+            "x": 3,
+            "y": 3
+          },
+          {
+            "openings": "ESW",
+            "x": 4,
+            "y": 3
+          },
+          {
+            "openings": "SW",
+            "x": 5,
+            "y": 3
+          },
+          {
+            "openings": "ES",
+            "x": 0,
+            "y": 4
+          },
+          {
+            "openings": "SW",
+            "x": 1,
+            "y": 4
+          },
+          {
+            "openings": "NE",
+            "x": 2,
+            "y": 4
+          },
+          {
+            "openings": "SW",
+            "x": 3,
+            "y": 4
+          },
+          {
+            "openings": "N",
+            "x": 4,
+            "y": 4
+          },
+          {
+            "openings": "NS",
+            "x": 5,
+            "y": 4
+          },
+          {
+            "openings": "N",
+            "x": 0,
+            "y": 5
+          },
+          {
+            "openings": "NE",
+            "x": 1,
+            "y": 5
+          },
+          {
+            "openings": "EW",
+            "x": 2,
+            "y": 5
+          },
+          {
+            "openings": "NEW",
+            "x": 3,
+            "y": 5
+          },
+          {
+            "openings": "EW",
+            "x": 4,
+            "y": 5
+          },
+          {
+            "openings": "NW",
+            "x": 5,
+            "y": 5
+          }
+        ],
+        "detourLength": 14,
+        "detourRoute": [
+          "S",
+          "S",
+          "S",
+          "E",
+          "E",
+          "S",
+          "E",
+          "S",
+          "W",
+          "E",
+          "E",
+          "E",
+          "N",
+          "N"
+        ],
+        "entrance": [
+          0,
+          0
+        ],
+        "exit": [
+          5,
+          3
+        ],
+        "generator": {
+          "algorithm": "recursive-backtracker",
+          "candidateOrder": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "prng": "Mulberry32 unsigned integer output",
+          "seedHash": "FNV-1a 32-bit over UTF-8",
+          "start": [
+            0,
+            0
+          ]
+        },
+        "grid": {
+          "height": 6,
+          "width": 6
+        },
+        "seed": "A|B;C",
+        "shortestLength": 12,
+        "shortestRoute": [
+          "S",
+          "S",
+          "S",
+          "E",
+          "E",
+          "S",
+          "E",
+          "S",
+          "E",
+          "E",
+          "N",
+          "N"
+        ],
+        "topologyDigest": "e3d863e738e09f4440152a348e9bb4b04a665e7b913a252a584869b4c26aa53e",
+        "topologySerialization": "seed|6x6| then row-major x,y:NESW-openings cells joined by ;",
+        "topologySignature": "A|B;C|6x6|0,0:S;1,0:ES;2,0:EW;3,0:EW;4,0:EW;5,0:SW;0,1:NS;1,1:NS;2,1:E;3,1:EW;4,1:ESW;5,1:NW;0,2:NS;1,2:NE;2,2:EW;3,2:SW;4,2:NE;5,2:W;0,3:NE;1,3:EW;2,3:SW;3,3:NE;4,3:ESW;5,3:SW;0,4:ES;1,4:SW;2,4:NE;3,4:SW;4,4:N;5,4:NS;0,5:N;1,5:NE;2,5:EW;3,5:NEW;4,5:EW;5,5:NW",
+        "trap": {
+          "approach": [
+            3,
+            5
+          ],
+          "approachStep": 8,
+          "cell": [
+            2,
+            5
+          ],
+          "enteredStep": 9,
+          "return": "E",
+          "selection": "latest off-route branch before exit; NESW tie-break",
+          "turn": "W"
+        }
+      }
+    ],
     "canonical": {
       "cells": [
         {
@@ -1783,6 +2585,7 @@
   "manifestReplay": {
     "actionCount": 71,
     "activationVisibilityRequired": true,
+    "actualInputVerification": "CDP mouse and keyboard events",
     "allowedActions": [
       "scroll",
       "click",
@@ -1841,6 +2644,7 @@
     "exactTiming": true,
     "individualSemanticKeyEvents": true,
     "manifest": "channel.production.json",
+    "publicFixtureApi": false,
     "scene": 0,
     "segments": {
       "detour": {
@@ -1907,14 +2711,14 @@
       "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
     },
     {
-      "bytes": 7458,
+      "bytes": 7980,
       "path": "README.md",
-      "sha256": "702ee3398386ff1e5be3664aebccde5c84d72b6462ab1d3502e8efa3189c66bc"
+      "sha256": "a4dfa9326514643e3807f33d15eee1f85df47f78644421a030d5d6f36994aa28"
     },
     {
-      "bytes": 49056,
+      "bytes": 45777,
       "path": "apps/maze-fogline.html",
-      "sha256": "70471b1e9600a2dfaf626920c7006429466fe3fd2a72f7c04f1bb95c9c757779"
+      "sha256": "77e998d55e4126b72e772dd808a820757873ab12ad94cd76873af290afe0f4ff"
     },
     {
       "bytes": 14506,
@@ -1922,9 +2726,9 @@
       "sha256": "96ce81595920b152994473f811c9e6f9a2d4359a5f4cfca6d4193e80385918cd"
     },
     {
-      "bytes": 78356,
+      "bytes": 79421,
       "path": "render.py",
-      "sha256": "33e5785a022f1ef27086cdb38251479e1a9faa825e9e2dc21de08afd9c63ba11"
+      "sha256": "1c850c6ffbf9ffb2d62e3c5a261200100fec43728c560d8f59f39f9760f6bcd1"
     },
     {
       "bytes": 18507,
@@ -1937,9 +2741,9 @@
       "sha256": "03a7dc5b3b7cec1c58c0f5802e97a3a8b10ae5399c531aa2ae63463f74dbc51e"
     },
     {
-      "bytes": 39536,
+      "bytes": 73808,
       "path": "verify_dom.mjs",
-      "sha256": "2f71c27210c3ed5b9ae8642c402103a012e20b95e9cd7470ced2a7502052b466"
+      "sha256": "6ec2974e5432c04a28ed7c52ffa0f4a213bbb190c40d7453162267a09f8d67b6"
     }
   ]
 }

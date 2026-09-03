@@ -58,6 +58,38 @@
   },
   "channel": "candidate-frame-0004-01-maze-fogline",
   "objective": {
+    "alternateSeeds": [
+      {
+        "detourLength": 12,
+        "referenceLength": 10,
+        "seed": "FOG-7",
+        "topologyDigest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
+        "trap": [
+          5,
+          0
+        ]
+      },
+      {
+        "detourLength": 20,
+        "referenceLength": 18,
+        "seed": "MIST-Δ",
+        "topologyDigest": "0e52d0e94088913486496953dd57eaf1d5a4991e1125ea4f97ad13ad6b9b558c",
+        "trap": [
+          2,
+          5
+        ]
+      },
+      {
+        "detourLength": 14,
+        "referenceLength": 12,
+        "seed": "A|B;C",
+        "topologyDigest": "e3d863e738e09f4440152a348e9bb4b04a665e7b913a252a584869b4c26aa53e",
+        "trap": [
+          2,
+          5
+        ]
+      }
+    ],
     "detourLength": 20,
     "handoffDigest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
     "handoffReferenceLength": 10,
@@ -168,14 +200,14 @@
       "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
     },
     {
-      "bytes": 7458,
+      "bytes": 7980,
       "path": "README.md",
-      "sha256": "702ee3398386ff1e5be3664aebccde5c84d72b6462ab1d3502e8efa3189c66bc"
+      "sha256": "a4dfa9326514643e3807f33d15eee1f85df47f78644421a030d5d6f36994aa28"
     },
     {
-      "bytes": 49056,
+      "bytes": 45777,
       "path": "apps/maze-fogline.html",
-      "sha256": "70471b1e9600a2dfaf626920c7006429466fe3fd2a72f7c04f1bb95c9c757779"
+      "sha256": "77e998d55e4126b72e772dd808a820757873ab12ad94cd76873af290afe0f4ff"
     },
     {
       "bytes": 14506,
@@ -188,14 +220,14 @@
       "sha256": "62599f2b0e81b36581cc735b263c131cf9ab79415819f46a75f2c8bc113978d3"
     },
     {
-      "bytes": 39327,
+      "bytes": 55770,
       "path": "evidence.json",
-      "sha256": "66837df08e0a0bf0e9225ffc26b150099c4513457082a835e0af0c6add08e037"
+      "sha256": "eff8894ab9002d3fee504d2b7e301f1b8489d6ef167f9790f3a6e35e0d5f79e2"
     },
     {
-      "bytes": 78356,
+      "bytes": 79421,
       "path": "render.py",
-      "sha256": "33e5785a022f1ef27086cdb38251479e1a9faa825e9e2dc21de08afd9c63ba11"
+      "sha256": "1c850c6ffbf9ffb2d62e3c5a261200100fec43728c560d8f59f39f9760f6bcd1"
     },
     {
       "bytes": 18507,
@@ -208,9 +240,9 @@
       "sha256": "03a7dc5b3b7cec1c58c0f5802e97a3a8b10ae5399c531aa2ae63463f74dbc51e"
     },
     {
-      "bytes": 39536,
+      "bytes": 73808,
       "path": "verify_dom.mjs",
-      "sha256": "2f71c27210c3ed5b9ae8642c402103a012e20b95e9cd7470ced2a7502052b466"
+      "sha256": "6ec2974e5432c04a28ed7c52ffa0f4a213bbb190c40d7453162267a09f8d67b6"
     }
   ]
 }

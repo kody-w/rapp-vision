@@ -22,11 +22,14 @@ const DEFAULTS = {
   app: join(ROOT, "apps", "maze-fogline.html"),
   evidence: join(ROOT, "evidence.json"),
   manifest: join(ROOT, "channel.production.json"),
-  profile: join(ROOT, ".browser-profile"),
+  profile: join(ROOT, `.browser-profile-${process.pid}`),
 };
 const CANONICAL_ROUTE = "SEESSWWSSENEESENNE".split("");
 const CANONICAL_DIGEST =
   "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda";
+const ALTERNATE_SEEDS = Object.freeze(["FOG-7", "MIST-Δ", "A|B;C"]);
+const INVALID_SEED_MESSAGE =
+  "Seed must contain 1–64 UTF-8 bytes and no controls.";
 const DIRECTIONS = Object.freeze([
   Object.freeze(["N", 0, -1, "S"]),
   Object.freeze(["E", 1, 0, "W"]),
@@ -74,6 +77,30 @@ const KEY_DATA = Object.freeze({
     code: "ArrowLeft",
     windowsVirtualKeyCode: 37,
     nativeVirtualKeyCode: 37,
+  }),
+  KeyW: Object.freeze({
+    key: "w",
+    code: "KeyW",
+    windowsVirtualKeyCode: 87,
+    nativeVirtualKeyCode: 87,
+  }),
+  KeyD: Object.freeze({
+    key: "d",
+    code: "KeyD",
+    windowsVirtualKeyCode: 68,
+    nativeVirtualKeyCode: 68,
+  }),
+  KeyS: Object.freeze({
+    key: "s",
+    code: "KeyS",
+    windowsVirtualKeyCode: 83,
+    nativeVirtualKeyCode: 83,
+  }),
+  KeyA: Object.freeze({
+    key: "a",
+    code: "KeyA",
+    windowsVirtualKeyCode: 65,
+    nativeVirtualKeyCode: 65,
   }),
 });
 
@@ -400,42 +427,222 @@ function independentFixture(seed) {
   };
 }
 
-function mapFromAppCells(cells) {
-  const maze = new Map();
-  for (const cell of cells) {
-    maze.set(`${cell.x},${cell.y}`, new Set(cell.openings.split("")));
+function normalizeSeed(value) {
+  assert.equal(typeof value, "string");
+  const bytes = new TextEncoder().encode(value);
+  if (
+    bytes.length < 1 ||
+    bytes.length > 64 ||
+    /[\u0000-\u001f\u007f]/.test(value)
+  ) {
+    throw new Error(INVALID_SEED_MESSAGE);
   }
-  return maze;
+  return value;
 }
 
-function auditFixture(appFixture, expectedSeed) {
-  const independent = independentFixture(expectedSeed);
-  assert.equal(appFixture.seed, expectedSeed);
-  assert.equal(appFixture.width, 6);
-  assert.equal(appFixture.height, 6);
-  assert.deepEqual(appFixture.entrance, [0, 0]);
-  assert.deepEqual(appFixture.exit, [5, 3]);
-  assert.equal(appFixture.topologySignature, independent.signature);
-  assert.equal(appFixture.topologyDigest, independent.digest);
-  assert.equal(appFixture.referenceLength, independent.route.length);
-  assert.deepEqual(appFixture.trap, independent.trap);
-  assert.equal(appFixture.detourLength, independent.detour.length);
-  assert.equal(appFixture.cells.length, 36);
-  assert.equal(independent.edges, 35);
-
-  const appMaze = mapFromAppCells(appFixture.cells);
-  for (const [cellKey, openings] of appMaze) {
-    const [x, y] = cellKey.split(",").map(Number);
+function auditIndependentFixture(seed) {
+  normalizeSeed(seed);
+  const fixture = independentFixture(seed);
+  assert.equal(fixture.maze.size, 36);
+  assert.equal(fixture.edges, 35);
+  const visited = new Set(["0,0"]);
+  const queue = [[0, 0]];
+  while (queue.length) {
+    const cell = queue.shift();
+    const openings = fixture.maze.get(keyOf(cell));
+    assert(openings, `missing independent cell ${keyOf(cell)}`);
     for (const direction of openings) {
-      const neighbor = nextCell([x, y], direction);
+      const neighbor = nextCell(cell, direction);
       assert(
-        appMaze.get(keyOf(neighbor)).has(OPPOSITE[direction]),
-        `nonreciprocal opening ${cellKey} ${direction}`
+        neighbor[0] >= 0 &&
+          neighbor[0] < 6 &&
+          neighbor[1] >= 0 &&
+          neighbor[1] < 6,
+        `out-of-bounds opening ${keyOf(cell)} ${direction}`
       );
+      assert(
+        fixture.maze.get(keyOf(neighbor)).has(OPPOSITE[direction]),
+        `nonreciprocal opening ${keyOf(cell)} ${direction}`
+      );
+      if (!visited.has(keyOf(neighbor))) {
+        visited.add(keyOf(neighbor));
+        queue.push(neighbor);
+      }
     }
   }
-  assert.deepEqual(independentRoute(appMaze), independent.route);
-  return independent;
+  assert.equal(visited.size, 36);
+  assert.deepEqual(independentRoute(fixture.maze), fixture.route);
+  let cursor = [0, 0];
+  for (const direction of fixture.detour) {
+    assert(
+      fixture.maze.get(keyOf(cursor)).has(direction),
+      `detour leaves topology at ${keyOf(cursor)} ${direction}`
+    );
+    cursor = nextCell(cursor, direction);
+  }
+  assert.deepEqual(cursor, [5, 3]);
+  assert.equal(fixture.detour.length, fixture.route.length + 2);
+  return fixture;
+}
+
+function revealedFrom(fixture, cell) {
+  const revealed = new Set([keyOf(cell)]);
+  for (const direction of fixture.maze.get(keyOf(cell))) {
+    revealed.add(keyOf(nextCell(cell, direction)));
+  }
+  return revealed;
+}
+
+function initialState(fixture) {
+  return {
+    position: [0, 0],
+    facing: "N",
+    acceptedMoves: [],
+    trail: [],
+    revealed: revealedFrom(fixture, [0, 0]),
+    status: "ready",
+    message:
+      `Seed ${fixture.seed} ready. Find the marked exit; ` +
+      `reference length ${fixture.route.length}.`,
+    lastAttempt: null,
+    lastRejected: null,
+    exitOpen: false,
+    completed: false,
+    matchedOptimal: null,
+    projectedTotal: fixture.route.length,
+    surveyEarned: false,
+    hintAvailable: false,
+    assistanceUsed: false,
+    hintRequests: 0,
+    hintDirection: null,
+  };
+}
+
+function moveState(fixture, current, direction) {
+  assert(VECTOR[direction], `unknown direction ${direction}`);
+  if (current.completed) {
+    return {
+      ...current,
+      facing: direction,
+      status: "closed",
+      message: "Exit already open. Restart or load another seed.",
+      lastAttempt: direction,
+      lastRejected: direction,
+      hintDirection: null,
+    };
+  }
+  if (!fixture.maze.get(keyOf(current.position)).has(direction)) {
+    const directionName = {
+      N: "North",
+      E: "East",
+      S: "South",
+      W: "West",
+    }[direction];
+    return {
+      ...current,
+      facing: direction,
+      status: "wall",
+      message:
+        `${directionName} is fogbound by a wall; ` +
+        "accepted steps and trail are preserved.",
+      lastAttempt: direction,
+      lastRejected: direction,
+    };
+  }
+  const position = nextCell(current.position, direction);
+  const acceptedMoves = [...current.acceptedMoves, direction];
+  const trail = [...current.trail, position];
+  const revealed = new Set(current.revealed);
+  for (const cellKey of revealedFrom(fixture, position)) revealed.add(cellKey);
+  const acceptedSteps = acceptedMoves.length;
+  const projectedTotal =
+    acceptedSteps + independentRoute(fixture.maze, position, [5, 3]).length;
+  const completed = sameCell(position, [5, 3]);
+  const surveyEarned = current.surveyEarned || acceptedSteps >= 4;
+  const hintAvailable = surveyEarned && !current.assistanceUsed;
+  let status;
+  let message;
+  let matchedOptimal = null;
+  if (completed) {
+    matchedOptimal = acceptedSteps === fixture.route.length;
+    status = matchedOptimal ? "complete-optimal" : "complete-detour";
+    message = matchedOptimal
+      ? `Exit open in ${acceptedSteps}. Direct survey matched the reference.`
+      : `Exit open in ${acceptedSteps}: +${
+          acceptedSteps - fixture.route.length
+        } over reference ${fixture.route.length}.`;
+  } else if (sameCell(position, fixture.trap.cell)) {
+    status = "trap";
+    message =
+      `Marked trap entered. Best finish is now ${projectedTotal} ` +
+      `(+${projectedTotal - fixture.route.length}); ` +
+      "exit beacon remains marked.";
+  } else if (projectedTotal > fixture.route.length) {
+    status = "detour";
+    message =
+      `Valid detour recorded. Best finish ${projectedTotal} ` +
+      `(+${projectedTotal - fixture.route.length}).`;
+  } else {
+    status = "moving";
+    message =
+      `${direction} accepted. ${acceptedSteps} steps; ` +
+      `best finish ${projectedTotal}.`;
+  }
+  return {
+    position,
+    facing: direction,
+    acceptedMoves,
+    trail,
+    revealed,
+    status,
+    message,
+    lastAttempt: direction,
+    lastRejected: null,
+    exitOpen: completed,
+    completed,
+    matchedOptimal,
+    projectedTotal,
+    surveyEarned,
+    hintAvailable,
+    assistanceUsed: current.assistanceUsed,
+    hintRequests: current.hintRequests,
+    hintDirection: null,
+  };
+}
+
+function requestHintState(fixture, current) {
+  if (current.completed) {
+    return {
+      ...current,
+      status: "hint-unavailable",
+      message: "Survey hint unavailable after completion.",
+    };
+  }
+  if (!current.hintAvailable) {
+    return {
+      ...current,
+      status: "hint-unavailable",
+      message: current.surveyEarned
+        ? "The one-step survey hint has already been spent."
+        : "Survey charge unlocks after four accepted moves.",
+    };
+  }
+  const direction = independentRoute(
+    fixture.maze,
+    current.position,
+    [5, 3]
+  )[0];
+  return {
+    ...current,
+    status: "hint",
+    message:
+      `One-step survey: ${direction}. Assistance is recorded; ` +
+      "no later moves are revealed.",
+    hintAvailable: false,
+    assistanceUsed: true,
+    hintRequests: current.hintRequests + 1,
+    hintDirection: direction,
+  };
 }
 
 class CdpClient {
@@ -557,30 +764,68 @@ async function waitForDevTools(child, port, launchLog, timeout = 45000) {
   );
 }
 
-async function waitForExit(child, timeout = 8000) {
+function processIsRunning(pid) {
+  if (!pid) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    if (error && error.code === "EPERM") return true;
+    if (error && error.code === "ESRCH") return false;
+    throw error;
+  }
+}
+
+async function waitForExit(child, timeout = 15000) {
   if (child.exitCode !== null || child.signalCode !== null) return true;
-  const exited = new Promise(resolveExit => child.once("exit", resolveExit));
+  const exited = new Promise(resolveExit => {
+    child.once("exit", resolveExit);
+    child.once("close", resolveExit);
+  });
   const timedOut = await Promise.race([
     exited.then(() => false),
     delay(timeout).then(() => true),
   ]);
   if (!timedOut) return true;
-  child.kill();
-  await Promise.race([exited, delay(3000)]);
-  return child.exitCode !== null || child.signalCode !== null;
+  child.kill("SIGTERM");
+  await Promise.race([exited, delay(5000)]);
+  if (
+    child.exitCode === null &&
+    child.signalCode === null &&
+    processIsRunning(child.pid)
+  ) {
+    child.kill("SIGKILL");
+    await Promise.race([exited, delay(10000)]);
+  }
+  return (
+    child.exitCode !== null ||
+    child.signalCode !== null ||
+    !processIsRunning(child.pid)
+  );
 }
 
-async function removeProfile(path) {
-  for (let attempt = 0; attempt < 12; attempt += 1) {
+async function removeProfile(path, timeout = 30000) {
+  const deadline = Date.now() + timeout;
+  let lastError = null;
+  while (Date.now() < deadline) {
     try {
-      await rm(path, { recursive: true, force: true });
+      await rm(path, {
+        recursive: true,
+        force: true,
+        maxRetries: 4,
+        retryDelay: 125,
+      });
       return true;
     } catch (error) {
-      if (attempt === 11) throw error;
-      await delay(100 * (attempt + 1));
+      lastError = error;
+      await delay(250);
     }
   }
-  return false;
+  throw new Error(
+    `could not remove browser profile ${path}: ${
+      lastError ? lastError.message : "timeout"
+    }`
+  );
 }
 
 async function evaluate(cdp, expression) {
@@ -606,8 +851,7 @@ async function waitForReady(cdp, timeout = 10000) {
     const ready = await evaluate(
       cdp,
       `document.documentElement.dataset.ready === "true" &&
-       !!window.foglineSurvey &&
-       !!document.querySelector("#maze-board")`
+       document.querySelectorAll("#maze-board > .cell").length === 36`
     );
     if (ready) return;
     await delay(50);
@@ -699,48 +943,74 @@ async function dispatchKey(cdp, code) {
   });
 }
 
+async function dispatchMouseClick(cdp, selector, label, allowDisabled = false) {
+  const record = await assertVisible(cdp, selector, label);
+  if (!allowDisabled) {
+    assert.equal(record.disabled, false, `${label}: disabled target`);
+  }
+  const x = record.rect.left + record.rect.width / 2;
+  const y = record.rect.top + record.rect.height / 2;
+  await cdp.command("Input.dispatchMouseEvent", {
+    type: "mouseMoved",
+    x,
+    y,
+  });
+  await cdp.command("Input.dispatchMouseEvent", {
+    type: "mousePressed",
+    x,
+    y,
+    button: "left",
+    buttons: 1,
+    clickCount: 1,
+  });
+  await cdp.command("Input.dispatchMouseEvent", {
+    type: "mouseReleased",
+    x,
+    y,
+    button: "left",
+    buttons: 0,
+    clickCount: 1,
+  });
+  await settle(cdp);
+  return record;
+}
+
+async function scrollTo(cdp, selector, block = "center") {
+  await evaluate(
+    cdp,
+    `(() => {
+      const target = document.querySelector(${JSON.stringify(selector)});
+      if (!target) throw new Error("missing scroll target");
+      target.scrollIntoView({
+        block: ${JSON.stringify(block)},
+        inline: "nearest",
+        behavior: "auto"
+      });
+      const rect = target.getBoundingClientRect();
+      const safeBottom = innerHeight - 112;
+      if (rect.top < 8) {
+        scrollBy(0, rect.top - 8);
+      } else if (rect.bottom > safeBottom && rect.height <= safeBottom - 8) {
+        scrollBy(0, rect.bottom - safeBottom);
+      }
+    })()`
+  );
+  await settle(cdp);
+}
+
 async function executeAction(cdp, action, index, viewportName) {
   let selector = action.selector || null;
   let before = null;
   if (action.do === "scroll") {
     before = await geometry(cdp, selector);
     assert(before.exists, `action ${index}: missing scroll target ${selector}`);
-    await evaluate(
-      cdp,
-      `(() => {
-        const target = document.querySelector(${JSON.stringify(selector)});
-        target.scrollIntoView({
-          block: ${JSON.stringify(action.block || "center")},
-          inline: "nearest",
-          behavior: "auto"
-        });
-        const rect = target.getBoundingClientRect();
-        const safeBottom = innerHeight - 112;
-        if (rect.top < 8) {
-          scrollBy(0, rect.top - 8);
-        } else if (rect.bottom > safeBottom && rect.height <= safeBottom - 8) {
-          scrollBy(0, rect.bottom - safeBottom);
-        }
-      })()`
-    );
-    await settle(cdp);
+    await scrollTo(cdp, selector, action.block || "center");
   } else if (action.do === "click") {
-    before = await assertVisible(
+    before = await dispatchMouseClick(
       cdp,
       selector,
       `${viewportName} action ${index} click before`
     );
-    assert.equal(before.disabled, false, `action ${index}: disabled target`);
-    await evaluate(
-      cdp,
-      `(() => {
-        const target = document.querySelector(${JSON.stringify(selector)});
-        target.focus({ preventScroll: true });
-        if (typeof target.select === "function") target.select();
-        target.click();
-      })()`
-    );
-    await settle(cdp);
   } else if (action.do === "key") {
     const activeId = await evaluate(
       cdp,
@@ -779,6 +1049,23 @@ async function executeAction(cdp, action, index, viewportName) {
       selector,
       `${viewportName} action ${index} type before`
     );
+    const selection = await evaluate(
+      cdp,
+      `(() => {
+        const input = document.querySelector("#seed-input");
+        return {
+          value: input.value,
+          start: input.selectionStart,
+          end: input.selectionEnd
+        };
+      })()`
+    );
+    assert.equal(selection.start, 0, `action ${index}: input selection start`);
+    assert.equal(
+      selection.end,
+      selection.value.length,
+      `action ${index}: input must be selected before replacement`
+    );
     await cdp.command("Input.insertText", { text: String(action.text || "") });
     await settle(cdp);
   } else {
@@ -789,7 +1076,18 @@ async function executeAction(cdp, action, index, viewportName) {
     selector,
     `${viewportName} action ${index} after`
   );
-  return { index, action, before, after };
+  return {
+    index,
+    action,
+    inputMethod:
+      action.do === "click"
+        ? "cdp-mouse"
+        : action.do === "key" || action.do === "type"
+          ? "cdp-keyboard"
+          : "cdp-scroll",
+    before,
+    after,
+  };
 }
 
 function keyDirections(actions, segment) {
@@ -802,12 +1100,13 @@ function keyDirections(actions, segment) {
     });
 }
 
-async function stateAndDom(cdp) {
+async function observeDom(cdp) {
   return await evaluate(
     cdp,
-    `(() => ({
-      snapshot: window.foglineSurvey.snapshot(),
-      fixture: window.foglineSurvey.fixture(),
+    `(() => {
+      const clone = document.documentElement.cloneNode(true);
+      clone.querySelectorAll("script, style, template").forEach(node => node.remove());
+      return {
       dom: {
         seed: document.querySelector("#seed-value").textContent.trim(),
         reference: document.querySelector("#reference-value").textContent.trim(),
@@ -818,38 +1117,763 @@ async function stateAndDom(cdp) {
         exit: document.querySelector("#exit-value").textContent.trim(),
         compass: document.querySelector("#compass-value").textContent.trim(),
         assist: document.querySelector("#assist-value").textContent.trim(),
+        status: document.querySelector("#status-message").textContent.trim(),
+        hint: {
+          hidden: document.querySelector("#hint-panel").hidden,
+          text: document.querySelector("#hint-panel").textContent.trim()
+        },
+        trap: {
+          hidden: document.querySelector("#trap-panel").hidden,
+          text: document.querySelector("#trap-panel").textContent.trim()
+        },
+        success: {
+          hidden: document.querySelector("#success-panel").hidden,
+          text: document.querySelector("#success-panel").textContent.trim()
+        },
+        hintButton: {
+          disabled: document.querySelector("#hint-btn").disabled,
+          text: document.querySelector("#hint-btn").textContent.trim()
+        },
+        seedInput: {
+          type: document.querySelector("#seed-input").type,
+          value: document.querySelector("#seed-input").value,
+          selectionStart: document.querySelector("#seed-input").selectionStart,
+          selectionEnd: document.querySelector("#seed-input").selectionEnd,
+          textSecurity:
+            getComputedStyle(document.querySelector("#seed-input"))
+              .webkitTextSecurity || "none"
+        },
+        seedError: {
+          hidden: document.querySelector("#seed-error").hidden,
+          text: document.querySelector("#seed-error").textContent.trim()
+        },
+        seedProof:
+          document.querySelector("#seed-change-proof").textContent.trim(),
+        boardLabel: document.querySelector("#maze-board").getAttribute("aria-label"),
         exitBeaconPresent: !!document.querySelector("#exit-beacon"),
-        routeText: document.body.innerText
+        cells: [...document.querySelectorAll("#maze-board > .cell")].map(cell => ({
+          id: cell.id,
+          classes: [...cell.classList],
+          ariaHidden: cell.getAttribute("aria-hidden"),
+          borders: {
+            N: cell.style.borderTopWidth,
+            E: cell.style.borderRightWidth,
+            S: cell.style.borderBottomWidth,
+            W: cell.style.borderLeftWidth
+          },
+          exitMarker: cell.querySelector(".exit-marker")
+            ? {
+                text: cell.querySelector(".exit-marker").textContent,
+                title: cell.querySelector(".exit-marker").title
+              }
+            : null,
+          trapMarker: cell.querySelector(".trap-marker")
+            ? {
+                text: cell.querySelector(".trap-marker").textContent,
+                title: cell.querySelector(".trap-marker").title
+              }
+            : null,
+          player: cell.querySelector(".player")
+            ? {
+                text: cell.querySelector(".player").textContent,
+                title: cell.querySelector(".player").title
+              }
+            : null
+        })),
+        renderedText: clone.textContent,
+        visibleText: document.body.innerText,
+        renderedMarkup: clone.innerHTML,
+        publicFixtureApi:
+          Object.prototype.hasOwnProperty.call(window, "foglineSurvey")
       },
       activeId: document.activeElement ? document.activeElement.id : "",
       width: {
         scroll: document.scrollingElement.scrollWidth,
         client: document.scrollingElement.clientWidth
       }
-    }))()`
+    };
+    })()`
   );
 }
 
-function assertDomMatchesState(record) {
-  const { snapshot, dom } = record;
-  assert.equal(dom.seed, snapshot.seed);
-  assert.equal(dom.reference, `${snapshot.referenceLength} moves`);
-  assert.equal(dom.digest, snapshot.topologyDigest);
-  assert.equal(dom.steps, `${snapshot.steps} / ${snapshot.referenceLength}`);
-  assert.equal(dom.projection, String(snapshot.projectedTotal));
-  assert.equal(dom.position, `(${snapshot.position.x},${snapshot.position.y})`);
+function assertDomMatchesExpected(
+  record,
+  fixture,
+  state,
+  {
+    seedInput = fixture.seed,
+    seedError = null,
+    label = fixture.seed,
+  } = {}
+) {
+  const { dom } = record;
+  assert.equal(dom.publicFixtureApi, false, `${label}: public fixture API`);
+  assert.equal(dom.seed, fixture.seed, `${label}: accepted seed`);
+  assert.equal(
+    dom.reference,
+    `${fixture.route.length} moves`,
+    `${label}: reference`
+  );
+  assert.equal(dom.digest, fixture.digest, `${label}: digest`);
+  assert.equal(
+    dom.steps,
+    `${state.acceptedMoves.length} / ${fixture.route.length}`,
+    `${label}: steps`
+  );
+  assert.equal(
+    dom.projection,
+    String(state.projectedTotal),
+    `${label}: projection`
+  );
+  assert.equal(
+    dom.position,
+    `(${state.position[0]},${state.position[1]})`,
+    `${label}: position`
+  );
   assert.equal(
     dom.exit,
-    `${snapshot.exit.state} · marked`
+    `${state.exitOpen ? "open" : "closed"} · marked`,
+    `${label}: exit`
   );
   assert.equal(dom.compass, {
     N: "NORTH",
     E: "EAST",
     S: "SOUTH",
     W: "WEST",
-  }[snapshot.facing]);
-  assert(dom.exitBeaconPresent, "exit beacon disappeared");
-  assert(record.width.scroll <= record.width.client + 1, "page overflowed");
+  }[state.facing], `${label}: compass`);
+  assert.equal(
+    dom.assist,
+    state.assistanceUsed
+      ? "ASSISTED · one bearing spent"
+      : state.hintAvailable
+        ? "Earned · one bearing ready"
+        : "Survey charge locked · earn at 4",
+    `${label}: assistance`
+  );
+  assert.equal(dom.status, state.message, `${label}: status`);
+  assert.equal(
+    dom.hint.hidden,
+    state.hintDirection === null,
+    `${label}: hint visibility`
+  );
+  assert.equal(
+    dom.hint.text,
+    state.hintDirection === null
+      ? ""
+      : `ONE STEP ONLY: ${state.hintDirection} · assistance recorded`,
+    `${label}: hint text`
+  );
+  assert.equal(
+    dom.trap.hidden,
+    state.status !== "trap",
+    `${label}: trap visibility`
+  );
+  assert.equal(
+    dom.trap.text,
+    state.status === "trap"
+      ? `MARKED TRAP · projected ${state.projectedTotal} · exit still marked`
+      : "",
+    `${label}: trap text`
+  );
+  assert.equal(
+    dom.success.hidden,
+    !state.completed,
+    `${label}: success visibility`
+  );
+  assert.equal(
+    dom.success.text,
+    state.completed
+      ? state.matchedOptimal
+        ? `EXIT OPEN · ${state.acceptedMoves.length} = reference · unassisted`
+        : `EXIT OPEN · final ${state.acceptedMoves.length} · reference ${
+            fixture.route.length
+          } · ${state.assistanceUsed ? "assisted" : "unassisted"}`
+      : "",
+    `${label}: success text`
+  );
+  assert.equal(
+    dom.hintButton.disabled,
+    !state.hintAvailable,
+    `${label}: hint disabled`
+  );
+  assert.equal(
+    dom.hintButton.text,
+    state.hintAvailable
+      ? "Request earned one-step hint"
+      : state.assistanceUsed
+        ? "One-step hint spent"
+        : "Earn hint after 4 moves",
+    `${label}: hint button`
+  );
+  assert.equal(dom.seedInput.type, "text", `${label}: input type`);
+  assert.equal(dom.seedInput.textSecurity, "none", `${label}: masked input`);
+  assert.equal(dom.seedInput.value, seedInput, `${label}: seed draft`);
+  assert.equal(
+    dom.seedError.hidden,
+    seedError === null,
+    `${label}: seed error visibility`
+  );
+  assert.equal(dom.seedError.text, seedError || "", `${label}: seed error`);
+  assert.equal(
+    dom.seedProof,
+    `Active topology: ${fixture.seed} · reference ${fixture.route.length} · ` +
+      `digest ${fixture.digest.slice(0, 12)}…`,
+    `${label}: seed proof`
+  );
+  assert.equal(
+    dom.boardLabel,
+    `Fogline maze, seed ${fixture.seed}. Position ` +
+      `${state.position[0]},${state.position[1]}, facing ${
+        { N: "north", E: "east", S: "south", W: "west" }[state.facing]
+      }. ${state.acceptedMoves.length} accepted steps.`,
+    `${label}: board label`
+  );
+  assert(dom.exitBeaconPresent, `${label}: exit beacon disappeared`);
+  assert.equal(dom.cells.length, 36, `${label}: board cell count`);
+  const trail = new Set(state.trail.map(keyOf));
+  let players = 0;
+  for (const cell of dom.cells) {
+    const match = /^cell-(\d)-(\d)$/.exec(cell.id);
+    assert(match, `${label}: invalid cell id ${cell.id}`);
+    const position = [Number(match[1]), Number(match[2])];
+    const cellKey = keyOf(position);
+    const revealed = state.revealed.has(cellKey);
+    assert(cell.classes.includes("cell"), `${label}: cell class ${cellKey}`);
+    assert.equal(
+      cell.classes.includes("revealed"),
+      revealed,
+      `${label}: revealed ${cellKey}`
+    );
+    assert.equal(
+      cell.classes.includes("trail"),
+      trail.has(cellKey),
+      `${label}: trail ${cellKey}`
+    );
+    assert.equal(
+      cell.classes.includes("entrance"),
+      sameCell(position, [0, 0]),
+      `${label}: entrance ${cellKey}`
+    );
+    assert.equal(cell.ariaHidden, "true", `${label}: cell aria ${cellKey}`);
+    const openings = fixture.maze.get(cellKey);
+    for (const direction of "NESW") {
+      assert.equal(
+        cell.borders[direction],
+        revealed ? (openings.has(direction) ? "1px" : "3px") : "",
+        `${label}: ${cellKey} ${direction} wall`
+      );
+    }
+    const isExit = sameCell(position, [5, 3]);
+    assert.equal(!!cell.exitMarker, isExit, `${label}: exit marker ${cellKey}`);
+    if (cell.exitMarker) {
+      assert.deepEqual(
+        cell.exitMarker,
+        { text: "X", title: "Marked exit beacon" },
+        `${label}: exit marker content`
+      );
+    }
+    const isTrap =
+      sameCell(position, fixture.trap.cell) && state.revealed.has(cellKey);
+    assert.equal(!!cell.trapMarker, isTrap, `${label}: trap marker ${cellKey}`);
+    if (cell.trapMarker) {
+      assert.deepEqual(
+        cell.trapMarker,
+        { text: "!", title: "Marked trap" },
+        `${label}: trap marker content`
+      );
+    }
+    const isPlayer = sameCell(position, state.position);
+    assert.equal(!!cell.player, isPlayer, `${label}: player ${cellKey}`);
+    if (cell.player) {
+      players += 1;
+      assert.equal(cell.player.text, "▲", `${label}: player glyph`);
+      assert.equal(
+        cell.player.title,
+        `Surveyor facing ${
+          { N: "north", E: "east", S: "south", W: "west" }[state.facing]
+        }`,
+        `${label}: player title`
+      );
+    }
+  }
+  assert.equal(players, 1, `${label}: player count`);
+  assert(
+    record.width.scroll <= record.width.client + 1,
+    `${label}: page overflowed`
+  );
+}
+
+function routeLeakPatterns(route) {
+  const separator = String.raw`[\s,;|:/·→>\-"'[\]]*`;
+  const letterPattern = route.join(separator);
+  const words = {
+    N: "north",
+    E: "east",
+    S: "south",
+    W: "west",
+  };
+  const arrows = { N: "↑", E: "→", S: "↓", W: "←" };
+  return [
+    new RegExp(`(^|[^A-Z])${letterPattern}([^A-Z]|$)`, "i"),
+    new RegExp(
+      `(^|[^a-z])${route.map(direction => words[direction]).join(String.raw`[\s,;|:/·→>\-]+`)}([^a-z]|$)`,
+      "i"
+    ),
+    new RegExp(
+      route
+        .map(direction => arrows[direction])
+        .join(String.raw`[\s,;|:/·→>\-]*`)
+    ),
+  ];
+}
+
+function assertNoRouteLeak(value, fixture, label) {
+  const text = String(value || "");
+  for (const pattern of routeLeakPatterns(fixture.route)) {
+    assert.equal(
+      pattern.test(text),
+      false,
+      `${label}: full route leaked via ${pattern}`
+    );
+  }
+}
+
+async function auditOpeningPrivacy(cdp, fixture, label) {
+  const observation = await observeDom(cdp);
+  assertNoRouteLeak(observation.dom.visibleText, fixture, `${label} visible text`);
+  assertNoRouteLeak(
+    observation.dom.renderedText,
+    fixture,
+    `${label} rendered text`
+  );
+  assertNoRouteLeak(
+    observation.dom.renderedMarkup,
+    fixture,
+    `${label} rendered markup`
+  );
+  for (const forbidden of [
+    "topologySignature",
+    "shortestRoute",
+    "detourRoute",
+    "routePositions",
+    "acceptedMoves",
+    "data-route",
+    "data-solution",
+    "data-topology",
+  ]) {
+    assert.equal(
+      observation.dom.renderedMarkup.includes(forbidden),
+      false,
+      `${label}: hidden route-bearing DOM field ${forbidden}`
+    );
+  }
+  assert.equal(
+    observation.dom.publicFixtureApi,
+    false,
+    `${label}: route-bearing window API`
+  );
+  const tree = await cdp.command("Accessibility.getFullAXTree");
+  const accessibleText = (tree.nodes || [])
+    .flatMap(node => [
+      node.name && node.name.value,
+      node.description && node.description.value,
+      node.value && node.value.value,
+    ])
+    .filter(value => typeof value === "string")
+    .join("\n");
+  assertNoRouteLeak(accessibleText, fixture, `${label} accessibility tree`);
+  return {
+    visibleCharacters: observation.dom.visibleText.length,
+    renderedCharacters: observation.dom.renderedText.length,
+    accessibilityCharacters: accessibleText.length,
+    publicFixtureApi: false,
+  };
+}
+
+function expectedSummary(fixture, state) {
+  return {
+    seed: fixture.seed,
+    digest: fixture.digest,
+    referenceLength: fixture.route.length,
+    position: [...state.position],
+    facing: state.facing,
+    steps: state.acceptedMoves.length,
+    projectedTotal: state.projectedTotal,
+    status: state.status,
+    completed: state.completed,
+    matchedOptimal: state.matchedOptimal,
+    assistanceUsed: state.assistanceUsed,
+    hintRequests: state.hintRequests,
+    hintDirection: state.hintDirection,
+    trapMarked: state.revealed.has(keyOf(fixture.trap.cell)),
+  };
+}
+
+function applyExpectedAction(context, action) {
+  if (action.do === "key") {
+    context.state = moveState(
+      context.fixture,
+      context.state,
+      CODE_DIRECTION[action.code]
+    );
+    return;
+  }
+  if (action.do === "type") {
+    context.seedInput = String(action.text || "");
+    return;
+  }
+  if (action.do !== "click") return;
+  if (action.selector === "#restart-btn") {
+    context.state = initialState(context.fixture);
+    context.seedInput = context.fixture.seed;
+    context.seedError = null;
+  } else if (action.selector === "#hint-btn") {
+    context.state = requestHintState(context.fixture, context.state);
+  } else if (action.selector === "#load-seed-btn") {
+    try {
+      normalizeSeed(context.seedInput);
+      context.fixture = auditIndependentFixture(context.seedInput);
+      context.state = initialState(context.fixture);
+      context.seedError = null;
+    } catch (error) {
+      assert.equal(error.message, INVALID_SEED_MESSAGE);
+      context.seedError = INVALID_SEED_MESSAGE;
+    }
+  }
+}
+
+function codeForDirection(direction, family = "arrow") {
+  const codes =
+    family === "wasd"
+      ? { N: "KeyW", E: "KeyD", S: "KeyS", W: "KeyA" }
+      : {
+          N: "ArrowUp",
+          E: "ArrowRight",
+          S: "ArrowDown",
+          W: "ArrowLeft",
+        };
+  return codes[direction];
+}
+
+async function focusBoard(cdp, label) {
+  await scrollTo(cdp, "#maze-board");
+  await dispatchMouseClick(cdp, "#maze-board", `${label} focus board`);
+  assert.equal(
+    await evaluate(
+      cdp,
+      `document.activeElement ? document.activeElement.id : ""`
+    ),
+    "maze-board",
+    `${label}: board did not receive focus`
+  );
+}
+
+async function driveDirections(cdp, context, directions, label, family = "arrow") {
+  await focusBoard(cdp, label);
+  for (let index = 0; index < directions.length; index += 1) {
+    await assertVisible(
+      cdp,
+      "#maze-board",
+      `${label} key ${index + 1} before`
+    );
+    const direction = directions[index];
+    await dispatchKey(cdp, codeForDirection(direction, family));
+    await settle(cdp);
+    context.state = moveState(context.fixture, context.state, direction);
+    const observation = await observeDom(cdp);
+    assertDomMatchesExpected(observation, context.fixture, context.state, {
+      seedInput: context.seedInput,
+      seedError: context.seedError,
+      label: `${label} key ${index + 1}`,
+    });
+    if (context.state.status === "trap") {
+      await assertVisible(
+        cdp,
+        "#exit-beacon",
+        `${label} key ${index + 1} visible exit`
+      );
+      await assertVisible(
+        cdp,
+        ".trap-marker",
+        `${label} key ${index + 1} visible trap`
+      );
+    }
+  }
+}
+
+async function clickControl(cdp, selector, label) {
+  await scrollTo(cdp, selector);
+  await dispatchMouseClick(cdp, selector, label);
+}
+
+async function restartThroughUi(cdp, context, label) {
+  await clickControl(cdp, "#restart-btn", `${label} restart`);
+  context.state = initialState(context.fixture);
+  context.seedInput = context.fixture.seed;
+  context.seedError = null;
+  const observation = await observeDom(cdp);
+  assertDomMatchesExpected(observation, context.fixture, context.state, {
+    seedInput: context.seedInput,
+    seedError: context.seedError,
+    label: `${label} reset`,
+  });
+}
+
+async function loadSeedThroughUi(cdp, context, seed, label) {
+  await scrollTo(cdp, "#seed-input");
+  await dispatchMouseClick(cdp, "#seed-input", `${label} seed input`);
+  const selection = await evaluate(
+    cdp,
+    `(() => {
+      const input = document.querySelector("#seed-input");
+      return {
+        value: input.value,
+        start: input.selectionStart,
+        end: input.selectionEnd
+      };
+    })()`
+  );
+  assert.equal(selection.start, 0, `${label}: seed selection start`);
+  assert.equal(
+    selection.end,
+    selection.value.length,
+    `${label}: seed selection end`
+  );
+  await cdp.command("Input.insertText", { text: seed });
+  await settle(cdp);
+  assert.equal(
+    await evaluate(cdp, `document.querySelector("#seed-input").value`),
+    seed,
+    `${label}: actual seed typing`
+  );
+  context.seedInput = seed;
+  await clickControl(cdp, "#load-seed-btn", `${label} generate`);
+  context.fixture = auditIndependentFixture(seed);
+  context.state = initialState(context.fixture);
+  context.seedError = null;
+  const observation = await observeDom(cdp);
+  assertDomMatchesExpected(observation, context.fixture, context.state, {
+    seedInput: seed,
+    seedError: null,
+    label: `${label} opening`,
+  });
+}
+
+async function rejectSeedThroughUi(cdp, context, seed, label) {
+  const before = expectedSummary(context.fixture, context.state);
+  await scrollTo(cdp, "#seed-input");
+  await dispatchMouseClick(cdp, "#seed-input", `${label} seed input`);
+  const selection = await evaluate(
+    cdp,
+    `(() => {
+      const input = document.querySelector("#seed-input");
+      return [input.selectionStart, input.selectionEnd, input.value.length];
+    })()`
+  );
+  assert.deepEqual(selection, [0, selection[2], selection[2]]);
+  await cdp.command("Input.insertText", { text: seed });
+  await settle(cdp);
+  context.seedInput = seed;
+  await clickControl(cdp, "#load-seed-btn", `${label} reject`);
+  context.seedError = INVALID_SEED_MESSAGE;
+  const observation = await observeDom(cdp);
+  assertDomMatchesExpected(observation, context.fixture, context.state, {
+    seedInput: seed,
+    seedError: INVALID_SEED_MESSAGE,
+    label,
+  });
+  assert.deepEqual(expectedSummary(context.fixture, context.state), before);
+}
+
+async function exerciseHintGate(cdp, appUrl) {
+  await cdp.command("Page.navigate", { url: appUrl });
+  await waitForReady(cdp);
+  await settle(cdp);
+  const context = {
+    fixture: auditIndependentFixture("RAPP-42"),
+    state: null,
+    seedInput: "RAPP-42",
+    seedError: null,
+  };
+  context.state = initialState(context.fixture);
+  assertDomMatchesExpected(
+    await observeDom(cdp),
+    context.fixture,
+    context.state,
+    { label: "hint gate opening" }
+  );
+  const privacy = await auditOpeningPrivacy(
+    cdp,
+    context.fixture,
+    "hint gate opening"
+  );
+
+  await scrollTo(cdp, "#hint-btn");
+  const disabled = await geometry(cdp, "#hint-btn");
+  assert.equal(disabled.disabled, true);
+  await dispatchMouseClick(
+    cdp,
+    "#hint-btn",
+    "hint gate disabled click",
+    true
+  );
+  assertDomMatchesExpected(
+    await observeDom(cdp),
+    context.fixture,
+    context.state,
+    { label: "hint gate disabled click" }
+  );
+
+  await driveDirections(
+    cdp,
+    context,
+    context.fixture.route.slice(0, 3),
+    "hint gate first three"
+  );
+  assert.equal(context.state.hintAvailable, false);
+  await driveDirections(
+    cdp,
+    context,
+    context.fixture.route.slice(3, 4),
+    "hint gate fourth move"
+  );
+  assert.equal(context.state.hintAvailable, true);
+  await clickControl(cdp, "#hint-btn", "hint gate earned request");
+  context.state = requestHintState(context.fixture, context.state);
+  assert.equal(context.state.hintRequests, 1);
+  assert.equal(context.state.assistanceUsed, true);
+  assertDomMatchesExpected(
+    await observeDom(cdp),
+    context.fixture,
+    context.state,
+    { label: "hint gate requested" }
+  );
+  const direction = context.state.hintDirection;
+  await scrollTo(cdp, "#hint-btn");
+  await dispatchMouseClick(
+    cdp,
+    "#hint-btn",
+    "hint gate spent click",
+    true
+  );
+  assertDomMatchesExpected(
+    await observeDom(cdp),
+    context.fixture,
+    context.state,
+    { label: "hint gate spent click" }
+  );
+  await driveDirections(cdp, context, [direction], "hint gate one-step clear");
+  assert.equal(context.state.hintDirection, null);
+  assert.equal(context.state.hintRequests, 1);
+  assert.equal(context.state.assistanceUsed, true);
+  await rejectSeedThroughUi(
+    cdp,
+    context,
+    "X".repeat(65),
+    "hint gate invalid preservation"
+  );
+  return {
+    privacy,
+    disabledBeforeFour: true,
+    enabledAtFour: true,
+    oneRequestOnly: true,
+    clearedAfterOneMove: true,
+    assistancePersisted: true,
+    invalidPreservedNontrivialState: true,
+  };
+}
+
+async function exerciseAlternateSeeds(cdp, appUrl) {
+  await cdp.command("Page.navigate", { url: appUrl });
+  await waitForReady(cdp);
+  await settle(cdp);
+  const context = {
+    fixture: auditIndependentFixture("RAPP-42"),
+    state: null,
+    seedInput: "RAPP-42",
+    seedError: null,
+  };
+  context.state = initialState(context.fixture);
+  const results = [];
+  const digests = new Set([context.fixture.digest]);
+  for (let index = 0; index < ALTERNATE_SEEDS.length; index += 1) {
+    const seed = ALTERNATE_SEEDS[index];
+    const label = `alternate ${seed}`;
+    await loadSeedThroughUi(cdp, context, seed, label);
+    assert.equal(digests.has(context.fixture.digest), false, `${label}: digest`);
+    digests.add(context.fixture.digest);
+    const privacy = await auditOpeningPrivacy(cdp, context.fixture, label);
+
+    await driveDirections(
+      cdp,
+      context,
+      context.fixture.route,
+      `${label} optimal`,
+      index % 2 ? "wasd" : "arrow"
+    );
+    assert.equal(context.state.completed, true, `${label}: optimal completion`);
+    assert.equal(context.state.matchedOptimal, true, `${label}: optimal mark`);
+    assert.equal(
+      context.state.acceptedMoves.length,
+      context.fixture.route.length,
+      `${label}: optimal length`
+    );
+
+    await restartThroughUi(cdp, context, label);
+    await driveDirections(
+      cdp,
+      context,
+      context.fixture.route.slice(0, context.fixture.trap.approachIndex),
+      `${label} trap approach`,
+      index % 2 ? "arrow" : "wasd"
+    );
+    await driveDirections(
+      cdp,
+      context,
+      [context.fixture.trap.turn],
+      `${label} trap entry`,
+      index % 2 ? "arrow" : "wasd"
+    );
+    assert.equal(context.state.status, "trap", `${label}: trap status`);
+    assert.equal(
+      context.state.projectedTotal,
+      context.fixture.route.length + 2,
+      `${label}: trap projection`
+    );
+    assert.equal(context.state.exitOpen, false, `${label}: exit remained closed`);
+    const tail = [
+      context.fixture.trap.returnDirection,
+      ...context.fixture.route.slice(context.fixture.trap.approachIndex),
+    ];
+    await driveDirections(
+      cdp,
+      context,
+      tail,
+      `${label} detour finish`,
+      index % 2 ? "arrow" : "wasd"
+    );
+    assert.equal(context.state.completed, true, `${label}: detour completion`);
+    assert.equal(context.state.matchedOptimal, false, `${label}: detour mark`);
+    assert.equal(
+      context.state.acceptedMoves.length,
+      context.fixture.route.length + 2,
+      `${label}: detour length`
+    );
+    results.push({
+      seed,
+      digest: context.fixture.digest,
+      edges: context.fixture.edges,
+      connectedCells: 36,
+      routeLength: context.fixture.route.length,
+      trap: context.fixture.trap,
+      detourLength: context.fixture.detour.length,
+      privacy,
+      optimalCompleted: true,
+      trapCompleted: true,
+      inputFamilies: ["arrow", "wasd"],
+    });
+  }
+  return results;
 }
 
 async function waitUntil(started, targetSeconds) {
@@ -883,27 +1907,29 @@ async function replayViewport(
   await waitForReady(cdp);
   await settle(cdp);
 
-  const initial = await stateAndDom(cdp);
-  assertDomMatchesState(initial);
-  const canonical = auditFixture(initial.fixture, "RAPP-42");
+  const canonical = auditIndependentFixture("RAPP-42");
+  const context = {
+    fixture: canonical,
+    state: initialState(canonical),
+    seedInput: "RAPP-42",
+    seedError: null,
+  };
+  const initial = await observeDom(cdp);
+  assertDomMatchesExpected(initial, context.fixture, context.state, {
+    seedInput: context.seedInput,
+    seedError: context.seedError,
+    label: `${viewport.name} opening`,
+  });
+  const openingPrivacy = await auditOpeningPrivacy(
+    cdp,
+    canonical,
+    `${viewport.name} opening`
+  );
   assert.deepEqual(canonical.route, CANONICAL_ROUTE);
   assert.equal(canonical.digest, CANONICAL_DIGEST);
   assert.deepEqual(canonical.trap.cell, [2, 5]);
   assert.equal(canonical.trap.turn, "W");
   assert.equal(canonical.detour.length, 20);
-  assert.equal(initial.snapshot.steps, 0);
-  assert.equal(initial.snapshot.facing, "N");
-  assert.equal(initial.snapshot.exit.state, "closed");
-  assert.deepEqual(initial.snapshot.trail, []);
-  assert.equal(initial.snapshot.assistance.used, false);
-  assert(
-    !initial.dom.routeText.includes(CANONICAL_ROUTE.join("")),
-    "canonical route leaked into visible DOM"
-  );
-  assert(
-    !initial.dom.routeText.includes(CANONICAL_ROUTE.join(" ")),
-    "spaced canonical route leaked into visible DOM"
-  );
 
   const scene = manifest.videos[0].live.scenes[0];
   const actions = scene.actions;
@@ -918,9 +1944,6 @@ async function replayViewport(
     canonical.detour
   );
 
-  const claims = new Map(
-    evidence.claims.map(claim => [claim.id, claim.expectedState])
-  );
   const checkpoints = new Map();
   for (const checkpoint of replay.checkpoints) {
     const records = checkpoints.get(checkpoint.afterAction) || [];
@@ -930,6 +1953,7 @@ async function replayViewport(
 
   const actionReports = [];
   const checkpointReports = [];
+  const privacyReports = [{ claim: "opening", report: openingPrivacy }];
   const started = process.hrtime.bigint();
   for (let index = 0; index < actions.length; index += 1) {
     const action = actions[index];
@@ -951,6 +1975,25 @@ async function replayViewport(
     report.executedAt = executedAt;
     report.lateness = executedAt - action.at;
     actionReports.push(report);
+    applyExpectedAction(context, action);
+    const actual = await observeDom(cdp);
+    assertDomMatchesExpected(actual, context.fixture, context.state, {
+      seedInput: context.seedInput,
+      seedError: context.seedError,
+      label: `${viewport.name} action ${index + 1}`,
+    });
+    if (action.do === "key" && context.state.status === "trap") {
+      await assertVisible(
+        cdp,
+        "#exit-beacon",
+        `${viewport.name} trap action visible exit`
+      );
+      await assertVisible(
+        cdp,
+        ".trap-marker",
+        `${viewport.name} trap action visible marker`
+      );
+    }
 
     for (const checkpoint of checkpoints.get(index + 1) || []) {
       const visible = await assertVisible(
@@ -958,42 +2001,91 @@ async function replayViewport(
         checkpoint.selector,
         `${viewport.name} checkpoint ${checkpoint.claim}`
       );
-      const actual = await stateAndDom(cdp);
-      assertDomMatchesState(actual);
-      assert.deepEqual(
-        actual.snapshot,
-        claims.get(checkpoint.claim),
-        `${viewport.name} checkpoint ${checkpoint.claim} state`
-      );
-      if (checkpoint.claim === "hint") {
-        const hint = await evaluate(
-          cdp,
-          `document.querySelector("#hint-panel").textContent.trim()`
-        );
-        assert.match(hint, /^ONE STEP ONLY: [NESW] · assistance recorded$/);
-        assert(!hint.includes(CANONICAL_ROUTE.join("")));
-      }
-      if (checkpoint.claim === "trap") {
-        assert.equal(actual.snapshot.projectedTotal, 20);
-        assert.equal(actual.snapshot.exit.marked, true);
-        assert.equal(actual.snapshot.exit.state, "closed");
+      if (checkpoint.claim === "optimal") {
+        assert.equal(context.state.completed, true);
+        assert.equal(context.state.matchedOptimal, true);
+        assert.equal(context.state.assistanceUsed, false);
+        assert.equal(context.state.acceptedMoves.length, canonical.route.length);
+      } else if (checkpoint.claim === "hint") {
+        assert.equal(context.state.hintRequests, 1);
+        assert.equal(context.state.assistanceUsed, true);
+        assert.match(context.state.hintDirection, /^[NESW]$/);
+        assertNoRouteLeak(actual.dom.hint.text, canonical, "hint panel");
+      } else if (checkpoint.claim === "trap") {
+        assert.equal(context.state.status, "trap");
+        assert.equal(context.state.projectedTotal, 20);
+        assert.equal(context.state.exitOpen, false);
+        assert.equal(actual.dom.exitBeaconPresent, true);
+      } else if (checkpoint.claim === "detour") {
+        assert.equal(context.state.completed, true);
+        assert.equal(context.state.matchedOptimal, false);
+        assert.equal(context.state.assistanceUsed, true);
+        assert.equal(context.state.acceptedMoves.length, 20);
+      } else if (checkpoint.claim === "reset") {
+        assert.deepEqual(expectedSummary(context.fixture, context.state), {
+          seed: "RAPP-42",
+          digest: CANONICAL_DIGEST,
+          referenceLength: 18,
+          position: [0, 0],
+          facing: "N",
+          steps: 0,
+          projectedTotal: 18,
+          status: "ready",
+          completed: false,
+          matchedOptimal: null,
+          assistanceUsed: false,
+          hintRequests: 0,
+          hintDirection: null,
+          trapMarked: false,
+        });
+        privacyReports.push({
+          claim: "reset",
+          report: await auditOpeningPrivacy(
+            cdp,
+            context.fixture,
+            `${viewport.name} reset`
+          ),
+        });
+      } else if (checkpoint.claim === "invalidSeedPreserved") {
+        assert.equal(context.fixture.seed, "RAPP-42");
+        assert.equal(context.seedInput, "X".repeat(65));
+        assert.equal(context.seedError, INVALID_SEED_MESSAGE);
+        assert.equal(context.state.acceptedMoves.length, 0);
+      } else if (checkpoint.claim === "handoff") {
+        assert.equal(context.fixture.seed, "FOG-7");
+        assert.equal(context.state.acceptedMoves.length, 0);
+        assert.equal(context.state.assistanceUsed, false);
+        privacyReports.push({
+          claim: "handoff",
+          report: await auditOpeningPrivacy(
+            cdp,
+            context.fixture,
+            `${viewport.name} handoff`
+          ),
+        });
+      } else {
+        throw new Error(`unknown checkpoint claim ${checkpoint.claim}`);
       }
       checkpointReports.push({
         afterAction: index + 1,
         claim: checkpoint.claim,
         selector: checkpoint.selector,
         geometry: visible,
-        snapshot: actual.snapshot,
+        expected: expectedSummary(context.fixture, context.state),
       });
     }
   }
 
   await waitUntil(started, scene.dur);
   await settle(cdp);
-  const authoredFinal = await stateAndDom(cdp);
-  assertDomMatchesState(authoredFinal);
-  assert.deepEqual(authoredFinal.snapshot, claims.get("handoff"));
-  const handoff = auditFixture(authoredFinal.fixture, "FOG-7");
+  const authoredFinal = await observeDom(cdp);
+  assertDomMatchesExpected(authoredFinal, context.fixture, context.state, {
+    seedInput: context.seedInput,
+    seedError: context.seedError,
+    label: `${viewport.name} authored final`,
+  });
+  const handoff = auditIndependentFixture("FOG-7");
+  assert.equal(context.fixture.digest, handoff.digest);
   assert.notEqual(handoff.digest, canonical.digest);
   assert.notEqual(handoff.route.length, canonical.route.length);
   await assertVisible(
@@ -1002,47 +2094,30 @@ async function replayViewport(
     `${viewport.name} final YOUR TURN`
   );
 
-  await evaluate(
-    cdp,
-    `document.querySelector("#maze-board").scrollIntoView({
-      block: "center", inline: "nearest", behavior: "auto"
-    });
-    document.querySelector("#maze-board").focus({ preventScroll: true });`
-  );
-  await settle(cdp);
-  assert.equal(
-    await evaluate(
-      cdp,
-      `document.activeElement ? document.activeElement.id : ""`
-    ),
-    "maze-board"
-  );
+  await focusBoard(cdp, `${viewport.name} takeover`);
   await dispatchKey(
     cdp,
-    {
-      N: "ArrowUp",
-      E: "ArrowRight",
-      S: "ArrowDown",
-      W: "ArrowLeft",
-    }[handoff.route[0]]
+    codeForDirection(handoff.route[0], "wasd")
   );
   await settle(cdp);
-  const takeoverMoved = await stateAndDom(cdp);
-  assert.equal(takeoverMoved.snapshot.steps, 1);
+  context.state = moveState(context.fixture, context.state, handoff.route[0]);
+  const takeoverMoved = await observeDom(cdp);
+  assertDomMatchesExpected(takeoverMoved, context.fixture, context.state, {
+    seedInput: context.seedInput,
+    seedError: context.seedError,
+    label: `${viewport.name} takeover moved`,
+  });
+  assert.equal(context.state.acceptedMoves.length, 1);
   assert.equal(
-    takeoverMoved.snapshot.acceptedMoves[0],
+    context.state.acceptedMoves[0],
     handoff.route[0]
   );
-  await evaluate(
-    cdp,
-    `document.querySelector("#restart-btn").click()`
-  );
-  await settle(cdp);
-  const takeoverReset = await stateAndDom(cdp);
-  assert.equal(takeoverReset.snapshot.seed, "FOG-7");
-  assert.equal(takeoverReset.snapshot.steps, 0);
-  assert.equal(takeoverReset.snapshot.facing, "N");
-  assert.deepEqual(takeoverReset.snapshot.trail, []);
+  await restartThroughUi(cdp, context, `${viewport.name} takeover`);
+  const takeoverReset = await observeDom(cdp);
+  assert.equal(context.fixture.seed, "FOG-7");
+  assert.equal(context.state.acceptedMoves.length, 0);
+  assert.equal(context.state.facing, "N");
+  assert.deepEqual(context.state.trail, []);
 
   const externalRequests = errors.requests
     .slice(requestStart)
@@ -1091,12 +2166,14 @@ async function replayViewport(
     },
     actionReports,
     checkpointReports,
-    authoredFinal: authoredFinal.snapshot,
+    privacyReports,
+    authoredFinal: expectedSummary(handoff, initialState(handoff)),
     takeover: {
       firstDirection: handoff.route[0],
-      movedSteps: takeoverMoved.snapshot.steps,
-      restartSteps: takeoverReset.snapshot.steps,
-      restartFacing: takeoverReset.snapshot.facing,
+      movedSteps: 1,
+      restartSteps: context.state.acceptedMoves.length,
+      restartFacing: context.state.facing,
+      inputMethod: "cdp-keyboard-wasd",
     },
     errors: {
       externalRequests,
@@ -1130,10 +2207,16 @@ async function main() {
 
   const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
   const evidence = JSON.parse(await readFile(evidencePath, "utf8"));
+  const appSource = await readFile(appPath, "utf8");
   assert.equal(manifest.schema, "rapp-vision-production/1.0");
   assert.equal(manifest.videos.length, 1);
   assert.equal(manifest.videos[0].live.kind, "rapp-vision-live/1.0");
   assert.equal(evidence.manifestReplay.exactTiming, true);
+  assert.equal(appSource.includes("window.foglineSurvey"), false);
+  assert.equal(appSource.includes("MIST-Δ"), false);
+  assert.equal(appSource.includes("A|B;C"), false);
+  assert.equal(/type\s*=\s*["']password["']/i.test(appSource), false);
+  assert.equal(/-webkit-text-security\s*:/i.test(appSource), false);
 
   const port = await reservePort();
   const launchLog = { value: "" };
@@ -1142,10 +2225,14 @@ async function main() {
     [
       "--headless=new",
       "--disable-background-networking",
+      "--disable-background-mode",
+      "--disable-breakpad",
       "--disable-component-update",
+      "--disable-crash-reporter",
       "--disable-default-apps",
       "--disable-dev-shm-usage",
       "--disable-extensions",
+      "--disable-features=Crashpad",
       "--disable-gpu",
       "--disable-sync",
       "--metrics-recording-only",
@@ -1189,6 +2276,7 @@ async function main() {
       console: [],
       requests: [],
       failed: [],
+      requestUrls: new Map(),
     };
     cdp.on("Runtime.exceptionThrown", event => {
       errors.exceptions.push(event.exceptionDetails || event);
@@ -1201,24 +2289,34 @@ async function main() {
     cdp.on("Network.requestWillBeSent", event => {
       if (event.request && event.request.url) {
         errors.requests.push(event.request.url);
+        errors.requestUrls.set(event.requestId, event.request.url);
       }
     });
     cdp.on("Network.loadingFailed", event => {
       errors.failed.push({
         requestId: event.requestId,
         errorText: event.errorText,
-        url: event.blockedReason || "",
+        blockedReason: event.blockedReason || "",
+        url: errors.requestUrls.get(event.requestId) || "",
       });
     });
 
     await cdp.command("Page.enable");
     await cdp.command("Runtime.enable");
+    await cdp.command("Accessibility.enable");
     await cdp.command("Network.enable");
     await cdp.command("Network.setBlockedURLs", {
       urls: ["http://*", "https://*", "ws://*", "wss://*"],
     });
 
     const appUrl = pathToFileURL(appPath).href;
+    await cdp.command("Emulation.setDeviceMetricsOverride", {
+      width: 1120,
+      height: 720,
+      deviceScaleFactor: 1,
+      mobile: false,
+    });
+    const hintGate = await exerciseHintGate(cdp, appUrl);
     const reports = [];
     for (const viewport of evidence.browserRuntime.viewports) {
       reports.push(
@@ -1232,6 +2330,13 @@ async function main() {
         )
       );
     }
+    await cdp.command("Emulation.setDeviceMetricsOverride", {
+      width: 1120,
+      height: 720,
+      deviceScaleFactor: 1,
+      mobile: false,
+    });
+    const alternateSeeds = await exerciseAlternateSeeds(cdp, appUrl);
 
     assert.equal(errors.requests.filter(url => /^(https?|wss?):/i.test(url)).length, 0);
     assert.equal(errors.exceptions.length, 0);
@@ -1250,14 +2355,31 @@ async function main() {
         exactManifestTiming: true,
         individualSemanticKeys: true,
         independentGeneratorDigestBfs: true,
+        independentStateAndDom: true,
+        actualCdpMouseAndKeyboard: true,
+        hintGatingAndOneStepOnly: true,
+        openingDomAndAccessibilityPrivacy: true,
+        alternateSeedRecomputation: true,
+        unmaskedSeedInput: true,
         desktopGeometry: true,
         mobile390Geometry: true,
-        stateAndDom: true,
         keyboardFocus: true,
         invalidInputPreservation: true,
         noNetworkOrScriptErrors: true,
       },
       viewports: reports,
+      hintGate,
+      alternateSeeds,
+      globalErrors: {
+        externalRequests: errors.requests.filter(url =>
+          /^(https?|wss?):/i.test(url)
+        ),
+        networkFailures: errors.failed.filter(item =>
+          /^(https?|wss?):/i.test(item.url || "")
+        ),
+        exceptions: errors.exceptions,
+        console: errors.console,
+      },
       cleanup: null,
     };
 
@@ -1269,7 +2391,7 @@ async function main() {
     cdp.close();
     cdp = null;
     const browserExited = await waitForExit(child);
-    const profileRemoved = await removeProfile(profilePath);
+    const profileRemoved = await removeProfile(profilePath, 45000);
     cleanupReport = {
       browserExited,
       profileRemoved,
@@ -1287,7 +2409,7 @@ async function main() {
       await waitForExit(child);
     }
     if (!cleanupReport || !cleanupReport.profileRemoved) {
-      await removeProfile(profilePath);
+      await removeProfile(profilePath, 45000);
     }
   }
 }

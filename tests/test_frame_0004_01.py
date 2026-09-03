@@ -45,6 +45,7 @@ EXPECTED_DIGEST = (
 )
 EXPECTED_ROUTE = tuple("SEESSWWSSENEESENNE")
 EXPECTED_DETOUR = tuple("SEESSWWSSENEESWEENNE")
+ALTERNATE_SEEDS = ("FOG-7", "MIST-Δ", "A|B;C")
 EXPECTED_FULFILLMENT = {
     "result_channel": "working-proofs",
     "publication_id": PUBLICATION_ID,
@@ -493,27 +494,41 @@ class TestCommissionFixtureAndState(unittest.TestCase):
             for item in commissions
             if item["id"] == "play-seeded-maze-return"
         )
-        self.assertEqual(commission["category"], "play")
-        self.assertEqual(
-            commission["gates"]["objective_evidence"]["criterion"],
-            RENDERER.COMMISSION_CRITERION,
-        )
-        self.assertTrue(commission["gates"]["paired_delivery"]["mp4"])
-        self.assertTrue(commission["gates"]["paired_delivery"]["webm"])
-        self.assertTrue(commission["gates"]["paired_delivery"]["live"])
-        self.assertTrue(
-            commission["gates"]["paired_delivery"]["same_publication"]
-        )
-        self.assertTrue(commission["gates"]["exact_reset"]["required"])
-        if commission["status"] == "open":
-            self.assertNotIn("fulfillment", commission)
-        elif commission["status"] == "closed":
-            self.assertEqual(commission["fulfillment"], EXPECTED_FULFILLMENT)
-        else:
-            self.fail(
-                f"commission must be exact open or future closed, not "
-                f"{commission['status']!r}"
+        def assert_compatible(document):
+            self.assertEqual(document["category"], "play")
+            self.assertEqual(
+                document["gates"]["objective_evidence"]["criterion"],
+                RENDERER.COMMISSION_CRITERION,
             )
+            self.assertTrue(document["gates"]["paired_delivery"]["mp4"])
+            self.assertTrue(document["gates"]["paired_delivery"]["webm"])
+            self.assertTrue(document["gates"]["paired_delivery"]["live"])
+            self.assertTrue(
+                document["gates"]["paired_delivery"]["same_publication"]
+            )
+            self.assertTrue(document["gates"]["exact_reset"]["required"])
+            if document["status"] == "open":
+                self.assertNotIn("fulfillment", document)
+            elif document["status"] == "closed":
+                self.assertEqual(
+                    document["fulfillment"],
+                    EXPECTED_FULFILLMENT,
+                )
+            else:
+                self.fail(
+                    "commission must be exact open or future closed, not "
+                    f"{document['status']!r}"
+                )
+
+        assert_compatible(commission)
+        simulated_open = copy.deepcopy(commission)
+        simulated_open["status"] = "open"
+        simulated_open.pop("fulfillment", None)
+        assert_compatible(simulated_open)
+        simulated_closed = copy.deepcopy(commission)
+        simulated_closed["status"] = "closed"
+        simulated_closed["fulfillment"] = EXPECTED_FULFILLMENT
+        assert_compatible(simulated_closed)
 
     def test_independent_canonical_generator_digest_bfs_and_trap_are_exact(self):
         fixture = independent_fixture("RAPP-42")
@@ -539,7 +554,7 @@ class TestCommissionFixtureAndState(unittest.TestCase):
         )
 
     def test_renderer_matches_independent_arbitrary_seed_recomputation(self):
-        for seed in ("RAPP-42", "FOG-7", "MIST-Δ", "A|B;C"):
+        for seed in ("RAPP-42", *ALTERNATE_SEEDS):
             with self.subTest(seed=seed):
                 expected = independent_fixture(seed)
                 validate_perfect_maze(expected["maze"])
@@ -769,6 +784,20 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
             tuple(self.evidence["fixtures"]["canonical"]["detourRoute"]),
             EXPECTED_DETOUR,
         )
+        alternates = self.evidence["fixtures"]["alternateAudit"]
+        self.assertEqual(
+            [fixture["seed"] for fixture in alternates],
+            list(ALTERNATE_SEEDS),
+        )
+        for fixture in alternates:
+            expected = independent_fixture(fixture["seed"])
+            self.assertEqual(fixture["topologySignature"], expected["signature"])
+            self.assertEqual(fixture["topologyDigest"], expected["digest"])
+            self.assertEqual(
+                tuple(fixture["shortestRoute"]),
+                expected["route"],
+            )
+            self.assertEqual(tuple(fixture["detourRoute"]), expected["detour"])
         claims = {
             claim["id"]: claim["expectedState"]
             for claim in self.evidence["claims"]
@@ -805,6 +834,22 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
             self.evidence["browserRuntime"]["geometry"][
                 "lowerThirdCriticalContent"
             ]
+        )
+        self.assertEqual(
+            self.evidence["manifestReplay"]["actualInputVerification"],
+            "CDP mouse and keyboard events",
+        )
+        self.assertFalse(
+            self.evidence["manifestReplay"]["publicFixtureApi"]
+        )
+        self.assertEqual(
+            self.evidence["browserRuntime"]["routePrivacy"],
+            {
+                "visibleTextChecked": True,
+                "renderedDomChecked": True,
+                "accessibilityTreeChecked": True,
+                "fullRouteBeforeAttempt": False,
+            },
         )
 
     def test_evidence_source_sha_bindings_are_current(self):
@@ -868,13 +913,22 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
             "YOUR TURN",
             "@media (max-width: 430px)",
             "min-height: 44px",
-            "window.foglineSurvey = Object.freeze",
             "function generateMaze(",
             "function canonicalTopology(",
             "function shortestRoute(",
             "function selectTrap(",
+            'elements.seedInput.addEventListener("click"',
+            "if (error.message !== INVALID_SEED_MESSAGE) throw error;",
         ):
             self.assertIn(fragment, self.app_source)
+        self.assertNotIn("window.foglineSurvey", self.app_source)
+        self.assertNotIn("fixtureSnapshot", self.app_source)
+        self.assertNotRegex(
+            self.app_source,
+            r'type\s*=\s*["\']password["\']|-webkit-text-security\s*:',
+        )
+        for uncanned in ("MIST-Δ", "A|B;C"):
+            self.assertNotIn(uncanned, self.app_source)
         for code in (
             "ArrowUp",
             "ArrowRight",
@@ -942,6 +996,7 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
                 self.assertNotIn(b"\r", data)
 
         scratch = CANDIDATE / ".frame-0004-01-crlf.json"
+        script_scratch = CANDIDATE / ".frame-0004-01-crlf.mjs"
         try:
             scratch.write_text(
                 normalized_text(MANIFEST_PATH).replace("\n", "\r\n"),
@@ -950,8 +1005,38 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
             )
             compilation = COMPILER.prepare_compilation(scratch)
             self.assertEqual(compilation.channel, self.channel)
+            ast.parse(
+                normalized_text(RENDERER_PATH).replace("\n", "\r\n"),
+                filename="crlf-render.py",
+            )
+            index = AppIndex()
+            index.feed(
+                normalized_text(APP_PATH).replace("\n", "\r\n")
+            )
+            self.assertIn("maze-board", index.ids)
+            if NODE:
+                script_scratch.write_text(
+                    normalized_text(VERIFY_PATH).replace("\n", "\r\n"),
+                    encoding="utf-8",
+                    newline="",
+                )
+                checked = subprocess.run(
+                    [NODE, "--check", str(script_scratch)],
+                    cwd=CANDIDATE,
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    timeout=30,
+                )
+                self.assertEqual(
+                    checked.returncode,
+                    0,
+                    checked.stderr or checked.stdout,
+                )
         finally:
             scratch.unlink(missing_ok=True)
+            script_scratch.unlink(missing_ok=True)
 
     def test_rights_privacy_and_secret_attestations_are_explicit(self):
         attestations = self.evidence["attestations"]
@@ -1040,6 +1125,25 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
                 frame = sample["frame"]
                 timestamp = sample["timestamp"]
                 self.assertEqual(RENDERER.film_phase(timestamp), phase)
+                fixture, _state, scene_phase, _banner, _extra = (
+                    RENDERER._film_scene(timestamp)
+                )
+                self.assertEqual(scene_phase, phase)
+                expected = independent_fixture(fixture.seed)
+                self.assertEqual(
+                    fixture.topology_signature,
+                    expected["signature"],
+                )
+                self.assertEqual(
+                    fixture.topology_digest,
+                    expected["digest"],
+                )
+                self.assertEqual(fixture.shortest_route, expected["route"])
+                self.assertEqual(fixture.detour_route, expected["detour"])
+                self.assertEqual(
+                    fixture.seed,
+                    "FOG-7" if phase == "takeover" else "RAPP-42",
+                )
                 self.assertEqual(
                     RENDERER.frame_digest(frame),
                     sample["sha256"],
@@ -1100,6 +1204,17 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
             {record["path"] for record in self.delivery["sourceArtifacts"]},
             set(RENDERER.DELIVERY_SOURCE_PATHS),
         )
+        alternate_objective = self.delivery["objective"]["alternateSeeds"]
+        self.assertEqual(
+            [item["seed"] for item in alternate_objective],
+            list(ALTERNATE_SEEDS),
+        )
+        for item in alternate_objective:
+            fixture = independent_fixture(item["seed"])
+            self.assertEqual(item["topologyDigest"], fixture["digest"])
+            self.assertEqual(item["referenceLength"], len(fixture["route"]))
+            self.assertEqual(item["trap"], list(fixture["trap"]["cell"]))
+            self.assertEqual(item["detourLength"], len(fixture["detour"]))
         for record in self.delivery["sourceArtifacts"]:
             path = CANDIDATE / record["path"]
             with self.subTest(path=record["path"]):
@@ -1296,6 +1411,10 @@ class TestExecutableReleaseChecks(unittest.TestCase):
                 first = scratches[0] / relative
                 second = scratches[1] / relative
                 self.assertEqual(first.read_bytes(), second.read_bytes())
+                self.assertEqual(
+                    first.read_bytes(),
+                    (CANDIDATE / relative).read_bytes(),
+                )
 
     def test_compiler_check_and_source_transform_pass(self):
         completed = subprocess.run(
@@ -1382,12 +1501,71 @@ class TestExecutableReleaseChecks(unittest.TestCase):
             'cdp.on("Runtime.exceptionThrown"',
             'cdp.on("Runtime.consoleAPICalled"',
             "Input.dispatchKeyEvent",
+            "Input.dispatchMouseEvent",
+            'cdp.command("Accessibility.enable")',
+            'cdp.command("Accessibility.getFullAXTree")',
             "assertVisibleGeometry",
             "independentFixture",
+            "exerciseAlternateSeeds",
+            "auditOpeningPrivacy",
             "await removeProfile(profilePath)",
         ):
             self.assertIn(fragment, source)
         self.assertNotIn("catch {}", source)
+        self.assertNotIn("window.foglineSurvey.snapshot", source)
+        self.assertNotIn("window.foglineSurvey.fixture", source)
+        self.assertNotIn("target.click()", source)
+
+    @unittest.skipUnless(
+        NODE and BROWSER,
+        "Node.js and a Chromium-family RAPP_BROWSER are required",
+    )
+    def test_rapp_browser_and_explicit_argument_precedence(self):
+        scratch = CANDIDATE / ".frame-0004-01-browser-precedence"
+        shutil.rmtree(scratch, ignore_errors=True)
+        self.addCleanup(lambda: shutil.rmtree(scratch, ignore_errors=True))
+        scratch.mkdir()
+        fake = scratch / ("chrome.exe" if os.name == "nt" else "chrome")
+        fake.write_text("not launched\n", encoding="utf-8", newline="\n")
+        fake.chmod(0o755)
+
+        def discover(arguments, environment):
+            completed = subprocess.run(
+                [NODE, str(VERIFY_PATH), *arguments, "--find-browser"],
+                cwd=CANDIDATE,
+                check=False,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                timeout=30,
+                env=environment,
+            )
+            self.assertEqual(
+                completed.returncode,
+                0,
+                completed.stderr or completed.stdout,
+            )
+            return str(Path(completed.stdout.strip()).resolve())
+
+        primary = os.environ.copy()
+        primary["RAPP_BROWSER"] = BROWSER
+        primary["RAPP_VISION_BROWSER"] = str(fake)
+        self.assertEqual(
+            discover([], primary),
+            str(Path(BROWSER).resolve()),
+        )
+
+        alias = os.environ.copy()
+        alias.pop("RAPP_BROWSER", None)
+        alias["RAPP_VISION_BROWSER"] = str(fake)
+        self.assertEqual(discover([], alias), str(fake.resolve()))
+
+        explicit = os.environ.copy()
+        explicit["RAPP_BROWSER"] = BROWSER
+        self.assertEqual(
+            discover(["--browser", str(fake)], explicit),
+            str(fake.resolve()),
+        )
 
     @unittest.skipUnless(
         NODE and BROWSER,
@@ -1406,7 +1584,7 @@ class TestExecutableReleaseChecks(unittest.TestCase):
             capture_output=True,
             text=True,
             encoding="utf-8",
-            timeout=180,
+            timeout=240,
         )
         self.assertEqual(
             completed.returncode,
@@ -1421,6 +1599,32 @@ class TestExecutableReleaseChecks(unittest.TestCase):
         self.assertTrue(all(report["checks"].values()), report["checks"])
         self.assertEqual(report["cleanup"]["browserExited"], True)
         self.assertEqual(report["cleanup"]["profileRemoved"], True)
+        self.assertFalse(Path(report["cleanup"]["profilePath"]).exists())
+        self.assertTrue(all(report["hintGate"].values()))
+        self.assertEqual(
+            [item["seed"] for item in report["alternateSeeds"]],
+            list(ALTERNATE_SEEDS),
+        )
+        for item in report["alternateSeeds"]:
+            expected = independent_fixture(item["seed"])
+            self.assertEqual(item["digest"], expected["digest"])
+            self.assertEqual(item["edges"], 35)
+            self.assertEqual(item["connectedCells"], 36)
+            self.assertEqual(item["routeLength"], len(expected["route"]))
+            self.assertEqual(item["trap"]["cell"], list(expected["trap"]["cell"]))
+            self.assertEqual(item["detourLength"], len(expected["detour"]))
+            self.assertTrue(item["optimalCompleted"])
+            self.assertTrue(item["trapCompleted"])
+            self.assertFalse(item["privacy"]["publicFixtureApi"])
+        self.assertEqual(
+            report["globalErrors"],
+            {
+                "externalRequests": [],
+                "networkFailures": [],
+                "exceptions": [],
+                "console": [],
+            },
+        )
         self.assertEqual(
             [
                 (item["viewport"]["width"], item["viewport"]["height"])
@@ -1438,6 +1642,31 @@ class TestExecutableReleaseChecks(unittest.TestCase):
                 self.assertEqual(viewport["fixture"]["detourLength"], 20)
                 self.assertEqual(len(viewport["actionReports"]), 71)
                 self.assertGreaterEqual(len(viewport["checkpointReports"]), 9)
+                self.assertTrue(
+                    all(
+                        item["inputMethod"]
+                        in {"cdp-mouse", "cdp-keyboard", "cdp-scroll"}
+                        for item in viewport["actionReports"]
+                    )
+                )
+                self.assertTrue(
+                    any(
+                        item["inputMethod"] == "cdp-mouse"
+                        for item in viewport["actionReports"]
+                    )
+                )
+                self.assertTrue(
+                    any(
+                        item["inputMethod"] == "cdp-keyboard"
+                        for item in viewport["actionReports"]
+                    )
+                )
+                self.assertTrue(
+                    all(
+                        report_item["report"]["publicFixtureApi"] is False
+                        for report_item in viewport["privacyReports"]
+                    )
+                )
                 self.assertEqual(
                     viewport["authoredFinal"]["seed"],
                     "FOG-7",
@@ -1449,6 +1678,10 @@ class TestExecutableReleaseChecks(unittest.TestCase):
                 self.assertEqual(
                     viewport["takeover"]["restartSteps"],
                     0,
+                )
+                self.assertEqual(
+                    viewport["takeover"]["inputMethod"],
+                    "cdp-keyboard-wasd",
                 )
                 self.assertEqual(viewport["errors"]["externalRequests"], [])
                 self.assertEqual(viewport["errors"]["exceptions"], [])

@@ -1285,7 +1285,6 @@
       let fixture = buildFixture("RAPP-42");
       let state = initialState(fixture);
       let seedError = null;
-      let seedChangeCount = 0;
 
       if (
         fixture.topologyDigest !==
@@ -1295,91 +1294,6 @@
         !sameCell(fixture.trap.cell, [2, 5])
       ) {
         throw new Error("Canonical RAPP-42 fixture drifted.");
-      }
-
-      function fixtureSnapshot() {
-        return {
-          seed: fixture.seed,
-          width: fixture.width,
-          height: fixture.height,
-          entrance: copyCell(fixture.entrance),
-          exit: copyCell(fixture.exit),
-          topologySignature: fixture.topologySignature,
-          topologyDigest: fixture.topologyDigest,
-          referenceLength: fixture.shortestRoute.length,
-          trap: {
-            approachIndex: fixture.trap.approachIndex,
-            approach: copyCell(fixture.trap.approach),
-            turn: fixture.trap.turn,
-            cell: copyCell(fixture.trap.cell),
-            returnDirection: fixture.trap.returnDirection,
-            selection: fixture.trap.selection
-          },
-          detourLength: fixture.detourRoute.length,
-          cells: Array.from({ length: fixture.height }, (_, y) =>
-            Array.from({ length: fixture.width }, (_, x) => ({
-              x,
-              y,
-              openings: "NESW"
-                .split("")
-                .filter(direction => fixture.maze.get(`${x},${y}`).has(direction))
-                .join("")
-            }))
-          ).flat()
-        };
-      }
-
-      function snapshot() {
-        const trapEntered = state.trail.some(cell => sameCell(cell, fixture.trap.cell));
-        return {
-          schema: "fogline-survey-state/1.0",
-          seed: fixture.seed,
-          seedInput: elements.seedInput.value,
-          seedError,
-          seedChangeCount,
-          grid: { width: fixture.width, height: fixture.height },
-          topologyDigest: fixture.topologyDigest,
-          topologySignature: fixture.topologySignature,
-          position: { x: state.position[0], y: state.position[1] },
-          facing: state.facing,
-          steps: state.acceptedMoves.length,
-          acceptedMoves: [...state.acceptedMoves],
-          referenceLength: fixture.shortestRoute.length,
-          projectedTotal: state.projectedTotal,
-          trail: state.trail.map(copyCell),
-          revealed: [...state.revealed]
-            .map(value => value.split(",").map(Number))
-            .sort((left, right) => left[1] - right[1] || left[0] - right[0]),
-          status: state.status,
-          message: state.message,
-          lastAttempt: state.lastAttempt,
-          lastRejected: state.lastRejected,
-          completed: state.completed,
-          matchedOptimal: state.matchedOptimal,
-          exit: {
-            x: fixture.exit[0],
-            y: fixture.exit[1],
-            state: state.exitOpen ? "open" : "closed",
-            marked: true
-          },
-          trap: {
-            x: fixture.trap.cell[0],
-            y: fixture.trap.cell[1],
-            approachStep: fixture.trap.approachIndex,
-            enteredStep: fixture.trap.approachIndex + 1,
-            turn: fixture.trap.turn,
-            marked: state.revealed.has(keyOf(fixture.trap.cell)),
-            entered: trapEntered
-          },
-          assistance: {
-            earned: state.surveyEarned,
-            available: state.hintAvailable,
-            used: state.assistanceUsed,
-            requests: state.hintRequests,
-            hintDirection: state.hintDirection,
-            scope: "one next move only"
-          }
-        };
       }
 
       function renderBoard() {
@@ -1506,7 +1420,6 @@
         elements.seedInput.value = fixture.seed;
         render();
         elements.board.focus({ preventScroll: true });
-        return snapshot();
       }
 
       function requestHint() {
@@ -1517,16 +1430,17 @@
       function loadSeed() {
         const draft = elements.seedInput.value;
         try {
-          const nextFixture = buildFixture(draft);
-          fixture = nextFixture;
-          state = initialState(fixture);
-          seedError = null;
-          seedChangeCount += 1;
-          render();
+          normalizeSeed(draft);
         } catch (error) {
+          if (error.message !== INVALID_SEED_MESSAGE) throw error;
           seedError = INVALID_SEED_MESSAGE;
           render();
+          return;
         }
+        fixture = buildFixture(draft);
+        state = initialState(fixture);
+        seedError = null;
+        render();
       }
 
       for (const button of document.querySelectorAll("[data-direction]")) {
@@ -1541,6 +1455,9 @@
       elements.hintButton.addEventListener("click", requestHint);
       elements.restartButton.addEventListener("click", restart);
       elements.seedButton.addEventListener("click", loadSeed);
+      elements.seedInput.addEventListener("click", () => {
+        elements.seedInput.select();
+      });
 
       document.addEventListener("keydown", event => {
         if (
@@ -1563,12 +1480,6 @@
         if (!direction) return;
         event.preventDefault();
         move(direction);
-      });
-
-      window.foglineSurvey = Object.freeze({
-        snapshot,
-        fixture: fixtureSnapshot,
-        restart
       });
 
       render();

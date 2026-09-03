@@ -37,6 +37,8 @@ implement or independently derive the generator, serialization, digest, BFS
 route, and trap. The live document displays the seed, full digest, current
 steps, best projected finish, and reference length. It never prints the route
 in visible DOM before play; reference length 18 is intentionally visible.
+The verifier also searches the rendered markup and Chromium accessibility
+tree. The app exposes no fixture, topology, route, or reducer API on `window`.
 
 ## One earned bearing
 
@@ -64,6 +66,11 @@ RAPP-42. Invalid text remains editable while the last accepted fixture and
 all game fields are preserved. This rejection is demonstrated before the
 multi-seed **YOUR TURN** handoff.
 
+The independent browser audit additionally generates `FOG-7`, `MIST-Δ`, and
+`A|B;C`, checks each recomputed digest and shortest length, completes each
+shortest route, enters each computed trap, and finishes each real +2 detour
+using CDP-delivered Arrow and WASD input.
+
 ## Editorial sequence
 
 1. Establish RAPP-42, its complete digest, fogline, compass, marked exit, and
@@ -86,7 +93,7 @@ checked throughout at desktop and exactly 390 CSS pixels.
 
 | Path | Purpose |
 | --- | --- |
-| `apps/maze-fogline.html` | Offline single-file maze, generator, reducer, responsive fog renderer, and `window.foglineSurvey.snapshot()` contract |
+| `apps/maze-fogline.html` | Offline single-file maze, private generator/reducer, responsive fog renderer, and keyboard-first controls |
 | `render.py` | Standard-library deterministic model, RGB24 renderer, FFV1 writer, thumbnail/evidence/delivery generator, and release checker |
 | `masters/maze-fogline.mkv` | 24-second, 12 fps, lossless FFV1 `bgr0` master |
 | `media/maze-fogline.mp4` | Compiler-produced H.264 `yuv420p` BT.709 delivery |
@@ -97,7 +104,7 @@ checked throughout at desktop and exactly 390 CSS pixels.
 | `snapshots/canonical-states.json` | Opening, optimal, hint, trap, detour, reset, invalid-preserved, and handoff states |
 | `evidence.json` | Commission, fixture, replay, browser, film, rights/privacy, and source SHA-256 evidence |
 | `delivery.json` | Source/media SHA-256 bindings plus fresh codec, color, frame-rate, size, and duration probes |
-| `verify_dom.mjs` | Dependency-free real-Chromium timed replay and responsive state/geometry verifier |
+| `verify_dom.mjs` | Dependency-free real-Chromium CDP-input, accessibility, timed replay, alternate-seed, and responsive geometry verifier |
 
 The app has no network code, external assets, external data, audio, analytics,
 personal data, customer data, credentials, or secrets.
@@ -139,8 +146,10 @@ LF contracts strict. It independently regenerates topology and BFS results,
 accepts either the exact open commission or its future exact fulfillment,
 binds committed delivery hashes separately from two same-toolchain rebuilds,
 decodes one committed frame from every declared film phase, compares the
-lossy deliveries, runs compiler/validator/release checks, and executes both
-desktop and 390 px real-browser replays when the declared tools are available.
+lossy deliveries, verifies `RAPP_BROWSER` precedence, runs
+compiler/validator/release checks, and executes both desktop and 390 px
+real-browser replays with actual CDP mouse/keyboard input when the declared
+tools are available.
 
 ## Rights and privacy
 
