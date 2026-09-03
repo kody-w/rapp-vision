@@ -84,7 +84,7 @@
       "sha256": "728f35b2dd6f8d48bfc8497eadba4359e121c01daf47865d7b6d403efff045c3"
     },
     "webm": {
-      "bytes": 84485,
+      "bytes": 84470,
       "codec": "vp9",
       "color_primaries": "bt709",
       "color_range": "tv",
@@ -94,7 +94,7 @@
       "height": 540,
       "path": "media/create-vector-icon-system.webm",
       "pixel_format": "yuv420p",
-      "sha256": "cb499f14e51445f3787657925fec0a27ee5d19ace761da1b3f1005225b8a2b45",
+      "sha256": "c046ad76e489d68d4663c57f08fa8e095604880d808447269ec44eb298399124",
       "width": 960
     }
   },
