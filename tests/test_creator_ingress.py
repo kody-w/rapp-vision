@@ -59,6 +59,11 @@ FULFILLED_COMMISSIONS = {
             "candidate-frame-0003/archive-wetland-contrast"
         ),
     },
+    "play-seeded-maze-return": {
+        "result_channel": "working-proofs",
+        "publication_id": "maze-fogline",
+        "source_candidate": "candidate-frame-0004/maze-fogline",
+    },
 }
 
 
@@ -331,7 +336,7 @@ class TestCreatorIngress(unittest.TestCase):
             for commission in slate
             if commission["status"] == "open"
         }
-        self.assertEqual(len(selectable), 7)
+        self.assertEqual(len(selectable), 6)
         self.assertTrue(set(FULFILLED_COMMISSIONS).isdisjoint(selectable))
         self.assertEqual(
             selectable,

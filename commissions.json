@@ -386,7 +386,12 @@
       "id": "play-seeded-maze-return",
       "title": "Escape and replay a seeded maze",
       "category": "play",
-      "status": "open",
+      "status": "closed",
+      "fulfillment": {
+        "result_channel": "working-proofs",
+        "publication_id": "maze-fogline",
+        "source_candidate": "candidate-frame-0004/maze-fogline"
+      },
       "brief": "Build a small maze whose seed, shortest route, failure room, and reset are legible enough for a viewer to verify and then take over.",
       "gates": {
         "paired_delivery": {

@@ -49,6 +49,15 @@ const profilePath = resolve(profileArgument);
 const workingRoot = resolve(ROOT, "working-proofs");
 const channel = JSON.parse(await readFile(channelPath, "utf8"));
 const evidenceIndex = JSON.parse(await readFile(evidenceIndexPath, "utf8"));
+const registry = JSON.parse(
+  await readFile(resolve(ROOT, "channels.json"), "utf8"),
+);
+const harnessRegistry = Buffer.from(JSON.stringify({
+  ...registry,
+  channels: registry.channels.filter(
+    entry => entry.id === channel.id,
+  ),
+}));
 
 function assertWorkingScratch(path, label) {
   const prefix = workingRoot.endsWith(sep)
@@ -148,6 +157,32 @@ const CONFIG = {
       };
     },
   },
+  "maze-fogline": {
+    openingClaim: "resetAfterTrap",
+    realInput: true,
+    readyExpression:
+      'frame.contentDocument.documentElement.dataset.ready === "true" && ' +
+      'frame.contentDocument.querySelectorAll("#maze-board > .cell").length === 36',
+    snapshotExpression: foglineSnapshotExpression,
+    captureClaims: {
+      trap: "trap",
+      optimal: "success",
+      handoff: "FOG-7",
+    },
+    evidence(document) {
+      return {
+        actionCount: document.manifestReplay.actionCount,
+        checkpointMode: "state-gated",
+        checkpoints: document.manifestReplay.checkpoints,
+        claims: document.claims.map(claim => ({
+          id: claim.id,
+          expectedState: claim.stateGate,
+        })),
+        maxActionLatenessSeconds:
+          document.manifestReplay.maxActionLatenessSeconds,
+      };
+    },
+  },
 };
 
 assert.deepEqual(
@@ -222,6 +257,19 @@ function repositoryPath(requestUrl) {
 
 const server = createServer(async (request, response) => {
   try {
+    const pathname = new URL(
+      request.url || "/",
+      "http://127.0.0.1",
+    ).pathname;
+    if (pathname === "/channels.json") {
+      response.writeHead(200, {
+        "Cache-Control": "no-store",
+        "Content-Length": harnessRegistry.length,
+        "Content-Type": "application/json; charset=utf-8",
+      });
+      response.end(harnessRegistry);
+      return;
+    }
     const path = repositoryPath(request.url || "/");
     if (!path || !(await stat(path)).isFile()) {
       response.writeHead(404);
@@ -381,6 +429,9 @@ class Cdp {
 
 let cdp;
 const browserErrors = [];
+const externalRequests = [];
+const networkErrors = [];
+const requests = [];
 
 async function evaluate(expression) {
   const response = await cdp.command("Runtime.evaluate", {
@@ -430,21 +481,93 @@ async function openReplay(publicationId, config) {
     )}) && Boolean(document.querySelector("#b-switch"))`,
   );
   await evaluate('document.querySelector("#b-switch").click()');
-  await waitFor(
-    `Boolean(document.querySelector("#stage iframe")?.contentWindow?.[${JSON.stringify(
-      config.contract,
-    )}])`,
-  );
+  if (config.readyExpression) {
+    await waitFor(`(() => {
+      const frame = document.querySelector("#stage iframe");
+      return Boolean(frame) && (${config.readyExpression});
+    })()`);
+  } else {
+    await waitFor(
+      `Boolean(document.querySelector("#stage iframe")?.contentWindow?.[${JSON.stringify(
+        config.contract,
+      )}])`,
+    );
+  }
   await delay(100);
 }
 
 async function snapshot(config) {
+  if (config.snapshotExpression) {
+    return evaluate(config.snapshotExpression());
+  }
   return evaluate(`(() => {
     const frame = document.querySelector("#stage iframe");
     return frame.contentWindow[${JSON.stringify(config.contract)}][${JSON.stringify(
       config.snapshotMethod,
     )}]();
   })()`);
+}
+
+function foglineSnapshotExpression() {
+  return `(() => {
+    const frame = document.querySelector("#stage iframe");
+    const doc = frame.contentDocument;
+    const text = selector => doc.querySelector(selector).textContent.trim();
+    const hidden = selector => doc.querySelector(selector).hidden;
+    const integer = value => Number.parseInt(value.match(/-?\\d+/)?.[0] || "0", 10);
+    const position = text("#position-value")
+      .replace(/[()]/g, "")
+      .split(",")
+      .map(value => Number.parseInt(value, 10));
+    const compass = {
+      NORTH: "N",
+      EAST: "E",
+      SOUTH: "S",
+      WEST: "W"
+    }[text("#compass-value")];
+    const successText = text("#success-panel");
+    const statusText = text("#status-message");
+    const hintText = text("#hint-panel");
+    const assistanceText = text("#assist-value");
+    const completed = !hidden("#success-panel");
+    let status = "ready";
+    if (completed) {
+      status = /matched the reference|= reference/i.test(successText)
+        ? "complete-optimal"
+        : "complete-detour";
+    } else if (!hidden("#trap-panel")) {
+      status = "trap";
+    } else if (!hidden("#hint-panel")) {
+      status = "hint";
+    } else if (/fogbound by a wall/i.test(statusText)) {
+      status = "wall";
+    } else if (!/\\bready\\b/i.test(statusText)) {
+      status = "moving";
+    }
+    const steps = integer(text("#step-value"));
+    const assistanceUsed = /^ASSISTED\\b/.test(assistanceText);
+    return {
+      assistanceUsed,
+      completed,
+      exitState: text("#exit-value").split(/\\s+/)[0],
+      facing: compass,
+      hintAvailable: !doc.querySelector("#hint-btn").disabled,
+      hintDirection: hidden("#hint-panel")
+        ? null
+        : (hintText.match(/ONE STEP ONLY:\\s*([NESW])/i)?.[1] || null),
+      hintRequests: assistanceUsed ? 1 : 0,
+      matchedOptimal: completed
+        ? /matched the reference|= reference/i.test(successText)
+        : null,
+      position,
+      projectedTotal: integer(text("#projection-value")),
+      seed: text("#seed-value"),
+      status,
+      steps,
+      topologyDigest: text("#digest-value"),
+      trailLength: steps
+    };
+  })()`;
 }
 
 async function waitForSnapshot(config, expected, label, timeout = 20_000) {
@@ -615,7 +738,145 @@ function keyFromCode(code) {
   return String(code || "").replace(/(Left|Right)$/, "");
 }
 
-async function applyAction(action) {
+const REAL_KEYS = {
+  ArrowDown: { key: "ArrowDown", code: "ArrowDown", virtualKeyCode: 40 },
+  ArrowLeft: { key: "ArrowLeft", code: "ArrowLeft", virtualKeyCode: 37 },
+  ArrowRight: { key: "ArrowRight", code: "ArrowRight", virtualKeyCode: 39 },
+  ArrowUp: { key: "ArrowUp", code: "ArrowUp", virtualKeyCode: 38 },
+  Escape: { key: "Escape", code: "Escape", virtualKeyCode: 27 },
+  KeyD: { key: "d", code: "KeyD", virtualKeyCode: 68, text: "d" },
+};
+
+async function dispatchRealKey(code) {
+  const definition = REAL_KEYS[code];
+  assert.ok(definition, `unsupported real key ${code}`);
+  const common = {
+    key: definition.key,
+    code: definition.code,
+    windowsVirtualKeyCode: definition.virtualKeyCode,
+    nativeVirtualKeyCode: definition.virtualKeyCode,
+  };
+  await cdp.command("Input.dispatchKeyEvent", {
+    type: "rawKeyDown",
+    ...common,
+    text: definition.text || "",
+  });
+  await cdp.command("Input.dispatchKeyEvent", {
+    type: "keyUp",
+    ...common,
+  });
+}
+
+async function dispatchMousePoint({ x, y }) {
+  await cdp.command("Input.dispatchMouseEvent", {
+    type: "mouseMoved",
+    x,
+    y,
+  });
+  await cdp.command("Input.dispatchMouseEvent", {
+    type: "mousePressed",
+    x,
+    y,
+    button: "left",
+    buttons: 1,
+    clickCount: 1,
+  });
+  await cdp.command("Input.dispatchMouseEvent", {
+    type: "mouseReleased",
+    x,
+    y,
+    button: "left",
+    buttons: 0,
+    clickCount: 1,
+  });
+}
+
+async function dispatchRealFrameClick(selector) {
+  const point = await evaluate(`(() => {
+    const stage = document.querySelector("#stage");
+    stage.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "auto" });
+    const frame = stage.querySelector("iframe");
+    const target = frame.contentDocument.querySelector(${JSON.stringify(selector)});
+    if (!target) throw new Error("missing real click target ${selector}");
+    const frameRect = frame.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    return {
+      x: frameRect.left + targetRect.left + targetRect.width / 2,
+      y: frameRect.top + targetRect.top + targetRect.height / 2
+    };
+  })()`);
+  await dispatchMousePoint(point);
+}
+
+async function dispatchRealOuterClick(selector) {
+  const point = await evaluate(`(() => {
+    const target = document.querySelector(${JSON.stringify(selector)});
+    if (!target) throw new Error("missing outer click target ${selector}");
+    target.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "auto" });
+    const rect = target.getBoundingClientRect();
+    return {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2
+    };
+  })()`);
+  await dispatchMousePoint(point);
+}
+
+async function applyRealAction(action) {
+  if (action.do === "scroll") {
+    await evaluate(`(() => {
+      const action = ${JSON.stringify(action)};
+      const frame = document.querySelector("#stage iframe");
+      const doc = frame.contentDocument;
+      const target = doc.querySelector(action.selector);
+      if (!target) throw new Error("missing scroll target " + action.selector);
+      const frameRect = frame.getBoundingClientRect();
+      const lower = document.querySelector("#stage .l3");
+      const lowerRect = lower ? lower.getBoundingClientRect() : null;
+      const safeBottom = Math.max(
+        0,
+        Math.min(
+          frameRect.height,
+          lowerRect ? lowerRect.top - frameRect.top : frameRect.height
+        )
+      );
+      target.scrollIntoView({
+        block: action.block || "center",
+        inline: "nearest",
+        behavior: "auto"
+      });
+      let rect = target.getBoundingClientRect();
+      if (rect.bottom > safeBottom - 8) {
+        const clearance = Math.max(0, frameRect.height - safeBottom + 16);
+        doc.documentElement.style.paddingBottom =
+          clearance ? clearance + "px" : "";
+        doc.documentElement.style.scrollPaddingBottom =
+          clearance ? clearance + "px" : "";
+        rect = target.getBoundingClientRect();
+        frame.contentWindow.scrollBy(0, rect.bottom - safeBottom + 8);
+      } else if (rect.top < 8) {
+        frame.contentWindow.scrollBy(0, rect.top - 8);
+      }
+    })()`);
+  } else if (action.do === "click") {
+    await dispatchRealFrameClick(action.selector);
+  } else if (action.do === "key") {
+    await dispatchRealKey(action.code);
+  } else if (action.do === "type") {
+    await cdp.command("Input.insertText", {
+      text: String(action.text || ""),
+    });
+  } else {
+    throw new Error(`unsupported real replay action ${action.do}`);
+  }
+  await delay(60);
+}
+
+async function applyAction(action, realInput = false) {
+  if (realInput) {
+    await applyRealAction(action);
+    return;
+  }
   const encoded = JSON.stringify(action);
   await evaluate(`(() => {
     const action = ${encoded};
@@ -769,6 +1030,286 @@ async function captureStage(path) {
   };
 }
 
+async function captureEvidence({
+  publicationId,
+  viewport,
+  checkpoint,
+  actionIndex,
+  resultSelector,
+  metrics,
+  actual,
+  expected,
+}) {
+  const filename =
+    `${publicationId}-${viewport.id}-${checkpoint}.png`;
+  const screenshot = await captureStage(join(outputRoot, filename));
+  assert.equal(
+    screenshot.width,
+    viewport.screenshotWidth,
+    `${filename}: screenshot width drifted`,
+  );
+  assert.equal(
+    screenshot.height,
+    viewport.screenshotHeight,
+    `${filename}: screenshot height drifted`,
+  );
+  return {
+    publication: publicationId,
+    viewport: viewport.id,
+    checkpoint,
+    actionIndex,
+    resultSelector,
+    metrics,
+    state: {
+      actualSha256: sha256(
+        Buffer.from(canonicalJson(actual), "utf8"),
+      ),
+      expectedSha256: sha256(
+        Buffer.from(canonicalJson(expected), "utf8"),
+      ),
+    },
+    screenshot: {
+      path: filename,
+      ...screenshot,
+    },
+  };
+}
+
+function rectanglesIntersect(a, b) {
+  return a.left < b.right && a.right > b.left &&
+    a.top < b.bottom && a.bottom > b.top;
+}
+
+async function takeoverChrome() {
+  return evaluate(`(() => {
+    const host = document.querySelector("#host");
+    const stage = document.querySelector("#stage");
+    const frame = stage.querySelector("iframe");
+    const lower = stage.querySelector(".l3");
+    const replay = document.querySelector(".lbar");
+    const toolbar = document.querySelector("#takebar");
+    const button = document.querySelector("#b-take-control");
+    const rect = element => {
+      const value = element.getBoundingClientRect();
+      return {
+        left: value.left,
+        top: value.top,
+        right: value.right,
+        bottom: value.bottom,
+        width: value.width,
+        height: value.height
+      };
+    };
+    return {
+      takeover: host.classList.contains("live-takeover"),
+      state: host.dataset.takeover || "",
+      stage: rect(stage),
+      frame: rect(frame),
+      lowerDisplay: lower ? getComputedStyle(lower).display : null,
+      replayDisplay: replay ? getComputedStyle(replay).display : null,
+      toolbar: {
+        display: getComputedStyle(toolbar).display,
+        rect: rect(toolbar)
+      },
+      button: {
+        display: getComputedStyle(button).display,
+        hidden: button.hidden,
+        pressed: button.getAttribute("aria-pressed"),
+        text: button.textContent.trim(),
+        rect: rect(button)
+      },
+      progress: Number.parseFloat(
+        document.querySelector("#ls i").style.width || "0"
+      ),
+      playText: document.querySelector("#lp").textContent.trim(),
+      page: {
+        innerHeight,
+        clientWidth: document.documentElement.clientWidth,
+        scrollWidth: document.documentElement.scrollWidth
+      },
+      topFocus: document.activeElement?.tagName || "",
+      childFocus: frame.contentDocument?.activeElement?.id || "",
+      childHasFocus: frame.contentDocument?.hasFocus() || false,
+      frameSrc: frame.src,
+      timeOrigin: frame.contentWindow.performance.timeOrigin,
+      marker: frame.contentWindow.__workingProofsTakeoverMarker || "",
+      keyLog: [...(frame.contentWindow.__workingProofsTakeoverKeys || [])]
+    };
+  })()`);
+}
+
+async function runFoglineTakeover(
+  viewport,
+  config,
+  normalFrameWidth,
+  handoffState,
+) {
+  await evaluate(`(() => {
+    const frame = document.querySelector("#stage iframe");
+    frame.contentWindow.__workingProofsTakeoverMarker =
+      ${JSON.stringify(`fogline-${viewport.id}`)};
+    frame.contentWindow.__workingProofsTakeoverKeys = [];
+    frame.contentDocument.addEventListener("keydown", event => {
+      frame.contentWindow.__workingProofsTakeoverKeys.push(event.code || event.key);
+    }, true);
+  })()`);
+  const before = {
+    state: await snapshot(config),
+    chrome: await takeoverChrome(),
+  };
+  assert.deepEqual(before.state, handoffState);
+  const appRequestsBefore = requests.filter(
+    url => url === before.chrome.frameSrc,
+  ).length;
+
+  await dispatchRealOuterClick("#lp");
+  await waitFor(
+    'document.querySelector("#lp").textContent.includes("Pause") && ' +
+      'Number.parseFloat(document.querySelector("#ls i").style.width || "0") > 0',
+  );
+  await dispatchRealOuterClick("#b-take-control");
+  await waitFor(
+    'document.querySelector("#host").classList.contains("live-takeover") && ' +
+      'document.activeElement?.tagName === "IFRAME"',
+  );
+  const entered = await takeoverChrome();
+  assert.equal(entered.state, "true");
+  assert.equal(entered.button.text, "Show captions");
+  assert.equal(entered.button.pressed, "true");
+  assert.equal(entered.lowerDisplay, "none");
+  assert.equal(entered.replayDisplay, "none");
+  assert.ok(entered.playText.includes("Play"));
+  assert.equal(entered.button.hidden, false);
+  assert.notEqual(entered.button.display, "none");
+  assert.ok(entered.button.rect.height >= 44);
+  assert.ok(entered.toolbar.rect.height >= 52);
+  assert.equal(
+    rectanglesIntersect(entered.button.rect, entered.frame),
+    false,
+  );
+  assert.equal(
+    rectanglesIntersect(entered.toolbar.rect, entered.frame),
+    false,
+  );
+  assert.ok(entered.toolbar.rect.top >= entered.frame.bottom);
+  assert.ok(
+    entered.toolbar.rect.bottom <= entered.page.innerHeight + 0.5,
+  );
+  assert.ok(entered.page.scrollWidth <= entered.page.clientWidth);
+  assert.ok(
+    Math.abs(entered.frame.width - normalFrameWidth) <= 0.5,
+    `${viewport.id}: takeover changed the exact iframe width`,
+  );
+  assert.ok(
+    entered.frame.height >= (viewport.id === "390" ? 600 : 520),
+    `${viewport.id}: takeover iframe is only ${entered.frame.height}px tall`,
+  );
+  assert.equal(entered.topFocus, "IFRAME");
+  assert.equal(entered.childHasFocus, true);
+  assert.equal(entered.timeOrigin, before.chrome.timeOrigin);
+  assert.equal(entered.marker, `fogline-${viewport.id}`);
+  assert.deepEqual(await snapshot(config), handoffState);
+
+  await delay(700);
+  const paused = await takeoverChrome();
+  assert.ok(
+    Math.abs(paused.progress - entered.progress) <= 0.01,
+    `${viewport.id}: replay clock advanced during takeover`,
+  );
+
+  await dispatchRealKey("KeyD");
+  await waitFor(`(() => {
+    const frame = document.querySelector("#stage iframe");
+    return frame.contentDocument.querySelector("#step-value")
+      ?.textContent.trim().startsWith("1 /");
+  })()`);
+  const movedState = await snapshot(config);
+  const movedChrome = await takeoverChrome();
+  assert.equal(movedState.seed, "FOG-7");
+  assert.equal(movedState.facing, "E");
+  assert.deepEqual(movedState.position, [1, 0]);
+  assert.equal(movedState.steps, 1);
+  assert.equal(movedState.trailLength, 1);
+  assert.deepEqual(movedChrome.keyLog.slice(-1), ["KeyD"]);
+  assert.equal(movedChrome.timeOrigin, before.chrome.timeOrigin);
+  assert.ok(
+    Math.abs(movedChrome.progress - entered.progress) <= 0.01,
+    `${viewport.id}: real east move changed the replay clock`,
+  );
+
+  await dispatchRealOuterClick("#b-take-control");
+  await waitFor(
+    '!document.querySelector("#host").classList.contains("live-takeover") && ' +
+      'document.querySelector("#lp").textContent.includes("Pause")',
+  );
+  await dispatchRealOuterClick("#lp");
+  await waitFor('document.querySelector("#lp").textContent.includes("Play")');
+  const shown = await takeoverChrome();
+  assert.equal(shown.button.text, "Take control");
+  assert.equal(shown.button.pressed, "false");
+  assert.notEqual(shown.lowerDisplay, "none");
+  assert.notEqual(shown.replayDisplay, "none");
+  assert.equal(shown.timeOrigin, before.chrome.timeOrigin);
+  assert.equal(shown.marker, `fogline-${viewport.id}`);
+  assert.deepEqual(await snapshot(config), movedState);
+
+  await dispatchRealOuterClick("#b-take-control");
+  await waitFor(
+    'document.querySelector("#host").classList.contains("live-takeover") && ' +
+      'document.activeElement?.tagName === "IFRAME"',
+  );
+  await dispatchRealKey("Escape");
+  await waitFor(
+    '!document.querySelector("#host").classList.contains("live-takeover") && ' +
+      'document.activeElement?.id === "b-take-control"',
+  );
+  const escaped = await takeoverChrome();
+  assert.equal(escaped.button.text, "Take control");
+  assert.notEqual(escaped.lowerDisplay, "none");
+  assert.notEqual(escaped.replayDisplay, "none");
+  assert.equal(escaped.timeOrigin, before.chrome.timeOrigin);
+  assert.equal(escaped.marker, `fogline-${viewport.id}`);
+  assert.deepEqual(await snapshot(config), movedState);
+  const appRequestsAfter = requests.filter(
+    url => url === before.chrome.frameSrc,
+  ).length;
+  assert.equal(
+    appRequestsAfter,
+    appRequestsBefore,
+    `${viewport.id}: takeover exit reloaded Fogline`,
+  );
+
+  return {
+    appRequestsBefore,
+    appRequestsAfter,
+    clock: {
+      entered: entered.progress,
+      after700ms: paused.progress,
+      afterEast: movedChrome.progress,
+    },
+    eastMove: {
+      direction: "E",
+      code: "KeyD",
+      position: movedState.position,
+      steps: movedState.steps,
+    },
+    entered: {
+      frame: entered.frame,
+      toolbar: entered.toolbar.rect,
+      button: entered.button.rect,
+      lowerDisplay: entered.lowerDisplay,
+      replayDisplay: entered.replayDisplay,
+    },
+    preserved: {
+      marker: escaped.marker,
+      stateAfterShowCaptions: canonicalJson(movedState) ===
+        canonicalJson(await snapshot(config)),
+      timeOrigin: escaped.timeOrigin === before.chrome.timeOrigin,
+    },
+    restoredBy: ["Show captions", "Escape"],
+  };
+}
+
 function requiresVisibleActivation(action) {
   return action.do !== "scroll";
 }
@@ -812,6 +1353,7 @@ try {
     cdp.command("Page.enable"),
     cdp.command("Runtime.enable"),
     cdp.command("Log.enable"),
+    cdp.command("Network.enable"),
   ]);
   cdp.on("Runtime.exceptionThrown", ({ exceptionDetails }) => {
     browserErrors.push(
@@ -828,6 +1370,28 @@ try {
   cdp.on("Log.entryAdded", ({ entry }) => {
     if (entry.level === "error" && entry.source === "javascript") {
       browserErrors.push(entry.text);
+    }
+  });
+  cdp.on("Network.requestWillBeSent", ({ request }) => {
+    requests.push(request.url);
+    if (
+      /^https?:/i.test(request.url) &&
+      !request.url.startsWith(`${origin}/`)
+    ) {
+      externalRequests.push(request.url);
+    }
+  });
+  cdp.on("Network.responseReceived", ({ response }) => {
+    if (/^https?:/i.test(response.url) && response.status >= 400) {
+      networkErrors.push(`${response.status} ${response.url}`);
+    }
+  });
+  cdp.on("Network.loadingFailed", ({
+    canceled,
+    errorText,
+  }) => {
+    if (!canceled && errorText !== "net::ERR_ABORTED") {
+      networkErrors.push(errorText);
     }
   });
   const version = await cdp.command("Browser.getVersion");
@@ -850,12 +1414,17 @@ try {
       const claims = new Map(
         evidenceContract.claims.map((claim) => [claim.id, claim]),
       );
-      const checkpoints = new Map(
-        evidenceContract.checkpoints.map((checkpoint) => [
-          checkpoint.afterAction,
-          checkpoint,
-        ]),
-      );
+      const checkpointMode =
+        evidenceContract.checkpointMode || "after-action";
+      const checkpoints = checkpointMode === "after-action"
+        ? new Map(
+            evidenceContract.checkpoints.map((checkpoint) => [
+              checkpoint.afterAction,
+              checkpoint,
+            ]),
+          )
+        : null;
+      let stateGatedCheckpointIndex = 0;
 
       assert.ok(
         evidenceContract.checkpoints.length >= 3,
@@ -870,19 +1439,25 @@ try {
       }
       await openReplay(publicationId, config);
       const resetClaim =
-        claims.get("reset") ||
+        claims.get(config.openingClaim || "reset") ||
         claims.get(evidenceContract.checkpoints.at(-1).claim);
       assert.ok(resetClaim, `${publicationId} has no opening/reset claim`);
+      const openingState = resetClaim.expectedState;
       await waitForSnapshot(
         config,
-        resetClaim.expectedState,
+        openingState,
         `${publicationId}/${viewport.id}/opening`,
       );
 
       const geometrySamples = [];
+      const supplementalGeometrySamples = [];
       const checkGeometry = (metrics, label) => {
         assertViewportGeometry(metrics, viewport, label);
         geometrySamples.push(metrics);
+      };
+      const checkSupplementalGeometry = (metrics, label) => {
+        assertViewportGeometry(metrics, viewport, label);
+        supplementalGeometrySamples.push(metrics);
       };
       const frame = await targetMetrics(
         aggregatePublication.live.scenes[0].ready.selector,
@@ -895,8 +1470,155 @@ try {
       const activationVisibility = [];
       const framingVisibility = [];
       const checkpointResults = [];
+      const captureResults = [];
       const timingSkews = [];
+      const inputMethods = new Set();
       let finalPromptChecked = false;
+      const addCapture = async ({
+        checkpoint,
+        actionIndex,
+        selector,
+        metrics,
+        actual,
+        expected,
+      }) => {
+        const entry = await captureEvidence({
+          publicationId,
+          viewport,
+          checkpoint,
+          actionIndex,
+          resultSelector: selector,
+          metrics,
+          actual,
+          expected,
+        });
+        captures.push(entry);
+        captureResults.push(entry);
+        return entry;
+      };
+      const resolveCheckpoint = async (
+        checkpoint,
+        observedState = null,
+        resolvedActionIndex = checkpoint.afterAction ?? null,
+        observedMetrics = null,
+      ) => {
+        const claim = claims.get(checkpoint.claim);
+        assert.ok(claim, `missing evidence claim ${checkpoint.claim}`);
+        const actual = observedState || await waitForSnapshot(
+          config,
+          claim.expectedState,
+          `${publicationId}/${viewport.id}/${checkpoint.claim}`,
+        );
+        assert.deepEqual(
+          actual,
+          claim.expectedState,
+          `${publicationId}/${viewport.id}/${checkpoint.claim}`,
+        );
+        const metrics =
+          observedMetrics || await targetMetrics(checkpoint.selector);
+        assertVisible(
+          metrics,
+          `${publicationId}/${viewport.id}/${checkpoint.claim} result`,
+        );
+        checkGeometry(
+          metrics,
+          `${publicationId}/${viewport.id}/${checkpoint.claim} geometry`,
+        );
+        const captureName = config.captureClaims
+          ? config.captureClaims[checkpoint.claim]
+          : checkpoint.claim;
+        let capture = null;
+        if (captureName) {
+          capture = await addCapture({
+            checkpoint: captureName,
+            actionIndex: resolvedActionIndex,
+            selector: checkpoint.selector,
+            metrics,
+            actual,
+            expected: claim.expectedState,
+          });
+        }
+        checkpointResults.push({
+          checkpoint: checkpoint.claim,
+          metrics,
+          capture,
+        });
+      };
+
+      if (publicationId === "maze-fogline") {
+        const active = await targetMetrics(null, true);
+        assert.equal(active.id, "maze-board");
+        assertVisible(active, `${publicationId}/${viewport.id}/failure key`);
+        checkSupplementalGeometry(
+          active,
+          `${publicationId}/${viewport.id}/failure key geometry`,
+        );
+        await dispatchRealKey("ArrowUp");
+        await delay(60);
+        const failureState = {
+          ...openingState,
+          facing: "N",
+          status: "wall",
+        };
+        const actualFailure = await waitForSnapshot(
+          config,
+          failureState,
+          `${publicationId}/${viewport.id}/failure`,
+        );
+        const failureMetrics = await targetMetrics("#status-message", true);
+        assertVisible(
+          failureMetrics,
+          `${publicationId}/${viewport.id}/failure result`,
+        );
+        checkSupplementalGeometry(
+          failureMetrics,
+          `${publicationId}/${viewport.id}/failure geometry`,
+        );
+        await addCapture({
+          checkpoint: "failure",
+          actionIndex: null,
+          selector: "#status-message",
+          metrics: failureMetrics,
+          actual: actualFailure,
+          expected: failureState,
+        });
+
+        const restartMetrics = await targetMetrics("#restart-btn", true);
+        assertVisible(
+          restartMetrics,
+          `${publicationId}/${viewport.id}/reset action`,
+        );
+        assert.equal(restartMetrics.disabled, false);
+        checkSupplementalGeometry(
+          restartMetrics,
+          `${publicationId}/${viewport.id}/reset action geometry`,
+        );
+        await dispatchRealFrameClick("#restart-btn");
+        await delay(60);
+        const actualReset = await waitForSnapshot(
+          config,
+          openingState,
+          `${publicationId}/${viewport.id}/reset`,
+        );
+        const resetMetrics = await targetMetrics("#reset-proof", true);
+        assertVisible(
+          resetMetrics,
+          `${publicationId}/${viewport.id}/reset result`,
+        );
+        checkSupplementalGeometry(
+          resetMetrics,
+          `${publicationId}/${viewport.id}/reset geometry`,
+        );
+        await addCapture({
+          checkpoint: "reset",
+          actionIndex: null,
+          selector: "#reset-proof",
+          metrics: resetMetrics,
+          actual: actualReset,
+          expected: openingState,
+        });
+      }
+
       const replayStarted = performance.now();
       for (let actionIndex = 0; actionIndex < actions.length; actionIndex += 1) {
         const action = actions[actionIndex];
@@ -909,6 +1631,16 @@ try {
           `${publicationId}/${viewport.id} action ${actionIndex} ran early`,
         );
         timingSkews.push(actualAt - action.at * 1000);
+        if (
+          evidenceContract.maxActionLatenessSeconds !== undefined
+        ) {
+          assert.ok(
+            actualAt - action.at * 1000 <=
+              evidenceContract.maxActionLatenessSeconds * 1000,
+            `${publicationId}/${viewport.id} action ${actionIndex} exceeded ` +
+              `${evidenceContract.maxActionLatenessSeconds}s lateness`,
+          );
+        }
         if (requiresVisibleActivation(action)) {
           const metrics = await targetMetrics(
             action.do === "click" ? action.selector : null,
@@ -935,7 +1667,16 @@ try {
           });
         }
 
-        await applyAction(action);
+        await applyAction(action, config.realInput);
+        inputMethods.add(
+          config.realInput
+            ? action.do === "click"
+              ? "cdp-mouse"
+              : action.do === "scroll"
+                ? "cdp-scroll"
+                : "cdp-keyboard"
+            : "dom-events",
+        );
         if (action.do === "scroll") {
           const metrics = await targetMetrics(action.selector);
           assertVisible(
@@ -951,6 +1692,43 @@ try {
             actionIndex,
             selector: action.selector,
             metrics,
+          });
+        }
+
+        if (
+          publicationId === "maze-fogline" &&
+          actionIndex === 1
+        ) {
+          await waitFor(`(() => {
+            const frame = document.querySelector("#stage iframe");
+            const text = frame.contentDocument
+              .querySelector("#challenge-status")?.textContent || "";
+            return /Challenge fragment (copied|ready and selected)/.test(text);
+          })()`);
+          const challengeState = await waitForSnapshot(
+            config,
+            openingState,
+            `${publicationId}/${viewport.id}/challenge`,
+          );
+          const challengeMetrics = await targetMetrics(
+            "#challenge-status",
+            true,
+          );
+          assertVisible(
+            challengeMetrics,
+            `${publicationId}/${viewport.id}/challenge result`,
+          );
+          checkSupplementalGeometry(
+            challengeMetrics,
+            `${publicationId}/${viewport.id}/challenge geometry`,
+          );
+          await addCapture({
+            checkpoint: "challenge",
+            actionIndex,
+            selector: "#challenge-status",
+            metrics: challengeMetrics,
+            actual: challengeState,
+            expected: openingState,
           });
         }
 
@@ -980,62 +1758,55 @@ try {
           finalPromptChecked = true;
         }
 
-        const checkpoint = checkpoints.get(actionIndex);
-        if (!checkpoint) continue;
-
-        const claim = claims.get(checkpoint.claim);
-        assert.ok(claim, `missing evidence claim ${checkpoint.claim}`);
-        const actual = await waitForSnapshot(
-          config,
-          claim.expectedState,
-          `${publicationId}/${viewport.id}/${checkpoint.claim}`,
-        );
-        const metrics = await targetMetrics(checkpoint.selector);
-        assertVisible(
-          metrics,
-          `${publicationId}/${viewport.id}/${checkpoint.claim} result`,
-        );
-        checkGeometry(
-          metrics,
-          `${publicationId}/${viewport.id}/${checkpoint.claim} geometry`,
-        );
-        const filename =
-          `${publicationId}-${viewport.id}-${checkpoint.claim}.png`;
-        const screenshot = await captureStage(join(outputRoot, filename));
-        assert.equal(
-          screenshot.width,
-          viewport.screenshotWidth,
-          `${filename}: screenshot width drifted`,
-        );
-        assert.equal(
-          screenshot.height,
-          viewport.screenshotHeight,
-          `${filename}: screenshot height drifted`,
-        );
-        const entry = {
-          publication: publicationId,
-          viewport: viewport.id,
-          checkpoint: checkpoint.claim,
-          actionIndex,
-          resultSelector: checkpoint.selector,
-          metrics,
-          state: {
-            actualSha256: sha256(
-              Buffer.from(canonicalJson(actual), "utf8"),
-            ),
-            expectedSha256: sha256(
-              Buffer.from(canonicalJson(claim.expectedState), "utf8"),
-            ),
-          },
-          screenshot: {
-            path: filename,
-            ...screenshot,
-          },
-        };
-        captures.push(entry);
-        checkpointResults.push(entry);
+        if (checkpointMode === "after-action") {
+          const checkpoint = checkpoints.get(actionIndex);
+          if (checkpoint) await resolveCheckpoint(checkpoint);
+        } else {
+          while (
+            stateGatedCheckpointIndex <
+            evidenceContract.checkpoints.length
+          ) {
+            const checkpoint =
+              evidenceContract.checkpoints[stateGatedCheckpointIndex];
+            const observedAt =
+              (performance.now() - replayStarted) / 1000;
+            const lateness =
+              evidenceContract.maxActionLatenessSeconds || 0;
+            assert.ok(
+              observedAt <= checkpoint.timeWindow.end + lateness,
+              `${publicationId}/${viewport.id} checkpoint ` +
+                `${checkpoint.claim} missed its time window`,
+            );
+            if (observedAt < checkpoint.timeWindow.start) break;
+            const claim = claims.get(checkpoint.claim);
+            assert.ok(claim, `missing evidence claim ${checkpoint.claim}`);
+            const actual = await snapshot(config);
+            if (
+              canonicalJson(actual) !==
+              canonicalJson(claim.expectedState)
+            ) {
+              break;
+            }
+            const metrics = await targetMetrics(checkpoint.selector);
+            if (!metrics.visible) break;
+            await resolveCheckpoint(
+              checkpoint,
+              actual,
+              actionIndex,
+              metrics,
+            );
+            stateGatedCheckpointIndex += 1;
+          }
+        }
       }
 
+      if (checkpointMode === "state-gated") {
+        assert.equal(
+          stateGatedCheckpointIndex,
+          evidenceContract.checkpoints.length,
+          `${publicationId}/${viewport.id} left state-gated checkpoints unresolved`,
+        );
+      }
       assert.equal(
         checkpointResults.length,
         evidenceContract.checkpoints.length,
@@ -1051,6 +1822,15 @@ try {
           evidenceContract.checkpoints.length +
           (evidenceContract.finalPrompt ? 1 : 0),
       );
+      let takeover = null;
+      if (publicationId === "maze-fogline") {
+        takeover = await runFoglineTakeover(
+          viewport,
+          config,
+          frame.frameWidth,
+          claims.get("handoff").expectedState,
+        );
+      }
       runs.push({
         publication: publicationId,
         viewport: viewport.id,
@@ -1061,9 +1841,15 @@ try {
         activationsChecked: activationVisibility.length,
         framingActionsChecked: framingVisibility.length,
         finalPromptChecked,
+        captureCheckpoints: captureResults.map(
+          entry => entry.checkpoint,
+        ),
         exactTiming: true,
         maxTimingSkewMs: Math.round(Math.max(...timingSkews)),
         geometryChecks: geometrySamples.length,
+        supplementalGeometryChecks:
+          supplementalGeometrySamples.length,
+        inputMethods: [...inputMethods].sort(),
         frameWidthsChecked: [
           ...new Set(geometrySamples.map(sample => sample.frameWidth)),
         ],
@@ -1079,6 +1865,7 @@ try {
           ),
         ],
         checkpoints: checkpointResults.map((entry) => entry.checkpoint),
+        takeover,
       });
     }
   }
@@ -1086,9 +1873,14 @@ try {
   assert.equal(runs.length, VIEWPORTS.length * Object.keys(CONFIG).length);
   assert.equal(
     captures.length,
-    runs.reduce((total, run) => total + run.checkpoints.length, 0),
+    runs.reduce(
+      (total, run) => total + run.captureCheckpoints.length,
+      0,
+    ),
   );
   assert.deepEqual(browserErrors, []);
+  assert.deepEqual(networkErrors, []);
+  assert.deepEqual(externalRequests, []);
   const manifest = {
     schema: "working-proofs-viewport-evidence/1.0",
     browser: version.product,
@@ -1129,6 +1921,8 @@ try {
     browser: version.product,
     captures: captures.length,
     errors: browserErrors,
+    externalRequests,
+    networkErrors,
     output: relative(ROOT, outputRoot),
     runs,
   };

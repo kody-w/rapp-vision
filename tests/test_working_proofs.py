@@ -78,6 +78,13 @@ PUBLICATIONS = (
         "explore-archive-map-contrast",
         "Read the Wetland Twice",
     ),
+    PublicationSpec(
+        "candidate-frame-0004",
+        "maze-fogline",
+        "play-seeded-maze-return",
+        "maze-fogline",
+        "Fogline Survey",
+    ),
 )
 EXPECTED_CODECS = {
     "video/mp4": "h264",
@@ -89,6 +96,7 @@ EXPECTED_ACTION_COUNTS = {
     "create-vector-icon-system": 17,
     "ecosystem-island-threshold": 23,
     "explore-archive-map-contrast": 25,
+    "maze-fogline": 71,
 }
 EXPECTED_CHECKPOINTS = {
     "learn-grid-overflow": ["positive", "failure", "reset"],
@@ -102,9 +110,34 @@ EXPECTED_CHECKPOINTS = {
         "your-turn",
     ],
     "explore-archive-map-contrast": ["positive", "failure", "reset"],
+    "maze-fogline": [
+        "hint",
+        "trap",
+        "detour",
+        "resetAfterTrap",
+        "optimal",
+        "resetAfterOptimal",
+        "handoff",
+    ],
+}
+EXPECTED_CAPTURE_CHECKPOINTS = {
+    **{
+        publication_id: checkpoints
+        for publication_id, checkpoints in EXPECTED_CHECKPOINTS.items()
+        if publication_id != "maze-fogline"
+    },
+    "maze-fogline": [
+        "failure",
+        "reset",
+        "challenge",
+        "trap",
+        "success",
+        "FOG-7",
+    ],
 }
 EXPECTED_CAPTURE_COUNT = 2 * sum(
-    len(checkpoints) for checkpoints in EXPECTED_CHECKPOINTS.values()
+    len(checkpoints)
+    for checkpoints in EXPECTED_CAPTURE_CHECKPOINTS.values()
 )
 EXPECTED_VIEWPORT_GEOMETRY = {
     "desktop": {
@@ -434,7 +467,7 @@ class TestWorkingProofsBuild(unittest.TestCase):
                 for spec in PUBLICATIONS
             ],
         )
-        self.assertEqual(len(self.channel["videos"]), 5)
+        self.assertEqual(len(self.channel["videos"]), 6)
 
         policy = load_json(ROOT / "policy" / "legacy-publications.json")
         self.assertEqual(
@@ -655,7 +688,7 @@ class TestWorkingProofsBuild(unittest.TestCase):
                 commission["status"] == "open"
                 for commission in commissions.values()
             ),
-            7,
+            6,
         )
         for spec in PUBLICATIONS:
             self.assertEqual(
@@ -850,7 +883,7 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
             self.index[publication_id]["source_channel"]["path"],
         )
 
-    def test_all_five_aggregate_live_replays_execute_in_real_browser(self):
+    def test_all_six_aggregate_live_replays_execute_in_real_browser(self):
         grid_id = "learn-grid-overflow"
         grid_profile = WORKING_ROOT / ".browser-grid"
         grid = self.run_json(
@@ -1029,6 +1062,75 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
             {"browserExited": True, "profileRemoved": True},
         )
 
+        fogline_id = "maze-fogline"
+        fogline_profile = WORKING_ROOT / ".browser-fogline"
+        fogline = self.run_json(
+            [
+                NODE,
+                str(
+                    self.source_spec(fogline_id).source_root
+                    / "verify_dom.mjs"
+                ),
+                "--browser",
+                BROWSER,
+                "--app",
+                str(self.aggregate_app(fogline_id)),
+                "--evidence",
+                str(self.evidence_path(fogline_id)),
+                "--manifest",
+                str(
+                    self.source_spec(fogline_id).source_root
+                    / "channel.production.json"
+                ),
+                "--continuity",
+                str(
+                    self.source_spec(fogline_id).source_root
+                    / "snapshots"
+                    / "film-live-continuity.json"
+                ),
+                "--profile",
+                str(fogline_profile),
+            ],
+            fogline_profile,
+            timeout=300,
+        )
+        self.assertEqual(
+            fogline["schema"],
+            "fogline-survey-browser-verifier/1.0",
+        )
+        self.assertTrue(all(fogline["checks"].values()), fogline["checks"])
+        self.assertEqual(
+            fogline["globalErrors"],
+            {
+                "externalRequests": [],
+                "networkFailures": [],
+                "exceptions": [],
+                "console": [],
+            },
+        )
+        self.assertEqual(
+            [
+                len(viewport["actionReports"])
+                for viewport in fogline["viewports"]
+            ],
+            [71, 71],
+        )
+        self.assertEqual(
+            [
+                [
+                    checkpoint["claim"]
+                    for checkpoint in viewport["checkpointReports"]
+                ]
+                for viewport in fogline["viewports"]
+            ],
+            [EXPECTED_CHECKPOINTS[fogline_id]] * 2,
+        )
+        for viewport in fogline["viewports"]:
+            self.assertEqual(viewport["authoredFinal"]["seed"], "FOG-7")
+            self.assertEqual(viewport["authoredFinal"]["steps"], 0)
+            self.assertEqual(viewport["takeover"]["firstDirection"], "E")
+            self.assertEqual(viewport["takeover"]["movedSteps"], 1)
+
     def test_desktop_and_390_player_stage_evidence_is_visible(self):
         profile = WORKING_ROOT / ".browser-viewports"
         scratch = WORKING_ROOT / ".viewport-captures"
@@ -1048,6 +1150,8 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                 timeout=300,
             )
             self.assertEqual(result["errors"], [])
+            self.assertEqual(result["externalRequests"], [])
+            self.assertEqual(result["networkErrors"], [])
             self.assertEqual(
                 result["cleanup"],
                 {
@@ -1057,7 +1161,7 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                 },
             )
             self.assertEqual(result["captures"], EXPECTED_CAPTURE_COUNT)
-            self.assertEqual(len(result["runs"]), 10)
+            self.assertEqual(len(result["runs"]), 12)
 
             for run in result["runs"]:
                 with self.subTest(
@@ -1071,6 +1175,12 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                     self.assertEqual(
                         run["checkpoints"],
                         EXPECTED_CHECKPOINTS[run["publication"]],
+                    )
+                    self.assertEqual(
+                        run["captureCheckpoints"],
+                        EXPECTED_CAPTURE_CHECKPOINTS[
+                            run["publication"]
+                        ],
                     )
                     actions = self.publications[run["publication"]][
                         "live"
@@ -1093,6 +1203,28 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                         run["finalPromptChecked"],
                         run["publication"] == "explore-archive-map-contrast",
                     )
+                    if run["publication"] == "maze-fogline":
+                        self.assertEqual(
+                            run["inputMethods"],
+                            [
+                                "cdp-keyboard",
+                                "cdp-mouse",
+                                "cdp-scroll",
+                            ],
+                        )
+                        self.assertEqual(
+                            run["supplementalGeometryChecks"],
+                            5,
+                        )
+                    else:
+                        self.assertEqual(
+                            run["inputMethods"],
+                            ["dom-events"],
+                        )
+                        self.assertEqual(
+                            run["supplementalGeometryChecks"],
+                            0,
+                        )
                     self.assertTrue(run["exactTiming"])
                     self.assertGreaterEqual(run["maxTimingSkewMs"], 0)
                     self.assertLess(run["maxTimingSkewMs"], 1000)
@@ -1130,6 +1262,77 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                         all(height > 0 for height in run["safeHeight"]),
                         run,
                     )
+                    if run["publication"] != "maze-fogline":
+                        self.assertIsNone(run["takeover"])
+                        continue
+
+                    takeover = run["takeover"]
+                    self.assertEqual(
+                        takeover["restoredBy"],
+                        ["Show captions", "Escape"],
+                    )
+                    self.assertEqual(
+                        takeover["eastMove"],
+                        {
+                            "direction": "E",
+                            "code": "KeyD",
+                            "position": [1, 0],
+                            "steps": 1,
+                        },
+                    )
+                    self.assertEqual(
+                        takeover["entered"]["lowerDisplay"],
+                        "none",
+                    )
+                    self.assertEqual(
+                        takeover["entered"]["replayDisplay"],
+                        "none",
+                    )
+                    self.assertGreaterEqual(
+                        takeover["entered"]["button"]["height"],
+                        44,
+                    )
+                    self.assertGreaterEqual(
+                        takeover["entered"]["toolbar"]["height"],
+                        52,
+                    )
+                    self.assertGreaterEqual(
+                        takeover["entered"]["toolbar"]["top"],
+                        takeover["entered"]["frame"]["bottom"],
+                    )
+                    self.assertAlmostEqual(
+                        takeover["entered"]["frame"]["width"],
+                        geometry["frameWidth"],
+                        delta=0.5,
+                    )
+                    self.assertGreaterEqual(
+                        takeover["entered"]["frame"]["height"],
+                        600 if run["viewport"] == "390" else 520,
+                    )
+                    self.assertAlmostEqual(
+                        takeover["clock"]["entered"],
+                        takeover["clock"]["after700ms"],
+                        delta=0.01,
+                    )
+                    self.assertAlmostEqual(
+                        takeover["clock"]["entered"],
+                        takeover["clock"]["afterEast"],
+                        delta=0.01,
+                    )
+                    self.assertEqual(
+                        takeover["appRequestsBefore"],
+                        takeover["appRequestsAfter"],
+                    )
+                    self.assertEqual(
+                        takeover["preserved"],
+                        {
+                            "marker": (
+                                f"fogline-{run['viewport']}"
+                            ),
+                            "stateAfterShowCaptions": True,
+                            "timeOrigin": True,
+                        },
+                    )
 
             generated_manifest = load_json(scratch / "manifest.json")
             self.assertEqual(
@@ -1148,6 +1351,21 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                 len(generated_manifest["captures"]),
                 EXPECTED_CAPTURE_COUNT,
             )
+            for viewport in EXPECTED_VIEWPORT_GEOMETRY:
+                for publication_id, checkpoints in (
+                    EXPECTED_CAPTURE_CHECKPOINTS.items()
+                ):
+                    self.assertEqual(
+                        [
+                            capture["checkpoint"]
+                            for capture in generated_manifest["captures"]
+                            if (
+                                capture["publication"] == publication_id
+                                and capture["viewport"] == viewport
+                            )
+                        ],
+                        checkpoints,
+                    )
             for capture in generated_manifest["captures"]:
                 screenshot = scratch / capture["screenshot"]["path"]
                 with self.subTest(
@@ -1233,6 +1451,24 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
             self.assertEqual(
                 len(committed_manifest["captures"]),
                 EXPECTED_CAPTURE_COUNT,
+            )
+            self.assertEqual(
+                [
+                    (
+                        item["publication"],
+                        item["viewport"],
+                        item["checkpoint"],
+                    )
+                    for item in committed_manifest["captures"]
+                ],
+                [
+                    (
+                        item["publication"],
+                        item["viewport"],
+                        item["checkpoint"],
+                    )
+                    for item in generated_manifest["captures"]
+                ],
             )
             for capture in committed_manifest["captures"]:
                 screenshot = SCREENSHOT_ROOT / capture["screenshot"]["path"]

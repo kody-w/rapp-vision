@@ -82,6 +82,13 @@ WINNERS = (
         "explore-archive-map-contrast",
         "Read the Wetland Twice",
     ),
+    Winner(
+        "candidate-frame-0004",
+        "maze-fogline",
+        "play-seeded-maze-return",
+        "maze-fogline",
+        "Fogline Survey",
+    ),
 )
 
 

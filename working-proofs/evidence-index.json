@@ -90,6 +90,24 @@
         "path": "../candidate-frame-0003/archive-wetland-contrast/channel.json",
         "sha256": "d9549fbf05dc18f2211cc8623e5ffb9ba079ca720702ce3b98713989ceca0d8b"
       }
+    },
+    {
+      "commission_id": "play-seeded-maze-return",
+      "delivery": {
+        "path": "../candidate-frame-0004/maze-fogline/delivery.json",
+        "sha256": "65baaad7291d1761f3240c1ba02e7c6a72e54dfd84fa4f9d514f4ec4bbef81ef"
+      },
+      "evidence": {
+        "path": "../candidate-frame-0004/maze-fogline/evidence.json",
+        "sha256": "53e543f32116979512a9314636693e35e682950fc45c185c2282cafdc51a92b7"
+      },
+      "publication_id": "maze-fogline",
+      "source_candidate": "../candidate-frame-0004/maze-fogline",
+      "source_channel": {
+        "id": "candidate-frame-0004-01-maze-fogline",
+        "path": "../candidate-frame-0004/maze-fogline/channel.json",
+        "sha256": "bcfa513f9b1773a42e686c01c3d9ff322b5c4dd4ead19441acb231b7bc0bf5aa"
+      }
     }
   ],
   "schema": "working-proofs-evidence-index/1.0"

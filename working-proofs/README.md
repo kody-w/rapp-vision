@@ -3,17 +3,19 @@
 **Useful work, measurable results, controls included.**
 
 Working Proofs is a recurring public channel for reviewed RAPP Vision work. Its
-first release promotes five cycle-2 and cycle-3 publications in this order:
+first release promotes six cycle-2 through cycle-4 publications in this order:
 
 1. **Why the Grid Overflows**
 2. **Triage Invoices Without a Pointer**
 3. **Six Shapes, One Grid**
 4. **Will the Island Herd Hold?**
 5. **Read the Wetland Twice**
+6. **Fogline Survey**
 
 The aggregate does not copy apps, thumbnails, masters, or encoded media.
 Instead, `channel.json` resolves each publication asset from its reviewed source
-under `candidate-frame-0002/` or `candidate-frame-0003/`.
+under `candidate-frame-0002/`, `candidate-frame-0003/`, or
+`candidate-frame-0004/`.
 `evidence-index.json` binds every source `channel.json`, `evidence.json`, and
 `delivery.json` by the SHA-256 of its raw bytes.
 
@@ -32,6 +34,8 @@ review-only fields, and rebases relative URLs for this channel.
 
 `screenshots/` contains real Edge captures of every configured checkpoint after
 the exact aggregate live actions run at the 960 px desktop player stage and the
-390 px iframe stage. Every result capture includes the player lower third, and
-`manifest.json` records screenshot hashes plus the measured visible
+390 px iframe stage. Fogline adds challenge, rejected-wall, trap, optimal
+success, exact-reset, and untouched FOG-7 handoff captures, followed by a real
+player takeover check. Every result capture includes the player lower third,
+and `manifest.json` records screenshot hashes plus the measured visible
 intersection for each configured result selector.
