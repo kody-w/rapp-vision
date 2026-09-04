@@ -19,7 +19,7 @@
       "evidenceIndex": {
         "path": "working-proofs/evidence-index.json",
         "bytes": 5088,
-        "sha256": "474fe3fd6310a47f9fc38dae05a2c4a25f298dbae25bf254c5dc75c6273b2c7f"
+        "sha256": "4a8b92e82fb8b31a0550decc987dfabbcd63714dcb8a1c365c5eefa539fdb6e4"
       }
     },
     "publications": [
@@ -128,8 +128,8 @@
         "apps": [
           {
             "path": "candidate-frame-0004/maze-fogline/apps/maze-fogline.html",
-            "bytes": 64780,
-            "sha256": "3551e57a577efe778362a85c5a40ea26a94d971ce98b07e2c644fa85518a7ae5"
+            "bytes": 65409,
+            "sha256": "7517816ae42d04a4817dbd61bd1e25c2c4297d215dc9212519e9f3ab91822e50"
           }
         ],
         "sourceChannel": {
@@ -139,8 +139,8 @@
         },
         "evidence": {
           "path": "candidate-frame-0004/maze-fogline/evidence.json",
-          "bytes": 44191,
-          "sha256": "63e4cace9d698ed67ecee06029c38350f471006ae7bf5ce8c3ba52915a294a62"
+          "bytes": 51738,
+          "sha256": "ee055078db7494565676f1fc6bb9fcc90824f329a07ed98e49ec2a2e965bf962"
         }
       }
     ]
@@ -1253,13 +1253,13 @@
         "lowerThirdHeight": 90.796875
       },
       "state": {
-        "actualSha256": "79e3783e1deab1f73dc69105c8430d1ac1fd1c84ff001742d284da3277821c5a",
-        "expectedSha256": "79e3783e1deab1f73dc69105c8430d1ac1fd1c84ff001742d284da3277821c5a"
+        "actualSha256": "c10279645831587bbf6430daf6587aa7a3f679133a5ffd82b43d2017bfc81d66",
+        "expectedSha256": "c10279645831587bbf6430daf6587aa7a3f679133a5ffd82b43d2017bfc81d66"
       },
       "screenshot": {
         "path": "maze-fogline-desktop-success.png",
-        "bytes": 105270,
-        "sha256": "4c6c3a3149a34e034860511dd3138b7963f680117beeaddfd32fba1fb9026e83",
+        "bytes": 108038,
+        "sha256": "bb508f4c629a12970723de5ff0a32fefb2bce73c954b94c7bb8f86b4535cdda3",
         "width": 962,
         "height": 601
       }
@@ -2380,13 +2380,13 @@
         "lowerThirdHeight": 122
       },
       "state": {
-        "actualSha256": "79e3783e1deab1f73dc69105c8430d1ac1fd1c84ff001742d284da3277821c5a",
-        "expectedSha256": "79e3783e1deab1f73dc69105c8430d1ac1fd1c84ff001742d284da3277821c5a"
+        "actualSha256": "c10279645831587bbf6430daf6587aa7a3f679133a5ffd82b43d2017bfc81d66",
+        "expectedSha256": "c10279645831587bbf6430daf6587aa7a3f679133a5ffd82b43d2017bfc81d66"
       },
       "screenshot": {
         "path": "maze-fogline-390-success.png",
-        "bytes": 30827,
-        "sha256": "8880cf727d59d699f037f85c367bbd562858f59b55292b0fb34185eedb219152",
+        "bytes": 31050,
+        "sha256": "6acb6de01f2c6e9bf7f258232c833fe611fbb84036c1c19c9b4bcc1fe482fccc",
         "width": 392,
         "height": 245
       }
