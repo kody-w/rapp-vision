@@ -286,8 +286,6 @@ def semantic_capture_contract(capture):
             "outerViewportWidth": metrics["outerViewportWidth"],
         },
         "visibilityContract": {
-            "requiredWidth": metrics["requiredWidth"],
-            "requiredHeight": metrics["requiredHeight"],
             "widthSatisfied": (
                 metrics["visibleWidth"] >= metrics["requiredWidth"]
             ),
@@ -968,6 +966,24 @@ class TestWorkingProofsBuild(unittest.TestCase):
             platform_variant["metrics"]["outerClientWidth"] -= 15
         self.assertEqual(
             semantic_capture_mismatches(committed, platform_variant),
+            [],
+        )
+
+        threshold_variant = json.loads(json.dumps(committed))
+        threshold_variant["metrics"]["requiredWidth"] += 3
+        threshold_variant["metrics"]["requiredHeight"] += 2.125
+        threshold_variant["metrics"]["visibleWidth"] = max(
+            threshold_variant["metrics"]["visibleWidth"],
+            threshold_variant["metrics"]["requiredWidth"],
+        )
+        threshold_variant["metrics"]["visibleHeight"] = max(
+            threshold_variant["metrics"]["visibleHeight"],
+            threshold_variant["metrics"]["requiredHeight"],
+        )
+        self.assertTrue(committed["metrics"]["visible"])
+        self.assertTrue(threshold_variant["metrics"]["visible"])
+        self.assertEqual(
+            semantic_capture_mismatches(committed, threshold_variant),
             [],
         )
 
