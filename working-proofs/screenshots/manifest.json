@@ -7,8 +7,8 @@
     "pathBase": "repository-root",
     "player": {
       "path": "index.html",
-      "bytes": 125556,
-      "sha256": "fa4bfb3cf39726f73405559376013eed505a333e91f18d795382a3c7589af902"
+      "bytes": 123080,
+      "sha256": "10a6816d34fda044536980cde0b53e261134b1776c320787a6120b3a7581394c"
     },
     "aggregate": {
       "channel": {

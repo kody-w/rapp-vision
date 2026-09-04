@@ -212,8 +212,21 @@ def manifest_source_bindings(manifest):
         yield publication["evidence"]
 
 
+def clean_git_environment():
+    environment = os.environ.copy()
+    for name in tuple(environment):
+        if (
+            name == "GIT_CONFIG_COUNT"
+            or name.startswith("GIT_CONFIG_KEY_")
+            or name.startswith("GIT_CONFIG_VALUE_")
+        ):
+            environment.pop(name)
+    return environment
+
+
 def source_binding_errors(manifest):
     errors = []
+    git_environment = clean_git_environment()
     for binding in manifest_source_bindings(manifest):
         path = ROOT.joinpath(
             *PurePosixPath(binding["path"]).parts
@@ -221,9 +234,27 @@ def source_binding_errors(manifest):
         if not path.is_relative_to(ROOT) or not path.is_file():
             errors.append(binding["path"])
             continue
+        repository_relative = path.relative_to(ROOT).as_posix()
+        completed = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(ROOT),
+                "show",
+                f":{repository_relative}",
+            ],
+            check=False,
+            capture_output=True,
+            env=git_environment,
+        )
+        if completed.returncode != 0 or completed.stdout != path.read_bytes():
+            errors.append(binding["path"])
+            continue
         if (
-            binding["bytes"] != path.stat().st_size
-            or binding["sha256"] != sha256(path)
+            binding["bytes"] != len(completed.stdout)
+            or binding["sha256"] != hashlib.sha256(
+                completed.stdout
+            ).hexdigest()
         ):
             errors.append(binding["path"])
     return errors
@@ -811,6 +842,25 @@ class TestWorkingProofsBuild(unittest.TestCase):
             expected_paths,
         )
         self.assertEqual(source_binding_errors(manifest), [])
+        eol = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(ROOT),
+                "ls-files",
+                "--eol",
+                "--",
+                "index.html",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            env=clean_git_environment(),
+        ).stdout
+        self.assertIn("i/lf", eol)
+        self.assertIn("w/lf", eol)
+        self.assertIn("attr/text eol=lf", eol)
 
         stale = json.loads(json.dumps(manifest))
         stale["sourceBindings"]["player"]["sha256"] = "0" * 64
