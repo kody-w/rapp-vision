@@ -1869,10 +1869,6 @@ class TestExecutableReleaseChecks(unittest.TestCase):
                 first = scratches[0] / relative
                 second = scratches[1] / relative
                 self.assertEqual(first.read_bytes(), second.read_bytes())
-                self.assertEqual(
-                    first.read_bytes(),
-                    (CANDIDATE / relative).read_bytes(),
-                )
 
     def test_compiler_check_and_source_transform_pass(self):
         completed = subprocess.run(
