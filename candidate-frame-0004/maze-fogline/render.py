@@ -531,6 +531,7 @@ def move_state(
             message="Exit already open. Restart or load another seed.",
             last_attempt=direction,
             last_rejected=direction,
+            hint_available=False,
             hint_direction=None,
         )
     if direction not in fixture.maze[state.position]:
@@ -558,15 +559,24 @@ def move_state(
     )
     completed = position == fixture.exit
     survey_earned = state.survey_earned or accepted_steps >= 4
-    hint_available = survey_earned and not state.assistance_used
+    hint_available = (
+        False
+        if completed
+        else survey_earned and not state.assistance_used
+    )
 
     if completed:
         matched_optimal = accepted_steps == len(fixture.shortest_route)
         status = "complete-optimal" if matched_optimal else "complete-detour"
         if matched_optimal:
+            assistance = (
+                "with assistance"
+                if state.assistance_used
+                else "without assistance"
+            )
             message = (
                 f"Exit open in {accepted_steps}. "
-                "Direct survey matched the reference."
+                f"Direct survey matched the reference {assistance}."
             )
         else:
             delta = accepted_steps - len(fixture.shortest_route)
@@ -629,6 +639,8 @@ def request_hint(
             state,
             status="hint-unavailable",
             message="Survey hint unavailable after completion.",
+            hint_available=False,
+            hint_direction=None,
         )
     if not state.hint_available:
         message = (
@@ -748,6 +760,13 @@ def canonical_states_document() -> dict[str, object]:
     opening_state = initial_state(CANONICAL)
     wall_rejected = move_state(CANONICAL, opening_state, "N")
     optimal_state = state_after(CANONICAL, CANONICAL.shortest_route)
+    earned_state = state_after(CANONICAL, CANONICAL.shortest_route[:4])
+    assisted_state = request_hint(CANONICAL, earned_state)
+    assisted_optimal_state = state_after(
+        CANONICAL,
+        CANONICAL.shortest_route[4:],
+        state=assisted_state,
+    )
     approach_state = state_after(
         CANONICAL,
         CANONICAL.shortest_route[: CANONICAL.trap.approach_index],
@@ -761,6 +780,10 @@ def canonical_states_document() -> dict[str, object]:
         "opening": session_snapshot(CANONICAL, opening_state),
         "wallRejected": session_snapshot(CANONICAL, wall_rejected),
         "optimal": session_snapshot(CANONICAL, optimal_state),
+        "assistedOptimal": session_snapshot(
+            CANONICAL,
+            assisted_optimal_state,
+        ),
         "hint": session_snapshot(CANONICAL, hint_state),
         "trap": session_snapshot(CANONICAL, trap_state),
         "detour": session_snapshot(CANONICAL, detour_complete),
@@ -1392,6 +1415,7 @@ def continuity_binding(root: Path) -> dict[str, object]:
 
 
 def evidence_document(root: Path = ROOT) -> dict[str, object]:
+    states = canonical_states_document()
     _actions, replay = production_actions()
     gates = checkpoint_state_gates()
     claims = [
@@ -1457,6 +1481,12 @@ def evidence_document(root: Path = ROOT) -> dict[str, object]:
             "trailIncluded": False,
             "fragmentOnly": True,
             "invalidPreservesAcceptedState": True,
+        },
+        "completionAssistance": {
+            "unassistedOptimal": states["optimal"],
+            "assistedOptimal": states["assistedOptimal"],
+            "completionHintAvailable": False,
+            "postCompletionHintDirection": None,
         },
         "claims": claims,
         "manifestReplay": {

@@ -1779,6 +1779,7 @@
             message: "Exit already open. Restart or load another seed.",
             lastAttempt: direction,
             lastRejected: direction,
+            hintAvailable: false,
             hintDirection: null
           };
         }
@@ -1805,7 +1806,8 @@
           acceptedSteps + shortestRoute(fixture.maze, position, fixture.exit).length;
         const completed = sameCell(position, fixture.exit);
         const surveyEarned = current.surveyEarned || acceptedSteps >= 4;
-        const hintAvailable = surveyEarned && !current.assistanceUsed;
+        const hintAvailable =
+          !completed && surveyEarned && !current.assistanceUsed;
         let status;
         let message;
         let matchedOptimal = null;
@@ -1813,7 +1815,12 @@
           matchedOptimal = acceptedSteps === fixture.shortestRoute.length;
           status = matchedOptimal ? "complete-optimal" : "complete-detour";
           message = matchedOptimal
-            ? `Exit open in ${acceptedSteps}. Direct survey matched the reference.`
+            ? `Exit open in ${acceptedSteps}. Direct survey matched the ` +
+              `reference ${
+                current.assistanceUsed
+                  ? "with assistance"
+                  : "without assistance"
+              }.`
             : `Exit open in ${acceptedSteps}: +${
                 acceptedSteps - fixture.shortestRoute.length
               } over reference ${fixture.shortestRoute.length}.`;
@@ -1861,7 +1868,9 @@
           return {
             ...current,
             status: "hint-unavailable",
-            message: "Survey hint unavailable after completion."
+            message: "Survey hint unavailable after completion.",
+            hintAvailable: false,
+            hintDirection: null
           };
         }
         if (!current.hintAvailable) {
@@ -1983,11 +1992,15 @@
         elements.exit.textContent = `${state.exitOpen ? "open" : "closed"} · marked`;
         elements.compass.textContent = NAMES[state.facing].toUpperCase();
         elements.needle.style.setProperty("--bearing", BEARING[state.facing]);
-        elements.assist.textContent = state.assistanceUsed
-          ? "ASSISTED · one bearing spent"
-          : state.hintAvailable
-            ? "Earned · one bearing ready"
-            : "Survey charge locked · earn at 4";
+        elements.assist.textContent = state.completed
+          ? state.assistanceUsed
+            ? "ASSISTED · completion locked"
+            : "UNASSISTED · completion locked"
+          : state.assistanceUsed
+            ? "ASSISTED · one bearing spent"
+            : state.hintAvailable
+              ? "Earned · one bearing ready"
+              : "Survey charge locked · earn at 4";
         elements.status.textContent = state.message;
         elements.hintPanel.hidden = state.hintDirection === null;
         elements.hintPanel.textContent = state.hintDirection
@@ -2001,17 +2014,22 @@
         elements.successPanel.hidden = !state.completed;
         elements.successPanel.textContent = state.completed
           ? state.matchedOptimal
-            ? `EXIT OPEN · ${steps} = reference · unassisted`
+            ? `EXIT OPEN · ${steps} = reference · ${
+                state.assistanceUsed ? "assisted" : "unassisted"
+              }`
             : `EXIT OPEN · final ${steps} · reference ${fixture.shortestRoute.length} · ${
                 state.assistanceUsed ? "assisted" : "unassisted"
               }`
           : "";
-        elements.hintButton.disabled = !state.hintAvailable;
-        elements.hintButton.textContent = state.hintAvailable
-          ? "Request earned one-step hint"
-          : state.assistanceUsed
-            ? "One-step hint spent"
-            : "Earn hint after 4 moves";
+        elements.hintButton.disabled =
+          state.completed || !state.hintAvailable;
+        elements.hintButton.textContent = state.completed
+          ? "Run complete · hint unavailable"
+          : state.hintAvailable
+            ? "Request earned one-step hint"
+            : state.assistanceUsed
+              ? "One-step hint spent"
+              : "Earn hint after 4 moves";
         elements.seedError.hidden = seedError === null;
         elements.seedError.textContent = seedError || "";
         elements.seedInput.setAttribute(

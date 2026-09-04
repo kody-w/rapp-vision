@@ -168,7 +168,7 @@
         "completed": true,
         "exitState": "open",
         "facing": "E",
-        "hintAvailable": true,
+        "hintAvailable": false,
         "hintDirection": null,
         "hintRequests": 0,
         "matchedOptimal": true,
@@ -246,6 +246,486 @@
     "statusAtBuild": "open",
     "visibleFailure": "After an explicitly requested one-step E hint, the valid W turn enters the marked trap, raises the projected and final length to 20, and never hides the exit beacon."
   },
+  "completionAssistance": {
+    "assistedOptimal": {
+      "acceptedMoves": [
+        "S",
+        "E",
+        "E",
+        "S",
+        "S",
+        "W",
+        "W",
+        "S",
+        "S",
+        "E",
+        "N",
+        "E",
+        "E",
+        "S",
+        "E",
+        "N",
+        "N",
+        "E"
+      ],
+      "assistance": {
+        "available": false,
+        "earned": true,
+        "hintDirection": null,
+        "requests": 1,
+        "scope": "one next move only",
+        "used": true
+      },
+      "completed": true,
+      "exit": {
+        "marked": true,
+        "state": "open",
+        "x": 5,
+        "y": 3
+      },
+      "facing": "E",
+      "grid": {
+        "height": 6,
+        "width": 6
+      },
+      "lastAttempt": "E",
+      "lastRejected": null,
+      "matchedOptimal": true,
+      "message": "Exit open in 18. Direct survey matched the reference with assistance.",
+      "position": {
+        "x": 5,
+        "y": 3
+      },
+      "projectedTotal": 18,
+      "referenceLength": 18,
+      "revealed": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "schema": "fogline-survey-state/1.0",
+      "seed": "RAPP-42",
+      "seedChangeCount": 0,
+      "seedError": null,
+      "seedInput": "RAPP-42",
+      "status": "complete-optimal",
+      "steps": 18,
+      "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+      "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
+      "trail": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          3
+        ]
+      ],
+      "trap": {
+        "approachStep": 14,
+        "entered": false,
+        "enteredStep": 15,
+        "marked": true,
+        "turn": "W",
+        "x": 2,
+        "y": 5
+      }
+    },
+    "completionHintAvailable": false,
+    "postCompletionHintDirection": null,
+    "unassistedOptimal": {
+      "acceptedMoves": [
+        "S",
+        "E",
+        "E",
+        "S",
+        "S",
+        "W",
+        "W",
+        "S",
+        "S",
+        "E",
+        "N",
+        "E",
+        "E",
+        "S",
+        "E",
+        "N",
+        "N",
+        "E"
+      ],
+      "assistance": {
+        "available": false,
+        "earned": true,
+        "hintDirection": null,
+        "requests": 0,
+        "scope": "one next move only",
+        "used": false
+      },
+      "completed": true,
+      "exit": {
+        "marked": true,
+        "state": "open",
+        "x": 5,
+        "y": 3
+      },
+      "facing": "E",
+      "grid": {
+        "height": 6,
+        "width": 6
+      },
+      "lastAttempt": "E",
+      "lastRejected": null,
+      "matchedOptimal": true,
+      "message": "Exit open in 18. Direct survey matched the reference without assistance.",
+      "position": {
+        "x": 5,
+        "y": 3
+      },
+      "projectedTotal": 18,
+      "referenceLength": 18,
+      "revealed": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "schema": "fogline-survey-state/1.0",
+      "seed": "RAPP-42",
+      "seedChangeCount": 0,
+      "seedError": null,
+      "seedInput": "RAPP-42",
+      "status": "complete-optimal",
+      "steps": 18,
+      "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+      "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
+      "trail": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          3
+        ]
+      ],
+      "trap": {
+        "approachStep": 14,
+        "entered": false,
+        "enteredStep": 15,
+        "marked": true,
+        "turn": "W",
+        "x": 2,
+        "y": 5
+      }
+    }
+  },
   "film": {
     "contentSamples": {
       "alternate-fresh": {
@@ -286,11 +766,11 @@
       }
     },
     "continuity": {
-      "bytes": 21921,
+      "bytes": 23433,
       "path": "snapshots/film-live-continuity.json",
       "renderer": "live-app-chromium-capture",
       "schema": "fogline-survey-film-live-continuity/1.0",
-      "sha256": "2996af4d65a9cd32fe1543d5f863c50e4e4182d1cce16e01508655d37bcb3c4a"
+      "sha256": "ea3dd6b0b13817e9baaee6b439c8a7baec19b44a02e2d7b9aaea93aeaa5fe53f"
     },
     "duration": 24,
     "exitBeaconAlwaysMarked": true,
@@ -1829,7 +2309,7 @@
           "completed": true,
           "exitState": "open",
           "facing": "E",
-          "hintAvailable": true,
+          "hintAvailable": false,
           "hintDirection": null,
           "hintRequests": 0,
           "matchedOptimal": true,
@@ -1979,14 +2459,14 @@
       "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
     },
     {
-      "bytes": 10019,
+      "bytes": 10314,
       "path": "README.md",
-      "sha256": "2a2dc150dd146c69e768bf47b03540613fb7452100989fc6f49b10be0cf459fe"
+      "sha256": "a9a0a9d697e2fdf6c38ff1e1824b9392244fcd3587e505ea6433060beab477e8"
     },
     {
-      "bytes": 64780,
+      "bytes": 65409,
       "path": "apps/maze-fogline.html",
-      "sha256": "3551e57a577efe778362a85c5a40ea26a94d971ce98b07e2c644fa85518a7ae5"
+      "sha256": "7517816ae42d04a4817dbd61bd1e25c2c4297d215dc9212519e9f3ab91822e50"
     },
     {
       "bytes": 14509,
@@ -1994,19 +2474,19 @@
       "sha256": "49d05d2b0025e4e065fcbd40c2788cce73e25317cafafc235cb56276be073875"
     },
     {
-      "bytes": 98346,
+      "bytes": 99347,
       "path": "render.py",
-      "sha256": "41a1175f80f46b0ae6b2bed2198f794661129d9d964a93521cb702a1e85a40bf"
+      "sha256": "f66695ac982e2b2669e246a1adead2577edab62234cebe76ff9dcba45f4f9f68"
     },
     {
-      "bytes": 19614,
+      "bytes": 19983,
       "path": "render_live.mjs",
-      "sha256": "2d5385b4d1cb5f1aa9269004bc7e994e185019f420ae6eee01b3d0da1e6e4a0d"
+      "sha256": "447fbccfb2eaaa6982d15ec6ff6b78f11cae3c67e415ed33d3ebdfb7e8ec6729"
     },
     {
-      "bytes": 20059,
+      "bytes": 23317,
       "path": "snapshots/canonical-states.json",
-      "sha256": "805b4e5b69224d11d88cc3e904034aa358299314d496cd69f986d14b9b05bfca"
+      "sha256": "689d7e0fee0394c65227b248d2a41aceb14852e7afb82dc9be0ee89166b02030"
     },
     {
       "bytes": 5563,
@@ -2014,9 +2494,9 @@
       "sha256": "03a7dc5b3b7cec1c58c0f5802e97a3a8b10ae5399c531aa2ae63463f74dbc51e"
     },
     {
-      "bytes": 90556,
+      "bytes": 95547,
       "path": "verify_dom.mjs",
-      "sha256": "48475ca2c8ea00bf549d458f2e79bf516497644cacbf5574b0abb8a8d6435ace"
+      "sha256": "a216dd70e5713640842f2563f6e24a4e60ff2261b8458506aeb7806ebe81b099"
     }
   ]
 }

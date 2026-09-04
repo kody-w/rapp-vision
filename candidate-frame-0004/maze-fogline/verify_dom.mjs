@@ -560,6 +560,7 @@ function moveState(fixture, current, direction) {
       message: "Exit already open. Restart or load another seed.",
       lastAttempt: direction,
       lastRejected: direction,
+      hintAvailable: false,
       hintDirection: null,
     };
   }
@@ -591,7 +592,8 @@ function moveState(fixture, current, direction) {
     acceptedSteps + independentRoute(fixture.maze, position, [5, 3]).length;
   const completed = sameCell(position, [5, 3]);
   const surveyEarned = current.surveyEarned || acceptedSteps >= 4;
-  const hintAvailable = surveyEarned && !current.assistanceUsed;
+  const hintAvailable =
+    !completed && surveyEarned && !current.assistanceUsed;
   let status;
   let message;
   let matchedOptimal = null;
@@ -599,7 +601,11 @@ function moveState(fixture, current, direction) {
     matchedOptimal = acceptedSteps === fixture.route.length;
     status = matchedOptimal ? "complete-optimal" : "complete-detour";
     message = matchedOptimal
-      ? `Exit open in ${acceptedSteps}. Direct survey matched the reference.`
+      ? `Exit open in ${acceptedSteps}. Direct survey matched the reference ${
+          current.assistanceUsed
+            ? "with assistance"
+            : "without assistance"
+        }.`
       : `Exit open in ${acceptedSteps}: +${
           acceptedSteps - fixture.route.length
         } over reference ${fixture.route.length}.`;
@@ -648,6 +654,8 @@ function requestHintState(fixture, current) {
       ...current,
       status: "hint-unavailable",
       message: "Survey hint unavailable after completion.",
+      hintAvailable: false,
+      hintDirection: null,
     };
   }
   if (!current.hintAvailable) {
@@ -1413,11 +1421,15 @@ function assertDomMatchesExpected(
   }[state.facing], `${label}: compass`);
   assert.equal(
     dom.assist,
-    state.assistanceUsed
-      ? "ASSISTED · one bearing spent"
-      : state.hintAvailable
-        ? "Earned · one bearing ready"
-        : "Survey charge locked · earn at 4",
+    state.completed
+      ? state.assistanceUsed
+        ? "ASSISTED · completion locked"
+        : "UNASSISTED · completion locked"
+      : state.assistanceUsed
+        ? "ASSISTED · one bearing spent"
+        : state.hintAvailable
+          ? "Earned · one bearing ready"
+          : "Survey charge locked · earn at 4",
     `${label}: assistance`
   );
   assert.equal(dom.status, state.message, `${label}: status`);
@@ -1454,7 +1466,9 @@ function assertDomMatchesExpected(
     dom.success.text,
     state.completed
       ? state.matchedOptimal
-        ? `EXIT OPEN · ${state.acceptedMoves.length} = reference · unassisted`
+        ? `EXIT OPEN · ${state.acceptedMoves.length} = reference · ${
+            state.assistanceUsed ? "assisted" : "unassisted"
+          }`
         : `EXIT OPEN · final ${state.acceptedMoves.length} · reference ${
             fixture.route.length
           } · ${state.assistanceUsed ? "assisted" : "unassisted"}`
@@ -1463,16 +1477,18 @@ function assertDomMatchesExpected(
   );
   assert.equal(
     dom.hintButton.disabled,
-    !state.hintAvailable,
+    state.completed || !state.hintAvailable,
     `${label}: hint disabled`
   );
   assert.equal(
     dom.hintButton.text,
-    state.hintAvailable
-      ? "Request earned one-step hint"
-      : state.assistanceUsed
-        ? "One-step hint spent"
-        : "Earn hint after 4 moves",
+    state.completed
+      ? "Run complete · hint unavailable"
+      : state.hintAvailable
+        ? "Request earned one-step hint"
+        : state.assistanceUsed
+          ? "One-step hint spent"
+          : "Earn hint after 4 moves",
     `${label}: hint button`
   );
   assert.equal(dom.seedInput.type, "text", `${label}: input type`);
@@ -2238,6 +2254,143 @@ async function exerciseHintGate(cdp, appUrl) {
   };
 }
 
+async function assertCompletionHintLocked(cdp, context, label) {
+  const before = await observeDom(cdp);
+  assert.equal(context.state.completed, true);
+  assert.equal(context.state.hintAvailable, false);
+  assert.equal(context.state.hintDirection, null);
+  assert.equal(before.dom.hintButton.disabled, true);
+  const expectedAssist = context.state.assistanceUsed
+    ? "ASSISTED · completion locked"
+    : "UNASSISTED · completion locked";
+  const expectedSuccess = `EXIT OPEN · ${
+    context.state.acceptedMoves.length
+  } = reference · ${context.state.assistanceUsed ? "assisted" : "unassisted"}`;
+  assert.equal(before.dom.assist, expectedAssist);
+  assert.equal(before.dom.success.text, expectedSuccess);
+
+  await scrollTo(cdp, "#hint-btn");
+  await dispatchMouseClick(
+    cdp,
+    "#hint-btn",
+    `${label} disabled hint click`,
+    true
+  );
+  await focusBoard(cdp, `${label} keyboard lock`);
+  await cdp.command("Input.dispatchKeyEvent", {
+    type: "keyDown",
+    key: "Enter",
+    code: "Enter",
+    windowsVirtualKeyCode: 13,
+    nativeVirtualKeyCode: 13,
+  });
+  await cdp.command("Input.dispatchKeyEvent", {
+    type: "keyUp",
+    key: "Enter",
+    code: "Enter",
+    windowsVirtualKeyCode: 13,
+    nativeVirtualKeyCode: 13,
+  });
+  await settle(cdp);
+  let after = await observeDom(cdp);
+  assertDomMatchesExpected(after, context.fixture, context.state, {
+    seedInput: context.seedInput,
+    seedError: context.seedError,
+    label: `${label} click and Enter`,
+  });
+  assert.equal(after.dom.assist, expectedAssist);
+  assert.equal(after.dom.success.text, expectedSuccess);
+  assert.equal(after.dom.hint.text, "");
+
+  await dispatchKey(cdp, "ArrowUp");
+  await settle(cdp);
+  context.state = moveState(context.fixture, context.state, "N");
+  after = await observeDom(cdp);
+  assertDomMatchesExpected(after, context.fixture, context.state, {
+    seedInput: context.seedInput,
+    seedError: context.seedError,
+    label: `${label} completed movement key`,
+  });
+  assert.equal(context.state.hintAvailable, false);
+  assert.equal(context.state.hintDirection, null);
+  assert.equal(after.dom.hintButton.disabled, true);
+  assert.equal(after.dom.assist, expectedAssist);
+  assert.equal(after.dom.success.text, expectedSuccess);
+  return {
+    hintDisabled: true,
+    disabledClickPreserved: true,
+    enterPreserved: true,
+    movementKeyPreserved: true,
+    assist: expectedAssist,
+    success: expectedSuccess,
+  };
+}
+
+async function exerciseCompletionAssistance(cdp, appUrl) {
+  async function complete(assisted) {
+    await cdp.command("Page.navigate", { url: appUrl });
+    await waitForReady(cdp);
+    await settle(cdp);
+    const fixture = auditIndependentFixture("RAPP-42");
+    const context = {
+      fixture,
+      state: initialState(fixture),
+      seedInput: fixture.seed,
+      seedError: null,
+    };
+    if (assisted) {
+      await driveDirections(
+        cdp,
+        context,
+        fixture.route.slice(0, 4),
+        "assisted optimal earn"
+      );
+      await clickControl(cdp, "#hint-btn", "assisted optimal request");
+      context.state = requestHintState(fixture, context.state);
+      assert.equal(context.state.assistanceUsed, true);
+      await driveDirections(
+        cdp,
+        context,
+        fixture.route.slice(4),
+        "assisted optimal finish"
+      );
+    } else {
+      await driveDirections(
+        cdp,
+        context,
+        fixture.route,
+        "unassisted optimal finish"
+      );
+    }
+    assert.equal(context.state.completed, true);
+    assert.equal(context.state.matchedOptimal, true);
+    assert.equal(context.state.hintAvailable, false);
+    assert.equal(context.state.hintDirection, null);
+    const observation = await observeDom(cdp);
+    assertDomMatchesExpected(observation, fixture, context.state, {
+      label: assisted ? "assisted optimal" : "unassisted optimal",
+    });
+    const locked = await assertCompletionHintLocked(
+      cdp,
+      context,
+      assisted ? "assisted optimal" : "unassisted optimal"
+    );
+    return {
+      assisted,
+      steps: 18,
+      matchedOptimal: true,
+      hintAvailable: false,
+      hintDirection: null,
+      locked,
+    };
+  }
+
+  return {
+    assisted: await complete(true),
+    unassisted: await complete(false),
+  };
+}
+
 async function exerciseAlternateSeeds(cdp, appUrl) {
   await cdp.command("Page.navigate", { url: appUrl });
   await waitForReady(cdp);
@@ -2822,6 +2975,10 @@ async function main() {
       appUrl
     );
     const hintGate = await exerciseHintGate(cdp, appUrl);
+    const completionAssistance = await exerciseCompletionAssistance(
+      cdp,
+      appUrl
+    );
     const reports = [];
     for (const viewport of evidence.browserRuntime.viewports) {
       reports.push(
@@ -2867,6 +3024,8 @@ async function main() {
         actualCdpMouseAndKeyboard: true,
         challengeContractRoundTrip: true,
         hintGatingAndOneStepOnly: true,
+        completionAssistanceConsistency: true,
+        postCompletionHintLocked: true,
         openingDomAndAccessibilityPrivacy: true,
         filmLivePixelAndStructureContinuity: true,
         alternateSeedRecomputation: true,
@@ -2882,6 +3041,7 @@ async function main() {
       viewports: reports,
       challengeContract: challengeContractReport,
       hintGate,
+      completionAssistance,
       alternateSeeds,
       globalErrors: {
         externalRequests: errors.requests.filter(url =>

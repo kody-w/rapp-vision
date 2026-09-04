@@ -216,6 +216,11 @@ async function captureDomEvidence(cdp) {
         steps: text("#step-value"),
         bestFinish: text("#projection-value"),
         exit: text("#exit-value"),
+        assistance: text("#assist-value"),
+        hintButton: {
+          disabled: document.querySelector("#hint-btn").disabled,
+          text: text("#hint-btn")
+        },
         status: text("#status-message"),
         hint: {
           hidden: document.querySelector("#hint-panel").hidden,
@@ -310,6 +315,9 @@ function assertSample(phase, dom, plan) {
   if (phase.name === "optimal-complete") {
     assert.equal(dom.steps, "18 / 18");
     assert.match(dom.success.text, /18 = reference · unassisted/);
+    assert.equal(dom.assistance, "UNASSISTED · completion locked");
+    assert.equal(dom.hintButton.disabled, true);
+    assert.equal(dom.hintButton.text, "Run complete · hint unavailable");
   }
   if (
     phase.name === "reset-after-trap" ||

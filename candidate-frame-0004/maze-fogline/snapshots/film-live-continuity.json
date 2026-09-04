@@ -4,11 +4,12 @@
     "exceptions": [],
     "externalRequests": []
   },
-  "masterSha256": "baca0a0956de62d8be90cd28f84985e9ab37a33c40be1d0bacc9d504d7dc6f14",
+  "masterSha256": "84667ad1052c7146ef66d831c917d1616fe965d12203ca7387825a4e90baf0b5",
   "phases": [
     {
       "dom": {
         "activeId": "challenge-link",
+        "assistance": "Survey charge locked · earn at 4",
         "bestFinish": "18",
         "challenge": {
           "ariaInvalid": "false",
@@ -27,6 +28,10 @@
         "hint": {
           "hidden": true,
           "text": ""
+        },
+        "hintButton": {
+          "disabled": true,
+          "text": "Earn hint after 4 moves"
         },
         "reference": "18 moves",
         "scroll": {
@@ -70,6 +75,7 @@
     {
       "dom": {
         "activeId": "maze-board",
+        "assistance": "Earned · one bearing ready",
         "bestFinish": "18",
         "challenge": {
           "ariaInvalid": "false",
@@ -88,6 +94,10 @@
         "hint": {
           "hidden": true,
           "text": ""
+        },
+        "hintButton": {
+          "disabled": false,
+          "text": "Request earned one-step hint"
         },
         "reference": "18 moves",
         "scroll": {
@@ -129,6 +139,7 @@
     {
       "dom": {
         "activeId": "maze-board",
+        "assistance": "ASSISTED · one bearing spent",
         "bestFinish": "20",
         "challenge": {
           "ariaInvalid": "false",
@@ -147,6 +158,10 @@
         "hint": {
           "hidden": true,
           "text": ""
+        },
+        "hintButton": {
+          "disabled": true,
+          "text": "One-step hint spent"
         },
         "reference": "18 moves",
         "scroll": {
@@ -189,6 +204,7 @@
     {
       "dom": {
         "activeId": "maze-board",
+        "assistance": "Survey charge locked · earn at 4",
         "bestFinish": "18",
         "challenge": {
           "ariaInvalid": "false",
@@ -207,6 +223,10 @@
         "hint": {
           "hidden": true,
           "text": ""
+        },
+        "hintButton": {
+          "disabled": true,
+          "text": "Earn hint after 4 moves"
         },
         "reference": "18 moves",
         "scroll": {
@@ -248,6 +268,7 @@
     {
       "dom": {
         "activeId": "maze-board",
+        "assistance": "Earned · one bearing ready",
         "bestFinish": "18",
         "challenge": {
           "ariaInvalid": "false",
@@ -266,6 +287,10 @@
         "hint": {
           "hidden": true,
           "text": ""
+        },
+        "hintButton": {
+          "disabled": false,
+          "text": "Request earned one-step hint"
         },
         "reference": "18 moves",
         "scroll": {
@@ -307,6 +332,7 @@
     {
       "dom": {
         "activeId": "maze-board",
+        "assistance": "UNASSISTED · completion locked",
         "bestFinish": "18",
         "challenge": {
           "ariaInvalid": "false",
@@ -326,13 +352,17 @@
           "hidden": true,
           "text": ""
         },
+        "hintButton": {
+          "disabled": true,
+          "text": "Run complete · hint unavailable"
+        },
         "reference": "18 moves",
         "scroll": {
           "height": 540,
           "width": 960
         },
         "seed": "RAPP-42",
-        "status": "Exit open in 18. Direct survey matched the reference.",
+        "status": "Exit open in 18. Direct survey matched the reference without assistance.",
         "steps": "18 / 18",
         "success": {
           "hidden": false,
@@ -357,16 +387,17 @@
         ]
       },
       "frame": 192,
-      "liveRgbSha256": "245dc0875857c7f2665d2d593e8f455152a3f032e581680259e65bcb8666e6aa",
-      "masterRgbSha256": "245dc0875857c7f2665d2d593e8f455152a3f032e581680259e65bcb8666e6aa",
+      "liveRgbSha256": "217c51b574c2f718a0f1890a3c9dc6715107fbac88f0f7f60478550b39946c8d",
+      "masterRgbSha256": "217c51b574c2f718a0f1890a3c9dc6715107fbac88f0f7f60478550b39946c8d",
       "phase": "optimal-complete",
       "pixelExact": true,
-      "screenshotPngSha256": "874afe531dd24387d6fccb063dfc568b60e9830689e7f94fb5c68b69eaa4ba27",
+      "screenshotPngSha256": "f8aa980930a13e561ad18db88cfacb998923aa7a4d57699eb3ebc0d38ef527bb",
       "timestamp": 16
     },
     {
       "dom": {
         "activeId": "maze-board",
+        "assistance": "Survey charge locked · earn at 4",
         "bestFinish": "18",
         "challenge": {
           "ariaInvalid": "false",
@@ -385,6 +416,10 @@
         "hint": {
           "hidden": true,
           "text": ""
+        },
+        "hintButton": {
+          "disabled": true,
+          "text": "Earn hint after 4 moves"
         },
         "reference": "18 moves",
         "scroll": {
@@ -426,6 +461,7 @@
     {
       "dom": {
         "activeId": "maze-board",
+        "assistance": "Survey charge locked · earn at 4",
         "bestFinish": "10",
         "challenge": {
           "ariaInvalid": "false",
@@ -444,6 +480,10 @@
         "hint": {
           "hidden": true,
           "text": ""
+        },
+        "hintButton": {
+          "disabled": true,
+          "text": "Earn hint after 4 moves"
         },
         "reference": "10 moves",
         "scroll": {
@@ -486,6 +526,7 @@
     {
       "dom": {
         "activeId": "maze-board",
+        "assistance": "Survey charge locked · earn at 4",
         "bestFinish": "10",
         "challenge": {
           "ariaInvalid": "false",
@@ -504,6 +545,10 @@
         "hint": {
           "hidden": true,
           "text": ""
+        },
+        "hintButton": {
+          "disabled": true,
+          "text": "Earn hint after 4 moves"
         },
         "reference": "10 moves",
         "scroll": {
@@ -675,5 +720,5 @@
     "headingFontFamily": "system-ui, sans-serif",
     "outputFontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace"
   },
-  "sourceAppSha256": "3551e57a577efe778362a85c5a40ea26a94d971ce98b07e2c644fa85518a7ae5"
+  "sourceAppSha256": "7517816ae42d04a4817dbd61bd1e25c2c4297d215dc9212519e9f3ab91822e50"
 }

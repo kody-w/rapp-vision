@@ -63,6 +63,11 @@ move clears the displayed bearing.
 A rejected wall changes facing only. It does not increment accepted steps,
 earn a charge, consume a displayed one-step bearing, or alter the trail.
 
+Completion always locks the hint control and clears any displayed direction.
+An 18-step result remains optimal whether assisted or not, but the assistance
+readout and completion panel derive their label from the recorded
+`assistanceUsed` state and never describe an assisted run as unassisted.
+
 The canonical detour demonstration reaches route step 14, explicitly requests
 the one-step `E` bearing, then deliberately takes the valid marked `W` branch.
 At entry, the best projected finish becomes 20 while the exit remains marked.

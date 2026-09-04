@@ -49,6 +49,19 @@ EXPECTED_DIGEST = (
 EXPECTED_ROUTE = tuple("SEESSWWSSENEESENNE")
 EXPECTED_DETOUR = tuple("SEESSWWSSENEESWEENNE")
 ALTERNATE_SEEDS = ("FOG-7", "MIST-Δ", "A|B;C")
+PRE_ASSISTANCE_REPAIR_PHASE_HASHES = {
+    "challenge": "91a3c0217a2744e3939eabab382cb497ae87d42772adafe66c4db113f22735f0",
+    "trap-approach": "1652c9c42b17375cde6f47fc0bf6fc9b3ac500cb5c91655104028876c8b5ebc1",
+    "trap-plus-two": "47508eb156ee1cda6368c88881a58555567df616c3365edf9a5ce2693834c906",
+    "reset-after-trap": "1611666d506b83a1f889e1a19d5b995e90969ae62dd2b7e7ff7111015f5fad3e",
+    "optimal-18": "da4ba8a165fa76e1edb08f73fc16f830c44757c7389f3dd3c94ced9264fd2034",
+    "reset-after-optimal": "41b706254634311149ea17e74f00a9c2043344c5c429c136d1c6af061c9ff479",
+    "alternate-fresh": "4cb920adcdbbf37384d1cb92e8929eee886b9813ff59fe529bb9616bffdc7aa0",
+    "takeover": "a44269205d6eb2a9af4b1a50b38bda036a3b4d4f2b87ae53ce8d1d0cde300682",
+}
+PRE_ASSISTANCE_OPTIMAL_COMPLETE_HASH = (
+    "245dc0875857c7f2665d2d593e8f455152a3f032e581680259e65bcb8666e6aa"
+)
 EXPECTED_FULFILLMENT = {
     "result_channel": "working-proofs",
     "publication_id": PUBLICATION_ID,
@@ -644,6 +657,41 @@ class TestCommissionFixtureAndState(unittest.TestCase):
         self.assertEqual(optimal["exit"]["state"], "open")
         self.assertTrue(optimal["matchedOptimal"])
         self.assertFalse(optimal["assistance"]["used"])
+        self.assertFalse(optimal["assistance"]["available"])
+        self.assertIsNone(optimal["assistance"]["hintDirection"])
+        self.assertIn("without assistance", optimal["message"])
+
+        assisted_optimal = states["assistedOptimal"]
+        self.assertEqual(assisted_optimal["steps"], 18)
+        self.assertTrue(assisted_optimal["matchedOptimal"])
+        self.assertTrue(assisted_optimal["assistance"]["used"])
+        self.assertFalse(assisted_optimal["assistance"]["available"])
+        self.assertIsNone(
+            assisted_optimal["assistance"]["hintDirection"]
+        )
+        self.assertIn("with assistance", assisted_optimal["message"])
+
+        earned = RENDERER.state_after(
+            RENDERER.CANONICAL,
+            RENDERER.CANONICAL.shortest_route[:4],
+        )
+        assisted = RENDERER.request_hint(RENDERER.CANONICAL, earned)
+        completed_assisted = RENDERER.state_after(
+            RENDERER.CANONICAL,
+            RENDERER.CANONICAL.shortest_route[4:],
+            state=assisted,
+        )
+        post_completion = RENDERER.request_hint(
+            RENDERER.CANONICAL,
+            completed_assisted,
+        )
+        self.assertFalse(post_completion.hint_available)
+        self.assertIsNone(post_completion.hint_direction)
+        self.assertTrue(post_completion.assistance_used)
+        self.assertEqual(
+            post_completion.hint_requests,
+            completed_assisted.hint_requests,
+        )
 
         hint = states["hint"]
         self.assertEqual(hint["steps"], 14)
@@ -905,6 +953,21 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
         )
         self.assertFalse(contract["routeIncluded"])
         self.assertFalse(contract["trailIncluded"])
+        completion = self.evidence["completionAssistance"]
+        self.assertFalse(completion["completionHintAvailable"])
+        self.assertIsNone(completion["postCompletionHintDirection"])
+        self.assertFalse(
+            completion["unassistedOptimal"]["assistance"]["used"]
+        )
+        self.assertFalse(
+            completion["unassistedOptimal"]["assistance"]["available"]
+        )
+        self.assertTrue(
+            completion["assistedOptimal"]["assistance"]["used"]
+        )
+        self.assertFalse(
+            completion["assistedOptimal"]["assistance"]["available"]
+        )
         self.assertEqual(
             self.evidence["browserRuntime"]["viewports"],
             [
@@ -1069,30 +1132,6 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
                         records[relative]["sha256"],
                         sha256_file(path),
                     )
-
-        relative = "render_live.mjs"
-        repository_relative = (
-            CANDIDATE / relative
-        ).relative_to(ROOT).as_posix()
-        committed = subprocess.run(
-            [
-                "git",
-                "-C",
-                str(ROOT),
-                "show",
-                f"HEAD:{repository_relative}",
-            ],
-            check=True,
-            capture_output=True,
-            env=git_environment,
-        ).stdout
-        checkout = (CANDIDATE / relative).read_bytes()
-        self.assertEqual(checkout, committed)
-        self.assertEqual(len(checkout), 19_614)
-        self.assertEqual(
-            hashlib.sha256(checkout).hexdigest(),
-            "2d5385b4d1cb5f1aa9269004bc7e994e185019f420ae6eee01b3d0da1e6e4a0d",
-        )
 
     def test_app_is_standalone_responsive_keyboard_first_and_route_private(self):
         index = AppIndex()
@@ -1498,6 +1537,18 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
                         "#exit-beacon",
                         entry["dom"]["visibleComponents"],
                     )
+                if phase == "optimal-complete":
+                    self.assertEqual(
+                        entry["dom"]["assistance"],
+                        "UNASSISTED · completion locked",
+                    )
+                    self.assertTrue(
+                        entry["dom"]["hintButton"]["disabled"]
+                    )
+                    self.assertEqual(
+                        entry["dom"]["hintButton"]["text"],
+                        "Run complete · hint unavailable",
+                    )
                 if phase in {"alternate-fresh", "takeover"}:
                     self.assertEqual(seed, "FOG-7")
                     self.assertEqual(entry["dom"]["steps"], "0 / 10")
@@ -1618,6 +1669,18 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
         self.assertEqual(
             challenge["film"]["detail"],
             "Seed · full digest · reference only",
+        )
+
+    def test_assistance_repair_preserves_other_declared_film_samples(self):
+        phase_hashes = {
+            phase["phase"]: phase["masterRgbSha256"]
+            for phase in self.continuity["phases"]
+        }
+        for phase, expected in PRE_ASSISTANCE_REPAIR_PHASE_HASHES.items():
+            self.assertEqual(phase_hashes[phase], expected, phase)
+        self.assertNotEqual(
+            phase_hashes["optimal-complete"],
+            PRE_ASSISTANCE_OPTIMAL_COMPLETE_HASH,
         )
 
     def test_committed_delivery_hashes_are_complete_and_current(self):
@@ -1962,6 +2025,7 @@ class TestExecutableReleaseChecks(unittest.TestCase):
             "independentFixture",
             "exerciseAlternateSeeds",
             "exerciseChallengeContract",
+            "exerciseCompletionAssistance",
             "auditOpeningPrivacy",
             "criticalPlayGeometry",
             "stateGateMatches",
@@ -2095,6 +2159,37 @@ class TestExecutableReleaseChecks(unittest.TestCase):
         )
         self.assertTrue(report["hintGate"]["validEditClearsAriaInvalid"])
         self.assertTrue(report["hintGate"]["resetClearsAriaInvalid"])
+        assisted_completion = report["completionAssistance"]["assisted"]
+        unassisted_completion = report["completionAssistance"]["unassisted"]
+        self.assertTrue(assisted_completion["assisted"])
+        self.assertFalse(assisted_completion["hintAvailable"])
+        self.assertEqual(
+            assisted_completion["locked"]["assist"],
+            "ASSISTED · completion locked",
+        )
+        self.assertIn(
+            "reference · assisted",
+            assisted_completion["locked"]["success"],
+        )
+        self.assertFalse(unassisted_completion["assisted"])
+        self.assertFalse(unassisted_completion["hintAvailable"])
+        self.assertEqual(
+            unassisted_completion["locked"]["assist"],
+            "UNASSISTED · completion locked",
+        )
+        self.assertIn(
+            "reference · unassisted",
+            unassisted_completion["locked"]["success"],
+        )
+        for completion in (assisted_completion, unassisted_completion):
+            self.assertTrue(completion["locked"]["hintDisabled"])
+            self.assertTrue(
+                completion["locked"]["disabledClickPreserved"]
+            )
+            self.assertTrue(completion["locked"]["enterPreserved"])
+            self.assertTrue(
+                completion["locked"]["movementKeyPreserved"]
+            )
         self.assertEqual(
             [item["seed"] for item in report["alternateSeeds"]],
             list(ALTERNATE_SEEDS),

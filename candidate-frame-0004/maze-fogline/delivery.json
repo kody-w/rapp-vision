@@ -3,7 +3,7 @@
     "master": {
       "audioStreamCount": 0,
       "averageFrameRate": "12/1",
-      "bytes": 36759198,
+      "bytes": 36855241,
       "codec": "ffv1",
       "colorRange": "pc",
       "colorSpace": "gbr",
@@ -11,14 +11,14 @@
       "height": 540,
       "path": "masters/maze-fogline.mkv",
       "pixelFormat": "bgr0",
-      "sha256": "baca0a0956de62d8be90cd28f84985e9ab37a33c40be1d0bacc9d504d7dc6f14",
+      "sha256": "84667ad1052c7146ef66d831c917d1616fe965d12203ca7387825a4e90baf0b5",
       "streamCount": 1,
       "width": 960
     },
     "mp4": {
       "audioStreamCount": 0,
       "averageFrameRate": "12/1",
-      "bytes": 486219,
+      "bytes": 495394,
       "codec": "h264",
       "colorPrimaries": "bt709",
       "colorRange": "tv",
@@ -28,14 +28,14 @@
       "height": 540,
       "path": "media/maze-fogline.mp4",
       "pixelFormat": "yuv420p",
-      "sha256": "b4c1b1dbb7941286d327cb8b8a85386500f30532f6b6d72df573cef0b6daa609",
+      "sha256": "97ca0ffb1689f6a93ce7e1c74d8e291bb98b04f1f1d5f4a03445c2ea7c3dc6c7",
       "streamCount": 1,
       "width": 960
     },
     "webm": {
       "audioStreamCount": 0,
       "averageFrameRate": "12/1",
-      "bytes": 353086,
+      "bytes": 358985,
       "codec": "vp9",
       "colorPrimaries": "bt709",
       "colorRange": "tv",
@@ -45,7 +45,7 @@
       "height": 540,
       "path": "media/maze-fogline.webm",
       "pixelFormat": "yuv420p",
-      "sha256": "ed3a05f51e112933c1eb762943988dff97657e01a99c0dbbf0e78aadc1098017",
+      "sha256": "ffb52c21c97597d6a3f2975565c4a4ca23d4ab301d526e6ffa991c0ee5d1da1c",
       "streamCount": 1,
       "width": 960
     }
@@ -125,7 +125,7 @@
       },
       "optimal-complete": {
         "frame": 192,
-        "sha256": "245dc0875857c7f2665d2d593e8f455152a3f032e581680259e65bcb8666e6aa",
+        "sha256": "217c51b574c2f718a0f1890a3c9dc6715107fbac88f0f7f60478550b39946c8d",
         "timestamp": 16
       },
       "reset-after-optimal": {
@@ -164,7 +164,7 @@
         "width": 960
       },
       "renderer": "live-app-chromium-capture",
-      "sourceAppSha256": "3551e57a577efe778362a85c5a40ea26a94d971ce98b07e2c644fa85518a7ae5"
+      "sourceAppSha256": "7517816ae42d04a4817dbd61bd1e25c2c4297d215dc9212519e9f3ab91822e50"
     },
     "duration": 24,
     "fps": 12,
@@ -246,14 +246,14 @@
       "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
     },
     {
-      "bytes": 10019,
+      "bytes": 10314,
       "path": "README.md",
-      "sha256": "2a2dc150dd146c69e768bf47b03540613fb7452100989fc6f49b10be0cf459fe"
+      "sha256": "a9a0a9d697e2fdf6c38ff1e1824b9392244fcd3587e505ea6433060beab477e8"
     },
     {
-      "bytes": 64780,
+      "bytes": 65409,
       "path": "apps/maze-fogline.html",
-      "sha256": "3551e57a577efe778362a85c5a40ea26a94d971ce98b07e2c644fa85518a7ae5"
+      "sha256": "7517816ae42d04a4817dbd61bd1e25c2c4297d215dc9212519e9f3ab91822e50"
     },
     {
       "bytes": 14509,
@@ -266,29 +266,29 @@
       "sha256": "bcfa513f9b1773a42e686c01c3d9ff322b5c4dd4ead19441acb231b7bc0bf5aa"
     },
     {
-      "bytes": 44191,
+      "bytes": 51738,
       "path": "evidence.json",
-      "sha256": "63e4cace9d698ed67ecee06029c38350f471006ae7bf5ce8c3ba52915a294a62"
+      "sha256": "ee055078db7494565676f1fc6bb9fcc90824f329a07ed98e49ec2a2e965bf962"
     },
     {
-      "bytes": 98346,
+      "bytes": 99347,
       "path": "render.py",
-      "sha256": "41a1175f80f46b0ae6b2bed2198f794661129d9d964a93521cb702a1e85a40bf"
+      "sha256": "f66695ac982e2b2669e246a1adead2577edab62234cebe76ff9dcba45f4f9f68"
     },
     {
-      "bytes": 19614,
+      "bytes": 19983,
       "path": "render_live.mjs",
-      "sha256": "2d5385b4d1cb5f1aa9269004bc7e994e185019f420ae6eee01b3d0da1e6e4a0d"
+      "sha256": "447fbccfb2eaaa6982d15ec6ff6b78f11cae3c67e415ed33d3ebdfb7e8ec6729"
     },
     {
-      "bytes": 20059,
+      "bytes": 23317,
       "path": "snapshots/canonical-states.json",
-      "sha256": "805b4e5b69224d11d88cc3e904034aa358299314d496cd69f986d14b9b05bfca"
+      "sha256": "689d7e0fee0394c65227b248d2a41aceb14852e7afb82dc9be0ee89166b02030"
     },
     {
-      "bytes": 21921,
+      "bytes": 23433,
       "path": "snapshots/film-live-continuity.json",
-      "sha256": "2996af4d65a9cd32fe1543d5f863c50e4e4182d1cce16e01508655d37bcb3c4a"
+      "sha256": "ea3dd6b0b13817e9baaee6b439c8a7baec19b44a02e2d7b9aaea93aeaa5fe53f"
     },
     {
       "bytes": 5563,
@@ -296,9 +296,9 @@
       "sha256": "03a7dc5b3b7cec1c58c0f5802e97a3a8b10ae5399c531aa2ae63463f74dbc51e"
     },
     {
-      "bytes": 90556,
+      "bytes": 95547,
       "path": "verify_dom.mjs",
-      "sha256": "48475ca2c8ea00bf549d458f2e79bf516497644cacbf5574b0abb8a8d6435ace"
+      "sha256": "a216dd70e5713640842f2563f6e24a4e60ff2261b8458506aeb7806ebe81b099"
     }
   ]
 }
