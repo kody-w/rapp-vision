@@ -121,6 +121,11 @@ the untouched handoff state and `#maze-board` focus. Every takeover frame
 immediately reasserts board focus and state-gates `activeElement` before its
 screenshot, including injected late-focus race frames.
 
+Readiness polling tolerates transient `Runtime.evaluate` failures while
+Chromium replaces a navigation context, but remains deadline-bounded and
+reports the last failure. Runtime exception/console listeners still fail the
+run after readiness, so persistent app faults are never converted to success.
+
 At exactly 390 CSS pixels, the board, four state readouts, D-pad, hint, and
 restart occupy a bounded 800-pixel play cluster instead of being distributed
 through a 2473-pixel page. The complete document is bounded to 1800 pixels.

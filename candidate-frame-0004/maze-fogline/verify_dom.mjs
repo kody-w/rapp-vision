@@ -109,11 +109,20 @@ const KEY_DATA = Object.freeze({
 });
 
 function parseOptions(argv) {
-  const options = { ...DEFAULTS, browser: null, findBrowser: false };
+  const options = {
+    ...DEFAULTS,
+    browser: null,
+    findBrowser: false,
+    selfTestReadiness: false,
+  };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--find-browser") {
       options.findBrowser = true;
+      continue;
+    }
+    if (argument === "--self-test-readiness") {
+      options.selfTestReadiness = true;
       continue;
     }
     const key = {
@@ -128,7 +137,7 @@ function parseOptions(argv) {
       throw new Error(
         "usage: node verify_dom.mjs [--browser PATH] [--app PATH] " +
         "[--continuity PATH] [--evidence PATH] [--manifest PATH] " +
-        "[--profile PATH] [--find-browser]"
+        "[--profile PATH] [--find-browser] [--self-test-readiness]"
       );
     }
     options[key] = argv[index + 1];
@@ -876,9 +885,15 @@ async function evaluate(cdp, expression) {
     userGesture: true,
   });
   if (response.exceptionDetails) {
+    const details = response.exceptionDetails;
+    const description =
+      details.exception && details.exception.description
+        ? details.exception.description
+        : "";
     throw new Error(
       `page evaluation failed: ${
-        response.exceptionDetails.text || "unknown exception"
+        [details.text, description].filter(Boolean).join(" · ") ||
+        "unknown exception"
       }`
     );
   }
@@ -887,16 +902,85 @@ async function evaluate(cdp, expression) {
 
 async function waitForReady(cdp, timeout = 10000) {
   const deadline = Date.now() + timeout;
+  let lastError = null;
   while (Date.now() < deadline) {
-    const ready = await evaluate(
-      cdp,
-      `document.documentElement.dataset.ready === "true" &&
-       document.querySelectorAll("#maze-board > .cell").length === 36`
-    );
-    if (ready) return;
+    try {
+      const ready = await evaluate(
+        cdp,
+        `document.documentElement.dataset.ready === "true" &&
+         document.querySelectorAll("#maze-board > .cell").length === 36`
+      );
+      if (ready) return;
+    } catch (error) {
+      lastError = error;
+    }
     await delay(50);
   }
-  throw new Error("Fogline Survey did not reach its ready contract");
+  throw new Error(
+    "Fogline Survey did not reach its ready contract before the bounded " +
+      `deadline. Last evaluation failure: ${
+        lastError ? lastError.message : "none"
+      }`
+  );
+}
+
+async function readinessRegression() {
+  const transientResponses = [
+    {
+      exceptionDetails: {
+        text: "Uncaught",
+        exception: {
+          description: "Execution context was destroyed during navigation.",
+        },
+      },
+    },
+    { result: { value: false } },
+    { result: { value: true } },
+  ];
+  let transientCalls = 0;
+  const transient = {
+    async command(method) {
+      assert.equal(method, "Runtime.evaluate");
+      const response =
+        transientResponses[Math.min(transientCalls, transientResponses.length - 1)];
+      transientCalls += 1;
+      return response;
+    },
+  };
+  await waitForReady(transient, 500);
+  assert.equal(transientCalls, 3);
+
+  let persistentCalls = 0;
+  const persistent = {
+    async command(method) {
+      assert.equal(method, "Runtime.evaluate");
+      persistentCalls += 1;
+      return {
+        exceptionDetails: {
+          text: "Uncaught",
+          exception: {
+            description: "Persistent readiness failure.",
+          },
+        },
+      };
+    },
+  };
+  let persistentMessage = "";
+  try {
+    await waitForReady(persistent, 120);
+  } catch (error) {
+    persistentMessage = error.message;
+  }
+  assert(persistentCalls >= 2);
+  assert.match(persistentMessage, /bounded deadline/);
+  assert.match(persistentMessage, /Persistent readiness failure/);
+  return {
+    transientCalls,
+    transientRecovered: true,
+    persistentCalls,
+    persistentFailedClosed: true,
+    timeoutIncludedLastFailure: true,
+  };
 }
 
 async function settle(cdp) {
@@ -2824,6 +2908,10 @@ async function replayViewport(
 
 async function main() {
   const options = parseOptions(process.argv.slice(2));
+  if (options.selfTestReadiness) {
+    console.log(JSON.stringify(await readinessRegression()));
+    return;
+  }
   const browserPath = await discoverBrowser(options.browser);
   if (options.findBrowser) {
     console.log(browserPath);

@@ -2069,6 +2069,8 @@ class TestExecutableReleaseChecks(unittest.TestCase):
             "criticalPlayGeometry",
             "stateGateMatches",
             "assertFilmLiveStructure",
+            "readinessRegression",
+            "Last evaluation failure",
             "executedAt - action.at <= maxLateness",
             "await removeProfile(profilePath)",
         ):
@@ -2093,6 +2095,29 @@ class TestExecutableReleaseChecks(unittest.TestCase):
             self.assertIn(fragment, film_source)
         self.assertNotIn("class Canvas", film_source)
         self.assertNotIn("prompt.focus()", film_source)
+
+    @unittest.skipUnless(NODE, "Node.js is required")
+    def test_navigation_readiness_retries_transient_and_fails_closed(self):
+        completed = subprocess.run(
+            [NODE, str(VERIFY_PATH), "--self-test-readiness"],
+            cwd=CANDIDATE,
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=30,
+        )
+        self.assertEqual(
+            completed.returncode,
+            0,
+            completed.stderr or completed.stdout,
+        )
+        report = json.loads(completed.stdout)
+        self.assertEqual(report["transientCalls"], 3)
+        self.assertTrue(report["transientRecovered"])
+        self.assertGreaterEqual(report["persistentCalls"], 2)
+        self.assertTrue(report["persistentFailedClosed"])
+        self.assertTrue(report["timeoutIncludedLastFailure"])
 
     @unittest.skipUnless(
         NODE and BROWSER,
