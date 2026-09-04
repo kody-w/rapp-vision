@@ -385,6 +385,90 @@ function ffmpegCommand(output, plan) {
   ];
 }
 
+async function focusHandoffBoard(cdp, delayMs, timeout = 5000) {
+  const setup = await evaluate(
+    cdp,
+    `(() => {
+      const prompt = document.querySelector("#takeover-prompt");
+      prompt.focus();
+      const promptRetainedFocus = document.activeElement === prompt;
+      document.querySelector("#restart-btn").focus();
+      document.documentElement.dataset.filmFocusGate = "pending";
+      return {
+        promptRetainedFocus,
+        promptTabIndex: prompt.tabIndex,
+        promptPointerEvents: getComputedStyle(prompt).pointerEvents
+      };
+    })()`
+  );
+  assert.equal(setup.promptRetainedFocus, false);
+  assert.equal(setup.promptTabIndex, -1);
+  assert.equal(setup.promptPointerEvents, "none");
+
+  const started = Date.now();
+  let attempts = 1;
+  assert.notEqual(
+    await evaluate(
+      cdp,
+      `document.activeElement ? document.activeElement.id : ""`
+    ),
+    "maze-board"
+  );
+  await delay(delayMs);
+  await settle(cdp);
+  await dispatchMouseClick(
+    cdp,
+    "#maze-board",
+    "film delayed handoff board focus"
+  );
+  await evaluate(
+    cdp,
+    `(() => {
+      document.querySelector("#maze-board").focus({ preventScroll: true });
+      document.documentElement.dataset.filmFocusGate = "ready";
+    })()`
+  );
+  let state = null;
+  while (Date.now() - started < timeout) {
+    attempts += 1;
+    state = await evaluate(
+      cdp,
+      `(() => ({
+        activeId: document.activeElement ? document.activeElement.id : "",
+        focusGate: document.documentElement.dataset.filmFocusGate || "",
+        seed: document.querySelector("#seed-value").textContent.trim(),
+        steps: document.querySelector("#step-value").textContent.trim(),
+        assist: document.querySelector("#assist-value").textContent.trim(),
+        hintDisabled: document.querySelector("#hint-btn").disabled,
+        takeoverHidden: document.querySelector("#takeover-prompt").hidden
+      }))()`
+    );
+    if (
+      state.activeId === "maze-board" &&
+      state.focusGate === "ready" &&
+      state.seed === "FOG-7" &&
+      state.steps === "0 / 10" &&
+      state.assist === "Survey charge locked · earn at 4" &&
+      state.hintDisabled === true &&
+      state.takeoverHidden === false
+    ) {
+      await settle(cdp);
+      return {
+        delayMs,
+        pollingObserved: attempts > 1,
+        configuredDelayElapsed: Date.now() - started >= delayMs,
+        promptRetainedFocus: false,
+        finalActiveId: state.activeId,
+        stateGateMatched: true,
+      };
+    }
+    await delay(25);
+  }
+  throw new Error(
+    `handoff board focus did not settle: ${JSON.stringify(state)}`
+  );
+}
+
 async function executePlanAction(cdp, action, appUrl, phase) {
   if (action.do === "click") {
     await dispatchMouseClick(
@@ -412,10 +496,13 @@ async function executePlanAction(cdp, action, appUrl, phase) {
     await waitForReady(cdp);
     await evaluate(cdp, `document.fonts.ready`);
     await setFilmPhase(cdp, phase);
+  } else if (action.do === "focusBoard") {
+    return await focusHandoffBoard(cdp, Number(action.delayMs || 0));
   } else {
     throw new Error(`unsupported film action ${action.do}`);
   }
   await delay(12);
+  return null;
 }
 
 async function main() {
@@ -545,6 +632,7 @@ async function main() {
     const structure = await captureStructure(cdp);
     assert.equal(structure.fontsReady, "loaded");
     let currentPhase = initialPhase;
+    let handoffFocusGate = null;
 
     for (let frame = 0; frame < plan.frames; frame += 1) {
       const phase = phaseAt(plan, frame);
@@ -553,7 +641,8 @@ async function main() {
         currentPhase = phase;
       }
       for (const action of actions.get(frame) || []) {
-        await executePlanAction(cdp, action, appUrl, phase);
+        const result = await executePlanAction(cdp, action, appUrl, phase);
+        if (action.do === "focusBoard") handoffFocusGate = result;
       }
       const screenshot = await cdp.command("Page.captureScreenshot", {
         format: "png",
@@ -588,6 +677,7 @@ async function main() {
       externalRequests: [],
     });
     assert.equal(phaseEvidence.length, plan.phases.length);
+    assert(handoffFocusGate && handoffFocusGate.stateGateMatched);
 
     const appBytes = await readFile(appPath);
     const continuity = {
@@ -602,6 +692,7 @@ async function main() {
       },
       sourceAppSha256: createHash("sha256").update(appBytes).digest("hex"),
       sharedStyle: structure,
+      handoffFocusGate,
       phases: phaseEvidence,
       errors: pageErrors,
     };

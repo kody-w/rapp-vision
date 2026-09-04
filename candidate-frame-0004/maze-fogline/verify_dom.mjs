@@ -1322,7 +1322,11 @@ async function observeDom(cdp) {
         },
         takeover: {
           hidden: document.querySelector("#takeover-prompt").hidden,
-          text: document.querySelector("#takeover-prompt").textContent.trim()
+          text: document.querySelector("#takeover-prompt").textContent.trim(),
+          tabIndex: document.querySelector("#takeover-prompt").tabIndex,
+          pointerEvents:
+            getComputedStyle(document.querySelector("#takeover-prompt"))
+              .pointerEvents
         },
         boardLabel: document.querySelector("#maze-board").getAttribute("aria-label"),
         exitBeaconPresent: !!document.querySelector("#exit-beacon"),
@@ -1550,6 +1554,12 @@ function assertDomMatchesExpected(
     dom.takeover.hidden,
     !handoffReady,
     `${label}: takeover visibility`
+  );
+  assert.equal(dom.takeover.tabIndex, -1, `${label}: takeover tab stop`);
+  assert.equal(
+    dom.takeover.pointerEvents,
+    "none",
+    `${label}: takeover pointer capture`
   );
   if (handoffReady) {
     assert.match(dom.takeover.text, /YOUR TURN · FOG-7 READY/);

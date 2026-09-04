@@ -115,6 +115,10 @@ hash, and exact lossless-master RGB hash. Live checkpoints remain partial
 state gates inside 1.25-second windows, while actions retain scheduled timing
 with a 0.8-second lateness ceiling.
 
+The final FOG-7 handoff overlay cannot receive pointer or tab focus. Film
+capture deliberately delays the final focus transition, then waits for both
+the untouched handoff state and `#maze-board` focus before sampling.
+
 At exactly 390 CSS pixels, the board, four state readouts, D-pad, hint, and
 restart occupy a bounded 800-pixel play cluster instead of being distributed
 through a 2473-pixel page. The complete document is bounded to 1800 pixels.

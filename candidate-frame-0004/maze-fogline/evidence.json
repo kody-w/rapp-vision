@@ -766,11 +766,11 @@
       }
     },
     "continuity": {
-      "bytes": 23433,
+      "bytes": 23645,
       "path": "snapshots/film-live-continuity.json",
       "renderer": "live-app-chromium-capture",
       "schema": "fogline-survey-film-live-continuity/1.0",
-      "sha256": "ea3dd6b0b13817e9baaee6b439c8a7baec19b44a02e2d7b9aaea93aeaa5fe53f"
+      "sha256": "a2ebcb6885de560a18b04a5cf7e59796dd1a24adc1e63ba4a934a3cf616e2525"
     },
     "duration": 24,
     "exitBeaconAlwaysMarked": true,
@@ -2459,14 +2459,14 @@
       "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
     },
     {
-      "bytes": 10314,
+      "bytes": 10534,
       "path": "README.md",
-      "sha256": "a9a0a9d697e2fdf6c38ff1e1824b9392244fcd3587e505ea6433060beab477e8"
+      "sha256": "d38f4c5aa25cee47c47ec8bf46ecda3dad3843e7cb1c9b0dce6c190d1de19c0f"
     },
     {
-      "bytes": 65409,
+      "bytes": 65498,
       "path": "apps/maze-fogline.html",
-      "sha256": "7517816ae42d04a4817dbd61bd1e25c2c4297d215dc9212519e9f3ab91822e50"
+      "sha256": "ee10db849dd0891f70b9a593de6b37e02b4e204112df5eca3607f564cd64348d"
     },
     {
       "bytes": 14509,
@@ -2474,14 +2474,14 @@
       "sha256": "49d05d2b0025e4e065fcbd40c2788cce73e25317cafafc235cb56276be073875"
     },
     {
-      "bytes": 99347,
+      "bytes": 99404,
       "path": "render.py",
-      "sha256": "f66695ac982e2b2669e246a1adead2577edab62234cebe76ff9dcba45f4f9f68"
+      "sha256": "1aa9b972705797ea8f7e6361c8064389dc12bd55c1fc122ad054d199862890dd"
     },
     {
-      "bytes": 19983,
+      "bytes": 22936,
       "path": "render_live.mjs",
-      "sha256": "447fbccfb2eaaa6982d15ec6ff6b78f11cae3c67e415ed33d3ebdfb7e8ec6729"
+      "sha256": "598e0084926780ac06e5d96f7aca0aa1936be33552649890484c7aa5645165b3"
     },
     {
       "bytes": 23317,
@@ -2494,9 +2494,9 @@
       "sha256": "03a7dc5b3b7cec1c58c0f5802e97a3a8b10ae5399c531aa2ae63463f74dbc51e"
     },
     {
-      "bytes": 95547,
+      "bytes": 95928,
       "path": "verify_dom.mjs",
-      "sha256": "a216dd70e5713640842f2563f6e24a4e60ff2261b8458506aeb7806ebe81b099"
+      "sha256": "40716fe064e7520ac42b8fa289f5b98173e28481f65d0a1547e47179b98bea74"
     }
   ]
 }

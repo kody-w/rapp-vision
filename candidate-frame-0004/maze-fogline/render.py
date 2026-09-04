@@ -1340,7 +1340,11 @@ def browser_film_plan() -> dict[str, object]:
                 "do": "navigate",
                 "fragment": challenge_fragment(HANDOFF),
             },
-            {"frame": 252, "do": "click", "selector": "#maze-board"},
+            {
+                "frame": 252,
+                "do": "focusBoard",
+                "delayMs": 175,
+            },
         ]
     )
     actions.sort(key=lambda action: (int(action["frame"]), str(action["do"])))

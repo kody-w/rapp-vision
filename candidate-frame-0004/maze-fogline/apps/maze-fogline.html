@@ -576,6 +576,7 @@
       padding: 10px 12px;
       color: #fff2c9;
       scroll-margin-block: 20px 170px;
+      pointer-events: none;
     }
 
     .takeover strong {
@@ -1126,7 +1127,7 @@
           <h2 id="map-heading">Revealed survey</h2>
           <span>6 × 6 · exit stays marked</span>
         </div>
-        <section id="takeover-prompt" class="takeover" tabindex="0" hidden>
+        <section id="takeover-prompt" class="takeover" aria-live="polite" hidden>
           <strong>YOUR TURN · FOG-7 READY</strong>
           <p>
             Fresh entrance, zero steps, empty trail, no assistance. Movement
@@ -2152,6 +2153,7 @@
         challengeError = null;
         challengeStatus = "Three-field contract ready.";
         render();
+        elements.board.focus({ preventScroll: true });
       }
 
       function clearSeedErrorOnValidEdit() {

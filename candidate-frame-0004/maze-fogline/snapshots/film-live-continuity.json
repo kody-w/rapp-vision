@@ -4,6 +4,14 @@
     "exceptions": [],
     "externalRequests": []
   },
+  "handoffFocusGate": {
+    "configuredDelayElapsed": true,
+    "delayMs": 175,
+    "finalActiveId": "maze-board",
+    "pollingObserved": true,
+    "promptRetainedFocus": false,
+    "stateGateMatched": true
+  },
   "masterSha256": "84667ad1052c7146ef66d831c917d1616fe965d12203ca7387825a4e90baf0b5",
   "phases": [
     {
@@ -720,5 +728,5 @@
     "headingFontFamily": "system-ui, sans-serif",
     "outputFontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace"
   },
-  "sourceAppSha256": "7517816ae42d04a4817dbd61bd1e25c2c4297d215dc9212519e9f3ab91822e50"
+  "sourceAppSha256": "ee10db849dd0891f70b9a593de6b37e02b4e204112df5eca3607f564cd64348d"
 }

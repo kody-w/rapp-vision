@@ -1210,6 +1210,14 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
         self.assertNotIn("fixtureSnapshot", self.app_source)
         self.assertNotRegex(
             self.app_source,
+            r'id="takeover-prompt"[^>]*tabindex=',
+        )
+        self.assertRegex(
+            self.app_source,
+            r"\.takeover \{[\s\S]*?pointer-events: none;",
+        )
+        self.assertNotRegex(
+            self.app_source,
             r'type\s*=\s*["\']password["\']|-webkit-text-security\s*:',
         )
         for uncanned in ("MIST-Δ", "A|B;C"):
@@ -1683,6 +1691,22 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
             PRE_ASSISTANCE_OPTIMAL_COMPLETE_HASH,
         )
 
+    def test_delayed_handoff_focus_is_state_gated_and_deterministic(self):
+        focus_actions = [
+            action
+            for action in RENDERER.browser_film_plan()["actions"]
+            if action["do"] == "focusBoard"
+        ]
+        self.assertEqual(len(focus_actions), 1)
+        self.assertGreaterEqual(focus_actions[0]["delayMs"], 150)
+        gate = self.continuity["handoffFocusGate"]
+        self.assertEqual(gate["delayMs"], focus_actions[0]["delayMs"])
+        self.assertTrue(gate["pollingObserved"])
+        self.assertTrue(gate["configuredDelayElapsed"])
+        self.assertFalse(gate["promptRetainedFocus"])
+        self.assertEqual(gate["finalActiveId"], "maze-board")
+        self.assertTrue(gate["stateGateMatched"])
+
     def test_committed_delivery_hashes_are_complete_and_current(self):
         self.assertEqual(
             self.delivery["schema"],
@@ -2046,6 +2070,9 @@ class TestExecutableReleaseChecks(unittest.TestCase):
             "live-app-chromium-capture",
             "screenshotPngSha256",
             "dispatchKey(cdp, action.code)",
+            "focusHandoffBoard",
+            'dataset.filmFocusGate = "pending"',
+            'state.activeId === "maze-board"',
         ):
             self.assertIn(fragment, film_source)
         self.assertNotIn("class Canvas", film_source)
