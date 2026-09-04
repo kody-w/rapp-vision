@@ -1692,9 +1692,10 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
         )
 
     def test_delayed_handoff_focus_is_state_gated_and_deterministic(self):
+        plan = RENDERER.browser_film_plan()
         focus_actions = [
             action
-            for action in RENDERER.browser_film_plan()["actions"]
+            for action in plan["actions"]
             if action["do"] == "focusBoard"
         ]
         self.assertEqual(len(focus_actions), 1)
@@ -1706,6 +1707,20 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
         self.assertFalse(gate["promptRetainedFocus"])
         self.assertEqual(gate["finalActiveId"], "maze-board")
         self.assertTrue(gate["stateGateMatched"])
+        self.assertTrue(gate["everyTakeoverFrameStateGated"])
+        self.assertEqual(gate["takeoverFramesChecked"], 36)
+        self.assertEqual(
+            gate["raceFramesInjected"],
+            plan["takeoverFocusRaceFrames"],
+        )
+        live_source = normalized_text(LIVE_RENDERER_PATH)
+        self.assertNotIn("prompt.focus()", live_source)
+        focus_gate = live_source.index("await gateTakeoverFrameFocus(cdp, frame)")
+        screenshot = live_source.index(
+            'cdp.command("Page.captureScreenshot"',
+            focus_gate,
+        )
+        self.assertLess(focus_gate, screenshot)
 
     def test_committed_delivery_hashes_are_complete_and_current(self):
         self.assertEqual(
@@ -2071,11 +2086,13 @@ class TestExecutableReleaseChecks(unittest.TestCase):
             "screenshotPngSha256",
             "dispatchKey(cdp, action.code)",
             "focusHandoffBoard",
+            "gateTakeoverFrameFocus",
             'dataset.filmFocusGate = "pending"',
             'state.activeId === "maze-board"',
         ):
             self.assertIn(fragment, film_source)
         self.assertNotIn("class Canvas", film_source)
+        self.assertNotIn("prompt.focus()", film_source)
 
     @unittest.skipUnless(
         NODE and BROWSER,

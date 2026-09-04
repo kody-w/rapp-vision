@@ -390,7 +390,6 @@ async function focusHandoffBoard(cdp, delayMs, timeout = 5000) {
     cdp,
     `(() => {
       const prompt = document.querySelector("#takeover-prompt");
-      prompt.focus();
       const promptRetainedFocus = document.activeElement === prompt;
       document.querySelector("#restart-btn").focus();
       document.documentElement.dataset.filmFocusGate = "pending";
@@ -466,6 +465,40 @@ async function focusHandoffBoard(cdp, delayMs, timeout = 5000) {
   }
   throw new Error(
     `handoff board focus did not settle: ${JSON.stringify(state)}`
+  );
+}
+
+async function gateTakeoverFrameFocus(cdp, frame, timeout = 1000) {
+  await evaluate(
+    cdp,
+    `document.querySelector("#maze-board").focus({ preventScroll: true })`
+  );
+  const started = Date.now();
+  let state = null;
+  while (Date.now() - started < timeout) {
+    state = await evaluate(
+      cdp,
+      `(() => ({
+        activeId: document.activeElement ? document.activeElement.id : "",
+        phase: document.documentElement.dataset.filmPhase || "",
+        seed: document.querySelector("#seed-value").textContent.trim(),
+        steps: document.querySelector("#step-value").textContent.trim(),
+        takeoverHidden: document.querySelector("#takeover-prompt").hidden
+      }))()`
+    );
+    if (
+      state.activeId === "maze-board" &&
+      state.phase === "takeover" &&
+      state.seed === "FOG-7" &&
+      state.steps === "0 / 10" &&
+      state.takeoverHidden === false
+    ) {
+      return true;
+    }
+    await delay(10);
+  }
+  throw new Error(
+    `takeover frame ${frame} focus gate failed: ${JSON.stringify(state)}`
   );
 }
 
@@ -633,6 +666,9 @@ async function main() {
     assert.equal(structure.fontsReady, "loaded");
     let currentPhase = initialPhase;
     let handoffFocusGate = null;
+    let takeoverFramesChecked = 0;
+    const raceFrames = new Set(plan.takeoverFocusRaceFrames || []);
+    const injectedRaceFrames = [];
 
     for (let frame = 0; frame < plan.frames; frame += 1) {
       const phase = phaseAt(plan, frame);
@@ -643,6 +679,17 @@ async function main() {
       for (const action of actions.get(frame) || []) {
         const result = await executePlanAction(cdp, action, appUrl, phase);
         if (action.do === "focusBoard") handoffFocusGate = result;
+      }
+      if (phase.name === "takeover") {
+        if (raceFrames.has(frame)) {
+          await evaluate(
+            cdp,
+            `document.querySelector("#restart-btn").focus({ preventScroll: true })`
+          );
+          injectedRaceFrames.push(frame);
+        }
+        await gateTakeoverFrameFocus(cdp, frame);
+        takeoverFramesChecked += 1;
       }
       const screenshot = await cdp.command("Page.captureScreenshot", {
         format: "png",
@@ -678,6 +725,19 @@ async function main() {
     });
     assert.equal(phaseEvidence.length, plan.phases.length);
     assert(handoffFocusGate && handoffFocusGate.stateGateMatched);
+    const takeoverPhase = plan.phases.find(phase => phase.name === "takeover");
+    assert(takeoverPhase);
+    assert.equal(
+      takeoverFramesChecked,
+      takeoverPhase.endFrame - takeoverPhase.startFrame
+    );
+    assert.deepEqual(injectedRaceFrames, [...raceFrames].sort((a, b) => a - b));
+    handoffFocusGate = {
+      ...handoffFocusGate,
+      everyTakeoverFrameStateGated: true,
+      takeoverFramesChecked,
+      raceFramesInjected: injectedRaceFrames,
+    };
 
     const appBytes = await readFile(appPath);
     const continuity = {

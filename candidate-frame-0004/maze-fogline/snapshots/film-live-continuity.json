@@ -7,10 +7,16 @@
   "handoffFocusGate": {
     "configuredDelayElapsed": true,
     "delayMs": 175,
+    "everyTakeoverFrameStateGated": true,
     "finalActiveId": "maze-board",
     "pollingObserved": true,
     "promptRetainedFocus": false,
-    "stateGateMatched": true
+    "raceFramesInjected": [
+      253,
+      270
+    ],
+    "stateGateMatched": true,
+    "takeoverFramesChecked": 36
   },
   "masterSha256": "84667ad1052c7146ef66d831c917d1616fe965d12203ca7387825a4e90baf0b5",
   "phases": [

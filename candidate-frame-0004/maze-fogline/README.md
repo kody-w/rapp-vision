@@ -117,7 +117,9 @@ with a 0.8-second lateness ceiling.
 
 The final FOG-7 handoff overlay cannot receive pointer or tab focus. Film
 capture deliberately delays the final focus transition, then waits for both
-the untouched handoff state and `#maze-board` focus before sampling.
+the untouched handoff state and `#maze-board` focus. Every takeover frame
+immediately reasserts board focus and state-gates `activeElement` before its
+screenshot, including injected late-focus race frames.
 
 At exactly 390 CSS pixels, the board, four state readouts, D-pad, hint, and
 restart occupy a bounded 800-pixel play cluster instead of being distributed

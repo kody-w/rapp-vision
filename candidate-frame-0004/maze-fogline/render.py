@@ -1366,6 +1366,7 @@ def browser_film_plan() -> dict[str, object]:
             for name, start, end in FILM_TIMELINE
         ],
         "actions": actions,
+        "takeoverFocusRaceFrames": [253, 270],
         "canonical": challenge_contract(CANONICAL),
         "handoff": challenge_contract(HANDOFF),
     }

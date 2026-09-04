@@ -766,11 +766,11 @@
       }
     },
     "continuity": {
-      "bytes": 23645,
+      "bytes": 23776,
       "path": "snapshots/film-live-continuity.json",
       "renderer": "live-app-chromium-capture",
       "schema": "fogline-survey-film-live-continuity/1.0",
-      "sha256": "a2ebcb6885de560a18b04a5cf7e59796dd1a24adc1e63ba4a934a3cf616e2525"
+      "sha256": "6fb4fbe4e84306910a8c447bef74a7958e3a43024ff17eb68d0b5aadb3e93136"
     },
     "duration": 24,
     "exitBeaconAlwaysMarked": true,
@@ -2459,9 +2459,9 @@
       "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
     },
     {
-      "bytes": 10534,
+      "bytes": 10671,
       "path": "README.md",
-      "sha256": "d38f4c5aa25cee47c47ec8bf46ecda3dad3843e7cb1c9b0dce6c190d1de19c0f"
+      "sha256": "672686d19b58e8e93cbbd4a9fb9c21a0812f3fab6e64b8dbb3443f70d08d939e"
     },
     {
       "bytes": 65498,
@@ -2474,14 +2474,14 @@
       "sha256": "49d05d2b0025e4e065fcbd40c2788cce73e25317cafafc235cb56276be073875"
     },
     {
-      "bytes": 99404,
+      "bytes": 99451,
       "path": "render.py",
-      "sha256": "1aa9b972705797ea8f7e6361c8064389dc12bd55c1fc122ad054d199862890dd"
+      "sha256": "b4de0ff85e147d57239181374ba5f68dd8ef636004b324fbc37841754c95acb7"
     },
     {
-      "bytes": 22936,
+      "bytes": 24939,
       "path": "render_live.mjs",
-      "sha256": "598e0084926780ac06e5d96f7aca0aa1936be33552649890484c7aa5645165b3"
+      "sha256": "c242da39daa11e1350a8dd697e0fe7c34ff6b9eb16c0bfe808a57d4cf92ad71a"
     },
     {
       "bytes": 23317,
