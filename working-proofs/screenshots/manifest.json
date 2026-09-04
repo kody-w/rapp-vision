@@ -19,7 +19,7 @@
       "evidenceIndex": {
         "path": "working-proofs/evidence-index.json",
         "bytes": 5088,
-        "sha256": "4a8b92e82fb8b31a0550decc987dfabbcd63714dcb8a1c365c5eefa539fdb6e4"
+        "sha256": "8c9681f3f9e53c55fe8ed8245d65b6abceae2eb19005ba3dc15256e749132e6a"
       }
     },
     "publications": [
@@ -128,8 +128,8 @@
         "apps": [
           {
             "path": "candidate-frame-0004/maze-fogline/apps/maze-fogline.html",
-            "bytes": 65409,
-            "sha256": "7517816ae42d04a4817dbd61bd1e25c2c4297d215dc9212519e9f3ab91822e50"
+            "bytes": 65498,
+            "sha256": "ee10db849dd0891f70b9a593de6b37e02b4e204112df5eca3607f564cd64348d"
           }
         ],
         "sourceChannel": {
@@ -140,7 +140,7 @@
         "evidence": {
           "path": "candidate-frame-0004/maze-fogline/evidence.json",
           "bytes": 51738,
-          "sha256": "ee055078db7494565676f1fc6bb9fcc90824f329a07ed98e49ec2a2e965bf962"
+          "sha256": "4c4c03fd8cffa26e5d4090bcb53542c1cec352643127185ab91a55590411d71c"
         }
       }
     ]

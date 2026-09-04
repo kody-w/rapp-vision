@@ -5,7 +5,7 @@
       "commission_id": "learn-grid-overflow",
       "delivery": {
         "path": "../candidate-frame-0002/learn-grid-overflow/delivery.json",
-        "sha256": "078498e411e981d4192643339063edc3f1a10cf048b3e7bf5c38ed38679e7739"
+        "sha256": "9c2e4b157685f7cfd1804b16ede6dcf8009310a22b2a489f876d835022cbd411"
       },
       "evidence": {
         "path": "../candidate-frame-0002/learn-grid-overflow/evidence.json",
@@ -95,11 +95,11 @@
       "commission_id": "play-seeded-maze-return",
       "delivery": {
         "path": "../candidate-frame-0004/maze-fogline/delivery.json",
-        "sha256": "667daeabff827de12e3f2e8e6312bd4754e7cb6ccdde50c4963f2c3f6cc6d099"
+        "sha256": "ed5335927a0e0396d13d57943be77278d466f7e4084a6dd51ec858715459c164"
       },
       "evidence": {
         "path": "../candidate-frame-0004/maze-fogline/evidence.json",
-        "sha256": "ee055078db7494565676f1fc6bb9fcc90824f329a07ed98e49ec2a2e965bf962"
+        "sha256": "4c4c03fd8cffa26e5d4090bcb53542c1cec352643127185ab91a55590411d71c"
       },
       "publication_id": "maze-fogline",
       "source_candidate": "../candidate-frame-0004/maze-fogline",
