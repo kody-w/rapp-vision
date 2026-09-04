@@ -1171,7 +1171,7 @@ function mountLive(v, host, progressKey) {
       <button class="tbtn mode-switch" id="b-take-control" type="button"
         aria-controls="stage" aria-describedby="take-control-help" aria-pressed="false">Take control</button>
     </div>
-    <span class="sr" id="take-control-help">Pauses the scripted replay, hides captions, and gives the live application the keyboard.</span>
+    <span class="sr" id="take-control-help">Pauses the scripted replay, hides captions, and gives the live application the keyboard. Show captions always returns to the replay. Escape also returns only when the live application is same-origin.</span>
     <span class="sr" id="take-control-status" role="status" aria-live="polite"></span>`;
 
   const stage = $("#stage", host), shade = $("#shade", host);
@@ -1180,15 +1180,20 @@ function mountLive(v, host, progressKey) {
   let clock = 0, playing = false, raf = 0, cur = -1, frame = null, fired = new Set(), last = 0;
   let anchor = null, anchorPoll = 0;
   let takeover = false, resumeAfterTakeover = false, frameEscapeDocument = null;
+  let frameEscapeAvailable = false;
   let destroyed = false;
   const retryTimers = new Set();
 
   const sceneAt = t => { let s = null; scenes.forEach((x, i) => { if (t >= x.t) { s = x; s._i = i; } }); return s; };
 
   function detachFrameEscape() {
-    if (!frameEscapeDocument) return;
-    try { frameEscapeDocument.removeEventListener("keydown", onFrameEscape, true); } catch {}
+    if (frameEscapeDocument) {
+      try { frameEscapeDocument.removeEventListener("keydown", onFrameEscape, true); } catch {}
+    }
     frameEscapeDocument = null;
+    frameEscapeAvailable = false;
+    host.dataset.takeoverEscape = "toolbar-only";
+    updateTakeoverControl();
   }
 
   function onFrameEscape(e) {
@@ -1203,9 +1208,16 @@ function mountLive(v, host, progressKey) {
     if (!frame) return;
     try {
       frameEscapeDocument = frame.contentDocument;
-      frameEscapeDocument?.addEventListener("keydown", onFrameEscape, true);
+      if (!frameEscapeDocument) return;
+      frameEscapeDocument.addEventListener("keydown", onFrameEscape, true);
+      frameEscapeAvailable = true;
+      host.dataset.takeoverEscape = "same-origin";
+      updateTakeoverControl();
     } catch {
       frameEscapeDocument = null;
+      frameEscapeAvailable = false;
+      host.dataset.takeoverEscape = "toolbar-only";
+      updateTakeoverControl();
     }
   }
 
@@ -1222,6 +1234,8 @@ function mountLive(v, host, progressKey) {
       "aria-label",
       takeover ? "Show captions and return to live replay" : "Take control of live application"
     );
+    if (frameEscapeAvailable) takeButton.setAttribute("aria-keyshortcuts", "Escape");
+    else takeButton.removeAttribute("aria-keyshortcuts");
   }
 
   function enterTakeover() {
@@ -1232,8 +1246,9 @@ function mountLive(v, host, progressKey) {
     host.classList.add("live-takeover");
     host.dataset.takeover = "true";
     updateTakeoverControl();
-    takeoverStatus.textContent =
-      "Take control mode. Scripted replay paused; the live application has the keyboard.";
+    takeoverStatus.textContent = frameEscapeAvailable
+      ? "Take control mode. Scripted replay paused; use Show captions or Escape to return."
+      : "Take control mode. Scripted replay paused; this app is cross-origin, so use the reserved Show captions button to return.";
     stage.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "auto" });
     focusLiveFrame();
     requestAnimationFrame(() => { if (takeover) focusLiveFrame(); });
@@ -1245,6 +1260,7 @@ function mountLive(v, host, progressKey) {
     resumeAfterTakeover = false;
     host.classList.remove("live-takeover");
     host.dataset.takeover = "false";
+    host.dataset.takeoverEscape = "toolbar-only";
     updateTakeoverControl();
     if (announce) {
       takeoverStatus.textContent = shouldResume
@@ -1698,6 +1714,7 @@ function mountLive(v, host, progressKey) {
         frame.remove();
       }
       delete host.dataset.takeover;
+      delete host.dataset.takeoverEscape;
       host.innerHTML = "";
     }
   };

@@ -72,6 +72,119 @@ const types = new Map([
   [".webm", "video/webm"],
 ]);
 
+const crossOriginRequests = [];
+const crossOriginApp = Buffer.from(`<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cross-origin takeover fixture</title>
+<style>
+  html,body{margin:0;min-height:100%;font:16px system-ui;background:#101820;color:#f5f7fa}
+  main{min-height:100vh;display:grid;place-items:center;padding:24px;box-sizing:border-box}
+  button{min-width:180px;min-height:52px;font:inherit}
+</style>
+<main><button id="state" type="button">Fixture state 7</button></main>
+<script>
+  const state = { token: "cross-origin-state-v1", count: 7 };
+  const button = document.querySelector("#state");
+  const report = event => parent.postMessage({
+    source: "rapp-cross-origin-takeover-fixture",
+    event,
+    token: state.token,
+    count: state.count
+  }, "*");
+  addEventListener("message", event => {
+    if (event.data?.source !== "rapp-cross-origin-takeover-harness") return;
+    if (event.data.command === "increment") {
+      state.count += 1;
+      button.textContent = "Fixture state " + state.count;
+    }
+    report(event.data.command);
+  });
+  button.addEventListener("click", () => {
+    state.count += 1;
+    button.textContent = "Fixture state " + state.count;
+    report("click");
+  });
+  report("ready");
+</script>
+</html>`);
+const crossOriginServer = createHttpServer((request, response) => {
+  const requestUrl = new URL(request.url || "/", "http://127.0.0.1");
+  crossOriginRequests.push(requestUrl.href);
+  if (requestUrl.pathname !== "/cross-origin-app.html") {
+    response.writeHead(404).end();
+    return;
+  }
+  response.writeHead(200, {
+    "Cache-Control": "no-store",
+    "Content-Length": crossOriginApp.length,
+    "Content-Type": "text/html; charset=utf-8",
+  });
+  response.end(request.method === "HEAD" ? undefined : crossOriginApp);
+});
+await new Promise((resolveListen, rejectListen) => {
+  crossOriginServer.once("error", rejectListen);
+  crossOriginServer.listen(0, "127.0.0.1", resolveListen);
+});
+const crossOriginAddress = crossOriginServer.address();
+assert.ok(crossOriginAddress && typeof crossOriginAddress === "object");
+const crossOrigin = `http://127.0.0.1:${crossOriginAddress.port}`;
+const crossOriginChannelPath =
+  "/candidate-frame-0002/use-keyboard-invoice-triage/cross-origin-channel.json";
+const crossOriginRedirectPath =
+  "/candidate-frame-0002/use-keyboard-invoice-triage/cross-origin-redirect.html";
+const crossOriginChannel = JSON.parse(
+  await readFile(
+    resolve(
+      ROOT,
+      "candidate-frame-0002",
+      "use-keyboard-invoice-triage",
+      "channel.json",
+    ),
+    "utf8",
+  ),
+);
+crossOriginChannel.id = "cross-origin-takeover";
+crossOriginChannel.name = "Cross-origin takeover fixture";
+const crossOriginPublication = crossOriginChannel.videos[0];
+crossOriginPublication.id = "cross-origin-state";
+crossOriginPublication.title = "Cross-origin state";
+crossOriginPublication.live = {
+  kind: "rapp-vision-live/1.0",
+  duration: 8,
+  chapters: [],
+  scenes: [
+    {
+      t: 0,
+      dur: 8,
+      app: "cross-origin-redirect.html",
+      ready: { enabled: true, selector: "#state" },
+      actions: [],
+      lower: {
+        title: "Cross-origin state",
+        bench: "SECOND ORIGIN",
+        bug: "Escape cannot cross the origin boundary",
+        fix: "Reserved Show captions control remains available",
+      },
+    },
+  ],
+};
+registry.channels.push({
+  id: crossOriginChannel.id,
+  url: crossOriginChannelPath.slice(1),
+  contract: "rapp-vision-channel/2.0",
+});
+const crossOriginChannelBody = Buffer.from(
+  JSON.stringify(crossOriginChannel),
+);
+const crossOriginRedirect = Buffer.from(`<!doctype html>
+<meta charset="utf-8">
+<title>Cross-origin redirect</title>
+<script>location.replace(${JSON.stringify(
+  `${crossOrigin}/cross-origin-app.html`,
+)})</script>`);
+
 const httpServer = createHttpServer(async (request, response) => {
   try {
     const requestUrl = new URL(request.url || "/", "http://127.0.0.1");
@@ -83,6 +196,28 @@ const httpServer = createHttpServer(async (request, response) => {
         "Cache-Control": "no-store",
       });
       response.end(request.method === "HEAD" ? undefined : body);
+      return;
+    }
+    if (requestUrl.pathname === crossOriginChannelPath) {
+      response.writeHead(200, {
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": crossOriginChannelBody.length,
+        "Cache-Control": "no-store",
+      });
+      response.end(
+        request.method === "HEAD" ? undefined : crossOriginChannelBody,
+      );
+      return;
+    }
+    if (requestUrl.pathname === crossOriginRedirectPath) {
+      response.writeHead(200, {
+        "Content-Type": "text/html; charset=utf-8",
+        "Content-Length": crossOriginRedirect.length,
+        "Cache-Control": "no-store",
+      });
+      response.end(
+        request.method === "HEAD" ? undefined : crossOriginRedirect,
+      );
       return;
     }
 
@@ -151,6 +286,7 @@ await new Promise((resolveListen, rejectListen) => {
 const httpAddress = httpServer.address();
 assert.ok(httpAddress && typeof httpAddress === "object");
 const origin = `http://127.0.0.1:${httpAddress.port}`;
+const localOrigins = new Set([origin, crossOrigin]);
 
 const debugPort = await new Promise((resolvePort, rejectPort) => {
   const reservation = createNetServer();
@@ -452,10 +588,15 @@ function rectanglesIntersect(a, b) {
 
 async function captureChrome() {
   return evaluate(`(() => {
+    const host = document.querySelector("#host");
     const stage = document.querySelector("#stage");
     const frame = stage.querySelector("iframe");
+    const lower = stage.querySelector(".l3");
+    const replay = document.querySelector(".lbar");
     const toolbar = document.querySelector("#takebar");
     const button = document.querySelector("#b-take-control");
+    const help = document.querySelector("#take-control-help");
+    const status = document.querySelector("#take-control-status");
     const rect = element => {
       const value = element.getBoundingClientRect();
       const round = number => Math.round(number * 100) / 100;
@@ -474,7 +615,21 @@ async function captureChrome() {
       toolbar: rect(toolbar),
       button: rect(button),
       buttonText: button.textContent.trim(),
-      takeover: document.querySelector("#host").classList.contains("live-takeover"),
+      buttonLabel: button.getAttribute("aria-label"),
+      buttonDescribedBy: button.getAttribute("aria-describedby"),
+      buttonShortcuts: button.getAttribute("aria-keyshortcuts"),
+      buttonPressed: button.getAttribute("aria-pressed"),
+      toolbarRole: toolbar.getAttribute("role"),
+      lowerDisplay: lower ? getComputedStyle(lower).display : null,
+      replayDisplay: replay ? getComputedStyle(replay).display : null,
+      helpText: help.textContent.trim(),
+      statusText: status.textContent.trim(),
+      escapeMode: host.dataset.takeoverEscape || "",
+      takeover: host.classList.contains("live-takeover"),
+      progress: Number.parseFloat(
+        document.querySelector("#ls i")?.style.width || "0"
+      ),
+      topFocus: document.activeElement?.tagName || "",
       pageInnerHeight: innerHeight,
       pageClientWidth: document.documentElement.clientWidth,
       pageScrollWidth: document.documentElement.scrollWidth
@@ -665,6 +820,210 @@ async function inspectCriticalFixture(fixture, viewport) {
   };
 }
 
+async function inspectCrossOriginTakeover(viewport) {
+  const key = encodeURIComponent(
+    `${crossOriginChannel.id}/${crossOriginPublication.id}`,
+  );
+  await client.send(
+    "Page.navigate",
+    { url: `${origin}/index.html#/watch/${key}` },
+    sessionId,
+  );
+  await waitFor(
+    'document.readyState === "complete" && ' +
+      'document.querySelector("#b-switch")?.textContent.includes("Try live replay")',
+  );
+  await waitFor('document.querySelector("video")?.readyState >= 2');
+  await evaluate(`(() => {
+    window.__crossOriginTakeoverMessages = [];
+    addEventListener("message", event => {
+      if (
+        event.origin === ${JSON.stringify(crossOrigin)} &&
+        event.data?.source === "rapp-cross-origin-takeover-fixture"
+      ) {
+        window.__crossOriginTakeoverMessages.push(event.data);
+      }
+    });
+  })()`);
+  await activate("#b-switch");
+  await waitFor(`window.__crossOriginTakeoverMessages?.some(
+    message => message.event === "ready"
+  )`);
+  await waitFor(
+    'document.querySelector("#host").dataset.takeoverEscape === "toolbar-only"',
+  );
+  const access = await evaluate(`(() => {
+    const frame = document.querySelector("#stage iframe");
+    let documentAccessible = false;
+    let errorName = "";
+    try {
+      documentAccessible = Boolean(frame.contentWindow.document?.body);
+    } catch (error) {
+      errorName = error.name;
+    }
+    return {
+      contentDocument: Boolean(frame.contentDocument),
+      documentAccessible,
+      errorName
+    };
+  })()`);
+  assert.deepEqual(access, {
+    contentDocument: false,
+    documentAccessible: false,
+    errorName: "SecurityError",
+  });
+
+  const ready = await evaluate(
+    `window.__crossOriginTakeoverMessages.find(
+      message => message.event === "ready"
+    )`,
+  );
+  const messageCount = await evaluate(
+    "window.__crossOriginTakeoverMessages.length",
+  );
+  await evaluate(`document.querySelector("#stage iframe").contentWindow.postMessage({
+    source: "rapp-cross-origin-takeover-harness",
+    command: "increment"
+  }, ${JSON.stringify(crossOrigin)})`);
+  await waitFor(
+    `window.__crossOriginTakeoverMessages.length > ${messageCount} && ` +
+      'window.__crossOriginTakeoverMessages.at(-1).event === "increment"',
+  );
+  const mutated = await evaluate(
+    "window.__crossOriginTakeoverMessages.at(-1)",
+  );
+  assert.equal(mutated.token, ready.token);
+  assert.equal(mutated.count, ready.count + 1);
+
+  const appRequestsBefore = crossOriginRequests.filter(
+    url => new URL(url).pathname === "/cross-origin-app.html",
+  ).length;
+  const normal = await captureChrome();
+  assert.equal(normal.escapeMode, "toolbar-only");
+  assert.equal(normal.buttonText, "Take control");
+  assert.equal(normal.buttonShortcuts, null);
+  assert.match(normal.helpText, /Escape also returns only when .*same-origin/i);
+
+  await activate("#lp");
+  await waitFor(
+    'document.querySelector("#lp").textContent.includes("Pause") && ' +
+      'Number.parseFloat(document.querySelector("#ls i").style.width) > 0.02',
+  );
+  await activate("#b-take-control");
+  await waitFor(
+    'document.querySelector("#host").classList.contains("live-takeover") && ' +
+      'document.activeElement?.tagName === "IFRAME"',
+  );
+  const active = await captureChrome();
+  assertReservedChrome(active, `${viewport.name} cross-origin takeover`);
+  assert.equal(active.escapeMode, "toolbar-only");
+  assert.equal(active.buttonText, "Show captions");
+  assert.equal(active.buttonLabel, "Show captions and return to live replay");
+  assert.equal(active.buttonDescribedBy, "take-control-help");
+  assert.equal(active.buttonShortcuts, null);
+  assert.equal(active.buttonPressed, "true");
+  assert.equal(active.toolbarRole, "toolbar");
+  assert.equal(active.lowerDisplay, "none");
+  assert.equal(active.replayDisplay, "none");
+  assert.equal(active.topFocus, "IFRAME");
+  assert.match(active.statusText, /cross-origin/i);
+  assert.match(active.statusText, /Show captions button/i);
+
+  await dispatchKey("Escape");
+  await delay(200);
+  const afterEscape = await captureChrome();
+  assert.equal(
+    afterEscape.takeover,
+    true,
+    `${viewport.name}: cross-origin Escape unexpectedly exited takeover`,
+  );
+  assert.ok(
+    Math.abs(afterEscape.progress - active.progress) <= 0.01,
+    `${viewport.name}: cross-origin Escape advanced the replay clock`,
+  );
+
+  await activate("#b-take-control");
+  await waitFor(
+    '!document.querySelector("#host").classList.contains("live-takeover") && ' +
+      'document.querySelector("#lp").textContent.includes("Pause")',
+  );
+  await activate("#lp");
+  await waitFor('document.querySelector("#lp").textContent.includes("Play")');
+  const restored = await captureChrome();
+  assert.equal(restored.buttonText, "Take control");
+  assert.equal(restored.buttonPressed, "false");
+  assert.equal(restored.escapeMode, "toolbar-only");
+  assert.notEqual(restored.lowerDisplay, "none");
+  assert.notEqual(restored.replayDisplay, "none");
+  assert.deepEqual(restored.stage, normal.stage);
+  assert.deepEqual(restored.frame, normal.frame);
+
+  const probeCount = await evaluate(
+    "window.__crossOriginTakeoverMessages.length",
+  );
+  await evaluate(`document.querySelector("#stage iframe").contentWindow.postMessage({
+    source: "rapp-cross-origin-takeover-harness",
+    command: "probe"
+  }, ${JSON.stringify(crossOrigin)})`);
+  await waitFor(
+    `window.__crossOriginTakeoverMessages.length > ${probeCount} && ` +
+      'window.__crossOriginTakeoverMessages.at(-1).event === "probe"',
+  );
+  const preserved = await evaluate(
+    "window.__crossOriginTakeoverMessages.at(-1)",
+  );
+  assert.deepEqual(preserved, {
+    source: "rapp-cross-origin-takeover-fixture",
+    event: "probe",
+    token: mutated.token,
+    count: mutated.count,
+  });
+  const appRequestsAfter = crossOriginRequests.filter(
+    url => new URL(url).pathname === "/cross-origin-app.html",
+  ).length;
+  assert.equal(
+    appRequestsAfter,
+    appRequestsBefore,
+    `${viewport.name}: cross-origin app reloaded during toolbar exit`,
+  );
+
+  return {
+    access,
+    normal: {
+      stage: normal.stage,
+      frame: normal.frame,
+      lowerDisplay: normal.lowerDisplay,
+      replayDisplay: normal.replayDisplay,
+    },
+    active: {
+      stage: active.stage,
+      frame: active.frame,
+      toolbar: active.toolbar,
+      button: active.button,
+      escapeMode: active.escapeMode,
+      helpText: active.helpText,
+      statusText: active.statusText,
+    },
+    afterEscape: {
+      takeover: afterEscape.takeover,
+      progress: afterEscape.progress,
+    },
+    restored: {
+      stage: restored.stage,
+      frame: restored.frame,
+      lowerDisplay: restored.lowerDisplay,
+      replayDisplay: restored.replayDisplay,
+    },
+    state: {
+      before: ready,
+      mutated,
+      preserved,
+    },
+    appRequestsBefore,
+    appRequestsAfter,
+  };
+}
+
 const viewports = [
   { name: "desktop", width: 1280, height: 900 },
   { name: "mobile-390", width: 390, height: 844 },
@@ -696,9 +1055,11 @@ try {
       );
     } else if (method === "Network.requestWillBeSent") {
       requests.push(params.request.url);
-      if (/^https?:/.test(params.request.url) &&
-          !params.request.url.startsWith(origin + "/")) {
-        externalRequests.push(params.request.url);
+      if (/^https?:/.test(params.request.url)) {
+        const requestOrigin = new URL(params.request.url).origin;
+        if (!localOrigins.has(requestOrigin)) {
+          externalRequests.push(params.request.url);
+        }
       }
     } else if (method === "Network.responseReceived" &&
                /^https?:/.test(params.response.url) &&
@@ -960,6 +1321,7 @@ try {
     for (const fixture of criticalFixtures) {
       criticalRuns.push(await inspectCriticalFixture(fixture, viewport));
     }
+    const crossOriginTakeover = await inspectCrossOriginTakeover(viewport);
 
     runs.push({
       viewport,
@@ -993,6 +1355,7 @@ try {
       modeCleanup,
       publicationCleanup,
       criticalFixtures: criticalRuns,
+      crossOriginTakeover,
     });
   }
 
@@ -1016,7 +1379,10 @@ try {
   const deadline = Date.now() + 10_000;
   while (browser.exitCode === null && Date.now() < deadline) await delay(50);
   if (browser.exitCode === null) browser.kill();
-  await new Promise(resolveClose => httpServer.close(resolveClose));
+  await Promise.all([
+    new Promise(resolveClose => httpServer.close(resolveClose)),
+    new Promise(resolveClose => crossOriginServer.close(resolveClose)),
+  ]);
   await rm(profilePath, {
     recursive: true,
     force: true,

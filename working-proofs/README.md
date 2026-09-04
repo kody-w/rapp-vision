@@ -38,4 +38,8 @@ the exact aggregate live actions run at the 960 px desktop player stage and the
 success, exact-reset, and untouched FOG-7 handoff captures, followed by a real
 player takeover check. Every result capture includes the player lower third,
 and `manifest.json` records screenshot hashes plus the measured visible
-intersection for each configured result selector.
+intersection for each configured result selector. The manifest also binds the
+player, aggregate channel and evidence index, and every source app, channel,
+and evidence document. Freshness compares checkpoint state and geometry while
+the committed PNG hashes authenticate only the captures made by the recorded
+browser.

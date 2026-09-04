@@ -1,7 +1,150 @@
 {
-  "schema": "working-proofs-viewport-evidence/1.0",
+  "schema": "working-proofs-viewport-evidence/1.1",
   "browser": "Edg/152.0.4191.53",
   "channel": "working-proofs",
+  "sourceBindings": {
+    "algorithm": "sha256",
+    "pathBase": "repository-root",
+    "player": {
+      "path": "index.html",
+      "bytes": 125556,
+      "sha256": "fa4bfb3cf39726f73405559376013eed505a333e91f18d795382a3c7589af902"
+    },
+    "aggregate": {
+      "channel": {
+        "path": "working-proofs/channel.json",
+        "bytes": 50663,
+        "sha256": "b484a8d2cea15ea5134d2a1c4a1f9d93a145f344a41300d97f2d14e977243f76"
+      },
+      "evidenceIndex": {
+        "path": "working-proofs/evidence-index.json",
+        "bytes": 5088,
+        "sha256": "474fe3fd6310a47f9fc38dae05a2c4a25f298dbae25bf254c5dc75c6273b2c7f"
+      }
+    },
+    "publications": [
+      {
+        "publication": "learn-grid-overflow",
+        "apps": [
+          {
+            "path": "candidate-frame-0002/learn-grid-overflow/apps/learn-grid-overflow.html",
+            "bytes": 32189,
+            "sha256": "858e223fdc0adba54f7e54b890fb2e9ad346b4851d6cf6e0f189474c9137a82f"
+          }
+        ],
+        "sourceChannel": {
+          "path": "candidate-frame-0002/learn-grid-overflow/channel.json",
+          "bytes": 6886,
+          "sha256": "410582bd2d6088ffa70aabceb4f8a2fcdd02f2015333725cdd43d30ab116b8c9"
+        },
+        "evidence": {
+          "path": "candidate-frame-0002/learn-grid-overflow/evidence.json",
+          "bytes": 12138,
+          "sha256": "500b6674104c2b359ba77e85197d83657e602893d9628ffedf4498dbf0c7dae4"
+        }
+      },
+      {
+        "publication": "use-keyboard-invoice-triage",
+        "apps": [
+          {
+            "path": "candidate-frame-0002/use-keyboard-invoice-triage/apps/use-keyboard-invoice-triage.html",
+            "bytes": 47082,
+            "sha256": "28209ac77188e48a22545252a7db8403d2070ce1750c3b06d138c066831d6bf2"
+          }
+        ],
+        "sourceChannel": {
+          "path": "candidate-frame-0002/use-keyboard-invoice-triage/channel.json",
+          "bytes": 8079,
+          "sha256": "9b2d6aa9b42279874614d486615fb3ecd097909c8836b734f072db0eda95481b"
+        },
+        "evidence": {
+          "path": "candidate-frame-0002/use-keyboard-invoice-triage/evidence.json",
+          "bytes": 9123,
+          "sha256": "e97712e3cbb0d9a4da22de7eaee27a18dd5d4f3fbe3f33a8da3af62a22e7145f"
+        }
+      },
+      {
+        "publication": "create-vector-icon-system",
+        "apps": [
+          {
+            "path": "candidate-frame-0002/create-vector-icon-system/apps/create-vector-icon-system.html",
+            "bytes": 45128,
+            "sha256": "fbe8b11a4294ef8fa557e1b87192f846cacf95b65358bcc8acb23f78c5dd9569"
+          }
+        ],
+        "sourceChannel": {
+          "path": "candidate-frame-0002/create-vector-icon-system/channel.json",
+          "bytes": 6297,
+          "sha256": "966c85f43ce482e98e2abd1bce64a3d3c80d59f646b4d1413bcea8b3d4329f5e"
+        },
+        "evidence": {
+          "path": "candidate-frame-0002/create-vector-icon-system/evidence.json",
+          "bytes": 23254,
+          "sha256": "6becaa4f9c5595b4081d8d479e6b610ac0c88e78091452e2b9289950ff7c0da2"
+        }
+      },
+      {
+        "publication": "ecosystem-island-threshold",
+        "apps": [
+          {
+            "path": "candidate-frame-0003/ecosystem-island-threshold/apps/ecosystem-island-threshold.html",
+            "bytes": 49307,
+            "sha256": "5f17f11e50df5792f54b4d53768c476b7e5f971ed46daac1546479a500a07cd0"
+          }
+        ],
+        "sourceChannel": {
+          "path": "candidate-frame-0003/ecosystem-island-threshold/channel.json",
+          "bytes": 7788,
+          "sha256": "5778dd5e11ae124943c69d87e563799a61ea14b44383abd090d1d4f447feeed1"
+        },
+        "evidence": {
+          "path": "candidate-frame-0003/ecosystem-island-threshold/evidence.json",
+          "bytes": 239922,
+          "sha256": "099576ef0f5e8da21357c2690e36b2f0f99a38d80e8c01f3ef2021376f28b00e"
+        }
+      },
+      {
+        "publication": "explore-archive-map-contrast",
+        "apps": [
+          {
+            "path": "candidate-frame-0003/archive-wetland-contrast/apps/explore-archive-map-contrast.html",
+            "bytes": 56461,
+            "sha256": "5a8e5215b7ae47c4d52a70a266e422aa33886c75f7e85c12c09d58c2dbf33426"
+          }
+        ],
+        "sourceChannel": {
+          "path": "candidate-frame-0003/archive-wetland-contrast/channel.json",
+          "bytes": 7916,
+          "sha256": "d9549fbf05dc18f2211cc8623e5ffb9ba079ca720702ce3b98713989ceca0d8b"
+        },
+        "evidence": {
+          "path": "candidate-frame-0003/archive-wetland-contrast/evidence.json",
+          "bytes": 16909,
+          "sha256": "cb44b128b019522985d9dfc854ab90185fbc95e0b4da38f09f9ca47c113a10da"
+        }
+      },
+      {
+        "publication": "maze-fogline",
+        "apps": [
+          {
+            "path": "candidate-frame-0004/maze-fogline/apps/maze-fogline.html",
+            "bytes": 64780,
+            "sha256": "3551e57a577efe778362a85c5a40ea26a94d971ce98b07e2c644fa85518a7ae5"
+          }
+        ],
+        "sourceChannel": {
+          "path": "candidate-frame-0004/maze-fogline/channel.json",
+          "bytes": 14647,
+          "sha256": "bcfa513f9b1773a42e686c01c3d9ff322b5c4dd4ead19441acb231b7bc0bf5aa"
+        },
+        "evidence": {
+          "path": "candidate-frame-0004/maze-fogline/evidence.json",
+          "bytes": 44191,
+          "sha256": "63e4cace9d698ed67ecee06029c38350f471006ae7bf5ce8c3ba52915a294a62"
+        }
+      }
+    ]
+  },
   "viewports": [
     {
       "id": "desktop",
@@ -86,8 +229,8 @@
       },
       "screenshot": {
         "path": "learn-grid-overflow-desktop-positive.png",
-        "bytes": 72606,
-        "sha256": "064e4ab8164816deb08baed0b579c44735a5c7549bc395964d42223c5b667394",
+        "bytes": 72757,
+        "sha256": "4794dd764f08b104874dfbc1d3c0fb82d174e4a349ebfeb6c9671e3b7963e9da",
         "width": 962,
         "height": 601
       }
@@ -135,8 +278,8 @@
       },
       "screenshot": {
         "path": "learn-grid-overflow-desktop-failure.png",
-        "bytes": 74627,
-        "sha256": "8413b0e9b291513ee88b95b6c790210de9f2d29b9ec79eddf1f6dd49d8d34fbd",
+        "bytes": 74752,
+        "sha256": "9c237d2f6ab7f0b7baa267806a78d198bfb229295a60dbb7eb6271313dcaf6e9",
         "width": 962,
         "height": 601
       }
@@ -282,8 +425,8 @@
       },
       "screenshot": {
         "path": "use-keyboard-invoice-triage-desktop-rejected.png",
-        "bytes": 107931,
-        "sha256": "877524292edfdda81db297ad003429db85439cd9f5a4f5dbc79d2927265d3939",
+        "bytes": 112479,
+        "sha256": "9c88353a6978c94c6004d295a4174293fca6d73237574cae01127d516da98b9a",
         "width": 962,
         "height": 601
       }
@@ -380,8 +523,8 @@
       },
       "screenshot": {
         "path": "create-vector-icon-system-desktop-positive.png",
-        "bytes": 124576,
-        "sha256": "d0a34f97f8015b1ce9b33cea6d265a597212d0daa797971a7365ff7f65fe1ced",
+        "bytes": 125597,
+        "sha256": "d9faea9848d2458f1ad8dacd7f7a595d3aa345658b698e5ac61f642ff4410c44",
         "width": 962,
         "height": 601
       }
@@ -429,8 +572,8 @@
       },
       "screenshot": {
         "path": "create-vector-icon-system-desktop-rejected.png",
-        "bytes": 130131,
-        "sha256": "29b85f9dd98e51cb44f653916dd197c528c43dbda4704c563df1639dc76e3155",
+        "bytes": 131001,
+        "sha256": "0c772504277d696edbf11a042794684b583fcf22edee191e4da41863ce9351fc",
         "width": 962,
         "height": 601
       }
@@ -478,8 +621,8 @@
       },
       "screenshot": {
         "path": "create-vector-icon-system-desktop-reset.png",
-        "bytes": 93987,
-        "sha256": "12b98ab9c9c78b8fef93db098b5fc80f609ae1f23e9f50f94fc8d0d4178b4e0d",
+        "bytes": 95168,
+        "sha256": "d8d8f88d85c2abeab7c300ffbe9a1371ab1f5d54c3b7fb17f220068ca14fd36b",
         "width": 962,
         "height": 601
       }
@@ -527,8 +670,8 @@
       },
       "screenshot": {
         "path": "ecosystem-island-threshold-desktop-stable.png",
-        "bytes": 95023,
-        "sha256": "f9bc707757fdcd34ff55e0f57b6a3315b8ae6993fe81dfb438837ee213a65f1f",
+        "bytes": 96445,
+        "sha256": "a8f697b1eba21419a0d4bde589ebfad1740a94a22a092cae42072cad99ac4366",
         "width": 962,
         "height": 601
       }
@@ -625,8 +768,8 @@
       },
       "screenshot": {
         "path": "ecosystem-island-threshold-desktop-export.png",
-        "bytes": 102820,
-        "sha256": "310c0d896f19810daaf5e03fe6d6efd7c5f58a6292e02e21caef60b412be2757",
+        "bytes": 104297,
+        "sha256": "98bd635127daf303779d4ef1de3982e2d6f4e04bd9317233f80f93aaec7de1d1",
         "width": 962,
         "height": 601
       }
@@ -674,8 +817,8 @@
       },
       "screenshot": {
         "path": "ecosystem-island-threshold-desktop-reset.png",
-        "bytes": 92061,
-        "sha256": "e22caf3cd6876b9e70f717c4bdfa91b4c99ba2aaba17115e63910cacbdc352de",
+        "bytes": 93564,
+        "sha256": "98be17bd5af47658a03052bb72a3427d97a46221693790ebc2fecbfbca62f2bc",
         "width": 962,
         "height": 601
       }
@@ -723,8 +866,8 @@
       },
       "screenshot": {
         "path": "ecosystem-island-threshold-desktop-your-turn.png",
-        "bytes": 85320,
-        "sha256": "031cf81b15bd407e56c9be910b0909db70d013de72244d027778e76e1ccf622f",
+        "bytes": 86804,
+        "sha256": "d60630c14e49bcacf939efd3be93994f8c9a3202796425192df81babb1907719",
         "width": 962,
         "height": 601
       }
@@ -772,8 +915,8 @@
       },
       "screenshot": {
         "path": "explore-archive-map-contrast-desktop-positive.png",
-        "bytes": 96578,
-        "sha256": "941a92a676249c18b1b2abe085638e8ce481bbe0eafa4776ee4b76ef41f6d967",
+        "bytes": 96624,
+        "sha256": "38500c90efca35baecba03edbf1d697913efa3d8ec16e167cf1daf1711468a96",
         "width": 962,
         "height": 601
       }
@@ -821,8 +964,8 @@
       },
       "screenshot": {
         "path": "explore-archive-map-contrast-desktop-failure.png",
-        "bytes": 118168,
-        "sha256": "56278ca3ef1b1ba46efb5b74a8e376d1f76f3f46052949dbf798b8bbf595fbab",
+        "bytes": 118221,
+        "sha256": "eebb7e6c1e46d9bd9e56c01d072eed2b562082d2960d803d639a9ef7cd1972d1",
         "width": 962,
         "height": 601
       }
@@ -870,8 +1013,8 @@
       },
       "screenshot": {
         "path": "explore-archive-map-contrast-desktop-reset.png",
-        "bytes": 100425,
-        "sha256": "9d926ceacb16a835630dea37650aef425a0efbf9cf9f9301dd283a45fc85c1fa",
+        "bytes": 100459,
+        "sha256": "4b7f51608d2d971115c6630f9a299d65a53e2e9c13ef121e1fba2ef8fa2804bc",
         "width": 962,
         "height": 601
       }

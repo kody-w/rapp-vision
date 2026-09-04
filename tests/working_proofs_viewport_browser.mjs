@@ -219,6 +219,59 @@ function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
 }
 
+function repositoryRelative(path) {
+  const resolvedPath = resolve(path);
+  const prefix = ROOT.endsWith(sep) ? ROOT : `${ROOT}${sep}`;
+  assert.ok(
+    resolvedPath !== ROOT && resolvedPath.startsWith(prefix),
+    `source binding escapes the repository: ${resolvedPath}`,
+  );
+  return relative(ROOT, resolvedPath).split(sep).join("/");
+}
+
+async function fileBinding(path) {
+  const bytes = await readFile(path);
+  return {
+    path: repositoryRelative(path),
+    bytes: bytes.length,
+    sha256: sha256(bytes),
+  };
+}
+
+async function buildSourceBindings() {
+  const publications = [];
+  for (const item of channel.videos) {
+    const record = indexRecord(item.id);
+    const appPaths = [
+      ...new Set(
+        item.live.scenes
+          .filter(scene => typeof scene.app === "string")
+          .map(scene => referencedPath(channelPath, scene.app)),
+      ),
+    ];
+    publications.push({
+      publication: item.id,
+      apps: await Promise.all(appPaths.map(fileBinding)),
+      sourceChannel: await fileBinding(
+        referencedPath(evidenceIndexPath, record.source_channel.path),
+      ),
+      evidence: await fileBinding(
+        referencedPath(evidenceIndexPath, record.evidence.path),
+      ),
+    });
+  }
+  return {
+    algorithm: "sha256",
+    pathBase: "repository-root",
+    player: await fileBinding(resolve(ROOT, "index.html")),
+    aggregate: {
+      channel: await fileBinding(channelPath),
+      evidenceIndex: await fileBinding(evidenceIndexPath),
+    },
+    publications,
+  };
+}
+
 function canonicalJson(value) {
   if (Array.isArray(value)) {
     return `[${value.map(canonicalJson).join(",")}]`;
@@ -1882,9 +1935,10 @@ try {
   assert.deepEqual(networkErrors, []);
   assert.deepEqual(externalRequests, []);
   const manifest = {
-    schema: "working-proofs-viewport-evidence/1.0",
+    schema: "working-proofs-viewport-evidence/1.1",
     browser: version.product,
     channel: channel.id,
+    sourceBindings: await buildSourceBindings(),
     viewports: VIEWPORTS.map(({
       id,
       pageWidth,

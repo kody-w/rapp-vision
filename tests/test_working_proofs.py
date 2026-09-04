@@ -201,6 +201,51 @@ def resolve_reference(base_file: Path, reference: str) -> Path:
     return base_file.parent.joinpath(*PurePosixPath(parsed.path).parts).resolve()
 
 
+def manifest_source_bindings(manifest):
+    bindings = manifest["sourceBindings"]
+    yield bindings["player"]
+    yield bindings["aggregate"]["channel"]
+    yield bindings["aggregate"]["evidenceIndex"]
+    for publication in bindings["publications"]:
+        yield from publication["apps"]
+        yield publication["sourceChannel"]
+        yield publication["evidence"]
+
+
+def source_binding_errors(manifest):
+    errors = []
+    for binding in manifest_source_bindings(manifest):
+        path = ROOT.joinpath(
+            *PurePosixPath(binding["path"]).parts
+        ).resolve()
+        if not path.is_relative_to(ROOT) or not path.is_file():
+            errors.append(binding["path"])
+            continue
+        if (
+            binding["bytes"] != path.stat().st_size
+            or binding["sha256"] != sha256(path)
+        ):
+            errors.append(binding["path"])
+    return errors
+
+
+def semantic_capture_record(capture):
+    return {
+        "publication": capture["publication"],
+        "viewport": capture["viewport"],
+        "checkpoint": capture["checkpoint"],
+        "actionIndex": capture["actionIndex"],
+        "resultSelector": capture["resultSelector"],
+        "metrics": capture["metrics"],
+        "state": capture["state"],
+        "screenshot": {
+            "path": capture["screenshot"]["path"],
+            "width": capture["screenshot"]["width"],
+            "height": capture["screenshot"]["height"],
+        },
+    }
+
+
 def resolve_browser() -> str | None:
     for environment_name in (
         "RAPP_BROWSER",
@@ -701,6 +746,86 @@ class TestWorkingProofsBuild(unittest.TestCase):
                     ),
                 },
             )
+
+    def test_committed_screenshot_manifest_binds_every_runtime_source(self):
+        manifest = load_json(SCREENSHOT_ROOT / "manifest.json")
+        bindings = manifest["sourceBindings"]
+        self.assertEqual(bindings["algorithm"], "sha256")
+        self.assertEqual(bindings["pathBase"], "repository-root")
+        self.assertEqual(bindings["player"]["path"], "index.html")
+        self.assertEqual(
+            bindings["aggregate"]["channel"]["path"],
+            "working-proofs/channel.json",
+        )
+        self.assertEqual(
+            bindings["aggregate"]["evidenceIndex"]["path"],
+            "working-proofs/evidence-index.json",
+        )
+        self.assertEqual(
+            [
+                publication["publication"]
+                for publication in bindings["publications"]
+            ],
+            [spec.publication_id for spec in PUBLICATIONS],
+        )
+        expected_paths = {
+            "index.html",
+            "working-proofs/channel.json",
+            "working-proofs/evidence-index.json",
+        }
+        for spec, publication, binding in zip(
+            PUBLICATIONS,
+            self.channel["videos"],
+            bindings["publications"],
+            strict=True,
+        ):
+            expected_apps = [
+                resolve_reference(CHANNEL_PATH, scene["app"])
+                .relative_to(ROOT)
+                .as_posix()
+                for scene in publication["live"]["scenes"]
+                if "app" in scene
+            ]
+            self.assertEqual(
+                [item["path"] for item in binding["apps"]],
+                list(dict.fromkeys(expected_apps)),
+            )
+            self.assertEqual(
+                binding["sourceChannel"]["path"],
+                (spec.source_root / "channel.json")
+                .relative_to(ROOT)
+                .as_posix(),
+            )
+            self.assertEqual(
+                binding["evidence"]["path"],
+                (spec.source_root / "evidence.json")
+                .relative_to(ROOT)
+                .as_posix(),
+            )
+            expected_paths.update(expected_apps)
+            expected_paths.add(binding["sourceChannel"]["path"])
+            expected_paths.add(binding["evidence"]["path"])
+
+        self.assertEqual(
+            {binding["path"] for binding in manifest_source_bindings(manifest)},
+            expected_paths,
+        )
+        self.assertEqual(source_binding_errors(manifest), [])
+
+        stale = json.loads(json.dumps(manifest))
+        stale["sourceBindings"]["player"]["sha256"] = "0" * 64
+        stale["sourceBindings"]["publications"][0]["apps"][0][
+            "sha256"
+        ] = "f" * 64
+        self.assertEqual(
+            set(source_binding_errors(stale)),
+            {
+                "index.html",
+                stale["sourceBindings"]["publications"][0]["apps"][0][
+                    "path"
+                ],
+            },
+        )
 
 
 class TestWorkingProofsMedia(unittest.TestCase):
@@ -1337,7 +1462,7 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
             generated_manifest = load_json(scratch / "manifest.json")
             self.assertEqual(
                 generated_manifest["schema"],
-                "working-proofs-viewport-evidence/1.0",
+                "working-proofs-viewport-evidence/1.1",
             )
             self.assertEqual(generated_manifest["channel"], "working-proofs")
             self.assertEqual(
@@ -1429,6 +1554,18 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
 
             committed_manifest = load_json(SCREENSHOT_ROOT / "manifest.json")
             self.assertEqual(
+                committed_manifest["sourceBindings"],
+                generated_manifest["sourceBindings"],
+            )
+            self.assertEqual(
+                source_binding_errors(generated_manifest),
+                [],
+            )
+            self.assertEqual(
+                source_binding_errors(committed_manifest),
+                [],
+            )
+            self.assertEqual(
                 {
                     (
                         item["publication"],
@@ -1454,19 +1591,11 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
             )
             self.assertEqual(
                 [
-                    (
-                        item["publication"],
-                        item["viewport"],
-                        item["checkpoint"],
-                    )
+                    semantic_capture_record(item)
                     for item in committed_manifest["captures"]
                 ],
                 [
-                    (
-                        item["publication"],
-                        item["viewport"],
-                        item["checkpoint"],
-                    )
+                    semantic_capture_record(item)
                     for item in generated_manifest["captures"]
                 ],
             )

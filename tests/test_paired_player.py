@@ -7,6 +7,7 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,6 +23,7 @@ BROWSER_RUNNER = ROOT / "tests" / "paired_player_takeover_browser.mjs"
 
 def resolve_browser():
     for environment_name in (
+        "RAPP_BROWSER",
         "BROWSER",
         "CHROME_PATH",
         "CHROMIUM_PATH",
@@ -228,6 +230,25 @@ class TestPairedPlayer(unittest.TestCase):
         )
         self.assertEqual(completed.returncode, 0, completed.stderr or completed.stdout)
         return completed.stdout
+
+    def test_rapp_browser_precedes_browser_and_path_candidates(self):
+        primary = str(BROWSER_RUNNER.resolve())
+        conflicting = str((ROOT / "index.html").resolve())
+        with (
+            mock.patch.dict(
+                os.environ,
+                {
+                    "RAPP_BROWSER": primary,
+                    "BROWSER": conflicting,
+                    "CHROME_PATH": "",
+                    "CHROMIUM_PATH": "",
+                    "EDGE_PATH": "",
+                },
+                clear=False,
+            ),
+            mock.patch.object(shutil, "which", return_value=conflicting),
+        ):
+            self.assertEqual(resolve_browser(), primary)
 
     def test_browser_validator_accepts_and_rejects_the_same_fixtures(self):
         valid = json.dumps(json.loads(
@@ -547,6 +568,20 @@ class TestPairedPlayer(unittest.TestCase):
         self.assertIn("frame.focus({ preventScroll: true })", live)
         self.assertIn("frame.contentWindow.focus()", live)
         self.assertIn('e.key !== "Escape"', live)
+        self.assertIn(
+            "Escape also returns only when the live application is same-origin.",
+            live,
+        )
+        self.assertIn('host.dataset.takeoverEscape = "same-origin";', live)
+        self.assertIn('host.dataset.takeoverEscape = "toolbar-only";', live)
+        self.assertIn(
+            'takeButton.setAttribute("aria-keyshortcuts", "Escape")',
+            live,
+        )
+        self.assertIn(
+            "this app is cross-origin, so use the reserved Show captions button",
+            live,
+        )
         self.assertIn("if (takeover) {", live)
         self.assertIn("setTakeoverAvailable(false);", live)
         self.assertIn("setTakeoverAvailable(true);", live)
@@ -727,6 +762,80 @@ class TestPairedPlayerTakeoverBrowser(unittest.TestCase):
             self.assertFalse(run["modeCleanup"]["takeoverButton"])
             self.assertEqual(run["publicationCleanup"]["takeoverNodes"], 0)
             self.assertFalse(run["publicationCleanup"]["takeoverButton"])
+
+    def test_cross_origin_takeover_uses_reserved_toolbar(self):
+        for run in self.result["runs"]:
+            fixture = run["crossOriginTakeover"]
+            with self.subTest(viewport=run["viewport"]["name"]):
+                self.assertEqual(
+                    fixture["access"],
+                    {
+                        "contentDocument": False,
+                        "documentAccessible": False,
+                        "errorName": "SecurityError",
+                    },
+                )
+                self.assertEqual(
+                    fixture["active"]["escapeMode"],
+                    "toolbar-only",
+                )
+                self.assertRegex(
+                    fixture["active"]["helpText"],
+                    r"Escape also returns only when .*same-origin",
+                )
+                self.assertRegex(
+                    fixture["active"]["statusText"],
+                    r"cross-origin.*Show captions button",
+                )
+                self.assertGreaterEqual(
+                    fixture["active"]["button"]["height"],
+                    44,
+                )
+                self.assertGreaterEqual(
+                    fixture["active"]["toolbar"]["height"],
+                    52,
+                )
+                self.assertGreaterEqual(
+                    fixture["active"]["button"]["top"],
+                    fixture["active"]["frame"]["bottom"],
+                )
+                self.assertTrue(fixture["afterEscape"]["takeover"])
+                self.assertEqual(
+                    fixture["restored"]["stage"],
+                    fixture["normal"]["stage"],
+                )
+                self.assertEqual(
+                    fixture["restored"]["frame"],
+                    fixture["normal"]["frame"],
+                )
+                self.assertNotEqual(
+                    fixture["restored"]["lowerDisplay"],
+                    "none",
+                )
+                self.assertNotEqual(
+                    fixture["restored"]["replayDisplay"],
+                    "none",
+                )
+                self.assertEqual(
+                    fixture["state"]["mutated"]["token"],
+                    fixture["state"]["before"]["token"],
+                )
+                self.assertEqual(
+                    fixture["state"]["mutated"]["count"],
+                    fixture["state"]["before"]["count"] + 1,
+                )
+                self.assertEqual(
+                    fixture["state"]["preserved"]["token"],
+                    fixture["state"]["mutated"]["token"],
+                )
+                self.assertEqual(
+                    fixture["state"]["preserved"]["count"],
+                    fixture["state"]["mutated"]["count"],
+                )
+                self.assertEqual(
+                    fixture["appRequestsBefore"],
+                    fixture["appRequestsAfter"],
+                )
 
     def test_fogline_and_rootway_controls_stay_unobscured(self):
         if not FOGLINE_FIXTURE or not ROOTWAY_FIXTURE:
