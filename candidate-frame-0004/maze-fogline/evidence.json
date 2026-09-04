@@ -1979,9 +1979,9 @@
       "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
     },
     {
-      "bytes": 9930,
+      "bytes": 10019,
       "path": "README.md",
-      "sha256": "1e1b0ac752211ac1e099486b4c15cf534a67ddb87e508a1280cb709dc85afcfe"
+      "sha256": "2a2dc150dd146c69e768bf47b03540613fb7452100989fc6f49b10be0cf459fe"
     },
     {
       "bytes": 64780,
@@ -1994,14 +1994,14 @@
       "sha256": "49d05d2b0025e4e065fcbd40c2788cce73e25317cafafc235cb56276be073875"
     },
     {
-      "bytes": 98356,
+      "bytes": 98346,
       "path": "render.py",
-      "sha256": "8ca7627b57dd3ee98a1a3acc6fd2641c3731e1abc200c7d2d55ee4fb6587bdef"
+      "sha256": "41a1175f80f46b0ae6b2bed2198f794661129d9d964a93521cb702a1e85a40bf"
     },
     {
-      "bytes": 20254,
+      "bytes": 19614,
       "path": "render_live.mjs",
-      "sha256": "342fc758e57df81a4db5d56b5a78d6299e5ff7090063f0bfb693980082efbfc4"
+      "sha256": "2d5385b4d1cb5f1aa9269004bc7e994e185019f420ae6eee01b3d0da1e6e4a0d"
     },
     {
       "bytes": 20059,

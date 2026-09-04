@@ -169,8 +169,9 @@ python scripts\validate_publications.py --ffprobe-local `
 git diff --check
 ```
 
-The focused test normalizes CRLF for source parsing but keeps generated raw
-LF contracts strict. It independently regenerates topology and BFS results,
+The focused test requires raw checkout bytes to match Git's canonical LF
+bytes, normalizes CRLF only for source-text parsing, and hashes unmodified raw
+bytes for every artifact binding. It independently regenerates topology and BFS results,
 accepts either the exact open commission or its future exact fulfillment,
 binds committed delivery hashes separately from two same-toolchain rebuilds,
 decodes one committed frame from every declared film phase, proves each

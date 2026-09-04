@@ -1352,11 +1352,25 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _binding(path: Path, root: Path) -> dict[str, object]:
+def source_text(path: Path) -> str:
+    return (
+        path.read_bytes()
+        .decode("utf-8")
+        .replace("\r\n", "\n")
+        .replace("\r", "\n")
+    )
+
+
+def source_json(path: Path) -> object:
+    return json.loads(source_text(path))
+
+
+def artifact_binding(path: Path, root: Path) -> dict[str, object]:
+    raw = path.read_bytes()
     return {
         "path": path.relative_to(root).as_posix(),
-        "bytes": path.stat().st_size,
-        "sha256": _sha256(path),
+        "bytes": len(raw),
+        "sha256": hashlib.sha256(raw).hexdigest(),
     }
 
 
@@ -1367,11 +1381,11 @@ def continuity_binding(root: Path) -> dict[str, object]:
             "path": "snapshots/film-live-continuity.json",
             "pending": True,
         }
-    document = json.loads(path.read_text(encoding="utf-8"))
+    document = source_json(path)
     if document.get("schema") != "fogline-survey-film-live-continuity/1.0":
         raise RuntimeError("film/live continuity evidence has the wrong schema")
     return {
-        **_binding(path, root),
+        **artifact_binding(path, root),
         "schema": document["schema"],
         "renderer": document["renderer"]["kind"],
     }
@@ -1539,7 +1553,7 @@ def evidence_document(root: Path = ROOT) -> dict[str, object]:
             "audio": False,
         },
         "sourceBindings": [
-            _binding(root / relative, root)
+            artifact_binding(root / relative, root)
             for relative in EVIDENCE_SOURCE_PATHS
         ],
     }
@@ -2457,7 +2471,7 @@ def _finalize_continuity(
     sample_dir: Path,
     ffmpeg: str,
 ) -> None:
-    document = json.loads(continuity_path.read_text(encoding="utf-8"))
+    document = source_json(continuity_path)
     phases = document.get("phases")
     if not isinstance(phases, list):
         raise RuntimeError("browser renderer emitted no continuity phases")
@@ -2643,7 +2657,7 @@ def _probe(path: Path, ffprobe: str) -> dict[str, object]:
 
 def _artifact(path: Path, root: Path, ffprobe: str) -> dict[str, object]:
     return {
-        **_binding(path, root),
+        **artifact_binding(path, root),
         **_probe(path, ffprobe),
     }
 
@@ -2660,10 +2674,8 @@ def delivery_document(
     missing = [path for path in required if not path.is_file()]
     if missing:
         raise RuntimeError(f"delivery artifact missing: {missing[0]}")
-    continuity = json.loads(
-        (root / "snapshots" / "film-live-continuity.json").read_text(
-            encoding="utf-8"
-        )
+    continuity = source_json(
+        root / "snapshots" / "film-live-continuity.json"
     )
     if continuity.get("schema") != "fogline-survey-film-live-continuity/1.0":
         raise RuntimeError("delivery continuity evidence has the wrong schema")
@@ -2685,7 +2697,7 @@ def delivery_document(
             "webm": _artifact(webm, root, ffprobe),
         },
         "sourceArtifacts": [
-            _binding(root / relative, root)
+            artifact_binding(root / relative, root)
             for relative in DELIVERY_SOURCE_PATHS
         ],
         "binding": {
@@ -2794,7 +2806,7 @@ def write_delivery(root: Path, ffprobe: str) -> Path:
 
 def validate_manifest(path: Path = MANIFEST_PATH) -> None:
     try:
-        document = json.loads(path.read_text(encoding="utf-8"))
+        document = source_json(path)
     except (OSError, json.JSONDecodeError) as exc:
         raise RuntimeError(f"cannot read production manifest: {exc}") from exc
     if document != production_document():
@@ -2808,7 +2820,7 @@ def check_delivery(root: Path, ffprobe: str) -> list[str]:
         for record in delivery_document(root, ffprobe)["sourceArtifacts"]
     }
     try:
-        actual = json.loads((root / "delivery.json").read_text(encoding="utf-8"))
+        actual = source_json(root / "delivery.json")
     except (OSError, json.JSONDecodeError) as exc:
         return [f"cannot read delivery.json: {exc}"]
     actual_source = {
@@ -2831,19 +2843,15 @@ def check_delivery(root: Path, ffprobe: str) -> list[str]:
 def check_release(root: Path, ffprobe: str) -> None:
     validate_manifest(root / "channel.production.json")
     expected_snapshots = canonical_states_document()
-    actual_snapshots = json.loads(
-        (root / "snapshots" / "canonical-states.json").read_text(
-            encoding="utf-8"
-        )
+    actual_snapshots = source_json(
+        root / "snapshots" / "canonical-states.json"
     )
     if actual_snapshots != expected_snapshots:
         raise RuntimeError("canonical snapshots are stale")
-    if (root / SPEC.thumbnail_relative).read_text(
-        encoding="utf-8"
-    ).replace("\r\n", "\n") != thumbnail_svg():
+    if source_text(root / SPEC.thumbnail_relative) != thumbnail_svg():
         raise RuntimeError("thumbnail is stale")
     continuity_path = root / "snapshots" / "film-live-continuity.json"
-    continuity = json.loads(continuity_path.read_text(encoding="utf-8"))
+    continuity = source_json(continuity_path)
     if continuity.get("renderer", {}).get("kind") != "live-app-chromium-capture":
         raise RuntimeError("film was not rendered from the live app")
     if continuity.get("sourceAppSha256") != _sha256(
@@ -2857,9 +2865,7 @@ def check_release(root: Path, ffprobe: str) -> None:
     ):
         raise RuntimeError("film/live phase pixel binding is incomplete")
     expected_evidence = evidence_document(root)
-    actual_evidence = json.loads(
-        (root / "evidence.json").read_text(encoding="utf-8")
-    )
+    actual_evidence = source_json(root / "evidence.json")
     if actual_evidence != expected_evidence:
         raise RuntimeError("evidence is stale")
     delivery_errors = check_delivery(root, ffprobe)

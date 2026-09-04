@@ -981,6 +981,119 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
                 self.assertEqual(path.stat().st_size, record["bytes"])
                 self.assertEqual(sha256_file(path), record["sha256"])
 
+    def test_source_bindings_match_git_canonical_checkout_bytes(self):
+        evidence_records = {
+            record["path"]: record
+            for record in self.evidence["sourceBindings"]
+        }
+        delivery_records = {
+            record["path"]: record
+            for record in self.delivery["sourceArtifacts"]
+        }
+        source_paths = sorted(
+            set(evidence_records) | set(delivery_records)
+        )
+        git_environment = os.environ.copy()
+        for name in tuple(git_environment):
+            if (
+                name == "GIT_CONFIG_COUNT"
+                or re.fullmatch(r"GIT_CONFIG_(KEY|VALUE)_\d+", name)
+            ):
+                git_environment.pop(name)
+        for relative in source_paths:
+            path = CANDIDATE / relative
+            repository_relative = path.relative_to(ROOT).as_posix()
+            with self.subTest(path=relative):
+                raw = subprocess.run(
+                    [
+                        "git",
+                        "-C",
+                        str(ROOT),
+                        "hash-object",
+                        "--no-filters",
+                        "--",
+                        repository_relative,
+                    ],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    env=git_environment,
+                ).stdout.strip()
+                canonical = subprocess.run(
+                    [
+                        "git",
+                        "-C",
+                        str(ROOT),
+                        "hash-object",
+                        f"--path={repository_relative}",
+                        "--",
+                        repository_relative,
+                    ],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    env=git_environment,
+                ).stdout.strip()
+                self.assertEqual(
+                    raw,
+                    canonical,
+                    f"{relative} checkout bytes differ from Git canonical bytes",
+                )
+                attribute = subprocess.run(
+                    [
+                        "git",
+                        "-C",
+                        str(ROOT),
+                        "check-attr",
+                        "eol",
+                        "--",
+                        repository_relative,
+                    ],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    env=git_environment,
+                ).stdout.strip()
+                self.assertTrue(attribute.endswith(": eol: lf"), attribute)
+                for records in (evidence_records, delivery_records):
+                    if relative not in records:
+                        continue
+                    self.assertEqual(
+                        records[relative]["bytes"],
+                        len(path.read_bytes()),
+                    )
+                    self.assertEqual(
+                        records[relative]["sha256"],
+                        sha256_file(path),
+                    )
+
+        relative = "render_live.mjs"
+        repository_relative = (
+            CANDIDATE / relative
+        ).relative_to(ROOT).as_posix()
+        committed = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(ROOT),
+                "show",
+                f"HEAD:{repository_relative}",
+            ],
+            check=True,
+            capture_output=True,
+            env=git_environment,
+        ).stdout
+        checkout = (CANDIDATE / relative).read_bytes()
+        self.assertEqual(checkout, committed)
+        self.assertEqual(len(checkout), 19_614)
+        self.assertEqual(
+            hashlib.sha256(checkout).hexdigest(),
+            "2d5385b4d1cb5f1aa9269004bc7e994e185019f420ae6eee01b3d0da1e6e4a0d",
+        )
+
     def test_app_is_standalone_responsive_keyboard_first_and_route_private(self):
         index = AppIndex()
         index.feed(self.app_source)
@@ -1142,6 +1255,7 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
 
         scratch = CANDIDATE / ".frame-0004-01-crlf.json"
         script_scratch = CANDIDATE / ".frame-0004-01-crlf.mjs"
+        binding_scratch = CANDIDATE / ".frame-0004-01-crlf-source.txt"
         try:
             scratch.write_text(
                 normalized_text(MANIFEST_PATH).replace("\n", "\r\n"),
@@ -1179,9 +1293,31 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
                     0,
                     checked.stderr or checked.stdout,
                 )
+
+            lf_source = b"alpha\nbeta\n"
+            crlf_source = lf_source.replace(b"\n", b"\r\n")
+            binding_scratch.write_bytes(crlf_source)
+            self.assertEqual(
+                RENDERER.source_text(binding_scratch),
+                lf_source.decode("utf-8"),
+            )
+            binding = RENDERER.artifact_binding(
+                binding_scratch,
+                CANDIDATE,
+            )
+            self.assertEqual(binding["bytes"], len(crlf_source))
+            self.assertEqual(
+                binding["sha256"],
+                hashlib.sha256(crlf_source).hexdigest(),
+            )
+            self.assertNotEqual(
+                binding["sha256"],
+                hashlib.sha256(lf_source).hexdigest(),
+            )
         finally:
             scratch.unlink(missing_ok=True)
             script_scratch.unlink(missing_ok=True)
+            binding_scratch.unlink(missing_ok=True)
 
     def test_rights_privacy_and_secret_attestations_are_explicit(self):
         attestations = self.evidence["attestations"]
