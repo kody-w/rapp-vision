@@ -19,7 +19,7 @@
       "evidenceIndex": {
         "path": "working-proofs/evidence-index.json",
         "bytes": 5088,
-        "sha256": "8c9681f3f9e53c55fe8ed8245d65b6abceae2eb19005ba3dc15256e749132e6a"
+        "sha256": "3e3cf6b0c6f18c92deb25bf0895ff3b4f9c371890aca18ed306c07f1de3e3285"
       }
     },
     "publications": [
@@ -140,7 +140,7 @@
         "evidence": {
           "path": "candidate-frame-0004/maze-fogline/evidence.json",
           "bytes": 51738,
-          "sha256": "4c4c03fd8cffa26e5d4090bcb53542c1cec352643127185ab91a55590411d71c"
+          "sha256": "7c53937d7ec505795c9cd5726e509c9cd4b6939913eea64358314dd8b32dd9c7"
         }
       }
     ]
