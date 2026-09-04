@@ -260,24 +260,50 @@ def source_binding_errors(manifest):
     return errors
 
 
-RAW_TARGET_POSITION_FIELDS = ("left", "top", "right", "bottom")
-RAW_TARGET_POSITION_TOLERANCE = 4.0
-
-
-def semantic_capture_record(capture):
-    metrics = {
-        key: value
-        for key, value in capture["metrics"].items()
-        if key not in RAW_TARGET_POSITION_FIELDS
-    }
+def semantic_capture_contract(capture):
+    metrics = capture["metrics"]
     return {
-        "publication": capture["publication"],
-        "viewport": capture["viewport"],
-        "checkpoint": capture["checkpoint"],
-        "actionIndex": capture["actionIndex"],
-        "resultSelector": capture["resultSelector"],
-        "metrics": metrics,
+        "identity": {
+            "publication": capture["publication"],
+            "viewport": capture["viewport"],
+            "checkpoint": capture["checkpoint"],
+            "actionIndex": capture["actionIndex"],
+            "resultSelector": capture["resultSelector"],
+        },
         "state": capture["state"],
+        "target": {
+            "id": metrics["id"],
+            "tag": metrics["tag"],
+            "disabled": metrics["disabled"],
+            "rendered": metrics["rendered"],
+            "visible": metrics["visible"],
+        },
+        "playerGeometry": {
+            "frameWidth": metrics["frameWidth"],
+            "frameHeight": metrics["frameHeight"],
+            "stageWidth": metrics["stageWidth"],
+            "stageHeight": metrics["stageHeight"],
+            "outerViewportWidth": metrics["outerViewportWidth"],
+        },
+        "visibilityContract": {
+            "requiredWidth": metrics["requiredWidth"],
+            "requiredHeight": metrics["requiredHeight"],
+            "widthSatisfied": (
+                metrics["visibleWidth"] >= metrics["requiredWidth"]
+            ),
+            "heightSatisfied": (
+                metrics["visibleHeight"] >= metrics["requiredHeight"]
+            ),
+        },
+        "overflowPolicy": {
+            "htmlOverflowY": metrics["htmlOverflowY"],
+            "bodyOverflowY": metrics["bodyOverflowY"],
+            "scrollbarGutter": metrics["scrollbarGutter"],
+            "pageScrolls": (
+                metrics["outerScrollHeight"]
+                > metrics["outerClientHeight"]
+            ),
+        },
         "screenshot": {
             "path": capture["screenshot"]["path"],
             "width": capture["screenshot"]["width"],
@@ -286,20 +312,32 @@ def semantic_capture_record(capture):
     }
 
 
-def semantic_capture_matches(committed, generated):
-    if semantic_capture_record(committed) != semantic_capture_record(generated):
-        return False
-    try:
-        return all(
-            abs(
-                float(committed["metrics"][field])
-                - float(generated["metrics"][field])
+def semantic_capture_mismatches(committed, generated):
+    expected = semantic_capture_contract(committed)
+    actual = semantic_capture_contract(generated)
+    mismatches = []
+
+    def compare(expected_value, actual_value, path):
+        if isinstance(expected_value, dict) and isinstance(actual_value, dict):
+            for key in sorted(set(expected_value) | set(actual_value)):
+                if key not in expected_value:
+                    mismatches.append(f"{path}.{key}: unexpected")
+                elif key not in actual_value:
+                    mismatches.append(f"{path}.{key}: missing")
+                else:
+                    compare(
+                        expected_value[key],
+                        actual_value[key],
+                        f"{path}.{key}",
+                    )
+        elif expected_value != actual_value:
+            mismatches.append(
+                f"{path}: committed={expected_value!r}, "
+                f"generated={actual_value!r}"
             )
-            <= RAW_TARGET_POSITION_TOLERANCE
-            for field in RAW_TARGET_POSITION_FIELDS
-        )
-    except (KeyError, TypeError, ValueError):
-        return False
+
+    compare(expected, actual, "capture")
+    return mismatches
 
 
 def resolve_browser() -> str | None:
@@ -902,45 +940,107 @@ class TestWorkingProofsBuild(unittest.TestCase):
             },
         )
 
-    def test_semantic_capture_comparison_tolerates_only_raw_position_drift(self):
+    def test_semantic_capture_contract_ignores_only_platform_layout_metrics(self):
         committed = load_json(SCREENSHOT_ROOT / "manifest.json")[
             "captures"
         ][0]
-        shifted = json.loads(json.dumps(committed))
-        for field in RAW_TARGET_POSITION_FIELDS:
-            shifted["metrics"][field] += 3
-        self.assertTrue(semantic_capture_matches(committed, shifted))
-
-        excessive = json.loads(json.dumps(shifted))
-        excessive["metrics"]["top"] += 2
-        self.assertFalse(semantic_capture_matches(committed, excessive))
+        platform_variant = json.loads(json.dumps(committed))
+        for field in (
+            "left",
+            "top",
+            "right",
+            "bottom",
+            "width",
+            "height",
+            "visibleWidth",
+            "visibleHeight",
+            "outerScrollHeight",
+            "outerClientHeight",
+            "safeHeight",
+            "lowerThirdHeight",
+        ):
+            platform_variant["metrics"][field] += 3
+        if platform_variant["metrics"]["outerScrollbarWidth"]:
+            platform_variant["metrics"]["outerScrollbarWidth"] = 0
+            platform_variant["metrics"]["outerClientWidth"] += 15
+        else:
+            platform_variant["metrics"]["outerScrollbarWidth"] = 15
+            platform_variant["metrics"]["outerClientWidth"] -= 15
+        self.assertEqual(
+            semantic_capture_mismatches(committed, platform_variant),
+            [],
+        )
 
         mutations = {
-            "frame width": lambda capture: capture["metrics"].__setitem__(
-                "frameWidth",
-                capture["metrics"]["frameWidth"] + 1,
+            "frame width": (
+                "capture.playerGeometry.frameWidth",
+                lambda capture: capture["metrics"].__setitem__(
+                    "frameWidth",
+                    capture["metrics"]["frameWidth"] + 1,
+                ),
             ),
-            "hidden state": lambda capture: capture["metrics"].__setitem__(
-                "rendered",
-                False,
+            "stage width": (
+                "capture.playerGeometry.stageWidth",
+                lambda capture: capture["metrics"].__setitem__(
+                    "stageWidth",
+                    capture["metrics"]["stageWidth"] + 1,
+                ),
             ),
-            "state hash": lambda capture: capture["state"].__setitem__(
-                "actualSha256",
-                "0" * 64,
+            "screenshot width": (
+                "capture.screenshot.width",
+                lambda capture: capture["screenshot"].__setitem__(
+                    "width",
+                    capture["screenshot"]["width"] + 1,
+                ),
+            ),
+            "hidden state": (
+                "capture.target.rendered",
+                lambda capture: capture["metrics"].__setitem__(
+                    "rendered",
+                    False,
+                ),
+            ),
+            "visible state": (
+                "capture.target.visible",
+                lambda capture: capture["metrics"].__setitem__(
+                    "visible",
+                    False,
+                ),
+            ),
+            "state hash": (
+                "capture.state.actualSha256",
+                lambda capture: capture["state"].__setitem__(
+                    "actualSha256",
+                    "0" * 64,
+                ),
             ),
             "insufficient visibility": (
+                "capture.visibilityContract.heightSatisfied",
                 lambda capture: capture["metrics"].__setitem__(
                     "visibleHeight",
                     capture["metrics"]["requiredHeight"] - 1,
-                )
+                ),
+            ),
+            "wrong checkpoint": (
+                "capture.identity.checkpoint",
+                lambda capture: capture.__setitem__(
+                    "checkpoint",
+                    "wrong-checkpoint",
+                ),
             ),
         }
-        for label, mutate in mutations.items():
+        for label, (field, mutate) in mutations.items():
             candidate = json.loads(json.dumps(committed))
             mutate(candidate)
             with self.subTest(change=label):
-                self.assertFalse(
-                    semantic_capture_matches(committed, candidate)
+                mismatches = semantic_capture_mismatches(
+                    committed,
+                    candidate,
+                )
+                self.assertTrue(mismatches)
+                self.assertTrue(
+                    any(field in mismatch for mismatch in mismatches),
+                    mismatches,
                 )
 
 
@@ -1616,6 +1716,10 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                 ):
                     self.assertTrue(capture["metrics"]["visible"])
                     self.assertGreaterEqual(
+                        capture["metrics"]["visibleWidth"],
+                        capture["metrics"]["requiredWidth"],
+                    )
+                    self.assertGreaterEqual(
                         capture["metrics"]["visibleHeight"],
                         capture["metrics"]["requiredHeight"],
                     )
@@ -1710,14 +1814,35 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                 generated_manifest["captures"],
                 strict=True,
             ):
-                self.assertTrue(
-                    semantic_capture_matches(committed, generated),
-                    generated["screenshot"]["path"],
+                mismatches = semantic_capture_mismatches(
+                    committed,
+                    generated,
+                )
+                self.assertEqual(
+                    mismatches,
+                    [],
+                    (
+                        f"{generated['screenshot']['path']}: "
+                        + "; ".join(mismatches)
+                    ),
                 )
             for capture in committed_manifest["captures"]:
                 screenshot = SCREENSHOT_ROOT / capture["screenshot"]["path"]
                 with self.subTest(committed=capture["screenshot"]["path"]):
                     self.assertTrue(screenshot.is_file())
+                    self.assertTrue(capture["metrics"]["visible"])
+                    self.assertGreaterEqual(
+                        capture["metrics"]["visibleWidth"],
+                        capture["metrics"]["requiredWidth"],
+                    )
+                    self.assertGreaterEqual(
+                        capture["metrics"]["visibleHeight"],
+                        capture["metrics"]["requiredHeight"],
+                    )
+                    self.assertGreater(
+                        capture["metrics"]["outerScrollHeight"],
+                        capture["metrics"]["outerClientHeight"],
+                    )
                     self.assertEqual(
                         capture["screenshot"]["sha256"],
                         sha256(screenshot),
