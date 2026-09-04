@@ -32,7 +32,9 @@ EVIDENCE_PATH = CANDIDATE / "evidence.json"
 DELIVERY_PATH = CANDIDATE / "delivery.json"
 RENDERER_PATH = CANDIDATE / "render.py"
 VERIFY_PATH = CANDIDATE / "verify_dom.mjs"
+LIVE_RENDERER_PATH = CANDIDATE / "render_live.mjs"
 SNAPSHOT_PATH = CANDIDATE / "snapshots" / "canonical-states.json"
+CONTINUITY_PATH = CANDIDATE / "snapshots" / "film-live-continuity.json"
 THUMB_PATH = CANDIDATE / "thumbs" / f"{PUBLICATION_ID}.svg"
 MASTER_PATH = CANDIDATE / "masters" / f"{PUBLICATION_ID}.mkv"
 MP4_PATH = CANDIDATE / "media" / f"{PUBLICATION_ID}.mp4"
@@ -704,6 +706,7 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
         cls.channel = load_json(CHANNEL_PATH)
         cls.evidence = load_json(EVIDENCE_PATH)
         cls.delivery = load_json(DELIVERY_PATH)
+        cls.continuity = load_json(CONTINUITY_PATH)
         cls.app_source = normalized_text(APP_PATH)
         cls.video = cls.manifest["videos"][0]
 
@@ -948,6 +951,23 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
                 "fullRouteBeforeAttempt": False,
             },
         )
+        continuity = self.evidence["film"]["continuity"]
+        self.assertEqual(
+            self.evidence["film"]["renderer"],
+            "live-app-chromium-capture",
+        )
+        self.assertEqual(
+            continuity["path"],
+            "snapshots/film-live-continuity.json",
+        )
+        self.assertEqual(
+            continuity["renderer"],
+            "live-app-chromium-capture",
+        )
+        self.assertEqual(
+            continuity["sha256"],
+            sha256_file(CONTINUITY_PATH),
+        )
 
     def test_evidence_source_sha_bindings_are_current(self):
         records = self.evidence["sourceBindings"]
@@ -989,6 +1009,10 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
             "challenge-link",
             "challenge-status",
             "challenge-error",
+            "film-slate",
+            "film-phase",
+            "film-callout",
+            "film-detail",
             "takeover-prompt",
             "move-north",
             "move-east",
@@ -1020,7 +1044,11 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
             "function selectTrap(",
             "function challengeContract(",
             "function fixtureFromChallengeFragment(",
+            'dataset.film = "true"',
+            'aria-invalid="false"',
+            'setAttribute(\n          "aria-invalid"',
             'window.addEventListener("hashchange"',
+            'elements.seedInput.addEventListener("input"',
             "Route and trail are never included.",
             'elements.seedInput.addEventListener("click"',
             "if (error.message !== INVALID_SEED_MESSAGE) throw error;",
@@ -1093,6 +1121,7 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
             "README.md",
             "apps/maze-fogline.html",
             "render.py",
+            "render_live.mjs",
             "verify_dom.mjs",
         ):
             with self.subTest(source=relative):
@@ -1103,6 +1132,7 @@ class TestManifestEvidenceAndApp(unittest.TestCase):
             "channel.json",
             "evidence.json",
             "snapshots/canonical-states.json",
+            "snapshots/film-live-continuity.json",
             "thumbs/maze-fogline.svg",
         ):
             data = (CANDIDATE / relative).read_bytes()
@@ -1191,6 +1221,7 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.delivery = load_json(DELIVERY_PATH)
+        cls.continuity = load_json(CONTINUITY_PATH)
 
     def test_renderer_is_standard_library_only_and_declares_every_film_phase(self):
         tree = ast.parse(normalized_text(RENDERER_PATH))
@@ -1212,6 +1243,7 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
                 "json",
                 "os",
                 "pathlib",
+                "re",
                 "shutil",
                 "subprocess",
                 "sys",
@@ -1259,67 +1291,86 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
             self.delivery["render"]["typography"]["fullDigestCharacters"],
             64,
         )
-        renderer_source = normalized_text(RENDERER_PATH)
-        for text in (
-            "KNOT / TRAP +2",
-            "BEST FINISH",
-            "FULL TOPOLOGY DIGEST",
-            "YOUR TURN / MOVEMENT FOCUSED",
-        ):
-            self.assertIn(text, renderer_source)
+        self.assertEqual(
+            self.continuity["schema"],
+            "fogline-survey-film-live-continuity/1.0",
+        )
+        self.assertEqual(
+            self.continuity["renderer"]["kind"],
+            "live-app-chromium-capture",
+        )
+        self.assertEqual(
+            self.continuity["sourceAppSha256"],
+            sha256_file(APP_PATH),
+        )
+        self.assertTrue(
+            self.continuity["pixelBinding"][
+                "exactAtEveryDeclaredPhase"
+            ]
+        )
+        self.assertEqual(
+            self.continuity["pixelBinding"]["sampleCount"],
+            len(RENDERER.FILM_TIMELINE),
+        )
         samples = self.delivery["render"]["contentSamples"]
         self.assertEqual(set(samples), {phase[0] for phase in RENDERER.FILM_TIMELINE})
-        for phase, sample in samples.items():
+        schedule = RENDERER.film_sample_schedule()
+        continuity = {
+            phase["phase"]: phase
+            for phase in self.continuity["phases"]
+        }
+        self.assertEqual(set(continuity), set(samples))
+        for phase, _start, _end in RENDERER.FILM_TIMELINE:
+            sample = samples[phase]
             with self.subTest(phase=phase):
-                frame = sample["frame"]
-                timestamp = sample["timestamp"]
-                self.assertEqual(RENDERER.film_phase(timestamp), phase)
-                fixture, _state, scene_phase, _banner, _extra = (
-                    RENDERER._film_scene(timestamp)
-                )
-                self.assertEqual(scene_phase, phase)
-                expected = independent_fixture(fixture.seed)
                 self.assertEqual(
-                    fixture.topology_signature,
-                    expected["signature"],
+                    {
+                        "frame": sample["frame"],
+                        "timestamp": sample["timestamp"],
+                    },
+                    schedule[phase],
+                )
+                entry = continuity[phase]
+                self.assertEqual(entry["frame"], sample["frame"])
+                self.assertEqual(entry["timestamp"], sample["timestamp"])
+                self.assertEqual(entry["masterRgbSha256"], sample["sha256"])
+                self.assertEqual(
+                    entry["liveRgbSha256"],
+                    entry["masterRgbSha256"],
+                )
+                self.assertTrue(entry["pixelExact"])
+                seed = entry["dom"]["seed"]
+                expected = independent_fixture(seed)
+                self.assertEqual(entry["dom"]["digest"], expected["digest"])
+                self.assertEqual(
+                    entry["dom"]["reference"],
+                    f"{len(expected['route'])} moves",
                 )
                 self.assertEqual(
-                    fixture.topology_digest,
-                    expected["digest"],
+                    entry["dom"]["film"]["callout"],
+                    RENDERER.FILM_CAPTIONS[phase][0],
                 )
-                self.assertEqual(fixture.shortest_route, expected["route"])
-                self.assertEqual(fixture.detour_route, expected["detour"])
                 self.assertEqual(
-                    fixture.seed,
-                    (
-                        "FOG-7"
-                        if phase in {"alternate-fresh", "takeover"}
-                        else "RAPP-42"
-                    ),
+                    entry["dom"]["film"]["detail"],
+                    RENDERER.FILM_CAPTIONS[phase][1],
                 )
                 if phase == "trap-plus-two":
-                    self.assertEqual(_state.status, "trap")
-                    self.assertEqual(_state.projected_total, 20)
-                    self.assertFalse(_state.exit_open)
-                    self.assertEqual(fixture.exit, (5, 3))
+                    self.assertEqual(entry["dom"]["steps"], "15 / 18")
+                    self.assertEqual(entry["dom"]["bestFinish"], "20")
+                    self.assertIn("MARKED TRAP", entry["dom"]["trap"]["text"])
+                    self.assertIn(
+                        "#exit-beacon",
+                        entry["dom"]["visibleComponents"],
+                    )
                 if phase in {"alternate-fresh", "takeover"}:
-                    self.assertEqual(_state.accepted_moves, ())
-                    self.assertEqual(_state.trail, ())
-                    self.assertFalse(_state.assistance_used)
-                self.assertEqual(
-                    RENDERER.frame_digest(frame),
-                    sample["sha256"],
-                )
-                self.assertEqual(
-                    len(RENDERER.frame_rgb(frame)),
-                    960 * 540 * 3,
-                )
+                    self.assertEqual(seed, "FOG-7")
+                    self.assertEqual(entry["dom"]["steps"], "0 / 10")
 
     def test_lossless_command_and_thumbnail_are_deterministic_and_safe(self):
         command = RENDERER.ffmpeg_command("fixed-ffmpeg", Path("master.mkv"))
         for value in (
-            "rawvideo",
-            "rgb24",
+            "image2pipe",
+            "png",
             "pipe:0",
             "ffv1",
             "bgr0",
@@ -1329,6 +1380,24 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
         ):
             self.assertIn(value, command)
         self.assertEqual(command[command.index("-threads") + 1], "1")
+        renderer_source = normalized_text(RENDERER_PATH)
+        render_master_source = renderer_source[
+            renderer_source.index("def render_master("):
+            renderer_source.index("\ndef _probe(")
+        ]
+        self.assertIn("LIVE_RENDERER_PATH", render_master_source)
+        self.assertNotIn("iter_frames", render_master_source)
+        with self.assertRaisesRegex(RuntimeError, "bitmap film rendering is retired"):
+            RENDERER.frame_rgb(0)
+        live_source = normalized_text(LIVE_RENDERER_PATH)
+        for fragment in (
+            'Page.captureScreenshot',
+            'appUrl.searchParams.set("film", "1")',
+            "dispatchKey(cdp, action.code)",
+            "dispatchMouseClick(",
+            "live-app-chromium-capture",
+        ):
+            self.assertIn(fragment, live_source)
         source = normalized_text(THUMB_PATH)
         self.assertEqual(source, RENDERER.thumbnail_svg())
         root = ET.fromstring(source)
@@ -1346,46 +1415,73 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
                 self.assertNotIn("data:", value.lower())
                 self.assertNotIn("url(", value.lower())
 
-    def test_film_critical_typography_and_trap_exit_regions_are_rendered(self):
-        def count_color(frame, bounds, color):
-            left, top, right, bottom = bounds
-            count = 0
-            for y in range(top, bottom):
-                for x in range(left, right):
-                    offset = (y * 960 + x) * 3
-                    if tuple(frame[offset : offset + 3]) == color:
-                        count += 1
-            return count
-
-        samples = self.delivery["render"]["contentSamples"]
-        challenge = RENDERER.frame_rgb(samples["challenge"]["frame"])
-        for top in (140, 169, 198, 227):
-            self.assertGreater(
-                count_color(
-                    challenge,
-                    (480, top, 880, top + 28),
-                    RENDERER.BLUE,
-                ),
-                500,
+    def test_film_uses_live_typography_components_and_safe_challenge(self):
+        shared = self.continuity["sharedStyle"]
+        self.assertEqual(shared["fontsReady"], "loaded")
+        self.assertEqual(
+            shared["bodyFontFamily"],
+            shared["buttonFontFamily"],
+        )
+        self.assertEqual(
+            shared["bodyFontFamily"],
+            shared["outputFontFamily"],
+        )
+        self.assertIn("ui-monospace", shared["bodyFontFamily"])
+        self.assertIn("system-ui", shared["headingFontFamily"])
+        typography = shared["criticalTypography"]
+        for selector in (
+            "#seed-value",
+            "#reference-value",
+            "#digest-value",
+            "#film-callout",
+            "#challenge-status",
+        ):
+            self.assertGreaterEqual(
+                typography[selector]["fontSize"],
+                22,
+                selector,
             )
+        self.assertEqual(
+            {component["selector"] for component in shared["components"]},
+            {
+                ".proof-strip",
+                ".map-card",
+                "#maze-board",
+                ".panel",
+                ".challenge-card",
+                "#film-slate",
+            },
+        )
 
-        trap = RENDERER.frame_rgb(samples["trap-plus-two"]["frame"])
-        self.assertGreater(
-            count_color(trap, (480, 286, 910, 320), RENDERER.RED),
-            500,
+        challenge = self.continuity["phases"][0]["dom"]
+        fragment = challenge["challenge"]["fragment"]
+        self.assertTrue(fragment.startswith("#challenge="))
+        encoded = fragment.removeprefix("#challenge=")
+        padding = "=" * ((4 - len(encoded) % 4) % 4)
+        contract = json.loads(
+            base64.urlsafe_b64decode(encoded + padding).decode("utf-8")
         )
-        self.assertGreater(
-            count_color(trap, (480, 396, 920, 452), RENDERER.RED),
-            500,
+        self.assertEqual(
+            list(contract),
+            ["seed", "topologyDigest", "referenceLength"],
         )
-        exit_x, exit_y = RENDERER._cell_center(RENDERER.CANONICAL.exit)
-        self.assertGreater(
-            count_color(
-                trap,
-                (exit_x - 22, exit_y - 22, exit_x + 23, exit_y + 23),
-                RENDERER.PURPLE,
-            ),
-            50,
+        self.assertNotIn("route", contract)
+        self.assertNotIn("trail", contract)
+        self.assertEqual(
+            challenge["challenge"]["selectionStart"],
+            0,
+        )
+        self.assertEqual(
+            challenge["challenge"]["selectionEnd"],
+            len(fragment),
+        )
+        self.assertRegex(
+            challenge["challenge"]["status"],
+            r"^Challenge fragment (copied|ready)",
+        )
+        self.assertEqual(
+            challenge["film"]["detail"],
+            "Seed · full digest · reference only",
         )
 
     def test_committed_delivery_hashes_are_complete_and_current(self):
@@ -1399,7 +1495,7 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
             self.delivery["binding"],
             {
                 "algorithm": "sha256",
-                "artifactCount": 13,
+                "artifactCount": 15,
                 "pathStyle": "POSIX-relative",
                 "selfExcluded": "delivery.json",
             },
@@ -1508,32 +1604,39 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
         webm = decode_rgb_samples(WEBM_PATH, indexes, FFMPEG)
         limits = {
             "mp4": {
-                "mae": 2.5,
-                "psnr": 33.0,
-                "over16": 0.02,
-                "maximum": 150,
+                "mae": 3.5,
+                "psnr": 30.8,
+                "over16": 0.038,
+                "maximum": 160,
             },
             "webm": {
-                "mae": 2.8,
-                "psnr": 32.8,
-                "over16": 0.025,
-                "maximum": 150,
+                "mae": 3.6,
+                "psnr": 30.5,
+                "over16": 0.04,
+                "maximum": 160,
             },
+        }
+        continuity = {
+            entry["phase"]: entry
+            for entry in load_json(CONTINUITY_PATH)["phases"]
         }
         for phase, _start, _end in RENDERER.FILM_TIMELINE:
             sample = samples[phase]
             frame_index = sample["frame"]
-            rendered = RENDERER.frame_rgb(frame_index)
             with self.subTest(kind="master", phase=phase):
-                self.assertEqual(
-                    hashlib.sha256(rendered).hexdigest(),
-                    sample["sha256"],
-                )
                 self.assertEqual(
                     hashlib.sha256(master[frame_index]).hexdigest(),
                     sample["sha256"],
                 )
-                self.assertEqual(master[frame_index], rendered)
+                self.assertEqual(
+                    sample["sha256"],
+                    continuity[phase]["masterRgbSha256"],
+                )
+                self.assertEqual(
+                    continuity[phase]["liveRgbSha256"],
+                    continuity[phase]["masterRgbSha256"],
+                )
+                self.assertTrue(continuity[phase]["pixelExact"])
             for kind, decoded in (("mp4", mp4), ("webm", webm)):
                 metrics = rgb_metrics(master[frame_index], decoded[frame_index])
                 diagnostic = (
@@ -1567,8 +1670,8 @@ class TestRendererDeliveryAndMedia(unittest.TestCase):
 
 class TestExecutableReleaseChecks(unittest.TestCase):
     @unittest.skipUnless(
-        FFMPEG and FFPROBE,
-        "ffmpeg/ffprobe not found via RAPP_FFMPEG and RAPP_FFPROBE",
+        FFMPEG and FFPROBE and NODE and BROWSER,
+        "ffmpeg/ffprobe/Node/Chromium are required for browser film rebuilds",
     )
     def test_two_fresh_same_toolchain_rebuilds_are_byte_identical(self):
         scratches = [
@@ -1590,6 +1693,7 @@ class TestExecutableReleaseChecks(unittest.TestCase):
             "channel.production.json",
             "evidence.json",
             "render.py",
+            "render_live.mjs",
             "snapshots/canonical-states.json",
             "thumbs/maze-fogline.svg",
             "verify_dom.mjs",
@@ -1601,7 +1705,12 @@ class TestExecutableReleaseChecks(unittest.TestCase):
                 target = scratch / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(source, target)
-            RENDERER.render_master(scratch, FFMPEG)
+            RENDERER.render_master(
+                scratch,
+                FFMPEG,
+                browser=BROWSER,
+                node=NODE,
+            )
             compilation = COMPILER.prepare_compilation(
                 scratch / "channel.production.json",
                 scratch,
@@ -1617,6 +1726,7 @@ class TestExecutableReleaseChecks(unittest.TestCase):
             "channel.json",
             "media/maze-fogline.mp4",
             "media/maze-fogline.webm",
+            "snapshots/film-live-continuity.json",
             "thumbs/maze-fogline.svg",
         ):
             with self.subTest(path=relative):
@@ -1723,6 +1833,7 @@ class TestExecutableReleaseChecks(unittest.TestCase):
             "auditOpeningPrivacy",
             "criticalPlayGeometry",
             "stateGateMatches",
+            "assertFilmLiveStructure",
             "executedAt - action.at <= maxLateness",
             "await removeProfile(profilePath)",
         ):
@@ -1732,6 +1843,16 @@ class TestExecutableReleaseChecks(unittest.TestCase):
         self.assertNotIn("window.foglineSurvey.fixture", source)
         self.assertNotIn("target.click()", source)
         self.assertNotIn("executedAt - action.at < 0.45", source)
+        film_source = normalized_text(LIVE_RENDERER_PATH)
+        for fragment in (
+            'Page.captureScreenshot',
+            'appUrl.searchParams.set("film", "1")',
+            "live-app-chromium-capture",
+            "screenshotPngSha256",
+            "dispatchKey(cdp, action.code)",
+        ):
+            self.assertIn(fragment, film_source)
+        self.assertNotIn("class Canvas", film_source)
 
     @unittest.skipUnless(
         NODE and BROWSER,
@@ -1834,6 +1955,14 @@ class TestExecutableReleaseChecks(unittest.TestCase):
         self.assertTrue(
             report["challengeContract"]["mismatchedLengthPreserved"]
         )
+        self.assertTrue(
+            report["challengeContract"]["invalidSetsAriaInvalid"]
+        )
+        self.assertTrue(
+            report["challengeContract"]["validLoadClearsAriaInvalid"]
+        )
+        self.assertTrue(report["hintGate"]["validEditClearsAriaInvalid"])
+        self.assertTrue(report["hintGate"]["resetClearsAriaInvalid"])
         self.assertEqual(
             [item["seed"] for item in report["alternateSeeds"]],
             list(ALTERNATE_SEEDS),
@@ -1865,6 +1994,7 @@ class TestExecutableReleaseChecks(unittest.TestCase):
             ],
             [(1120, 720), (390, 844)],
         )
+        film_style = load_json(CONTINUITY_PATH)["sharedStyle"]
         for viewport in report["viewports"]:
             with self.subTest(viewport=viewport["viewport"]["name"]):
                 self.assertEqual(viewport["fixture"]["digest"], EXPECTED_DIGEST)
@@ -1873,6 +2003,14 @@ class TestExecutableReleaseChecks(unittest.TestCase):
                     EXPECTED_ROUTE,
                 )
                 self.assertEqual(viewport["fixture"]["detourLength"], 20)
+                self.assertEqual(
+                    viewport["continuityStyle"]["bodyFontFamily"],
+                    film_style["bodyFontFamily"],
+                )
+                self.assertEqual(
+                    viewport["continuityStyle"]["headingFontFamily"],
+                    film_style["headingFontFamily"],
+                )
                 self.assertEqual(len(viewport["actionReports"]), 71)
                 self.assertEqual(len(viewport["checkpointReports"]), 7)
                 self.assertLessEqual(

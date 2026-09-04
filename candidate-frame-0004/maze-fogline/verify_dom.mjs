@@ -20,6 +20,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const DEFAULTS = {
   app: join(ROOT, "apps", "maze-fogline.html"),
+  continuity: join(ROOT, "snapshots", "film-live-continuity.json"),
   evidence: join(ROOT, "evidence.json"),
   manifest: join(ROOT, "channel.production.json"),
   profile: join(ROOT, `.browser-profile-${process.pid}`),
@@ -118,6 +119,7 @@ function parseOptions(argv) {
     const key = {
       "--browser": "browser",
       "--app": "app",
+      "--continuity": "continuity",
       "--evidence": "evidence",
       "--manifest": "manifest",
       "--profile": "profile",
@@ -125,7 +127,8 @@ function parseOptions(argv) {
     if (!key || index + 1 >= argv.length) {
       throw new Error(
         "usage: node verify_dom.mjs [--browser PATH] [--app PATH] " +
-        "[--evidence PATH] [--manifest PATH] [--profile PATH] [--find-browser]"
+        "[--continuity PATH] [--evidence PATH] [--manifest PATH] " +
+        "[--profile PATH] [--find-browser]"
       );
     }
     options[key] = argv[index + 1];
@@ -969,6 +972,74 @@ async function criticalPlayGeometry(cdp) {
   );
 }
 
+async function liveContinuityStyle(cdp) {
+  return await evaluate(
+    cdp,
+    `(() => {
+      const describe = selector => {
+        const element = document.querySelector(selector);
+        const style = getComputedStyle(element);
+        return {
+          selector,
+          tag: element.tagName.toLowerCase(),
+          classes: [...element.classList],
+          fontFamily: style.fontFamily,
+          color: style.color,
+          backgroundColor: style.backgroundColor
+        };
+      };
+      return {
+        fontsReady: document.fonts.status,
+        bodyFontFamily: getComputedStyle(document.body).fontFamily,
+        headingFontFamily: getComputedStyle(document.querySelector("h1")).fontFamily,
+        buttonFontFamily:
+          getComputedStyle(document.querySelector("#restart-btn")).fontFamily,
+        outputFontFamily:
+          getComputedStyle(document.querySelector("#digest-value")).fontFamily,
+        components: [
+          describe(".proof-strip"),
+          describe(".map-card"),
+          describe("#maze-board"),
+          describe(".panel"),
+          describe(".challenge-card")
+        ]
+      };
+    })()`
+  );
+}
+
+function assertFilmLiveStructure(live, continuity) {
+  const film = continuity.sharedStyle;
+  assert.equal(live.fontsReady, "loaded");
+  for (const field of [
+    "bodyFontFamily",
+    "headingFontFamily",
+    "buttonFontFamily",
+    "outputFontFamily",
+  ]) {
+    assert.equal(live[field], film[field], `film/live ${field}`);
+  }
+  for (const liveComponent of live.components) {
+    const filmComponent = film.components.find(
+      component => component.selector === liveComponent.selector
+    );
+    assert(filmComponent, `film component missing ${liveComponent.selector}`);
+    for (const field of [
+      "tag",
+      "classes",
+      "fontFamily",
+      "color",
+      "backgroundColor",
+    ]) {
+      assert.deepEqual(
+        liveComponent[field],
+        filmComponent[field],
+        `film/live ${liveComponent.selector} ${field}`
+      );
+    }
+  }
+}
+
 function isVisibleGeometry(record) {
   return (
     record.exists &&
@@ -1216,6 +1287,8 @@ async function observeDom(cdp) {
           value: document.querySelector("#seed-input").value,
           selectionStart: document.querySelector("#seed-input").selectionStart,
           selectionEnd: document.querySelector("#seed-input").selectionEnd,
+          ariaInvalid:
+            document.querySelector("#seed-input").getAttribute("aria-invalid"),
           textSecurity:
             getComputedStyle(document.querySelector("#seed-input"))
               .webkitTextSecurity || "none"
@@ -1232,6 +1305,9 @@ async function observeDom(cdp) {
             document.querySelector("#challenge-link").selectionStart,
           selectionEnd:
             document.querySelector("#challenge-link").selectionEnd,
+          ariaInvalid:
+            document.querySelector("#challenge-link")
+              .getAttribute("aria-invalid"),
           status: document.querySelector("#challenge-status").textContent.trim(),
           errorHidden: document.querySelector("#challenge-error").hidden,
           error: document.querySelector("#challenge-error").textContent.trim()
@@ -1403,6 +1479,11 @@ function assertDomMatchesExpected(
   assert.equal(dom.seedInput.textSecurity, "none", `${label}: masked input`);
   assert.equal(dom.seedInput.value, seedInput, `${label}: seed draft`);
   assert.equal(
+    dom.seedInput.ariaInvalid,
+    seedError === null ? "false" : "true",
+    `${label}: seed aria-invalid`
+  );
+  assert.equal(
     dom.seedError.hidden,
     seedError === null,
     `${label}: seed error visibility`
@@ -1429,6 +1510,11 @@ function assertDomMatchesExpected(
     dom.challenge.error,
     challengeError || "",
     `${label}: challenge error`
+  );
+  assert.equal(
+    dom.challenge.ariaInvalid,
+    challengeError === null ? "false" : "true",
+    `${label}: challenge aria-invalid`
   );
   if (challengeStatus !== null) {
     assert.equal(
@@ -1830,6 +1916,27 @@ async function rejectSeedThroughUi(cdp, context, seed, label) {
   assert.deepEqual(expectedSummary(context.fixture, context.state), before);
 }
 
+async function clearSeedErrorThroughValidEdit(cdp, context, label) {
+  const before = expectedSummary(context.fixture, context.state);
+  await scrollTo(cdp, "#seed-input");
+  await dispatchMouseClick(cdp, "#seed-input", `${label} seed input`);
+  await cdp.command("Input.insertText", { text: context.fixture.seed });
+  await settle(cdp);
+  context.seedInput = context.fixture.seed;
+  context.seedError = null;
+  assertDomMatchesExpected(
+    await observeDom(cdp),
+    context.fixture,
+    context.state,
+    {
+      seedInput: context.seedInput,
+      seedError: null,
+      label,
+    }
+  );
+  assert.deepEqual(expectedSummary(context.fixture, context.state), before);
+}
+
 async function exerciseChallengeContract(cdp, appUrl) {
   await cdp.command("Page.navigate", { url: appUrl });
   await waitForReady(cdp);
@@ -1990,6 +2097,8 @@ async function exerciseChallengeContract(cdp, appUrl) {
     invalidExtraFieldPreserved: true,
     mismatchedDigestPreserved: true,
     mismatchedLengthPreserved: true,
+    invalidSetsAriaInvalid: true,
+    validLoadClearsAriaInvalid: true,
   };
 }
 
@@ -2098,6 +2207,22 @@ async function exerciseHintGate(cdp, appUrl) {
     "X".repeat(65),
     "hint gate invalid preservation"
   );
+  await clearSeedErrorThroughValidEdit(
+    cdp,
+    context,
+    "hint gate valid edit clears error"
+  );
+  await rejectSeedThroughUi(
+    cdp,
+    context,
+    "X".repeat(65),
+    "hint gate reset clearing setup"
+  );
+  await restartThroughUi(cdp, context, "hint gate invalid reset");
+  assert.equal(
+    (await observeDom(cdp)).dom.seedInput.ariaInvalid,
+    "false"
+  );
   return {
     privacy,
     disabledBeforeFour: true,
@@ -2108,6 +2233,8 @@ async function exerciseHintGate(cdp, appUrl) {
     clearedAfterOneMove: true,
     assistancePersisted: true,
     invalidPreservedNontrivialState: true,
+    validEditClearsAriaInvalid: true,
+    resetClearsAriaInvalid: true,
   };
 }
 
@@ -2219,6 +2346,7 @@ async function replayViewport(
   viewport,
   manifest,
   evidence,
+  continuity,
   errors
 ) {
   await cdp.command("Emulation.setDeviceMetricsOverride", {
@@ -2254,6 +2382,8 @@ async function replayViewport(
     `${viewport.name} opening`
   );
   const playGeometry = await criticalPlayGeometry(cdp);
+  const continuityStyle = await liveContinuityStyle(cdp);
+  assertFilmLiveStructure(continuityStyle, continuity);
   if (viewport.width === 390) {
     assert(
       playGeometry.span <=
@@ -2505,6 +2635,7 @@ async function replayViewport(
     checkpointReports,
     privacyReports,
     playGeometry,
+    continuityStyle,
     maximumActionLateness: Math.max(
       ...actionReports.map(report => report.lateness)
     ),
@@ -2537,6 +2668,7 @@ async function main() {
   }
 
   const appPath = resolve(options.app);
+  const continuityPath = resolve(options.continuity);
   const evidencePath = resolve(options.evidence);
   const manifestPath = resolve(options.manifest);
   const profilePath = resolve(options.profile);
@@ -2550,12 +2682,23 @@ async function main() {
   await removeProfile(profilePath);
 
   const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  const continuity = JSON.parse(await readFile(continuityPath, "utf8"));
   const evidence = JSON.parse(await readFile(evidencePath, "utf8"));
   const appSource = await readFile(appPath, "utf8");
   assert.equal(manifest.schema, "rapp-vision-production/1.0");
   assert.equal(manifest.videos.length, 1);
   assert.equal(manifest.videos[0].live.kind, "rapp-vision-live/1.0");
   assert.equal(evidence.manifestReplay.exactTiming, true);
+  assert.equal(
+    continuity.schema,
+    "fogline-survey-film-live-continuity/1.0"
+  );
+  assert.equal(continuity.renderer.kind, "live-app-chromium-capture");
+  assert.equal(
+    continuity.sourceAppSha256,
+    createHash("sha256").update(appSource, "utf8").digest("hex")
+  );
+  assert.equal(continuity.pixelBinding.exactAtEveryDeclaredPhase, true);
   assert.equal(
     evidence.manifestReplay.checkpointMode,
     "state-gated within bounded time windows"
@@ -2688,6 +2831,7 @@ async function main() {
           viewport,
           manifest,
           evidence,
+          continuity,
           errors
         )
       );
@@ -2724,6 +2868,7 @@ async function main() {
         challengeContractRoundTrip: true,
         hintGatingAndOneStepOnly: true,
         openingDomAndAccessibilityPrivacy: true,
+        filmLivePixelAndStructureContinuity: true,
         alternateSeedRecomputation: true,
         unmaskedSeedInput: true,
         desktopGeometry: true,
@@ -2782,7 +2927,28 @@ async function main() {
   }
 }
 
-main().catch(error => {
-  console.error(error && error.stack ? error.stack : String(error));
-  process.exitCode = 1;
-});
+export {
+  CdpClient,
+  delay,
+  discoverBrowser,
+  dispatchKey,
+  dispatchMouseClick,
+  evaluate,
+  geometry,
+  removeProfile,
+  reservePort,
+  settle,
+  waitForDevTools,
+  waitForExit,
+  waitForReady,
+};
+
+const invokedDirectly =
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+if (invokedDirectly) {
+  main().catch(error => {
+    console.error(error && error.stack ? error.stack : String(error));
+    process.exitCode = 1;
+  });
+}

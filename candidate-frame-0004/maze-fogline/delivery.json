@@ -3,7 +3,7 @@
     "master": {
       "audioStreamCount": 0,
       "averageFrameRate": "12/1",
-      "bytes": 10489834,
+      "bytes": 36759198,
       "codec": "ffv1",
       "colorRange": "pc",
       "colorSpace": "gbr",
@@ -11,14 +11,14 @@
       "height": 540,
       "path": "masters/maze-fogline.mkv",
       "pixelFormat": "bgr0",
-      "sha256": "7b6425073dc7aa900b9f4a833f3106962b8c729a10d81e35abde870357798e54",
+      "sha256": "baca0a0956de62d8be90cd28f84985e9ab37a33c40be1d0bacc9d504d7dc6f14",
       "streamCount": 1,
       "width": 960
     },
     "mp4": {
       "audioStreamCount": 0,
       "averageFrameRate": "12/1",
-      "bytes": 381597,
+      "bytes": 486219,
       "codec": "h264",
       "colorPrimaries": "bt709",
       "colorRange": "tv",
@@ -28,14 +28,14 @@
       "height": 540,
       "path": "media/maze-fogline.mp4",
       "pixelFormat": "yuv420p",
-      "sha256": "5ac2745e3d68d87de7ee625e82a682b69d5ef47901c2666f08ee8645fae78634",
+      "sha256": "b4c1b1dbb7941286d327cb8b8a85386500f30532f6b6d72df573cef0b6daa609",
       "streamCount": 1,
       "width": 960
     },
     "webm": {
       "audioStreamCount": 0,
       "averageFrameRate": "12/1",
-      "bytes": 247962,
+      "bytes": 353086,
       "codec": "vp9",
       "colorPrimaries": "bt709",
       "colorRange": "tv",
@@ -45,14 +45,14 @@
       "height": 540,
       "path": "media/maze-fogline.webm",
       "pixelFormat": "yuv420p",
-      "sha256": "a228a3727c1a7a17534d00a173ff2d6a3c7eaf5d775e77ea3b06671ecd721243",
+      "sha256": "ed3a05f51e112933c1eb762943988dff97657e01a99c0dbbf0e78aadc1098017",
       "streamCount": 1,
       "width": 960
     }
   },
   "binding": {
     "algorithm": "sha256",
-    "artifactCount": 13,
+    "artifactCount": 15,
     "pathStyle": "POSIX-relative",
     "selfExcluded": "delivery.json"
   },
@@ -110,55 +110,68 @@
     "contentSamples": {
       "alternate-fresh": {
         "frame": 240,
-        "sha256": "04a5df7188bdb6b1652fd7ca1fe41757b76a548c01e74ac522dd5e9c5e3bf864",
-        "timestamp": 20.0
+        "sha256": "4cb920adcdbbf37384d1cb92e8929eee886b9813ff59fe529bb9616bffdc7aa0",
+        "timestamp": 20
       },
       "challenge": {
         "frame": 18,
-        "sha256": "84d626dcdbb594cd69a1742c21e06ca38eac34e2e1714b647bcdbf85e3c40846",
+        "sha256": "91a3c0217a2744e3939eabab382cb497ae87d42772adafe66c4db113f22735f0",
         "timestamp": 1.5
       },
       "optimal-18": {
         "frame": 150,
-        "sha256": "f8aafe6ccfce1fca49000a3d9ddc5a6dca650d65114e1d9c8361e55ae016bd89",
+        "sha256": "da4ba8a165fa76e1edb08f73fc16f830c44757c7389f3dd3c94ced9264fd2034",
         "timestamp": 12.5
       },
       "optimal-complete": {
         "frame": 192,
-        "sha256": "13583d42c0a10ecbeaca113447872a33a4d364c86d9f472e6b5bdcc5bc11e441",
-        "timestamp": 16.0
+        "sha256": "245dc0875857c7f2665d2d593e8f455152a3f032e581680259e65bcb8666e6aa",
+        "timestamp": 16
       },
       "reset-after-optimal": {
         "frame": 216,
-        "sha256": "448aec9c48c896724b518663ad563747980a8babd3f779875ceef4c6dbfc8ff3",
-        "timestamp": 18.0
+        "sha256": "41b706254634311149ea17e74f00a9c2043344c5c429c136d1c6af061c9ff479",
+        "timestamp": 18
       },
       "reset-after-trap": {
         "frame": 108,
-        "sha256": "563894e464f89e33fe542e1b5ee2396571150dc844523691554fa84c43119e60",
-        "timestamp": 9.0
+        "sha256": "1611666d506b83a1f889e1a19d5b995e90969ae62dd2b7e7ff7111015f5fad3e",
+        "timestamp": 9
       },
       "takeover": {
         "frame": 270,
-        "sha256": "20e944db13cb114a4c6b81e16e5ad5b1521107d4aeacf95cf387ba39d6b2ab49",
+        "sha256": "a44269205d6eb2a9af4b1a50b38bda036a3b4d4f2b87ae53ce8d1d0cde300682",
         "timestamp": 22.5
       },
       "trap-approach": {
         "frame": 54,
-        "sha256": "a1780f7522aa692dfb732fba9e1f254471e384b4b5f1ba5584fe63bed1c1a69f",
+        "sha256": "1652c9c42b17375cde6f47fc0bf6fc9b3ac500cb5c91655104028876c8b5ebc1",
         "timestamp": 4.5
       },
       "trap-plus-two": {
         "frame": 72,
-        "sha256": "5177f4fca2cec7babc16ccb7a931382b2970246ffb4f307f70fe62658a7c1e8a",
-        "timestamp": 6.0
+        "sha256": "47508eb156ee1cda6368c88881a58555567df616c3365edf9a5ce2693834c906",
+        "timestamp": 6
       }
+    },
+    "continuity": {
+      "path": "snapshots/film-live-continuity.json",
+      "pixelBinding": {
+        "algorithm": "sha256-rgb24",
+        "exactAtEveryDeclaredPhase": true,
+        "height": 540,
+        "sampleCount": 9,
+        "width": 960
+      },
+      "renderer": "live-app-chromium-capture",
+      "sourceAppSha256": "3551e57a577efe778362a85c5a40ea26a94d971ce98b07e2c644fa85518a7ae5"
     },
     "duration": 24,
     "fps": 12,
     "frames": 288,
     "height": 540,
     "masterCodec": "ffv1",
+    "renderer": "live-app-chromium-capture",
     "sequence": [
       "challenge",
       "trap-approach",
@@ -218,9 +231,9 @@
       }
     ],
     "typography": {
-      "criticalTextSourcePixels": 28,
+      "criticalTextSourcePixels": 22,
       "fullDigestCharacters": 64,
-      "fullDigestSourcePixels": 28,
+      "fullDigestSourcePixels": 22,
       "liveHierarchyMatched": true
     },
     "width": 960
@@ -233,14 +246,14 @@
       "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
     },
     {
-      "bytes": 8762,
+      "bytes": 9930,
       "path": "README.md",
-      "sha256": "9d74d8f7293e24aafbdca333d7dedf40b4368898683257d048a4594df00186e6"
+      "sha256": "1e1b0ac752211ac1e099486b4c15cf534a67ddb87e508a1280cb709dc85afcfe"
     },
     {
-      "bytes": 56437,
+      "bytes": 64780,
       "path": "apps/maze-fogline.html",
-      "sha256": "71dd029553c9f02a8c4977d7567abfb5daf859f0e0ebb438205b3ef223009b33"
+      "sha256": "3551e57a577efe778362a85c5a40ea26a94d971ce98b07e2c644fa85518a7ae5"
     },
     {
       "bytes": 14509,
@@ -253,14 +266,19 @@
       "sha256": "bcfa513f9b1773a42e686c01c3d9ff322b5c4dd4ead19441acb231b7bc0bf5aa"
     },
     {
-      "bytes": 44477,
+      "bytes": 44190,
       "path": "evidence.json",
-      "sha256": "fe8f4b11665399e5d4cf06e236f0e2e2accf9394782971bb9fb8f04387c412e5"
+      "sha256": "53e543f32116979512a9314636693e35e682950fc45c185c2282cafdc51a92b7"
     },
     {
-      "bytes": 84048,
+      "bytes": 98356,
       "path": "render.py",
-      "sha256": "da037e95c49b22b5456c2eb3ba8f3c6095333edb2169629cc8b43a6c4025696f"
+      "sha256": "8ca7627b57dd3ee98a1a3acc6fd2641c3731e1abc200c7d2d55ee4fb6587bdef"
+    },
+    {
+      "bytes": 20254,
+      "path": "render_live.mjs",
+      "sha256": "342fc758e57df81a4db5d56b5a78d6299e5ff7090063f0bfb693980082efbfc4"
     },
     {
       "bytes": 20059,
@@ -268,14 +286,19 @@
       "sha256": "805b4e5b69224d11d88cc3e904034aa358299314d496cd69f986d14b9b05bfca"
     },
     {
+      "bytes": 21921,
+      "path": "snapshots/film-live-continuity.json",
+      "sha256": "2996af4d65a9cd32fe1543d5f863c50e4e4182d1cce16e01508655d37bcb3c4a"
+    },
+    {
       "bytes": 5563,
       "path": "thumbs/maze-fogline.svg",
       "sha256": "03a7dc5b3b7cec1c58c0f5802e97a3a8b10ae5399c531aa2ae63463f74dbc51e"
     },
     {
-      "bytes": 85661,
+      "bytes": 90556,
       "path": "verify_dom.mjs",
-      "sha256": "0d003d4b7a854f25ee7e963f21afe13cdea35f58bc1e6a8488a218c53dd1a8df"
+      "sha256": "48475ca2c8ea00bf549d458f2e79bf516497644cacbf5574b0abb8a8d6435ace"
     }
   ]
 }

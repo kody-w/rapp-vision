@@ -8,6 +8,7 @@ import base64
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -57,8 +58,9 @@ THUMB_PATH = ROOT / "thumbs" / f"{PUBLICATION_ID}.svg"
 SNAPSHOT_PATH = ROOT / "snapshots" / "canonical-states.json"
 EVIDENCE_PATH = ROOT / "evidence.json"
 DELIVERY_PATH = ROOT / "delivery.json"
+CONTINUITY_PATH = ROOT / "snapshots" / "film-live-continuity.json"
+LIVE_RENDERER_PATH = ROOT / "render_live.mjs"
 
-RGB = tuple[int, int, int]
 Cell = tuple[int, int]
 Maze = dict[Cell, frozenset[str]]
 
@@ -110,8 +112,45 @@ FILM_SAMPLE_TIMES = {
     "alternate-fresh": 20.0,
     "takeover": 22.5,
 }
-FILM_CRITICAL_TEXT_SCALE = 4
-FILM_CRITICAL_TEXT_PIXELS = 7 * FILM_CRITICAL_TEXT_SCALE
+FILM_CAPTIONS = {
+    "challenge": (
+        "Copy-ready offline challenge",
+        "Seed · full digest · reference only",
+    ),
+    "trap-approach": (
+        "Trap first · exit stays marked",
+        "Earn one bearing, then choose the knot",
+    ),
+    "trap-plus-two": (
+        "Knot / trap +2 · best finish 20",
+        "Exit remains visible",
+    ),
+    "reset-after-trap": (
+        "Exact reset after trap",
+        "Entrance · north · zero · empty trail",
+    ),
+    "optimal-18": (
+        "Unassisted direct survey",
+        "18 individual Arrow-key moves",
+    ),
+    "optimal-complete": (
+        "Exit open · 18 = reference",
+        "Unassisted optimal",
+    ),
+    "reset-after-optimal": (
+        "Exact reset repeats",
+        "Closed exit · zero · empty trail",
+    ),
+    "alternate-fresh": (
+        "Untouched FOG-7 challenge",
+        "Zero steps · no assistance",
+    ),
+    "takeover": (
+        "Your turn · movement focused",
+        "FOG-7 · Arrow or WASD now",
+    ),
+}
+FILM_CRITICAL_TEXT_PIXELS = 22
 
 
 @dataclass(frozen=True)
@@ -1178,6 +1217,7 @@ EVIDENCE_SOURCE_PATHS = (
     "apps/maze-fogline.html",
     "channel.production.json",
     "render.py",
+    "render_live.mjs",
     "snapshots/canonical-states.json",
     "thumbs/maze-fogline.svg",
     "verify_dom.mjs",
@@ -1191,7 +1231,9 @@ DELIVERY_SOURCE_PATHS = (
     "channel.json",
     "evidence.json",
     "render.py",
+    "render_live.mjs",
     "snapshots/canonical-states.json",
+    "snapshots/film-live-continuity.json",
     "thumbs/maze-fogline.svg",
     "verify_dom.mjs",
 )
@@ -1206,22 +1248,100 @@ def film_phase(time_seconds: float) -> str:
     raise RuntimeError("film timeline has a gap")
 
 
-def film_content_samples() -> dict[str, dict[str, object]]:
+def film_sample_schedule() -> dict[str, dict[str, object]]:
     samples: dict[str, dict[str, object]] = {}
     for name, start, end in FILM_TIMELINE:
         timestamp = FILM_SAMPLE_TIMES[name]
         if not start <= timestamp < end:
             raise RuntimeError(f"film sample for {name} is outside its phase")
-        frame_index = min(
-            SPEC.frame_count - 1,
-            int(timestamp * SPEC.fps),
-        )
+        frame_index = min(SPEC.frame_count - 1, int(timestamp * SPEC.fps))
         samples[name] = {
             "timestamp": frame_index / SPEC.fps,
             "frame": frame_index,
-            "sha256": frame_digest(frame_index),
         }
     return samples
+
+
+def browser_film_plan() -> dict[str, object]:
+    actions: list[dict[str, object]] = [
+        {"frame": 0, "do": "click", "selector": "#copy-challenge-btn"},
+        {"frame": 1, "do": "selectChallenge"},
+        {"frame": 35, "do": "click", "selector": "#maze-board"},
+    ]
+    for index, direction in enumerate(
+        CANONICAL.shortest_route[: CANONICAL.trap.approach_index]
+    ):
+        actions.append(
+            {
+                "frame": 36 + index * 2,
+                "do": "key",
+                "code": KEY_CODE[direction],
+            }
+        )
+    actions.extend(
+        [
+            {"frame": 64, "do": "click", "selector": "#hint-btn"},
+            {"frame": 65, "do": "click", "selector": "#maze-board"},
+            {
+                "frame": 66,
+                "do": "key",
+                "code": KEY_CODE[CANONICAL.trap.turn],
+            },
+        ]
+    )
+    tail = (
+        CANONICAL.trap.return_direction,
+    ) + CANONICAL.shortest_route[CANONICAL.trap.approach_index :]
+    for index, direction in enumerate(tail):
+        actions.append(
+            {
+                "frame": 78 + index * 4,
+                "do": "key",
+                "code": KEY_CODE[direction],
+            }
+        )
+    actions.append({"frame": 96, "do": "click", "selector": "#restart-btn"})
+    for index, direction in enumerate(CANONICAL.shortest_route):
+        actions.append(
+            {
+                "frame": 120 + index * 3,
+                "do": "key",
+                "code": KEY_CODE[direction],
+            }
+        )
+    actions.extend(
+        [
+            {"frame": 204, "do": "click", "selector": "#restart-btn"},
+            {
+                "frame": 228,
+                "do": "navigate",
+                "fragment": challenge_fragment(HANDOFF),
+            },
+            {"frame": 252, "do": "click", "selector": "#maze-board"},
+        ]
+    )
+    actions.sort(key=lambda action: (int(action["frame"]), str(action["do"])))
+    return {
+        "schema": "fogline-survey-film-plan/1.0",
+        "width": SPEC.width,
+        "height": SPEC.height,
+        "fps": SPEC.fps,
+        "frames": SPEC.frame_count,
+        "phases": [
+            {
+                "name": name,
+                "startFrame": int(start * SPEC.fps),
+                "endFrame": int(end * SPEC.fps),
+                "sampleFrame": film_sample_schedule()[name]["frame"],
+                "callout": FILM_CAPTIONS[name][0],
+                "detail": FILM_CAPTIONS[name][1],
+            }
+            for name, start, end in FILM_TIMELINE
+        ],
+        "actions": actions,
+        "canonical": challenge_contract(CANONICAL),
+        "handoff": challenge_contract(HANDOFF),
+    }
 
 
 def _sha256(path: Path) -> str:
@@ -1237,6 +1357,23 @@ def _binding(path: Path, root: Path) -> dict[str, object]:
         "path": path.relative_to(root).as_posix(),
         "bytes": path.stat().st_size,
         "sha256": _sha256(path),
+    }
+
+
+def continuity_binding(root: Path) -> dict[str, object]:
+    path = root / "snapshots" / "film-live-continuity.json"
+    if not path.is_file():
+        return {
+            "path": "snapshots/film-live-continuity.json",
+            "pending": True,
+        }
+    document = json.loads(path.read_text(encoding="utf-8"))
+    if document.get("schema") != "fogline-survey-film-live-continuity/1.0":
+        raise RuntimeError("film/live continuity evidence has the wrong schema")
+    return {
+        **_binding(path, root),
+        "schema": document["schema"],
+        "renderer": document["renderer"]["kind"],
     }
 
 
@@ -1362,6 +1499,7 @@ def evidence_document(root: Path = ROOT) -> dict[str, object]:
             },
         },
         "film": {
+            "renderer": "live-app-chromium-capture",
             "width": SPEC.width,
             "height": SPEC.height,
             "fps": SPEC.fps,
@@ -1371,7 +1509,7 @@ def evidence_document(root: Path = ROOT) -> dict[str, object]:
                 {"phase": name, "start": start, "end": end}
                 for name, start, end in FILM_TIMELINE
             ],
-            "contentSamples": film_content_samples(),
+            "contentSamples": film_sample_schedule(),
             "sequence": [
                 phase for phase, _start, _end in FILM_TIMELINE
             ],
@@ -1383,6 +1521,7 @@ def evidence_document(root: Path = ROOT) -> dict[str, object]:
             },
             "routePrintedBeforeAttempt": False,
             "exitBeaconAlwaysMarked": True,
+            "continuity": continuity_binding(root),
         },
         "attestations": {
             "rights": (
@@ -1814,6 +1953,9 @@ def frame_rgb(
     frame_index: int,
     spec: RenderSpec = SPEC,
 ) -> bytes:
+    raise RuntimeError(
+        "standalone bitmap film rendering is retired; use render_live.mjs"
+    )
     if not 0 <= frame_index < spec.frame_count:
         raise ValueError("frame index is outside the film")
     time_seconds = frame_index / spec.fps
@@ -2017,13 +2159,11 @@ def ffmpeg_command(
         "-nostdin",
         "-y",
         "-f",
-        "rawvideo",
-        "-pixel_format",
-        "rgb24",
-        "-video_size",
-        f"{spec.width}x{spec.height}",
+        "image2pipe",
         "-framerate",
         str(spec.fps),
+        "-vcodec",
+        "png",
         "-i",
         "pipe:0",
         "-an",
@@ -2138,49 +2278,299 @@ def discover_executable(name: str, explicit: str | None = None) -> str:
     )
 
 
+def _browser_candidate(value: str | None) -> str | None:
+    if not value:
+        return None
+    resolved = _resolve_candidate(value)
+    if resolved and re.search(
+        r"(chrome|chromium|edge|brave)",
+        Path(resolved).name,
+        flags=re.IGNORECASE,
+    ):
+        return resolved
+    return None
+
+
+def discover_browser(explicit: str | None = None) -> str:
+    if explicit:
+        found = _browser_candidate(explicit)
+        if not found:
+            raise RuntimeError(
+                f"Chromium-family browser does not exist: {explicit}"
+            )
+        return found
+    for variable in (
+        "RAPP_BROWSER",
+        "RAPP_VISION_BROWSER",
+        "PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH",
+        "EDGE_BIN",
+        "CHROME_BIN",
+        "CHROMIUM_BIN",
+    ):
+        found = _browser_candidate(os.environ.get(variable))
+        if found:
+            return found
+    for command in (
+        "msedge",
+        "microsoft-edge",
+        "microsoft-edge-stable",
+        "google-chrome",
+        "google-chrome-stable",
+        "chromium",
+        "chromium-browser",
+        "brave-browser",
+    ):
+        found = _browser_candidate(command)
+        if found:
+            return found
+    candidates: list[Path] = []
+    if os.name == "nt":
+        roots = [
+            os.environ.get("ProgramFiles"),
+            os.environ.get("ProgramFiles(x86)"),
+            os.environ.get("LOCALAPPDATA"),
+        ]
+        for root in filter(None, roots):
+            candidates.extend(
+                [
+                    Path(root)
+                    / "Microsoft"
+                    / "Edge"
+                    / "Application"
+                    / "msedge.exe",
+                    Path(root)
+                    / "Google"
+                    / "Chrome"
+                    / "Application"
+                    / "chrome.exe",
+                    Path(root)
+                    / "Chromium"
+                    / "Application"
+                    / "chrome.exe",
+                    Path(root)
+                    / "BraveSoftware"
+                    / "Brave-Browser"
+                    / "Application"
+                    / "brave.exe",
+                ]
+            )
+    else:
+        candidates.extend(
+            [
+                Path("/usr/bin/google-chrome"),
+                Path("/usr/bin/microsoft-edge"),
+                Path("/usr/bin/chromium"),
+                Path("/usr/bin/brave-browser"),
+                Path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
+                Path(
+                    "/Applications/Microsoft Edge.app/Contents/MacOS/"
+                    "Microsoft Edge"
+                ),
+            ]
+        )
+    for candidate in candidates:
+        found = _browser_candidate(str(candidate))
+        if found:
+            return found
+    raise RuntimeError(
+        "Chromium-family browser not found via RAPP_BROWSER, environment, "
+        "PATH, or common locations"
+    )
+
+
+def _decode_rgb_frame(path: Path, ffmpeg: str) -> bytes:
+    completed = subprocess.run(
+        [
+            ffmpeg,
+            "-v",
+            "error",
+            "-i",
+            str(path),
+            "-frames:v",
+            "1",
+            "-pix_fmt",
+            "rgb24",
+            "-f",
+            "rawvideo",
+            "pipe:1",
+        ],
+        check=False,
+        capture_output=True,
+        timeout=120,
+    )
+    if completed.returncode:
+        raise RuntimeError(
+            completed.stderr.decode("utf-8", errors="replace").strip()
+            or f"cannot decode {path}"
+        )
+    expected = SPEC.width * SPEC.height * 3
+    if len(completed.stdout) != expected:
+        raise RuntimeError(
+            f"decoded {len(completed.stdout)} bytes from {path}, "
+            f"expected {expected}"
+        )
+    return completed.stdout
+
+
+def _decode_rgb_samples(
+    path: Path,
+    indexes: Sequence[int],
+    ffmpeg: str,
+) -> list[bytes]:
+    expression = "+".join(f"eq(n\\,{index})" for index in indexes)
+    completed = subprocess.run(
+        [
+            ffmpeg,
+            "-v",
+            "error",
+            "-i",
+            str(path),
+            "-vf",
+            f"select={expression},format=rgb24",
+            "-fps_mode",
+            "passthrough",
+            "-f",
+            "rawvideo",
+            "pipe:1",
+        ],
+        check=False,
+        capture_output=True,
+        timeout=180,
+    )
+    if completed.returncode:
+        raise RuntimeError(
+            completed.stderr.decode("utf-8", errors="replace").strip()
+            or f"cannot decode samples from {path}"
+        )
+    frame_bytes = SPEC.width * SPEC.height * 3
+    if len(completed.stdout) != frame_bytes * len(indexes):
+        raise RuntimeError("decoded browser-film sample count is incomplete")
+    return [
+        completed.stdout[offset * frame_bytes : (offset + 1) * frame_bytes]
+        for offset in range(len(indexes))
+    ]
+
+
+def _finalize_continuity(
+    continuity_path: Path,
+    master_path: Path,
+    sample_dir: Path,
+    ffmpeg: str,
+) -> None:
+    document = json.loads(continuity_path.read_text(encoding="utf-8"))
+    phases = document.get("phases")
+    if not isinstance(phases, list):
+        raise RuntimeError("browser renderer emitted no continuity phases")
+    expected_names = [phase for phase, _start, _end in FILM_TIMELINE]
+    if [phase.get("phase") for phase in phases] != expected_names:
+        raise RuntimeError("browser renderer continuity phases drifted")
+    indexes = [int(phase["frame"]) for phase in phases]
+    master_frames = _decode_rgb_samples(master_path, indexes, ffmpeg)
+    for phase, master_rgb in zip(phases, master_frames, strict=True):
+        screenshot = sample_dir / f"{phase['phase']}.png"
+        if not screenshot.is_file():
+            raise RuntimeError(f"browser screenshot missing: {screenshot.name}")
+        live_rgb = _decode_rgb_frame(screenshot, ffmpeg)
+        if live_rgb != master_rgb:
+            raise RuntimeError(
+                f"master pixels differ from live screenshot: {phase['phase']}"
+            )
+        digest = hashlib.sha256(live_rgb).hexdigest()
+        phase["liveRgbSha256"] = digest
+        phase["masterRgbSha256"] = digest
+        phase["pixelExact"] = True
+    document["pixelBinding"] = {
+        "algorithm": "sha256-rgb24",
+        "exactAtEveryDeclaredPhase": True,
+        "sampleCount": len(phases),
+        "width": SPEC.width,
+        "height": SPEC.height,
+    }
+    document["masterSha256"] = _sha256(master_path)
+    write_json(continuity_path, document)
+
+
 def render_master(
     output_root: Path,
     ffmpeg: str,
     spec: RenderSpec = SPEC,
+    *,
+    browser: str | None = None,
+    node: str | None = None,
 ) -> Path:
     target = output_root / spec.master_relative
     partial = target.with_name(f"{target.stem}.partial.mkv")
+    continuity = output_root / "snapshots" / "film-live-continuity.json"
+    partial_continuity = continuity.with_name(
+        "film-live-continuity.partial.json"
+    )
+    plan_path = output_root / ".film-plan.json"
+    sample_dir = output_root / ".film-samples"
+    profile = output_root / ".film-browser-profile"
+    live_renderer = output_root / "render_live.mjs"
+    if not live_renderer.is_file():
+        live_renderer = LIVE_RENDERER_PATH
     if target.exists() or partial.exists():
         raise RuntimeError(f"refusing to replace existing master: {target}")
     target.parent.mkdir(parents=True, exist_ok=True)
-    process: subprocess.Popen[bytes] | None = None
+    continuity.parent.mkdir(parents=True, exist_ok=True)
+    shutil.rmtree(sample_dir, ignore_errors=True)
+    shutil.rmtree(profile, ignore_errors=True)
+    partial_continuity.unlink(missing_ok=True)
+    write_json(plan_path, browser_film_plan())
+    command = [
+        node or discover_executable("node"),
+        str(live_renderer),
+        "--app",
+        str(output_root / "apps" / f"{PUBLICATION_ID}.html"),
+        "--browser",
+        browser or discover_browser(),
+        "--continuity",
+        str(partial_continuity),
+        "--ffmpeg",
+        ffmpeg,
+        "--output",
+        str(partial),
+        "--plan",
+        str(plan_path),
+        "--profile",
+        str(profile),
+        "--sample-dir",
+        str(sample_dir),
+    ]
     try:
-        process = subprocess.Popen(
-            ffmpeg_command(ffmpeg, partial, spec),
-            stdin=subprocess.PIPE,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.PIPE,
+        completed = subprocess.run(
+            command,
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=900,
         )
-        if process.stdin is None or process.stderr is None:
-            raise RuntimeError("ffmpeg pipes were not created")
-        try:
-            for frame in iter_frames(spec):
-                process.stdin.write(frame)
-            process.stdin.close()
-        except BrokenPipeError:
-            process.stdin.close()
-        stderr = process.stderr.read().decode(
-            "utf-8",
-            errors="replace",
-        ).strip()
-        process.stderr.close()
-        return_code = process.wait()
-        if return_code:
-            raise RuntimeError(f"ffmpeg failed: {stderr or return_code}")
+        if completed.returncode:
+            raise RuntimeError(
+                "live-app browser render failed: "
+                f"{completed.stderr.strip() or completed.stdout.strip()}"
+            )
         if not partial.is_file() or partial.stat().st_size <= 0:
-            raise RuntimeError("ffmpeg produced no lossless master")
+            raise RuntimeError("browser renderer produced no lossless master")
+        if not partial_continuity.is_file():
+            raise RuntimeError("browser renderer produced no continuity evidence")
+        _finalize_continuity(
+            partial_continuity,
+            partial,
+            sample_dir,
+            ffmpeg,
+        )
         partial.replace(target)
+        partial_continuity.replace(continuity)
     finally:
-        if process is not None and process.poll() is None:
-            process.kill()
-            process.wait()
-        if partial.exists():
-            partial.unlink()
+        partial.unlink(missing_ok=True)
+        partial_continuity.unlink(missing_ok=True)
+        plan_path.unlink(missing_ok=True)
+        shutil.rmtree(sample_dir, ignore_errors=True)
+        shutil.rmtree(profile, ignore_errors=True)
     return target
 
 
@@ -2270,6 +2660,21 @@ def delivery_document(
     missing = [path for path in required if not path.is_file()]
     if missing:
         raise RuntimeError(f"delivery artifact missing: {missing[0]}")
+    continuity = json.loads(
+        (root / "snapshots" / "film-live-continuity.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    if continuity.get("schema") != "fogline-survey-film-live-continuity/1.0":
+        raise RuntimeError("delivery continuity evidence has the wrong schema")
+    content_samples = {
+        phase["phase"]: {
+            "frame": phase["frame"],
+            "timestamp": phase["timestamp"],
+            "sha256": phase["masterRgbSha256"],
+        }
+        for phase in continuity["phases"]
+    }
     return {
         "schema": "fogline-survey-delivery/1.0",
         "channel": CHANNEL_ID,
@@ -2314,6 +2719,7 @@ def delivery_document(
             ],
         },
         "render": {
+            "renderer": "live-app-chromium-capture",
             "width": SPEC.width,
             "height": SPEC.height,
             "fps": SPEC.fps,
@@ -2325,7 +2731,13 @@ def delivery_document(
                 {"phase": name, "start": start, "end": end}
                 for name, start, end in FILM_TIMELINE
             ],
-            "contentSamples": film_content_samples(),
+            "contentSamples": content_samples,
+            "continuity": {
+                "path": "snapshots/film-live-continuity.json",
+                "sourceAppSha256": continuity["sourceAppSha256"],
+                "renderer": continuity["renderer"]["kind"],
+                "pixelBinding": continuity["pixelBinding"],
+            },
             "sequence": [
                 phase for phase, _start, _end in FILM_TIMELINE
             ],
@@ -2430,6 +2842,20 @@ def check_release(root: Path, ffprobe: str) -> None:
         encoding="utf-8"
     ).replace("\r\n", "\n") != thumbnail_svg():
         raise RuntimeError("thumbnail is stale")
+    continuity_path = root / "snapshots" / "film-live-continuity.json"
+    continuity = json.loads(continuity_path.read_text(encoding="utf-8"))
+    if continuity.get("renderer", {}).get("kind") != "live-app-chromium-capture":
+        raise RuntimeError("film was not rendered from the live app")
+    if continuity.get("sourceAppSha256") != _sha256(
+        root / "apps" / f"{PUBLICATION_ID}.html"
+    ):
+        raise RuntimeError("film/live app source binding is stale")
+    if continuity.get("masterSha256") != _sha256(root / SPEC.master_relative):
+        raise RuntimeError("film/live master binding is stale")
+    if not continuity.get("pixelBinding", {}).get(
+        "exactAtEveryDeclaredPhase"
+    ):
+        raise RuntimeError("film/live phase pixel binding is incomplete")
     expected_evidence = evidence_document(root)
     actual_evidence = json.loads(
         (root / "evidence.json").read_text(encoding="utf-8")
@@ -2449,6 +2875,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--ffmpeg")
     parser.add_argument("--ffprobe")
+    parser.add_argument("--browser")
+    parser.add_argument("--node")
     parser.add_argument("--output-root", type=Path, default=ROOT)
     return parser
 
@@ -2463,6 +2891,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                     {
                         "ffmpeg": discover_executable("ffmpeg", args.ffmpeg),
                         "ffprobe": discover_executable("ffprobe", args.ffprobe),
+                        "browser": discover_browser(args.browser),
+                        "node": discover_executable("node", args.node),
                     },
                     sort_keys=True,
                 )
@@ -2476,6 +2906,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 render_master(
                     root,
                     discover_executable("ffmpeg", args.ffmpeg),
+                    browser=discover_browser(args.browser),
+                    node=discover_executable("node", args.node),
                 )
             )
         elif args.command == "delivery":

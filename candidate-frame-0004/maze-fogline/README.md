@@ -17,6 +17,11 @@ fragment regenerates and validates all three values, then starts at zero.
 Malformed, extra-field, or mismatched fragments preserve the accepted game
 and surface a visible error.
 
+Rejected seed text sets `aria-invalid="true"` on the seed input. Rejected
+challenge fragments set it on the fragment field. A valid edit, valid
+fragment/load, or exact reset clears the associated invalid state without
+silently changing the accepted game.
+
 ## Canonical fixture
 
 - Seed: `RAPP-42`
@@ -91,10 +96,19 @@ using CDP-delivered Arrow and WASD input.
 6. Generate untouched `FOG-7`, export it, show a strong **YOUR TURN**, and
    finish the authored replay with the board focused for movement.
 
-The film follows the same trap-first hierarchy. Its full 64-character digest,
-`KNOT / TRAP +2`, `BEST FINISH 20`, and final handoff use at least 28 source
-pixels. Live checkpoints are partial state gates inside 1.25-second windows,
-while actions retain scheduled timing with a 0.8-second lateness ceiling.
+The film follows the same trap-first hierarchy and is captured directly from
+`apps/maze-fogline.html?film=1` in Chromium. It therefore uses the live
+system/UI-monospace font stack, proof cards, fog board, readouts, notices,
+buttons, focus treatment, and handoff component rather than a separate bitmap
+approximation. The seed, reference, full 64-character digest, and film
+callouts render at 22 source pixels or larger. The opening film frame visibly
+shows the selected `#challenge=...` fragment and its copied/ready status.
+
+`snapshots/film-live-continuity.json` binds every declared phase to the live
+DOM structure, computed font families, screenshot PNG hash, decoded live RGB
+hash, and exact lossless-master RGB hash. Live checkpoints remain partial
+state gates inside 1.25-second windows, while actions retain scheduled timing
+with a 0.8-second lateness ceiling.
 
 At exactly 390 CSS pixels, the board, four state readouts, D-pad, hint, and
 restart occupy a bounded 800-pixel play cluster instead of being distributed
@@ -105,7 +119,8 @@ through a 2473-pixel page. The complete document is bounded to 1800 pixels.
 | Path | Purpose |
 | --- | --- |
 | `apps/maze-fogline.html` | Offline maze, private generator/reducer, three-field fragment export/import, responsive fog renderer, and keyboard-first controls |
-| `render.py` | Standard-library deterministic model, RGB24 renderer, FFV1 writer, thumbnail/evidence/delivery generator, and release checker |
+| `render.py` | Standard-library deterministic model, browser-film orchestrator, thumbnail/evidence/delivery generator, and release checker |
+| `render_live.mjs` | Chromium/CDP capture of the actual live app into the lossless FFV1 master |
 | `masters/maze-fogline.mkv` | 24-second, 12 fps, lossless FFV1 `bgr0` master |
 | `media/maze-fogline.mp4` | Compiler-produced H.264 `yuv420p` BT.709 delivery |
 | `media/maze-fogline.webm` | Compiler-produced VP9 `yuv420p` BT.709 delivery |
@@ -113,6 +128,7 @@ through a 2473-pixel page. The complete document is bounded to 1800 pixels.
 | `channel.json` | Exact compiler transformation with paired sources |
 | `thumbs/maze-fogline.svg` | Original self-contained fogline thumbnail |
 | `snapshots/canonical-states.json` | Opening, rejected-wall, optimal, hint, trap, detour, reset, invalid-preserved, and handoff states |
+| `snapshots/film-live-continuity.json` | Per-phase live DOM/font structure and exact screenshot-to-master pixel bindings |
 | `evidence.json` | Commission, fixture, replay, browser, film, rights/privacy, and source SHA-256 evidence |
 | `delivery.json` | Source/media SHA-256 bindings plus fresh codec, color, frame-rate, size, and duration probes |
 | `verify_dom.mjs` | Dependency-free real-Chromium CDP-input, accessibility, timed replay, alternate-seed, and responsive geometry verifier |
@@ -132,7 +148,8 @@ From this candidate directory:
 $tools = python .\render.py tools | ConvertFrom-Json
 $env:PATH = "$([IO.Path]::GetDirectoryName($tools.ffprobe));$env:PATH"
 python .\render.py artifacts
-python .\render.py render --ffmpeg $tools.ffmpeg
+python .\render.py render --ffmpeg $tools.ffmpeg `
+  --browser $tools.browser --node $tools.node
 python ..\..\scripts\compile_publications.py build .\channel.production.json `
   --ffmpeg $tools.ffmpeg --ffprobe $tools.ffprobe
 python .\render.py artifacts
@@ -156,16 +173,17 @@ The focused test normalizes CRLF for source parsing but keeps generated raw
 LF contracts strict. It independently regenerates topology and BFS results,
 accepts either the exact open commission or its future exact fulfillment,
 binds committed delivery hashes separately from two same-toolchain rebuilds,
-decodes one committed frame from every declared film phase, compares the
-lossy deliveries, verifies `RAPP_BROWSER` precedence, round-trips and rejects
-challenge fragments, checks state-gated replay timing and compact mobile
-geometry, runs compiler/validator/release checks, and executes both desktop
-and 390 px real-browser replays with actual CDP mouse/keyboard input.
+decodes one committed frame from every declared film phase, proves each
+lossless frame is pixel-identical to its live Chromium screenshot, compares
+the lossy deliveries, verifies `RAPP_BROWSER` precedence, round-trips and
+rejects challenge fragments, checks `aria-invalid`, state-gated replay timing,
+and compact mobile geometry, runs compiler/validator/release checks, and
+executes both desktop and 390 px direct play with actual CDP input.
 
 ## Rights and privacy
 
-All maze code, prose, interface graphics, bitmap typography, SVG artwork, and
-film frames were created for this candidate. The fixture is algorithmic and
+All maze code, prose, interface graphics, browser-rendered typography, SVG
+artwork, and film frames were created for this candidate. The fixture is algorithmic and
 contains no people, real places, copied imagery, private information, or
 third-party runtime material. No approval is self-asserted; the commission's
 independent technical and curation review quorum remains external.

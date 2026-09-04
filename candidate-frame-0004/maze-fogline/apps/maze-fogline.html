@@ -591,6 +591,10 @@
       font-size: 13px;
     }
 
+    #film-slate {
+      display: none;
+    }
+
     [hidden] {
       display: none !important;
     }
@@ -795,6 +799,296 @@
         font-size: 12px;
       }
     }
+
+    html[data-film="true"] {
+      width: 960px;
+      height: 540px;
+      overflow: hidden;
+      scroll-padding: 0;
+    }
+
+    html[data-film="true"] body {
+      width: 960px;
+      height: 540px;
+      overflow: hidden;
+      padding: 0;
+      font-size: 14px;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(91, 229, 174, 0.08), transparent 34rem),
+        var(--bg);
+    }
+
+    html[data-film="true"] * {
+      caret-color: transparent !important;
+      animation: none !important;
+      transition: none !important;
+    }
+
+    html[data-film="true"] .proof,
+    html[data-film="true"] .map-card,
+    html[data-film="true"] .panel,
+    html[data-film="true"] .metric,
+    html[data-film="true"] .compass-card,
+    html[data-film="true"] .notice,
+    html[data-film="true"] .action-row button,
+    html[data-film="true"] .seed-card,
+    html[data-film="true"] #maze-board,
+    html[data-film="true"] #challenge-link,
+    html[data-film="true"] #copy-challenge-btn,
+    html[data-film="true"] .takeover {
+      border-radius: 0 !important;
+    }
+
+    html[data-film="true"] .shell {
+      position: relative;
+      display: grid;
+      grid-template-rows: 48px 68px 352px 44px;
+      gap: 4px;
+      width: 960px;
+      height: 540px;
+      margin: 0;
+      padding: 8px 12px;
+    }
+
+    html[data-film="true"] .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0;
+      padding: 0 2px 5px;
+    }
+
+    html[data-film="true"] .hero .eyebrow,
+    html[data-film="true"] .hero p {
+      display: none;
+    }
+
+    html[data-film="true"] h1 {
+      margin: 0;
+      font-size: 38px;
+      line-height: 1;
+    }
+
+    html[data-film="true"] .hero-badge {
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+
+    html[data-film="true"] .proof-strip {
+      grid-template-columns: 160px 130px minmax(0, 1fr);
+      gap: 6px;
+      margin: 0;
+    }
+
+    html[data-film="true"] .proof {
+      padding: 5px 8px;
+      border-radius: 8px;
+    }
+
+    html[data-film="true"] .proof.digest {
+      grid-column: auto;
+    }
+
+    html[data-film="true"] .proof .label {
+      font-size: 10px;
+    }
+
+    html[data-film="true"] .proof output {
+      margin-top: 1px;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    html[data-film="true"] #digest-value {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    html[data-film="true"] .layout {
+      grid-template-columns: 440px minmax(0, 1fr);
+      gap: 8px;
+      min-height: 0;
+    }
+
+    html[data-film="true"] .map-card,
+    html[data-film="true"] .panel {
+      height: 352px;
+      min-height: 0;
+      padding: 8px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    html[data-film="true"] .map-heading {
+      margin-bottom: 5px;
+    }
+
+    html[data-film="true"] .map-heading h2 {
+      font-size: 18px;
+    }
+
+    html[data-film="true"] #maze-board {
+      width: 310px;
+      border-width: 4px;
+      scroll-margin: 0;
+    }
+
+    html[data-film="true"] .map-legend,
+    html[data-film="true"] .controls,
+    html[data-film="true"] #reset-proof {
+      display: none;
+    }
+
+    html[data-film="true"] .panel {
+      gap: 6px;
+    }
+
+    html[data-film="true"] .readout {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    html[data-film="true"] .metric {
+      padding: 5px 6px;
+    }
+
+    html[data-film="true"] .metric span {
+      font-size: 9px;
+      letter-spacing: 0.03em;
+    }
+
+    html[data-film="true"] .metric output {
+      font-size: 15px;
+    }
+
+    html[data-film="true"] .compass-card {
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 9px;
+      padding: 6px 8px;
+    }
+
+    html[data-film="true"] .compass {
+      width: 62px;
+    }
+
+    html[data-film="true"] #compass-needle {
+      top: 11px;
+      height: 21px;
+    }
+
+    html[data-film="true"] .compass-copy strong {
+      font-size: 19px;
+    }
+
+    html[data-film="true"] .notice {
+      padding: 7px 9px;
+      font-size: 13px;
+    }
+
+    html[data-film="true"] .seed-card {
+      display: none;
+    }
+
+    html[data-film="true"][data-film-phase="challenge"] .panel {
+      visibility: hidden;
+    }
+
+    html[data-film="true"][data-film-phase="challenge"] .seed-card {
+      position: absolute;
+      z-index: 6;
+      top: 128px;
+      right: 12px;
+      display: block;
+      width: 500px;
+      height: 352px;
+      margin: 0;
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    html[data-film="true"][data-film-phase="challenge"] .seed-card > h2,
+    html[data-film="true"][data-film-phase="challenge"] .seed-card > p,
+    html[data-film="true"][data-film-phase="challenge"] .seed-controls,
+    html[data-film="true"][data-film-phase="challenge"] #seed-rule,
+    html[data-film="true"][data-film-phase="challenge"] #seed-error,
+    html[data-film="true"][data-film-phase="challenge"] #seed-change-proof {
+      display: none;
+    }
+
+    html[data-film="true"][data-film-phase="challenge"] .challenge-card {
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+
+    html[data-film="true"][data-film-phase="challenge"] .challenge-card h3 {
+      font-size: 27px;
+    }
+
+    html[data-film="true"][data-film-phase="challenge"] .challenge-card p {
+      font-size: 15px;
+    }
+
+    html[data-film="true"][data-film-phase="challenge"] .challenge-controls {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    html[data-film="true"][data-film-phase="challenge"] #copy-challenge-btn {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    html[data-film="true"][data-film-phase="challenge"] #challenge-link {
+      font-size: 13px;
+    }
+
+    html[data-film="true"][data-film-phase="challenge"] #challenge-status {
+      color: var(--mint);
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    html[data-film="true"] #film-slate {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr) 260px;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 0;
+      background: var(--panel);
+      padding: 5px 10px;
+    }
+
+    html[data-film="true"] #film-slate > div {
+      display: contents;
+    }
+
+    html[data-film="true"] #film-phase {
+      color: var(--mint);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    html[data-film="true"] #film-callout {
+      display: block;
+      color: var(--ink);
+      font-family: system-ui, sans-serif;
+      font-size: 22px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    html[data-film="true"] #film-detail {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: right;
+    }
   </style>
 </head>
 <body>
@@ -928,6 +1222,7 @@
           autocomplete="off"
           autocapitalize="off"
           spellcheck="false"
+          aria-invalid="false"
           aria-describedby="seed-rule seed-error"
         >
         <button id="load-seed-btn" type="button">Generate seed</button>
@@ -949,6 +1244,7 @@
             id="challenge-link"
             type="text"
             readonly
+            aria-invalid="false"
             aria-label="Offline challenge fragment"
             aria-describedby="challenge-status challenge-error"
           >
@@ -959,11 +1255,23 @@
         <p id="challenge-error" class="notice error" role="alert" hidden></p>
       </section>
     </section>
+
+    <section id="film-slate" aria-label="Film phase">
+      <div>
+        <span id="film-phase">Challenge</span>
+        <strong id="film-callout">Copy-ready offline challenge</strong>
+      </div>
+      <span id="film-detail">Seed · full digest · reference only</span>
+    </section>
   </main>
 
   <script>
     (() => {
       "use strict";
+
+      const FILM_MODE =
+        new URLSearchParams(location.search).get("film") === "1";
+      if (FILM_MODE) document.documentElement.dataset.film = "true";
 
       const WIDTH = 6;
       const HEIGHT = 6;
@@ -1023,7 +1331,10 @@
         challengeButton: document.querySelector("#copy-challenge-btn"),
         challengeLink: document.querySelector("#challenge-link"),
         challengeStatus: document.querySelector("#challenge-status"),
-        challengeError: document.querySelector("#challenge-error")
+        challengeError: document.querySelector("#challenge-error"),
+        filmPhase: document.querySelector("#film-phase"),
+        filmCallout: document.querySelector("#film-callout"),
+        filmDetail: document.querySelector("#film-detail")
       });
 
       class ChallengeContractError extends Error {}
@@ -1703,6 +2014,10 @@
             : "Earn hint after 4 moves";
         elements.seedError.hidden = seedError === null;
         elements.seedError.textContent = seedError || "";
+        elements.seedInput.setAttribute(
+          "aria-invalid",
+          seedError === null ? "false" : "true"
+        );
         elements.seedProof.textContent =
           `Active topology: ${fixture.seed} · reference ` +
           `${fixture.shortestRoute.length} · digest ` +
@@ -1711,6 +2026,10 @@
         elements.challengeStatus.textContent = challengeStatus;
         elements.challengeError.hidden = challengeError === null;
         elements.challengeError.textContent = challengeError || "";
+        elements.challengeLink.setAttribute(
+          "aria-invalid",
+          challengeError === null ? "false" : "true"
+        );
         elements.takeover.hidden = !(
           fixture.seed === HANDOFF_SEED &&
           steps === 0 &&
@@ -1766,6 +2085,7 @@
           : "Challenge fragment ready and selected for copying.";
         elements.challengeError.hidden = true;
         elements.challengeError.textContent = "";
+        elements.challengeLink.setAttribute("aria-invalid", "false");
         elements.challengeStatus.textContent = challengeStatus;
       }
 
@@ -1816,6 +2136,20 @@
         render();
       }
 
+      function clearSeedErrorOnValidEdit() {
+        if (seedError === null) return;
+        try {
+          normalizeSeed(elements.seedInput.value);
+        } catch (error) {
+          if (error.message === INVALID_SEED_MESSAGE) return;
+          throw error;
+        }
+        seedError = null;
+        elements.seedInput.setAttribute("aria-invalid", "false");
+        elements.seedError.hidden = true;
+        elements.seedError.textContent = "";
+      }
+
       for (const button of document.querySelectorAll("[data-direction]")) {
         button.addEventListener("click", () => {
           move(button.dataset.direction);
@@ -1832,6 +2166,7 @@
       elements.seedInput.addEventListener("click", () => {
         elements.seedInput.select();
       });
+      elements.seedInput.addEventListener("input", clearSeedErrorOnValidEdit);
       window.addEventListener("hashchange", loadChallengeFromFragment);
 
       document.addEventListener("keydown", event => {
