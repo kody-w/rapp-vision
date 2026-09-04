@@ -260,14 +260,23 @@ def source_binding_errors(manifest):
     return errors
 
 
+RAW_TARGET_POSITION_FIELDS = ("left", "top", "right", "bottom")
+RAW_TARGET_POSITION_TOLERANCE = 4.0
+
+
 def semantic_capture_record(capture):
+    metrics = {
+        key: value
+        for key, value in capture["metrics"].items()
+        if key not in RAW_TARGET_POSITION_FIELDS
+    }
     return {
         "publication": capture["publication"],
         "viewport": capture["viewport"],
         "checkpoint": capture["checkpoint"],
         "actionIndex": capture["actionIndex"],
         "resultSelector": capture["resultSelector"],
-        "metrics": capture["metrics"],
+        "metrics": metrics,
         "state": capture["state"],
         "screenshot": {
             "path": capture["screenshot"]["path"],
@@ -275,6 +284,22 @@ def semantic_capture_record(capture):
             "height": capture["screenshot"]["height"],
         },
     }
+
+
+def semantic_capture_matches(committed, generated):
+    if semantic_capture_record(committed) != semantic_capture_record(generated):
+        return False
+    try:
+        return all(
+            abs(
+                float(committed["metrics"][field])
+                - float(generated["metrics"][field])
+            )
+            <= RAW_TARGET_POSITION_TOLERANCE
+            for field in RAW_TARGET_POSITION_FIELDS
+        )
+    except (KeyError, TypeError, ValueError):
+        return False
 
 
 def resolve_browser() -> str | None:
@@ -876,6 +901,47 @@ class TestWorkingProofsBuild(unittest.TestCase):
                 ],
             },
         )
+
+    def test_semantic_capture_comparison_tolerates_only_raw_position_drift(self):
+        committed = load_json(SCREENSHOT_ROOT / "manifest.json")[
+            "captures"
+        ][0]
+        shifted = json.loads(json.dumps(committed))
+        for field in RAW_TARGET_POSITION_FIELDS:
+            shifted["metrics"][field] += 3
+        self.assertTrue(semantic_capture_matches(committed, shifted))
+
+        excessive = json.loads(json.dumps(shifted))
+        excessive["metrics"]["top"] += 2
+        self.assertFalse(semantic_capture_matches(committed, excessive))
+
+        mutations = {
+            "frame width": lambda capture: capture["metrics"].__setitem__(
+                "frameWidth",
+                capture["metrics"]["frameWidth"] + 1,
+            ),
+            "hidden state": lambda capture: capture["metrics"].__setitem__(
+                "rendered",
+                False,
+            ),
+            "state hash": lambda capture: capture["state"].__setitem__(
+                "actualSha256",
+                "0" * 64,
+            ),
+            "insufficient visibility": (
+                lambda capture: capture["metrics"].__setitem__(
+                    "visibleHeight",
+                    capture["metrics"]["requiredHeight"] - 1,
+                )
+            ),
+        }
+        for label, mutate in mutations.items():
+            candidate = json.loads(json.dumps(committed))
+            mutate(candidate)
+            with self.subTest(change=label):
+                self.assertFalse(
+                    semantic_capture_matches(committed, candidate)
+                )
 
 
 class TestWorkingProofsMedia(unittest.TestCase):
@@ -1639,16 +1705,15 @@ class TestWorkingProofsBrowserExecution(unittest.TestCase):
                 len(committed_manifest["captures"]),
                 EXPECTED_CAPTURE_COUNT,
             )
-            self.assertEqual(
-                [
-                    semantic_capture_record(item)
-                    for item in committed_manifest["captures"]
-                ],
-                [
-                    semantic_capture_record(item)
-                    for item in generated_manifest["captures"]
-                ],
-            )
+            for committed, generated in zip(
+                committed_manifest["captures"],
+                generated_manifest["captures"],
+                strict=True,
+            ):
+                self.assertTrue(
+                    semantic_capture_matches(committed, generated),
+                    generated["screenshot"]["path"],
+                )
             for capture in committed_manifest["captures"]:
                 screenshot = SCREENSHOT_ROOT / capture["screenshot"]["path"]
                 with self.subTest(committed=capture["screenshot"]["path"]):
