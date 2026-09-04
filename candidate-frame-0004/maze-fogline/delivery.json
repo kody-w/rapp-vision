@@ -1,0 +1,304 @@
+{
+  "artifacts": {
+    "master": {
+      "audioStreamCount": 0,
+      "averageFrameRate": "12/1",
+      "bytes": 36855241,
+      "codec": "ffv1",
+      "colorRange": "pc",
+      "colorSpace": "gbr",
+      "duration": 24.0,
+      "height": 540,
+      "path": "masters/maze-fogline.mkv",
+      "pixelFormat": "bgr0",
+      "sha256": "84667ad1052c7146ef66d831c917d1616fe965d12203ca7387825a4e90baf0b5",
+      "streamCount": 1,
+      "width": 960
+    },
+    "mp4": {
+      "audioStreamCount": 0,
+      "averageFrameRate": "12/1",
+      "bytes": 495394,
+      "codec": "h264",
+      "colorPrimaries": "bt709",
+      "colorRange": "tv",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "duration": 24.0,
+      "height": 540,
+      "path": "media/maze-fogline.mp4",
+      "pixelFormat": "yuv420p",
+      "sha256": "97ca0ffb1689f6a93ce7e1c74d8e291bb98b04f1f1d5f4a03445c2ea7c3dc6c7",
+      "streamCount": 1,
+      "width": 960
+    },
+    "webm": {
+      "audioStreamCount": 0,
+      "averageFrameRate": "12/1",
+      "bytes": 358985,
+      "codec": "vp9",
+      "colorPrimaries": "bt709",
+      "colorRange": "tv",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "duration": 24.0,
+      "height": 540,
+      "path": "media/maze-fogline.webm",
+      "pixelFormat": "yuv420p",
+      "sha256": "ffb52c21c97597d6a3f2975565c4a4ca23d4ab301d526e6ffa991c0ee5d1da1c",
+      "streamCount": 1,
+      "width": 960
+    }
+  },
+  "binding": {
+    "algorithm": "sha256",
+    "artifactCount": 15,
+    "pathStyle": "POSIX-relative",
+    "selfExcluded": "delivery.json"
+  },
+  "channel": "candidate-frame-0004-01-maze-fogline",
+  "objective": {
+    "alternateSeeds": [
+      {
+        "detourLength": 12,
+        "referenceLength": 10,
+        "seed": "FOG-7",
+        "topologyDigest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
+        "trap": [
+          5,
+          0
+        ]
+      },
+      {
+        "detourLength": 20,
+        "referenceLength": 18,
+        "seed": "MIST-Δ",
+        "topologyDigest": "0e52d0e94088913486496953dd57eaf1d5a4991e1125ea4f97ad13ad6b9b558c",
+        "trap": [
+          2,
+          5
+        ]
+      },
+      {
+        "detourLength": 14,
+        "referenceLength": 12,
+        "seed": "A|B;C",
+        "topologyDigest": "e3d863e738e09f4440152a348e9bb4b04a665e7b913a252a584869b4c26aa53e",
+        "trap": [
+          2,
+          5
+        ]
+      }
+    ],
+    "challengeContract": {
+      "referenceLength": 18,
+      "seed": "RAPP-42",
+      "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda"
+    },
+    "challengeFragment": "#challenge=eyJzZWVkIjoiUkFQUC00MiIsInRvcG9sb2d5RGlnZXN0IjoiMTI2YmY3MDQ0MGQzZWY1NDJjOGRjOTcyNTE3MjY5OTRlMGYyMzQyMjY3NWU4MzFmOTMzMDkyMzVhZTA4NWVkYSIsInJlZmVyZW5jZUxlbmd0aCI6MTh9",
+    "detourLength": 20,
+    "handoffDigest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
+    "handoffReferenceLength": 10,
+    "handoffSeed": "FOG-7",
+    "referenceLength": 18,
+    "seed": "RAPP-42",
+    "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda"
+  },
+  "publication": "maze-fogline",
+  "render": {
+    "audio": false,
+    "contentSamples": {
+      "alternate-fresh": {
+        "frame": 240,
+        "sha256": "4cb920adcdbbf37384d1cb92e8929eee886b9813ff59fe529bb9616bffdc7aa0",
+        "timestamp": 20
+      },
+      "challenge": {
+        "frame": 18,
+        "sha256": "91a3c0217a2744e3939eabab382cb497ae87d42772adafe66c4db113f22735f0",
+        "timestamp": 1.5
+      },
+      "optimal-18": {
+        "frame": 150,
+        "sha256": "da4ba8a165fa76e1edb08f73fc16f830c44757c7389f3dd3c94ced9264fd2034",
+        "timestamp": 12.5
+      },
+      "optimal-complete": {
+        "frame": 192,
+        "sha256": "217c51b574c2f718a0f1890a3c9dc6715107fbac88f0f7f60478550b39946c8d",
+        "timestamp": 16
+      },
+      "reset-after-optimal": {
+        "frame": 216,
+        "sha256": "41b706254634311149ea17e74f00a9c2043344c5c429c136d1c6af061c9ff479",
+        "timestamp": 18
+      },
+      "reset-after-trap": {
+        "frame": 108,
+        "sha256": "1611666d506b83a1f889e1a19d5b995e90969ae62dd2b7e7ff7111015f5fad3e",
+        "timestamp": 9
+      },
+      "takeover": {
+        "frame": 270,
+        "sha256": "a44269205d6eb2a9af4b1a50b38bda036a3b4d4f2b87ae53ce8d1d0cde300682",
+        "timestamp": 22.5
+      },
+      "trap-approach": {
+        "frame": 54,
+        "sha256": "1652c9c42b17375cde6f47fc0bf6fc9b3ac500cb5c91655104028876c8b5ebc1",
+        "timestamp": 4.5
+      },
+      "trap-plus-two": {
+        "frame": 72,
+        "sha256": "47508eb156ee1cda6368c88881a58555567df616c3365edf9a5ce2693834c906",
+        "timestamp": 6
+      }
+    },
+    "continuity": {
+      "path": "snapshots/film-live-continuity.json",
+      "pixelBinding": {
+        "algorithm": "sha256-rgb24",
+        "exactAtEveryDeclaredPhase": true,
+        "height": 540,
+        "sampleCount": 9,
+        "width": 960
+      },
+      "renderer": "live-app-chromium-capture",
+      "sourceAppSha256": "ee10db849dd0891f70b9a593de6b37e02b4e204112df5eca3607f564cd64348d"
+    },
+    "duration": 24,
+    "fps": 12,
+    "frames": 288,
+    "height": 540,
+    "masterCodec": "ffv1",
+    "renderer": "live-app-chromium-capture",
+    "sequence": [
+      "challenge",
+      "trap-approach",
+      "trap-plus-two",
+      "reset-after-trap",
+      "optimal-18",
+      "optimal-complete",
+      "reset-after-optimal",
+      "alternate-fresh",
+      "takeover"
+    ],
+    "timeline": [
+      {
+        "end": 3.0,
+        "phase": "challenge",
+        "start": 0.0
+      },
+      {
+        "end": 5.5,
+        "phase": "trap-approach",
+        "start": 3.0
+      },
+      {
+        "end": 8.0,
+        "phase": "trap-plus-two",
+        "start": 5.5
+      },
+      {
+        "end": 10.0,
+        "phase": "reset-after-trap",
+        "start": 8.0
+      },
+      {
+        "end": 15.0,
+        "phase": "optimal-18",
+        "start": 10.0
+      },
+      {
+        "end": 17.0,
+        "phase": "optimal-complete",
+        "start": 15.0
+      },
+      {
+        "end": 19.0,
+        "phase": "reset-after-optimal",
+        "start": 17.0
+      },
+      {
+        "end": 21.0,
+        "phase": "alternate-fresh",
+        "start": 19.0
+      },
+      {
+        "end": 24.0,
+        "phase": "takeover",
+        "start": 21.0
+      }
+    ],
+    "typography": {
+      "criticalTextSourcePixels": 22,
+      "fullDigestCharacters": 64,
+      "fullDigestSourcePixels": 22,
+      "liveHierarchyMatched": true
+    },
+    "width": 960
+  },
+  "schema": "fogline-survey-delivery/1.0",
+  "sourceArtifacts": [
+    {
+      "bytes": 175,
+      "path": ".gitattributes",
+      "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
+    },
+    {
+      "bytes": 10972,
+      "path": "README.md",
+      "sha256": "56e3e8dd9738d77c269e0e497093c474bc28a3ef55620c95b171f663a900f410"
+    },
+    {
+      "bytes": 65498,
+      "path": "apps/maze-fogline.html",
+      "sha256": "ee10db849dd0891f70b9a593de6b37e02b4e204112df5eca3607f564cd64348d"
+    },
+    {
+      "bytes": 14509,
+      "path": "channel.production.json",
+      "sha256": "49d05d2b0025e4e065fcbd40c2788cce73e25317cafafc235cb56276be073875"
+    },
+    {
+      "bytes": 14647,
+      "path": "channel.json",
+      "sha256": "bcfa513f9b1773a42e686c01c3d9ff322b5c4dd4ead19441acb231b7bc0bf5aa"
+    },
+    {
+      "bytes": 51738,
+      "path": "evidence.json",
+      "sha256": "09b0bef17f52b210fb71beb75720e0cb508d941d7e5c6cc7bb05baf5ed504bb9"
+    },
+    {
+      "bytes": 99451,
+      "path": "render.py",
+      "sha256": "b4de0ff85e147d57239181374ba5f68dd8ef636004b324fbc37841754c95acb7"
+    },
+    {
+      "bytes": 24939,
+      "path": "render_live.mjs",
+      "sha256": "c242da39daa11e1350a8dd697e0fe7c34ff6b9eb16c0bfe808a57d4cf92ad71a"
+    },
+    {
+      "bytes": 23317,
+      "path": "snapshots/canonical-states.json",
+      "sha256": "689d7e0fee0394c65227b248d2a41aceb14852e7afb82dc9be0ee89166b02030"
+    },
+    {
+      "bytes": 23776,
+      "path": "snapshots/film-live-continuity.json",
+      "sha256": "6fb4fbe4e84306910a8c447bef74a7958e3a43024ff17eb68d0b5aadb3e93136"
+    },
+    {
+      "bytes": 5563,
+      "path": "thumbs/maze-fogline.svg",
+      "sha256": "03a7dc5b3b7cec1c58c0f5802e97a3a8b10ae5399c531aa2ae63463f74dbc51e"
+    },
+    {
+      "bytes": 98168,
+      "path": "verify_dom.mjs",
+      "sha256": "85fb790715538f150ce4f962847be74904ba4f15ce1113b3e14bb907ed52b49a"
+    }
+  ]
+}

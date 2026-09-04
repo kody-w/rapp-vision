@@ -5,7 +5,7 @@
       "commission_id": "learn-grid-overflow",
       "delivery": {
         "path": "../candidate-frame-0002/learn-grid-overflow/delivery.json",
-        "sha256": "078498e411e981d4192643339063edc3f1a10cf048b3e7bf5c38ed38679e7739"
+        "sha256": "9c2e4b157685f7cfd1804b16ede6dcf8009310a22b2a489f876d835022cbd411"
       },
       "evidence": {
         "path": "../candidate-frame-0002/learn-grid-overflow/evidence.json",
@@ -89,6 +89,24 @@
         "id": "candidate-frame-0003-09-archive-wetland-contrast",
         "path": "../candidate-frame-0003/archive-wetland-contrast/channel.json",
         "sha256": "d9549fbf05dc18f2211cc8623e5ffb9ba079ca720702ce3b98713989ceca0d8b"
+      }
+    },
+    {
+      "commission_id": "play-seeded-maze-return",
+      "delivery": {
+        "path": "../candidate-frame-0004/maze-fogline/delivery.json",
+        "sha256": "30cdd6fd3b367825da50e164cd12c1bc7346a7fa11f18e5d7294241bd0d27347"
+      },
+      "evidence": {
+        "path": "../candidate-frame-0004/maze-fogline/evidence.json",
+        "sha256": "09b0bef17f52b210fb71beb75720e0cb508d941d7e5c6cc7bb05baf5ed504bb9"
+      },
+      "publication_id": "maze-fogline",
+      "source_candidate": "../candidate-frame-0004/maze-fogline",
+      "source_channel": {
+        "id": "candidate-frame-0004-01-maze-fogline",
+        "path": "../candidate-frame-0004/maze-fogline/channel.json",
+        "sha256": "bcfa513f9b1773a42e686c01c3d9ff322b5c4dd4ead19441acb231b7bc0bf5aa"
       }
     }
   ],

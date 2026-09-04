@@ -53,7 +53,7 @@ automation branches and open review-ready pull requests. See
 
 | Channel | | What it is |
 |---|---|---|
-| **Working Proofs** | ✓ | A recurring public channel for reviewed work. Its first five publications preserve the winning cycle-2 and cycle-3 films, live controls, evidence, visible failures, and exact resets without duplicating their binaries. |
+| **Working Proofs** | ✓ | A recurring public channel for reviewed work. Its first six publications preserve the winning cycle-2 through cycle-4 films, live controls, evidence, visible failures, exact resets, and viewer takeover without duplicating their binaries. |
 | **Tiny Systems** | ▦ | Three deterministic micro-lessons about an interlock, an accessibility boundary, and an arithmetic gate. Each film teaches the rule; each live replay proves acceptance, visible rejection, preserved state, and exact reset. |
 | **Oil Field season** | 🛢️ | Ten independent current-contract channels spanning botanical documentary, portrait gameplay, investigation, physics, cartography, future news, repair, music, synthetic nature, and criticism. Every film teaches first; every replay exposes a positive path, visible failure, and reset. |
 | **Frame Chains** | ⛓️ | The first current-contract channel: five paired publications combining newcomer-first encoded films with live executable proofs across ten synthetic worlds. |

@@ -1,0 +1,1438 @@
+{
+  "assistedOptimal": {
+    "acceptedMoves": [
+      "S",
+      "E",
+      "E",
+      "S",
+      "S",
+      "W",
+      "W",
+      "S",
+      "S",
+      "E",
+      "N",
+      "E",
+      "E",
+      "S",
+      "E",
+      "N",
+      "N",
+      "E"
+    ],
+    "assistance": {
+      "available": false,
+      "earned": true,
+      "hintDirection": null,
+      "requests": 1,
+      "scope": "one next move only",
+      "used": true
+    },
+    "completed": true,
+    "exit": {
+      "marked": true,
+      "state": "open",
+      "x": 5,
+      "y": 3
+    },
+    "facing": "E",
+    "grid": {
+      "height": 6,
+      "width": 6
+    },
+    "lastAttempt": "E",
+    "lastRejected": null,
+    "matchedOptimal": true,
+    "message": "Exit open in 18. Direct survey matched the reference with assistance.",
+    "position": {
+      "x": 5,
+      "y": 3
+    },
+    "projectedTotal": 18,
+    "referenceLength": 18,
+    "revealed": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        5,
+        2
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        4,
+        3
+      ],
+      [
+        5,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        5,
+        4
+      ],
+      [
+        0,
+        5
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        4,
+        5
+      ]
+    ],
+    "schema": "fogline-survey-state/1.0",
+    "seed": "RAPP-42",
+    "seedChangeCount": 0,
+    "seedError": null,
+    "seedInput": "RAPP-42",
+    "status": "complete-optimal",
+    "steps": 18,
+    "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+    "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
+    "trail": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        0,
+        5
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        3
+      ],
+      [
+        5,
+        3
+      ]
+    ],
+    "trap": {
+      "approachStep": 14,
+      "entered": false,
+      "enteredStep": 15,
+      "marked": true,
+      "turn": "W",
+      "x": 2,
+      "y": 5
+    }
+  },
+  "detour": {
+    "acceptedMoves": [
+      "S",
+      "E",
+      "E",
+      "S",
+      "S",
+      "W",
+      "W",
+      "S",
+      "S",
+      "E",
+      "N",
+      "E",
+      "E",
+      "S",
+      "W",
+      "E",
+      "E",
+      "N",
+      "N",
+      "E"
+    ],
+    "assistance": {
+      "available": false,
+      "earned": true,
+      "hintDirection": null,
+      "requests": 1,
+      "scope": "one next move only",
+      "used": true
+    },
+    "completed": true,
+    "exit": {
+      "marked": true,
+      "state": "open",
+      "x": 5,
+      "y": 3
+    },
+    "facing": "E",
+    "grid": {
+      "height": 6,
+      "width": 6
+    },
+    "lastAttempt": "E",
+    "lastRejected": null,
+    "matchedOptimal": false,
+    "message": "Exit open in 20: +2 over reference 18.",
+    "position": {
+      "x": 5,
+      "y": 3
+    },
+    "projectedTotal": 20,
+    "referenceLength": 18,
+    "revealed": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        5,
+        2
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        4,
+        3
+      ],
+      [
+        5,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        5,
+        4
+      ],
+      [
+        0,
+        5
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        4,
+        5
+      ]
+    ],
+    "schema": "fogline-survey-state/1.0",
+    "seed": "RAPP-42",
+    "seedChangeCount": 0,
+    "seedError": null,
+    "seedInput": "RAPP-42",
+    "status": "complete-detour",
+    "steps": 20,
+    "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+    "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
+    "trail": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        0,
+        5
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        3
+      ],
+      [
+        5,
+        3
+      ]
+    ],
+    "trap": {
+      "approachStep": 14,
+      "entered": true,
+      "enteredStep": 15,
+      "marked": true,
+      "turn": "W",
+      "x": 2,
+      "y": 5
+    }
+  },
+  "handoff": {
+    "acceptedMoves": [],
+    "assistance": {
+      "available": false,
+      "earned": false,
+      "hintDirection": null,
+      "requests": 0,
+      "scope": "one next move only",
+      "used": false
+    },
+    "completed": false,
+    "exit": {
+      "marked": true,
+      "state": "closed",
+      "x": 5,
+      "y": 3
+    },
+    "facing": "N",
+    "grid": {
+      "height": 6,
+      "width": 6
+    },
+    "lastAttempt": null,
+    "lastRejected": null,
+    "matchedOptimal": null,
+    "message": "Seed FOG-7 ready. Find the marked exit; reference length 10.",
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "projectedTotal": 10,
+    "referenceLength": 10,
+    "revealed": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "schema": "fogline-survey-state/1.0",
+    "seed": "FOG-7",
+    "seedChangeCount": 1,
+    "seedError": null,
+    "seedInput": "FOG-7",
+    "status": "ready",
+    "steps": 0,
+    "topologyDigest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
+    "topologySignature": "FOG-7|6x6|0,0:E;1,0:EW;2,0:SW;3,0:ES;4,0:SW;5,0:S;0,1:ES;1,1:W;2,1:NE;3,1:NW;4,1:NE;5,1:NSW;0,2:NES;1,2:EW;2,2:EW;3,2:ESW;4,2:SW;5,2:NS;0,3:NS;1,3:S;2,3:ES;3,3:NW;4,3:N;5,3:NS;0,4:NE;1,4:NSW;2,4:NS;3,4:ES;4,4:EW;5,4:NW;0,5:E;1,5:NW;2,5:NE;3,5:NEW;4,5:EW;5,5:W",
+    "trail": [],
+    "trap": {
+      "approachStep": 8,
+      "entered": false,
+      "enteredStep": 9,
+      "marked": false,
+      "turn": "N",
+      "x": 5,
+      "y": 0
+    }
+  },
+  "hint": {
+    "acceptedMoves": [
+      "S",
+      "E",
+      "E",
+      "S",
+      "S",
+      "W",
+      "W",
+      "S",
+      "S",
+      "E",
+      "N",
+      "E",
+      "E",
+      "S"
+    ],
+    "assistance": {
+      "available": false,
+      "earned": true,
+      "hintDirection": "E",
+      "requests": 1,
+      "scope": "one next move only",
+      "used": true
+    },
+    "completed": false,
+    "exit": {
+      "marked": true,
+      "state": "closed",
+      "x": 5,
+      "y": 3
+    },
+    "facing": "S",
+    "grid": {
+      "height": 6,
+      "width": 6
+    },
+    "lastAttempt": "S",
+    "lastRejected": null,
+    "matchedOptimal": null,
+    "message": "One-step survey: E. Assistance is recorded; no later moves are revealed.",
+    "position": {
+      "x": 3,
+      "y": 5
+    },
+    "projectedTotal": 18,
+    "referenceLength": 18,
+    "revealed": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        0,
+        5
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        4,
+        5
+      ]
+    ],
+    "schema": "fogline-survey-state/1.0",
+    "seed": "RAPP-42",
+    "seedChangeCount": 0,
+    "seedError": null,
+    "seedInput": "RAPP-42",
+    "status": "hint",
+    "steps": 14,
+    "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+    "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
+    "trail": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        0,
+        5
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        3,
+        5
+      ]
+    ],
+    "trap": {
+      "approachStep": 14,
+      "entered": false,
+      "enteredStep": 15,
+      "marked": true,
+      "turn": "W",
+      "x": 2,
+      "y": 5
+    }
+  },
+  "invalidSeedPreserved": {
+    "acceptedMoves": [],
+    "assistance": {
+      "available": false,
+      "earned": false,
+      "hintDirection": null,
+      "requests": 0,
+      "scope": "one next move only",
+      "used": false
+    },
+    "completed": false,
+    "exit": {
+      "marked": true,
+      "state": "closed",
+      "x": 5,
+      "y": 3
+    },
+    "facing": "N",
+    "grid": {
+      "height": 6,
+      "width": 6
+    },
+    "lastAttempt": null,
+    "lastRejected": null,
+    "matchedOptimal": null,
+    "message": "Seed RAPP-42 ready. Find the marked exit; reference length 18.",
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "projectedTotal": 18,
+    "referenceLength": 18,
+    "revealed": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    "schema": "fogline-survey-state/1.0",
+    "seed": "RAPP-42",
+    "seedChangeCount": 0,
+    "seedError": "Seed must contain 1–64 UTF-8 bytes and no controls.",
+    "seedInput": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "status": "ready",
+    "steps": 0,
+    "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+    "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
+    "trail": [],
+    "trap": {
+      "approachStep": 14,
+      "entered": false,
+      "enteredStep": 15,
+      "marked": false,
+      "turn": "W",
+      "x": 2,
+      "y": 5
+    }
+  },
+  "opening": {
+    "acceptedMoves": [],
+    "assistance": {
+      "available": false,
+      "earned": false,
+      "hintDirection": null,
+      "requests": 0,
+      "scope": "one next move only",
+      "used": false
+    },
+    "completed": false,
+    "exit": {
+      "marked": true,
+      "state": "closed",
+      "x": 5,
+      "y": 3
+    },
+    "facing": "N",
+    "grid": {
+      "height": 6,
+      "width": 6
+    },
+    "lastAttempt": null,
+    "lastRejected": null,
+    "matchedOptimal": null,
+    "message": "Seed RAPP-42 ready. Find the marked exit; reference length 18.",
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "projectedTotal": 18,
+    "referenceLength": 18,
+    "revealed": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    "schema": "fogline-survey-state/1.0",
+    "seed": "RAPP-42",
+    "seedChangeCount": 0,
+    "seedError": null,
+    "seedInput": "RAPP-42",
+    "status": "ready",
+    "steps": 0,
+    "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+    "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
+    "trail": [],
+    "trap": {
+      "approachStep": 14,
+      "entered": false,
+      "enteredStep": 15,
+      "marked": false,
+      "turn": "W",
+      "x": 2,
+      "y": 5
+    }
+  },
+  "optimal": {
+    "acceptedMoves": [
+      "S",
+      "E",
+      "E",
+      "S",
+      "S",
+      "W",
+      "W",
+      "S",
+      "S",
+      "E",
+      "N",
+      "E",
+      "E",
+      "S",
+      "E",
+      "N",
+      "N",
+      "E"
+    ],
+    "assistance": {
+      "available": false,
+      "earned": true,
+      "hintDirection": null,
+      "requests": 0,
+      "scope": "one next move only",
+      "used": false
+    },
+    "completed": true,
+    "exit": {
+      "marked": true,
+      "state": "open",
+      "x": 5,
+      "y": 3
+    },
+    "facing": "E",
+    "grid": {
+      "height": 6,
+      "width": 6
+    },
+    "lastAttempt": "E",
+    "lastRejected": null,
+    "matchedOptimal": true,
+    "message": "Exit open in 18. Direct survey matched the reference without assistance.",
+    "position": {
+      "x": 5,
+      "y": 3
+    },
+    "projectedTotal": 18,
+    "referenceLength": 18,
+    "revealed": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        5,
+        2
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        4,
+        3
+      ],
+      [
+        5,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        5,
+        4
+      ],
+      [
+        0,
+        5
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        4,
+        5
+      ]
+    ],
+    "schema": "fogline-survey-state/1.0",
+    "seed": "RAPP-42",
+    "seedChangeCount": 0,
+    "seedError": null,
+    "seedInput": "RAPP-42",
+    "status": "complete-optimal",
+    "steps": 18,
+    "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+    "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
+    "trail": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        0,
+        5
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        3
+      ],
+      [
+        5,
+        3
+      ]
+    ],
+    "trap": {
+      "approachStep": 14,
+      "entered": false,
+      "enteredStep": 15,
+      "marked": true,
+      "turn": "W",
+      "x": 2,
+      "y": 5
+    }
+  },
+  "reset": {
+    "acceptedMoves": [],
+    "assistance": {
+      "available": false,
+      "earned": false,
+      "hintDirection": null,
+      "requests": 0,
+      "scope": "one next move only",
+      "used": false
+    },
+    "completed": false,
+    "exit": {
+      "marked": true,
+      "state": "closed",
+      "x": 5,
+      "y": 3
+    },
+    "facing": "N",
+    "grid": {
+      "height": 6,
+      "width": 6
+    },
+    "lastAttempt": null,
+    "lastRejected": null,
+    "matchedOptimal": null,
+    "message": "Seed RAPP-42 ready. Find the marked exit; reference length 18.",
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "projectedTotal": 18,
+    "referenceLength": 18,
+    "revealed": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    "schema": "fogline-survey-state/1.0",
+    "seed": "RAPP-42",
+    "seedChangeCount": 0,
+    "seedError": null,
+    "seedInput": "RAPP-42",
+    "status": "ready",
+    "steps": 0,
+    "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+    "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
+    "trail": [],
+    "trap": {
+      "approachStep": 14,
+      "entered": false,
+      "enteredStep": 15,
+      "marked": false,
+      "turn": "W",
+      "x": 2,
+      "y": 5
+    }
+  },
+  "schema": "fogline-survey-snapshots/1.0",
+  "trap": {
+    "acceptedMoves": [
+      "S",
+      "E",
+      "E",
+      "S",
+      "S",
+      "W",
+      "W",
+      "S",
+      "S",
+      "E",
+      "N",
+      "E",
+      "E",
+      "S",
+      "W"
+    ],
+    "assistance": {
+      "available": false,
+      "earned": true,
+      "hintDirection": null,
+      "requests": 1,
+      "scope": "one next move only",
+      "used": true
+    },
+    "completed": false,
+    "exit": {
+      "marked": true,
+      "state": "closed",
+      "x": 5,
+      "y": 3
+    },
+    "facing": "W",
+    "grid": {
+      "height": 6,
+      "width": 6
+    },
+    "lastAttempt": "W",
+    "lastRejected": null,
+    "matchedOptimal": null,
+    "message": "Marked trap entered. Best finish is now 20 (+2); exit beacon remains marked.",
+    "position": {
+      "x": 2,
+      "y": 5
+    },
+    "projectedTotal": 20,
+    "referenceLength": 18,
+    "revealed": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        0,
+        5
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        4,
+        5
+      ]
+    ],
+    "schema": "fogline-survey-state/1.0",
+    "seed": "RAPP-42",
+    "seedChangeCount": 0,
+    "seedError": null,
+    "seedInput": "RAPP-42",
+    "status": "trap",
+    "steps": 15,
+    "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+    "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
+    "trail": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        0,
+        5
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        2,
+        5
+      ]
+    ],
+    "trap": {
+      "approachStep": 14,
+      "entered": true,
+      "enteredStep": 15,
+      "marked": true,
+      "turn": "W",
+      "x": 2,
+      "y": 5
+    }
+  },
+  "wallRejected": {
+    "acceptedMoves": [],
+    "assistance": {
+      "available": false,
+      "earned": false,
+      "hintDirection": null,
+      "requests": 0,
+      "scope": "one next move only",
+      "used": false
+    },
+    "completed": false,
+    "exit": {
+      "marked": true,
+      "state": "closed",
+      "x": 5,
+      "y": 3
+    },
+    "facing": "N",
+    "grid": {
+      "height": 6,
+      "width": 6
+    },
+    "lastAttempt": "N",
+    "lastRejected": "N",
+    "matchedOptimal": null,
+    "message": "North is fogbound by a wall; accepted steps, hint charge, and trail are preserved.",
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "projectedTotal": 18,
+    "referenceLength": 18,
+    "revealed": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    "schema": "fogline-survey-state/1.0",
+    "seed": "RAPP-42",
+    "seedChangeCount": 0,
+    "seedError": null,
+    "seedInput": "RAPP-42",
+    "status": "wall",
+    "steps": 0,
+    "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+    "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
+    "trail": [],
+    "trap": {
+      "approachStep": 14,
+      "entered": false,
+      "enteredStep": 15,
+      "marked": false,
+      "turn": "W",
+      "x": 2,
+      "y": 5
+    }
+  }
+}

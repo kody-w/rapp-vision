@@ -1,0 +1,2502 @@
+{
+  "attestations": {
+    "audio": false,
+    "copiedImagery": false,
+    "externalRuntimeResources": false,
+    "networkRequests": false,
+    "noSecrets": true,
+    "privacy": "The bundle contains no people, personal data, customer data, locations, analytics, credentials, or secrets.",
+    "rights": "All code, prose, maze graphics, typography, film frames, and interface artwork were created for this candidate."
+  },
+  "browserRuntime": {
+    "cleanup": {
+      "browserExitRequired": true,
+      "errorsAreFatal": true,
+      "profileRemovalRequired": true
+    },
+    "contract": "real Chromium-family browser over reserved DevTools port",
+    "earlyChildExitIsFatal": true,
+    "geometry": {
+      "horizontalOverflowAllowedPixels": 1,
+      "lowerThirdCriticalContent": false,
+      "minimumVisibleFontPixels": 12,
+      "mobileCriticalSpanMaximumPixels": 800,
+      "mobileDocumentHeightMaximumPixels": 1800,
+      "perAction": true,
+      "perCheckpoint": true
+    },
+    "network": {
+      "expectedExternalRequests": 0,
+      "httpBlocked": true,
+      "webSocketBlocked": true
+    },
+    "routePrivacy": {
+      "accessibilityTreeChecked": true,
+      "fullRouteBeforeAttempt": false,
+      "renderedDomChecked": true,
+      "visibleTextChecked": true
+    },
+    "startupTimeoutSeconds": 45,
+    "viewports": [
+      {
+        "height": 720,
+        "name": "desktop",
+        "width": 1120
+      },
+      {
+        "height": 844,
+        "name": "mobile",
+        "width": 390
+      }
+    ]
+  },
+  "challengeContract": {
+    "example": {
+      "referenceLength": 18,
+      "seed": "RAPP-42",
+      "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda"
+    },
+    "fragment": "#challenge=eyJzZWVkIjoiUkFQUC00MiIsInRvcG9sb2d5RGlnZXN0IjoiMTI2YmY3MDQ0MGQzZWY1NDJjOGRjOTcyNTE3MjY5OTRlMGYyMzQyMjY3NWU4MzFmOTMzMDkyMzVhZTA4NWVkYSIsInJlZmVyZW5jZUxlbmd0aCI6MTh9",
+    "fragmentOnly": true,
+    "invalidPreservesAcceptedState": true,
+    "keys": [
+      "seed",
+      "topologyDigest",
+      "referenceLength"
+    ],
+    "routeIncluded": false,
+    "trailIncluded": false
+  },
+  "channel": "candidate-frame-0004-01-maze-fogline",
+  "claims": [
+    {
+      "id": "hint",
+      "stateGate": {
+        "assistanceUsed": true,
+        "completed": false,
+        "exitState": "closed",
+        "facing": "S",
+        "hintAvailable": false,
+        "hintDirection": "E",
+        "hintRequests": 1,
+        "matchedOptimal": null,
+        "position": [
+          3,
+          5
+        ],
+        "projectedTotal": 18,
+        "seed": "RAPP-42",
+        "status": "hint",
+        "steps": 14,
+        "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+        "trailLength": 14
+      }
+    },
+    {
+      "id": "trap",
+      "stateGate": {
+        "assistanceUsed": true,
+        "completed": false,
+        "exitState": "closed",
+        "facing": "W",
+        "hintAvailable": false,
+        "hintDirection": null,
+        "hintRequests": 1,
+        "matchedOptimal": null,
+        "position": [
+          2,
+          5
+        ],
+        "projectedTotal": 20,
+        "seed": "RAPP-42",
+        "status": "trap",
+        "steps": 15,
+        "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+        "trailLength": 15
+      }
+    },
+    {
+      "id": "detour",
+      "stateGate": {
+        "assistanceUsed": true,
+        "completed": true,
+        "exitState": "open",
+        "facing": "E",
+        "hintAvailable": false,
+        "hintDirection": null,
+        "hintRequests": 1,
+        "matchedOptimal": false,
+        "position": [
+          5,
+          3
+        ],
+        "projectedTotal": 20,
+        "seed": "RAPP-42",
+        "status": "complete-detour",
+        "steps": 20,
+        "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+        "trailLength": 20
+      }
+    },
+    {
+      "id": "resetAfterTrap",
+      "stateGate": {
+        "assistanceUsed": false,
+        "completed": false,
+        "exitState": "closed",
+        "facing": "N",
+        "hintAvailable": false,
+        "hintDirection": null,
+        "hintRequests": 0,
+        "matchedOptimal": null,
+        "position": [
+          0,
+          0
+        ],
+        "projectedTotal": 18,
+        "seed": "RAPP-42",
+        "status": "ready",
+        "steps": 0,
+        "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+        "trailLength": 0
+      }
+    },
+    {
+      "id": "optimal",
+      "stateGate": {
+        "assistanceUsed": false,
+        "completed": true,
+        "exitState": "open",
+        "facing": "E",
+        "hintAvailable": false,
+        "hintDirection": null,
+        "hintRequests": 0,
+        "matchedOptimal": true,
+        "position": [
+          5,
+          3
+        ],
+        "projectedTotal": 18,
+        "seed": "RAPP-42",
+        "status": "complete-optimal",
+        "steps": 18,
+        "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+        "trailLength": 18
+      }
+    },
+    {
+      "id": "resetAfterOptimal",
+      "stateGate": {
+        "assistanceUsed": false,
+        "completed": false,
+        "exitState": "closed",
+        "facing": "N",
+        "hintAvailable": false,
+        "hintDirection": null,
+        "hintRequests": 0,
+        "matchedOptimal": null,
+        "position": [
+          0,
+          0
+        ],
+        "projectedTotal": 18,
+        "seed": "RAPP-42",
+        "status": "ready",
+        "steps": 0,
+        "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+        "trailLength": 0
+      }
+    },
+    {
+      "id": "handoff",
+      "stateGate": {
+        "assistanceUsed": false,
+        "completed": false,
+        "exitState": "closed",
+        "facing": "N",
+        "hintAvailable": false,
+        "hintDirection": null,
+        "hintRequests": 0,
+        "matchedOptimal": null,
+        "position": [
+          0,
+          0
+        ],
+        "projectedTotal": 10,
+        "seed": "FOG-7",
+        "status": "ready",
+        "steps": 0,
+        "topologyDigest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
+        "trailLength": 0
+      }
+    }
+  ],
+  "commission": {
+    "criterion": "Seed RAPP-42 always generates the same topology digest and an 18-step shortest route from the marked entrance to the exit.",
+    "exactReset": "Restart same seed restores RAPP-42, its digest, entrance (0,0), north, zero steps, closed exit, empty trail, and no assistance.",
+    "id": "play-seeded-maze-return",
+    "offlineChallenge": "A portable fragment exports exactly seed, full topology digest, and reference length; validation failure preserves the accepted game.",
+    "pairedDelivery": {
+      "live": true,
+      "mp4": true,
+      "samePublication": true,
+      "webm": true
+    },
+    "positivePath": "The trap-first replay proves the valid +2 knot, resets, then individual semantic keys complete RAPP-42 in exactly 18 without assistance.",
+    "statusAtBuild": "open",
+    "visibleFailure": "After an explicitly requested one-step E hint, the valid W turn enters the marked trap, raises the projected and final length to 20, and never hides the exit beacon."
+  },
+  "completionAssistance": {
+    "assistedOptimal": {
+      "acceptedMoves": [
+        "S",
+        "E",
+        "E",
+        "S",
+        "S",
+        "W",
+        "W",
+        "S",
+        "S",
+        "E",
+        "N",
+        "E",
+        "E",
+        "S",
+        "E",
+        "N",
+        "N",
+        "E"
+      ],
+      "assistance": {
+        "available": false,
+        "earned": true,
+        "hintDirection": null,
+        "requests": 1,
+        "scope": "one next move only",
+        "used": true
+      },
+      "completed": true,
+      "exit": {
+        "marked": true,
+        "state": "open",
+        "x": 5,
+        "y": 3
+      },
+      "facing": "E",
+      "grid": {
+        "height": 6,
+        "width": 6
+      },
+      "lastAttempt": "E",
+      "lastRejected": null,
+      "matchedOptimal": true,
+      "message": "Exit open in 18. Direct survey matched the reference with assistance.",
+      "position": {
+        "x": 5,
+        "y": 3
+      },
+      "projectedTotal": 18,
+      "referenceLength": 18,
+      "revealed": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "schema": "fogline-survey-state/1.0",
+      "seed": "RAPP-42",
+      "seedChangeCount": 0,
+      "seedError": null,
+      "seedInput": "RAPP-42",
+      "status": "complete-optimal",
+      "steps": 18,
+      "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+      "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
+      "trail": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          3
+        ]
+      ],
+      "trap": {
+        "approachStep": 14,
+        "entered": false,
+        "enteredStep": 15,
+        "marked": true,
+        "turn": "W",
+        "x": 2,
+        "y": 5
+      }
+    },
+    "completionHintAvailable": false,
+    "postCompletionHintDirection": null,
+    "unassistedOptimal": {
+      "acceptedMoves": [
+        "S",
+        "E",
+        "E",
+        "S",
+        "S",
+        "W",
+        "W",
+        "S",
+        "S",
+        "E",
+        "N",
+        "E",
+        "E",
+        "S",
+        "E",
+        "N",
+        "N",
+        "E"
+      ],
+      "assistance": {
+        "available": false,
+        "earned": true,
+        "hintDirection": null,
+        "requests": 0,
+        "scope": "one next move only",
+        "used": false
+      },
+      "completed": true,
+      "exit": {
+        "marked": true,
+        "state": "open",
+        "x": 5,
+        "y": 3
+      },
+      "facing": "E",
+      "grid": {
+        "height": 6,
+        "width": 6
+      },
+      "lastAttempt": "E",
+      "lastRejected": null,
+      "matchedOptimal": true,
+      "message": "Exit open in 18. Direct survey matched the reference without assistance.",
+      "position": {
+        "x": 5,
+        "y": 3
+      },
+      "projectedTotal": 18,
+      "referenceLength": 18,
+      "revealed": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "schema": "fogline-survey-state/1.0",
+      "seed": "RAPP-42",
+      "seedChangeCount": 0,
+      "seedError": null,
+      "seedInput": "RAPP-42",
+      "status": "complete-optimal",
+      "steps": 18,
+      "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+      "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
+      "trail": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          3
+        ]
+      ],
+      "trap": {
+        "approachStep": 14,
+        "entered": false,
+        "enteredStep": 15,
+        "marked": true,
+        "turn": "W",
+        "x": 2,
+        "y": 5
+      }
+    }
+  },
+  "film": {
+    "contentSamples": {
+      "alternate-fresh": {
+        "frame": 240,
+        "timestamp": 20.0
+      },
+      "challenge": {
+        "frame": 18,
+        "timestamp": 1.5
+      },
+      "optimal-18": {
+        "frame": 150,
+        "timestamp": 12.5
+      },
+      "optimal-complete": {
+        "frame": 192,
+        "timestamp": 16.0
+      },
+      "reset-after-optimal": {
+        "frame": 216,
+        "timestamp": 18.0
+      },
+      "reset-after-trap": {
+        "frame": 108,
+        "timestamp": 9.0
+      },
+      "takeover": {
+        "frame": 270,
+        "timestamp": 22.5
+      },
+      "trap-approach": {
+        "frame": 54,
+        "timestamp": 4.5
+      },
+      "trap-plus-two": {
+        "frame": 72,
+        "timestamp": 6.0
+      }
+    },
+    "continuity": {
+      "bytes": 23776,
+      "path": "snapshots/film-live-continuity.json",
+      "renderer": "live-app-chromium-capture",
+      "schema": "fogline-survey-film-live-continuity/1.0",
+      "sha256": "6fb4fbe4e84306910a8c447bef74a7958e3a43024ff17eb68d0b5aadb3e93136"
+    },
+    "duration": 24,
+    "exitBeaconAlwaysMarked": true,
+    "fps": 12,
+    "frames": 288,
+    "height": 540,
+    "renderer": "live-app-chromium-capture",
+    "routePrintedBeforeAttempt": false,
+    "sequence": [
+      "challenge",
+      "trap-approach",
+      "trap-plus-two",
+      "reset-after-trap",
+      "optimal-18",
+      "optimal-complete",
+      "reset-after-optimal",
+      "alternate-fresh",
+      "takeover"
+    ],
+    "timeline": [
+      {
+        "end": 3.0,
+        "phase": "challenge",
+        "start": 0.0
+      },
+      {
+        "end": 5.5,
+        "phase": "trap-approach",
+        "start": 3.0
+      },
+      {
+        "end": 8.0,
+        "phase": "trap-plus-two",
+        "start": 5.5
+      },
+      {
+        "end": 10.0,
+        "phase": "reset-after-trap",
+        "start": 8.0
+      },
+      {
+        "end": 15.0,
+        "phase": "optimal-18",
+        "start": 10.0
+      },
+      {
+        "end": 17.0,
+        "phase": "optimal-complete",
+        "start": 15.0
+      },
+      {
+        "end": 19.0,
+        "phase": "reset-after-optimal",
+        "start": 17.0
+      },
+      {
+        "end": 21.0,
+        "phase": "alternate-fresh",
+        "start": 19.0
+      },
+      {
+        "end": 24.0,
+        "phase": "takeover",
+        "start": 21.0
+      }
+    ],
+    "typography": {
+      "criticalTextSourcePixels": 22,
+      "fullDigestCharacters": 64,
+      "fullDigestSourcePixels": 22,
+      "liveHierarchyMatched": true
+    },
+    "width": 960
+  },
+  "fixtures": {
+    "alternateAudit": [
+      {
+        "cells": [
+          {
+            "openings": "E",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "openings": "EW",
+            "x": 1,
+            "y": 0
+          },
+          {
+            "openings": "SW",
+            "x": 2,
+            "y": 0
+          },
+          {
+            "openings": "ES",
+            "x": 3,
+            "y": 0
+          },
+          {
+            "openings": "SW",
+            "x": 4,
+            "y": 0
+          },
+          {
+            "openings": "S",
+            "x": 5,
+            "y": 0
+          },
+          {
+            "openings": "ES",
+            "x": 0,
+            "y": 1
+          },
+          {
+            "openings": "W",
+            "x": 1,
+            "y": 1
+          },
+          {
+            "openings": "NE",
+            "x": 2,
+            "y": 1
+          },
+          {
+            "openings": "NW",
+            "x": 3,
+            "y": 1
+          },
+          {
+            "openings": "NE",
+            "x": 4,
+            "y": 1
+          },
+          {
+            "openings": "NSW",
+            "x": 5,
+            "y": 1
+          },
+          {
+            "openings": "NES",
+            "x": 0,
+            "y": 2
+          },
+          {
+            "openings": "EW",
+            "x": 1,
+            "y": 2
+          },
+          {
+            "openings": "EW",
+            "x": 2,
+            "y": 2
+          },
+          {
+            "openings": "ESW",
+            "x": 3,
+            "y": 2
+          },
+          {
+            "openings": "SW",
+            "x": 4,
+            "y": 2
+          },
+          {
+            "openings": "NS",
+            "x": 5,
+            "y": 2
+          },
+          {
+            "openings": "NS",
+            "x": 0,
+            "y": 3
+          },
+          {
+            "openings": "S",
+            "x": 1,
+            "y": 3
+          },
+          {
+            "openings": "ES",
+            "x": 2,
+            "y": 3
+          },
+          {
+            "openings": "NW",
+            "x": 3,
+            "y": 3
+          },
+          {
+            "openings": "N",
+            "x": 4,
+            "y": 3
+          },
+          {
+            "openings": "NS",
+            "x": 5,
+            "y": 3
+          },
+          {
+            "openings": "NE",
+            "x": 0,
+            "y": 4
+          },
+          {
+            "openings": "NSW",
+            "x": 1,
+            "y": 4
+          },
+          {
+            "openings": "NS",
+            "x": 2,
+            "y": 4
+          },
+          {
+            "openings": "ES",
+            "x": 3,
+            "y": 4
+          },
+          {
+            "openings": "EW",
+            "x": 4,
+            "y": 4
+          },
+          {
+            "openings": "NW",
+            "x": 5,
+            "y": 4
+          },
+          {
+            "openings": "E",
+            "x": 0,
+            "y": 5
+          },
+          {
+            "openings": "NW",
+            "x": 1,
+            "y": 5
+          },
+          {
+            "openings": "NE",
+            "x": 2,
+            "y": 5
+          },
+          {
+            "openings": "NEW",
+            "x": 3,
+            "y": 5
+          },
+          {
+            "openings": "EW",
+            "x": 4,
+            "y": 5
+          },
+          {
+            "openings": "W",
+            "x": 5,
+            "y": 5
+          }
+        ],
+        "detourLength": 12,
+        "detourRoute": [
+          "E",
+          "E",
+          "S",
+          "E",
+          "N",
+          "E",
+          "S",
+          "E",
+          "N",
+          "S",
+          "S",
+          "S"
+        ],
+        "entrance": [
+          0,
+          0
+        ],
+        "exit": [
+          5,
+          3
+        ],
+        "generator": {
+          "algorithm": "recursive-backtracker",
+          "candidateOrder": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "prng": "Mulberry32 unsigned integer output",
+          "seedHash": "FNV-1a 32-bit over UTF-8",
+          "start": [
+            0,
+            0
+          ]
+        },
+        "grid": {
+          "height": 6,
+          "width": 6
+        },
+        "seed": "FOG-7",
+        "shortestLength": 10,
+        "shortestRoute": [
+          "E",
+          "E",
+          "S",
+          "E",
+          "N",
+          "E",
+          "S",
+          "E",
+          "S",
+          "S"
+        ],
+        "topologyDigest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
+        "topologySerialization": "seed|6x6| then row-major x,y:NESW-openings cells joined by ;",
+        "topologySignature": "FOG-7|6x6|0,0:E;1,0:EW;2,0:SW;3,0:ES;4,0:SW;5,0:S;0,1:ES;1,1:W;2,1:NE;3,1:NW;4,1:NE;5,1:NSW;0,2:NES;1,2:EW;2,2:EW;3,2:ESW;4,2:SW;5,2:NS;0,3:NS;1,3:S;2,3:ES;3,3:NW;4,3:N;5,3:NS;0,4:NE;1,4:NSW;2,4:NS;3,4:ES;4,4:EW;5,4:NW;0,5:E;1,5:NW;2,5:NE;3,5:NEW;4,5:EW;5,5:W",
+        "trap": {
+          "approach": [
+            5,
+            1
+          ],
+          "approachStep": 8,
+          "cell": [
+            5,
+            0
+          ],
+          "enteredStep": 9,
+          "return": "S",
+          "selection": "latest off-route branch before exit; NESW tie-break",
+          "turn": "N"
+        }
+      },
+      {
+        "cells": [
+          {
+            "openings": "S",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "openings": "ES",
+            "x": 1,
+            "y": 0
+          },
+          {
+            "openings": "EW",
+            "x": 2,
+            "y": 0
+          },
+          {
+            "openings": "EW",
+            "x": 3,
+            "y": 0
+          },
+          {
+            "openings": "SW",
+            "x": 4,
+            "y": 0
+          },
+          {
+            "openings": "S",
+            "x": 5,
+            "y": 0
+          },
+          {
+            "openings": "NE",
+            "x": 0,
+            "y": 1
+          },
+          {
+            "openings": "NW",
+            "x": 1,
+            "y": 1
+          },
+          {
+            "openings": "ES",
+            "x": 2,
+            "y": 1
+          },
+          {
+            "openings": "EW",
+            "x": 3,
+            "y": 1
+          },
+          {
+            "openings": "NW",
+            "x": 4,
+            "y": 1
+          },
+          {
+            "openings": "NS",
+            "x": 5,
+            "y": 1
+          },
+          {
+            "openings": "ES",
+            "x": 0,
+            "y": 2
+          },
+          {
+            "openings": "W",
+            "x": 1,
+            "y": 2
+          },
+          {
+            "openings": "NS",
+            "x": 2,
+            "y": 2
+          },
+          {
+            "openings": "ES",
+            "x": 3,
+            "y": 2
+          },
+          {
+            "openings": "EW",
+            "x": 4,
+            "y": 2
+          },
+          {
+            "openings": "NSW",
+            "x": 5,
+            "y": 2
+          },
+          {
+            "openings": "NE",
+            "x": 0,
+            "y": 3
+          },
+          {
+            "openings": "SW",
+            "x": 1,
+            "y": 3
+          },
+          {
+            "openings": "NS",
+            "x": 2,
+            "y": 3
+          },
+          {
+            "openings": "N",
+            "x": 3,
+            "y": 3
+          },
+          {
+            "openings": "ES",
+            "x": 4,
+            "y": 3
+          },
+          {
+            "openings": "NSW",
+            "x": 5,
+            "y": 3
+          },
+          {
+            "openings": "ES",
+            "x": 0,
+            "y": 4
+          },
+          {
+            "openings": "NW",
+            "x": 1,
+            "y": 4
+          },
+          {
+            "openings": "NE",
+            "x": 2,
+            "y": 4
+          },
+          {
+            "openings": "SW",
+            "x": 3,
+            "y": 4
+          },
+          {
+            "openings": "NS",
+            "x": 4,
+            "y": 4
+          },
+          {
+            "openings": "NS",
+            "x": 5,
+            "y": 4
+          },
+          {
+            "openings": "NE",
+            "x": 0,
+            "y": 5
+          },
+          {
+            "openings": "EW",
+            "x": 1,
+            "y": 5
+          },
+          {
+            "openings": "EW",
+            "x": 2,
+            "y": 5
+          },
+          {
+            "openings": "NEW",
+            "x": 3,
+            "y": 5
+          },
+          {
+            "openings": "NW",
+            "x": 4,
+            "y": 5
+          },
+          {
+            "openings": "N",
+            "x": 5,
+            "y": 5
+          }
+        ],
+        "detourLength": 20,
+        "detourRoute": [
+          "S",
+          "E",
+          "N",
+          "E",
+          "E",
+          "E",
+          "S",
+          "W",
+          "W",
+          "S",
+          "S",
+          "S",
+          "E",
+          "S",
+          "W",
+          "E",
+          "E",
+          "N",
+          "N",
+          "E"
+        ],
+        "entrance": [
+          0,
+          0
+        ],
+        "exit": [
+          5,
+          3
+        ],
+        "generator": {
+          "algorithm": "recursive-backtracker",
+          "candidateOrder": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "prng": "Mulberry32 unsigned integer output",
+          "seedHash": "FNV-1a 32-bit over UTF-8",
+          "start": [
+            0,
+            0
+          ]
+        },
+        "grid": {
+          "height": 6,
+          "width": 6
+        },
+        "seed": "MIST-Δ",
+        "shortestLength": 18,
+        "shortestRoute": [
+          "S",
+          "E",
+          "N",
+          "E",
+          "E",
+          "E",
+          "S",
+          "W",
+          "W",
+          "S",
+          "S",
+          "S",
+          "E",
+          "S",
+          "E",
+          "N",
+          "N",
+          "E"
+        ],
+        "topologyDigest": "0e52d0e94088913486496953dd57eaf1d5a4991e1125ea4f97ad13ad6b9b558c",
+        "topologySerialization": "seed|6x6| then row-major x,y:NESW-openings cells joined by ;",
+        "topologySignature": "MIST-Δ|6x6|0,0:S;1,0:ES;2,0:EW;3,0:EW;4,0:SW;5,0:S;0,1:NE;1,1:NW;2,1:ES;3,1:EW;4,1:NW;5,1:NS;0,2:ES;1,2:W;2,2:NS;3,2:ES;4,2:EW;5,2:NSW;0,3:NE;1,3:SW;2,3:NS;3,3:N;4,3:ES;5,3:NSW;0,4:ES;1,4:NW;2,4:NE;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:EW;2,5:EW;3,5:NEW;4,5:NW;5,5:N",
+        "trap": {
+          "approach": [
+            3,
+            5
+          ],
+          "approachStep": 14,
+          "cell": [
+            2,
+            5
+          ],
+          "enteredStep": 15,
+          "return": "E",
+          "selection": "latest off-route branch before exit; NESW tie-break",
+          "turn": "W"
+        }
+      },
+      {
+        "cells": [
+          {
+            "openings": "S",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "openings": "ES",
+            "x": 1,
+            "y": 0
+          },
+          {
+            "openings": "EW",
+            "x": 2,
+            "y": 0
+          },
+          {
+            "openings": "EW",
+            "x": 3,
+            "y": 0
+          },
+          {
+            "openings": "EW",
+            "x": 4,
+            "y": 0
+          },
+          {
+            "openings": "SW",
+            "x": 5,
+            "y": 0
+          },
+          {
+            "openings": "NS",
+            "x": 0,
+            "y": 1
+          },
+          {
+            "openings": "NS",
+            "x": 1,
+            "y": 1
+          },
+          {
+            "openings": "E",
+            "x": 2,
+            "y": 1
+          },
+          {
+            "openings": "EW",
+            "x": 3,
+            "y": 1
+          },
+          {
+            "openings": "ESW",
+            "x": 4,
+            "y": 1
+          },
+          {
+            "openings": "NW",
+            "x": 5,
+            "y": 1
+          },
+          {
+            "openings": "NS",
+            "x": 0,
+            "y": 2
+          },
+          {
+            "openings": "NE",
+            "x": 1,
+            "y": 2
+          },
+          {
+            "openings": "EW",
+            "x": 2,
+            "y": 2
+          },
+          {
+            "openings": "SW",
+            "x": 3,
+            "y": 2
+          },
+          {
+            "openings": "NE",
+            "x": 4,
+            "y": 2
+          },
+          {
+            "openings": "W",
+            "x": 5,
+            "y": 2
+          },
+          {
+            "openings": "NE",
+            "x": 0,
+            "y": 3
+          },
+          {
+            "openings": "EW",
+            "x": 1,
+            "y": 3
+          },
+          {
+            "openings": "SW",
+            "x": 2,
+            "y": 3
+          },
+          {
+            "openings": "NE",
+            "x": 3,
+            "y": 3
+          },
+          {
+            "openings": "ESW",
+            "x": 4,
+            "y": 3
+          },
+          {
+            "openings": "SW",
+            "x": 5,
+            "y": 3
+          },
+          {
+            "openings": "ES",
+            "x": 0,
+            "y": 4
+          },
+          {
+            "openings": "SW",
+            "x": 1,
+            "y": 4
+          },
+          {
+            "openings": "NE",
+            "x": 2,
+            "y": 4
+          },
+          {
+            "openings": "SW",
+            "x": 3,
+            "y": 4
+          },
+          {
+            "openings": "N",
+            "x": 4,
+            "y": 4
+          },
+          {
+            "openings": "NS",
+            "x": 5,
+            "y": 4
+          },
+          {
+            "openings": "N",
+            "x": 0,
+            "y": 5
+          },
+          {
+            "openings": "NE",
+            "x": 1,
+            "y": 5
+          },
+          {
+            "openings": "EW",
+            "x": 2,
+            "y": 5
+          },
+          {
+            "openings": "NEW",
+            "x": 3,
+            "y": 5
+          },
+          {
+            "openings": "EW",
+            "x": 4,
+            "y": 5
+          },
+          {
+            "openings": "NW",
+            "x": 5,
+            "y": 5
+          }
+        ],
+        "detourLength": 14,
+        "detourRoute": [
+          "S",
+          "S",
+          "S",
+          "E",
+          "E",
+          "S",
+          "E",
+          "S",
+          "W",
+          "E",
+          "E",
+          "E",
+          "N",
+          "N"
+        ],
+        "entrance": [
+          0,
+          0
+        ],
+        "exit": [
+          5,
+          3
+        ],
+        "generator": {
+          "algorithm": "recursive-backtracker",
+          "candidateOrder": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "prng": "Mulberry32 unsigned integer output",
+          "seedHash": "FNV-1a 32-bit over UTF-8",
+          "start": [
+            0,
+            0
+          ]
+        },
+        "grid": {
+          "height": 6,
+          "width": 6
+        },
+        "seed": "A|B;C",
+        "shortestLength": 12,
+        "shortestRoute": [
+          "S",
+          "S",
+          "S",
+          "E",
+          "E",
+          "S",
+          "E",
+          "S",
+          "E",
+          "E",
+          "N",
+          "N"
+        ],
+        "topologyDigest": "e3d863e738e09f4440152a348e9bb4b04a665e7b913a252a584869b4c26aa53e",
+        "topologySerialization": "seed|6x6| then row-major x,y:NESW-openings cells joined by ;",
+        "topologySignature": "A|B;C|6x6|0,0:S;1,0:ES;2,0:EW;3,0:EW;4,0:EW;5,0:SW;0,1:NS;1,1:NS;2,1:E;3,1:EW;4,1:ESW;5,1:NW;0,2:NS;1,2:NE;2,2:EW;3,2:SW;4,2:NE;5,2:W;0,3:NE;1,3:EW;2,3:SW;3,3:NE;4,3:ESW;5,3:SW;0,4:ES;1,4:SW;2,4:NE;3,4:SW;4,4:N;5,4:NS;0,5:N;1,5:NE;2,5:EW;3,5:NEW;4,5:EW;5,5:NW",
+        "trap": {
+          "approach": [
+            3,
+            5
+          ],
+          "approachStep": 8,
+          "cell": [
+            2,
+            5
+          ],
+          "enteredStep": 9,
+          "return": "E",
+          "selection": "latest off-route branch before exit; NESW tie-break",
+          "turn": "W"
+        }
+      }
+    ],
+    "canonical": {
+      "cells": [
+        {
+          "openings": "S",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "openings": "E",
+          "x": 1,
+          "y": 0
+        },
+        {
+          "openings": "EW",
+          "x": 2,
+          "y": 0
+        },
+        {
+          "openings": "ESW",
+          "x": 3,
+          "y": 0
+        },
+        {
+          "openings": "EW",
+          "x": 4,
+          "y": 0
+        },
+        {
+          "openings": "W",
+          "x": 5,
+          "y": 0
+        },
+        {
+          "openings": "NE",
+          "x": 0,
+          "y": 1
+        },
+        {
+          "openings": "EW",
+          "x": 1,
+          "y": 1
+        },
+        {
+          "openings": "SW",
+          "x": 2,
+          "y": 1
+        },
+        {
+          "openings": "NES",
+          "x": 3,
+          "y": 1
+        },
+        {
+          "openings": "EW",
+          "x": 4,
+          "y": 1
+        },
+        {
+          "openings": "SW",
+          "x": 5,
+          "y": 1
+        },
+        {
+          "openings": "ES",
+          "x": 0,
+          "y": 2
+        },
+        {
+          "openings": "W",
+          "x": 1,
+          "y": 2
+        },
+        {
+          "openings": "NS",
+          "x": 2,
+          "y": 2
+        },
+        {
+          "openings": "NES",
+          "x": 3,
+          "y": 2
+        },
+        {
+          "openings": "W",
+          "x": 4,
+          "y": 2
+        },
+        {
+          "openings": "NS",
+          "x": 5,
+          "y": 2
+        },
+        {
+          "openings": "NES",
+          "x": 0,
+          "y": 3
+        },
+        {
+          "openings": "EW",
+          "x": 1,
+          "y": 3
+        },
+        {
+          "openings": "NW",
+          "x": 2,
+          "y": 3
+        },
+        {
+          "openings": "N",
+          "x": 3,
+          "y": 3
+        },
+        {
+          "openings": "ES",
+          "x": 4,
+          "y": 3
+        },
+        {
+          "openings": "NSW",
+          "x": 5,
+          "y": 3
+        },
+        {
+          "openings": "NS",
+          "x": 0,
+          "y": 4
+        },
+        {
+          "openings": "ES",
+          "x": 1,
+          "y": 4
+        },
+        {
+          "openings": "EW",
+          "x": 2,
+          "y": 4
+        },
+        {
+          "openings": "SW",
+          "x": 3,
+          "y": 4
+        },
+        {
+          "openings": "NS",
+          "x": 4,
+          "y": 4
+        },
+        {
+          "openings": "NS",
+          "x": 5,
+          "y": 4
+        },
+        {
+          "openings": "NE",
+          "x": 0,
+          "y": 5
+        },
+        {
+          "openings": "NW",
+          "x": 1,
+          "y": 5
+        },
+        {
+          "openings": "E",
+          "x": 2,
+          "y": 5
+        },
+        {
+          "openings": "NEW",
+          "x": 3,
+          "y": 5
+        },
+        {
+          "openings": "NW",
+          "x": 4,
+          "y": 5
+        },
+        {
+          "openings": "N",
+          "x": 5,
+          "y": 5
+        }
+      ],
+      "detourLength": 20,
+      "detourRoute": [
+        "S",
+        "E",
+        "E",
+        "S",
+        "S",
+        "W",
+        "W",
+        "S",
+        "S",
+        "E",
+        "N",
+        "E",
+        "E",
+        "S",
+        "W",
+        "E",
+        "E",
+        "N",
+        "N",
+        "E"
+      ],
+      "entrance": [
+        0,
+        0
+      ],
+      "exit": [
+        5,
+        3
+      ],
+      "generator": {
+        "algorithm": "recursive-backtracker",
+        "candidateOrder": [
+          "N",
+          "E",
+          "S",
+          "W"
+        ],
+        "prng": "Mulberry32 unsigned integer output",
+        "seedHash": "FNV-1a 32-bit over UTF-8",
+        "start": [
+          0,
+          0
+        ]
+      },
+      "grid": {
+        "height": 6,
+        "width": 6
+      },
+      "seed": "RAPP-42",
+      "shortestLength": 18,
+      "shortestRoute": [
+        "S",
+        "E",
+        "E",
+        "S",
+        "S",
+        "W",
+        "W",
+        "S",
+        "S",
+        "E",
+        "N",
+        "E",
+        "E",
+        "S",
+        "E",
+        "N",
+        "N",
+        "E"
+      ],
+      "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+      "topologySerialization": "seed|6x6| then row-major x,y:NESW-openings cells joined by ;",
+      "topologySignature": "RAPP-42|6x6|0,0:S;1,0:E;2,0:EW;3,0:ESW;4,0:EW;5,0:W;0,1:NE;1,1:EW;2,1:SW;3,1:NES;4,1:EW;5,1:SW;0,2:ES;1,2:W;2,2:NS;3,2:NES;4,2:W;5,2:NS;0,3:NES;1,3:EW;2,3:NW;3,3:N;4,3:ES;5,3:NSW;0,4:NS;1,4:ES;2,4:EW;3,4:SW;4,4:NS;5,4:NS;0,5:NE;1,5:NW;2,5:E;3,5:NEW;4,5:NW;5,5:N",
+      "trap": {
+        "approach": [
+          3,
+          5
+        ],
+        "approachStep": 14,
+        "cell": [
+          2,
+          5
+        ],
+        "enteredStep": 15,
+        "return": "E",
+        "selection": "latest off-route branch before exit; NESW tie-break",
+        "turn": "W"
+      }
+    },
+    "handoff": {
+      "cells": [
+        {
+          "openings": "E",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "openings": "EW",
+          "x": 1,
+          "y": 0
+        },
+        {
+          "openings": "SW",
+          "x": 2,
+          "y": 0
+        },
+        {
+          "openings": "ES",
+          "x": 3,
+          "y": 0
+        },
+        {
+          "openings": "SW",
+          "x": 4,
+          "y": 0
+        },
+        {
+          "openings": "S",
+          "x": 5,
+          "y": 0
+        },
+        {
+          "openings": "ES",
+          "x": 0,
+          "y": 1
+        },
+        {
+          "openings": "W",
+          "x": 1,
+          "y": 1
+        },
+        {
+          "openings": "NE",
+          "x": 2,
+          "y": 1
+        },
+        {
+          "openings": "NW",
+          "x": 3,
+          "y": 1
+        },
+        {
+          "openings": "NE",
+          "x": 4,
+          "y": 1
+        },
+        {
+          "openings": "NSW",
+          "x": 5,
+          "y": 1
+        },
+        {
+          "openings": "NES",
+          "x": 0,
+          "y": 2
+        },
+        {
+          "openings": "EW",
+          "x": 1,
+          "y": 2
+        },
+        {
+          "openings": "EW",
+          "x": 2,
+          "y": 2
+        },
+        {
+          "openings": "ESW",
+          "x": 3,
+          "y": 2
+        },
+        {
+          "openings": "SW",
+          "x": 4,
+          "y": 2
+        },
+        {
+          "openings": "NS",
+          "x": 5,
+          "y": 2
+        },
+        {
+          "openings": "NS",
+          "x": 0,
+          "y": 3
+        },
+        {
+          "openings": "S",
+          "x": 1,
+          "y": 3
+        },
+        {
+          "openings": "ES",
+          "x": 2,
+          "y": 3
+        },
+        {
+          "openings": "NW",
+          "x": 3,
+          "y": 3
+        },
+        {
+          "openings": "N",
+          "x": 4,
+          "y": 3
+        },
+        {
+          "openings": "NS",
+          "x": 5,
+          "y": 3
+        },
+        {
+          "openings": "NE",
+          "x": 0,
+          "y": 4
+        },
+        {
+          "openings": "NSW",
+          "x": 1,
+          "y": 4
+        },
+        {
+          "openings": "NS",
+          "x": 2,
+          "y": 4
+        },
+        {
+          "openings": "ES",
+          "x": 3,
+          "y": 4
+        },
+        {
+          "openings": "EW",
+          "x": 4,
+          "y": 4
+        },
+        {
+          "openings": "NW",
+          "x": 5,
+          "y": 4
+        },
+        {
+          "openings": "E",
+          "x": 0,
+          "y": 5
+        },
+        {
+          "openings": "NW",
+          "x": 1,
+          "y": 5
+        },
+        {
+          "openings": "NE",
+          "x": 2,
+          "y": 5
+        },
+        {
+          "openings": "NEW",
+          "x": 3,
+          "y": 5
+        },
+        {
+          "openings": "EW",
+          "x": 4,
+          "y": 5
+        },
+        {
+          "openings": "W",
+          "x": 5,
+          "y": 5
+        }
+      ],
+      "detourLength": 12,
+      "detourRoute": [
+        "E",
+        "E",
+        "S",
+        "E",
+        "N",
+        "E",
+        "S",
+        "E",
+        "N",
+        "S",
+        "S",
+        "S"
+      ],
+      "entrance": [
+        0,
+        0
+      ],
+      "exit": [
+        5,
+        3
+      ],
+      "generator": {
+        "algorithm": "recursive-backtracker",
+        "candidateOrder": [
+          "N",
+          "E",
+          "S",
+          "W"
+        ],
+        "prng": "Mulberry32 unsigned integer output",
+        "seedHash": "FNV-1a 32-bit over UTF-8",
+        "start": [
+          0,
+          0
+        ]
+      },
+      "grid": {
+        "height": 6,
+        "width": 6
+      },
+      "seed": "FOG-7",
+      "shortestLength": 10,
+      "shortestRoute": [
+        "E",
+        "E",
+        "S",
+        "E",
+        "N",
+        "E",
+        "S",
+        "E",
+        "S",
+        "S"
+      ],
+      "topologyDigest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
+      "topologySerialization": "seed|6x6| then row-major x,y:NESW-openings cells joined by ;",
+      "topologySignature": "FOG-7|6x6|0,0:E;1,0:EW;2,0:SW;3,0:ES;4,0:SW;5,0:S;0,1:ES;1,1:W;2,1:NE;3,1:NW;4,1:NE;5,1:NSW;0,2:NES;1,2:EW;2,2:EW;3,2:ESW;4,2:SW;5,2:NS;0,3:NS;1,3:S;2,3:ES;3,3:NW;4,3:N;5,3:NS;0,4:NE;1,4:NSW;2,4:NS;3,4:ES;4,4:EW;5,4:NW;0,5:E;1,5:NW;2,5:NE;3,5:NEW;4,5:EW;5,5:W",
+      "trap": {
+        "approach": [
+          5,
+          1
+        ],
+        "approachStep": 8,
+        "cell": [
+          5,
+          0
+        ],
+        "enteredStep": 9,
+        "return": "S",
+        "selection": "latest off-route branch before exit; NESW tie-break",
+        "turn": "N"
+      }
+    }
+  },
+  "manifestReplay": {
+    "actionCount": 71,
+    "activationVisibilityRequired": true,
+    "actualInputVerification": "CDP mouse and keyboard events",
+    "allowedActions": [
+      "scroll",
+      "click",
+      "key",
+      "type"
+    ],
+    "autoSolveApi": false,
+    "checkpointMode": "state-gated within bounded time windows",
+    "checkpointVisibilityRequired": true,
+    "checkpoints": [
+      {
+        "claim": "hint",
+        "selector": "#hint-panel",
+        "stateGate": {
+          "assistanceUsed": true,
+          "completed": false,
+          "exitState": "closed",
+          "facing": "S",
+          "hintAvailable": false,
+          "hintDirection": "E",
+          "hintRequests": 1,
+          "matchedOptimal": null,
+          "position": [
+            3,
+            5
+          ],
+          "projectedTotal": 18,
+          "seed": "RAPP-42",
+          "status": "hint",
+          "steps": 14,
+          "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+          "trailLength": 14
+        },
+        "timeWindow": {
+          "end": 5.77,
+          "start": 4.52
+        }
+      },
+      {
+        "claim": "trap",
+        "selector": "#trap-panel",
+        "stateGate": {
+          "assistanceUsed": true,
+          "completed": false,
+          "exitState": "closed",
+          "facing": "W",
+          "hintAvailable": false,
+          "hintDirection": null,
+          "hintRequests": 1,
+          "matchedOptimal": null,
+          "position": [
+            2,
+            5
+          ],
+          "projectedTotal": 20,
+          "seed": "RAPP-42",
+          "status": "trap",
+          "steps": 15,
+          "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+          "trailLength": 15
+        },
+        "timeWindow": {
+          "end": 6.63,
+          "start": 5.38
+        }
+      },
+      {
+        "claim": "detour",
+        "selector": "#success-panel",
+        "stateGate": {
+          "assistanceUsed": true,
+          "completed": true,
+          "exitState": "open",
+          "facing": "E",
+          "hintAvailable": false,
+          "hintDirection": null,
+          "hintRequests": 1,
+          "matchedOptimal": false,
+          "position": [
+            5,
+            3
+          ],
+          "projectedTotal": 20,
+          "seed": "RAPP-42",
+          "status": "complete-detour",
+          "steps": 20,
+          "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+          "trailLength": 20
+        },
+        "timeWindow": {
+          "end": 8.27,
+          "start": 7.02
+        }
+      },
+      {
+        "claim": "resetAfterTrap",
+        "selector": "#reset-proof",
+        "stateGate": {
+          "assistanceUsed": false,
+          "completed": false,
+          "exitState": "closed",
+          "facing": "N",
+          "hintAvailable": false,
+          "hintDirection": null,
+          "hintRequests": 0,
+          "matchedOptimal": null,
+          "position": [
+            0,
+            0
+          ],
+          "projectedTotal": 18,
+          "seed": "RAPP-42",
+          "status": "ready",
+          "steps": 0,
+          "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+          "trailLength": 0
+        },
+        "timeWindow": {
+          "end": 8.87,
+          "start": 7.62
+        }
+      },
+      {
+        "claim": "optimal",
+        "selector": "#success-panel",
+        "stateGate": {
+          "assistanceUsed": false,
+          "completed": true,
+          "exitState": "open",
+          "facing": "E",
+          "hintAvailable": false,
+          "hintDirection": null,
+          "hintRequests": 0,
+          "matchedOptimal": true,
+          "position": [
+            5,
+            3
+          ],
+          "projectedTotal": 18,
+          "seed": "RAPP-42",
+          "status": "complete-optimal",
+          "steps": 18,
+          "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+          "trailLength": 18
+        },
+        "timeWindow": {
+          "end": 13.53,
+          "start": 12.28
+        }
+      },
+      {
+        "claim": "resetAfterOptimal",
+        "selector": "#reset-proof",
+        "stateGate": {
+          "assistanceUsed": false,
+          "completed": false,
+          "exitState": "closed",
+          "facing": "N",
+          "hintAvailable": false,
+          "hintDirection": null,
+          "hintRequests": 0,
+          "matchedOptimal": null,
+          "position": [
+            0,
+            0
+          ],
+          "projectedTotal": 18,
+          "seed": "RAPP-42",
+          "status": "ready",
+          "steps": 0,
+          "topologyDigest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+          "trailLength": 0
+        },
+        "timeWindow": {
+          "end": 14.15,
+          "start": 12.9
+        }
+      },
+      {
+        "claim": "handoff",
+        "selector": "#takeover-prompt",
+        "stateGate": {
+          "assistanceUsed": false,
+          "completed": false,
+          "exitState": "closed",
+          "facing": "N",
+          "hintAvailable": false,
+          "hintDirection": null,
+          "hintRequests": 0,
+          "matchedOptimal": null,
+          "position": [
+            0,
+            0
+          ],
+          "projectedTotal": 10,
+          "seed": "FOG-7",
+          "status": "ready",
+          "steps": 0,
+          "topologyDigest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
+          "trailLength": 0
+        },
+        "timeWindow": {
+          "end": 15.35,
+          "start": 14.1
+        }
+      }
+    ],
+    "exactTiming": true,
+    "individualSemanticKeyEvents": true,
+    "manifest": "channel.production.json",
+    "maxActionLatenessSeconds": 0.8,
+    "maxSceneOverrunSeconds": 1.0,
+    "publicFixtureApi": false,
+    "scene": 0,
+    "segments": {
+      "detour": {
+        "assistance": true,
+        "directions": [
+          "S",
+          "E",
+          "E",
+          "S",
+          "S",
+          "W",
+          "W",
+          "S",
+          "S",
+          "E",
+          "N",
+          "E",
+          "E",
+          "S",
+          "W",
+          "E",
+          "E",
+          "N",
+          "N",
+          "E"
+        ],
+        "firstAction": 5,
+        "hintRequestedAfterAcceptedStep": 14,
+        "lastAction": 32
+      },
+      "optimal": {
+        "assistance": false,
+        "directions": [
+          "S",
+          "E",
+          "E",
+          "S",
+          "S",
+          "W",
+          "W",
+          "S",
+          "S",
+          "E",
+          "N",
+          "E",
+          "E",
+          "S",
+          "E",
+          "N",
+          "N",
+          "E"
+        ],
+        "firstAction": 39,
+        "lastAction": 56
+      }
+    },
+    "timingMode": "scheduled actions with bounded lateness"
+  },
+  "publication": "maze-fogline",
+  "schema": "fogline-survey-evidence/1.0",
+  "sourceBindings": [
+    {
+      "bytes": 175,
+      "path": ".gitattributes",
+      "sha256": "dd1a12958d7b329cc905589b071aefdba4c5d06e8ea643364e270668f0af03a5"
+    },
+    {
+      "bytes": 10972,
+      "path": "README.md",
+      "sha256": "56e3e8dd9738d77c269e0e497093c474bc28a3ef55620c95b171f663a900f410"
+    },
+    {
+      "bytes": 65498,
+      "path": "apps/maze-fogline.html",
+      "sha256": "ee10db849dd0891f70b9a593de6b37e02b4e204112df5eca3607f564cd64348d"
+    },
+    {
+      "bytes": 14509,
+      "path": "channel.production.json",
+      "sha256": "49d05d2b0025e4e065fcbd40c2788cce73e25317cafafc235cb56276be073875"
+    },
+    {
+      "bytes": 99451,
+      "path": "render.py",
+      "sha256": "b4de0ff85e147d57239181374ba5f68dd8ef636004b324fbc37841754c95acb7"
+    },
+    {
+      "bytes": 24939,
+      "path": "render_live.mjs",
+      "sha256": "c242da39daa11e1350a8dd697e0fe7c34ff6b9eb16c0bfe808a57d4cf92ad71a"
+    },
+    {
+      "bytes": 23317,
+      "path": "snapshots/canonical-states.json",
+      "sha256": "689d7e0fee0394c65227b248d2a41aceb14852e7afb82dc9be0ee89166b02030"
+    },
+    {
+      "bytes": 5563,
+      "path": "thumbs/maze-fogline.svg",
+      "sha256": "03a7dc5b3b7cec1c58c0f5802e97a3a8b10ae5399c531aa2ae63463f74dbc51e"
+    },
+    {
+      "bytes": 98168,
+      "path": "verify_dom.mjs",
+      "sha256": "85fb790715538f150ce4f962847be74904ba4f15ce1113b3e14bb907ed52b49a"
+    }
+  ]
+}

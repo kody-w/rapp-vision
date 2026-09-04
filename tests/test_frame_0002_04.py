@@ -660,6 +660,15 @@ class TestFrame000204BrowserExecution(unittest.TestCase):
             self.assertEqual(result["restoredX"], 292)
             self.assertEqual(result["resetX"], 0)
             self.assertEqual(result["browserErrors"], 0)
+            self.assertEqual(
+                result["cleanup"],
+                {
+                    "browserExited": True,
+                    "profileRemoved": True,
+                    "browserCloseError": None,
+                },
+            )
+            self.assertFalse(profile.exists())
         finally:
             shutil.rmtree(profile, ignore_errors=True)
 

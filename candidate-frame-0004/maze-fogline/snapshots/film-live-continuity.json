@@ -1,0 +1,738 @@
+{
+  "errors": {
+    "console": [],
+    "exceptions": [],
+    "externalRequests": []
+  },
+  "handoffFocusGate": {
+    "configuredDelayElapsed": true,
+    "delayMs": 175,
+    "everyTakeoverFrameStateGated": true,
+    "finalActiveId": "maze-board",
+    "pollingObserved": true,
+    "promptRetainedFocus": false,
+    "raceFramesInjected": [
+      253,
+      270
+    ],
+    "stateGateMatched": true,
+    "takeoverFramesChecked": 36
+  },
+  "masterSha256": "84667ad1052c7146ef66d831c917d1616fe965d12203ca7387825a4e90baf0b5",
+  "phases": [
+    {
+      "dom": {
+        "activeId": "challenge-link",
+        "assistance": "Survey charge locked · earn at 4",
+        "bestFinish": "18",
+        "challenge": {
+          "ariaInvalid": "false",
+          "fragment": "#challenge=eyJzZWVkIjoiUkFQUC00MiIsInRvcG9sb2d5RGlnZXN0IjoiMTI2YmY3MDQ0MGQzZWY1NDJjOGRjOTcyNTE3MjY5OTRlMGYyMzQyMjY3NWU4MzFmOTMzMDkyMzVhZTA4NWVkYSIsInJlZmVyZW5jZUxlbmd0aCI6MTh9",
+          "selectionEnd": 175,
+          "selectionStart": 0,
+          "status": "Challenge fragment copied. Contract has exactly three fields."
+        },
+        "digest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+        "exit": "closed · marked",
+        "film": {
+          "callout": "Copy-ready offline challenge",
+          "detail": "Seed · full digest · reference only",
+          "phase": "challenge"
+        },
+        "hint": {
+          "hidden": true,
+          "text": ""
+        },
+        "hintButton": {
+          "disabled": true,
+          "text": "Earn hint after 4 moves"
+        },
+        "reference": "18 moves",
+        "scroll": {
+          "height": 540,
+          "width": 960
+        },
+        "seed": "RAPP-42",
+        "status": "Seed RAPP-42 ready. Find the marked exit; reference length 18.",
+        "steps": "0 / 18",
+        "success": {
+          "hidden": true,
+          "text": ""
+        },
+        "trap": {
+          "hidden": true,
+          "text": ""
+        },
+        "viewport": {
+          "height": 540,
+          "width": 960
+        },
+        "visibleComponents": [
+          "#seed-value",
+          "#reference-value",
+          "#digest-value",
+          "#maze-board",
+          "#exit-beacon",
+          "#film-slate",
+          "#challenge-link",
+          "#challenge-status"
+        ]
+      },
+      "frame": 18,
+      "liveRgbSha256": "91a3c0217a2744e3939eabab382cb497ae87d42772adafe66c4db113f22735f0",
+      "masterRgbSha256": "91a3c0217a2744e3939eabab382cb497ae87d42772adafe66c4db113f22735f0",
+      "phase": "challenge",
+      "pixelExact": true,
+      "screenshotPngSha256": "2620f61193c22006748bea97467449df23951857fc7f9019c408129a6c5ac4b6",
+      "timestamp": 1.5
+    },
+    {
+      "dom": {
+        "activeId": "maze-board",
+        "assistance": "Earned · one bearing ready",
+        "bestFinish": "18",
+        "challenge": {
+          "ariaInvalid": "false",
+          "fragment": "#challenge=eyJzZWVkIjoiUkFQUC00MiIsInRvcG9sb2d5RGlnZXN0IjoiMTI2YmY3MDQ0MGQzZWY1NDJjOGRjOTcyNTE3MjY5OTRlMGYyMzQyMjY3NWU4MzFmOTMzMDkyMzVhZTA4NWVkYSIsInJlZmVyZW5jZUxlbmd0aCI6MTh9",
+          "selectionEnd": 175,
+          "selectionStart": 0,
+          "status": "Challenge fragment copied. Contract has exactly three fields."
+        },
+        "digest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+        "exit": "closed · marked",
+        "film": {
+          "callout": "Trap first · exit stays marked",
+          "detail": "Earn one bearing, then choose the knot",
+          "phase": "trap approach"
+        },
+        "hint": {
+          "hidden": true,
+          "text": ""
+        },
+        "hintButton": {
+          "disabled": false,
+          "text": "Request earned one-step hint"
+        },
+        "reference": "18 moves",
+        "scroll": {
+          "height": 540,
+          "width": 960
+        },
+        "seed": "RAPP-42",
+        "status": "E accepted. 10 steps; best finish 18.",
+        "steps": "10 / 18",
+        "success": {
+          "hidden": true,
+          "text": ""
+        },
+        "trap": {
+          "hidden": true,
+          "text": ""
+        },
+        "viewport": {
+          "height": 540,
+          "width": 960
+        },
+        "visibleComponents": [
+          "#seed-value",
+          "#reference-value",
+          "#digest-value",
+          "#maze-board",
+          "#exit-beacon",
+          "#film-slate"
+        ]
+      },
+      "frame": 54,
+      "liveRgbSha256": "1652c9c42b17375cde6f47fc0bf6fc9b3ac500cb5c91655104028876c8b5ebc1",
+      "masterRgbSha256": "1652c9c42b17375cde6f47fc0bf6fc9b3ac500cb5c91655104028876c8b5ebc1",
+      "phase": "trap-approach",
+      "pixelExact": true,
+      "screenshotPngSha256": "16ae45676a6120a3f9d3b2ef45c86d6d3443d670faa4f3f2aa6a3fc7b80224cd",
+      "timestamp": 4.5
+    },
+    {
+      "dom": {
+        "activeId": "maze-board",
+        "assistance": "ASSISTED · one bearing spent",
+        "bestFinish": "20",
+        "challenge": {
+          "ariaInvalid": "false",
+          "fragment": "#challenge=eyJzZWVkIjoiUkFQUC00MiIsInRvcG9sb2d5RGlnZXN0IjoiMTI2YmY3MDQ0MGQzZWY1NDJjOGRjOTcyNTE3MjY5OTRlMGYyMzQyMjY3NWU4MzFmOTMzMDkyMzVhZTA4NWVkYSIsInJlZmVyZW5jZUxlbmd0aCI6MTh9",
+          "selectionEnd": 175,
+          "selectionStart": 0,
+          "status": "Challenge fragment copied. Contract has exactly three fields."
+        },
+        "digest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+        "exit": "closed · marked",
+        "film": {
+          "callout": "Knot / trap +2 · best finish 20",
+          "detail": "Exit remains visible",
+          "phase": "trap plus two"
+        },
+        "hint": {
+          "hidden": true,
+          "text": ""
+        },
+        "hintButton": {
+          "disabled": true,
+          "text": "One-step hint spent"
+        },
+        "reference": "18 moves",
+        "scroll": {
+          "height": 540,
+          "width": 960
+        },
+        "seed": "RAPP-42",
+        "status": "Marked trap entered. Best finish is now 20 (+2); exit beacon remains marked.",
+        "steps": "15 / 18",
+        "success": {
+          "hidden": true,
+          "text": ""
+        },
+        "trap": {
+          "hidden": false,
+          "text": "MARKED TRAP · projected 20 · exit still marked"
+        },
+        "viewport": {
+          "height": 540,
+          "width": 960
+        },
+        "visibleComponents": [
+          "#seed-value",
+          "#reference-value",
+          "#digest-value",
+          "#maze-board",
+          "#exit-beacon",
+          "#film-slate",
+          "#trap-panel"
+        ]
+      },
+      "frame": 72,
+      "liveRgbSha256": "47508eb156ee1cda6368c88881a58555567df616c3365edf9a5ce2693834c906",
+      "masterRgbSha256": "47508eb156ee1cda6368c88881a58555567df616c3365edf9a5ce2693834c906",
+      "phase": "trap-plus-two",
+      "pixelExact": true,
+      "screenshotPngSha256": "4912ac0e66c1544d837c11aca86c9530700d2ea1f06e4b67bc29d419916f36d5",
+      "timestamp": 6
+    },
+    {
+      "dom": {
+        "activeId": "maze-board",
+        "assistance": "Survey charge locked · earn at 4",
+        "bestFinish": "18",
+        "challenge": {
+          "ariaInvalid": "false",
+          "fragment": "#challenge=eyJzZWVkIjoiUkFQUC00MiIsInRvcG9sb2d5RGlnZXN0IjoiMTI2YmY3MDQ0MGQzZWY1NDJjOGRjOTcyNTE3MjY5OTRlMGYyMzQyMjY3NWU4MzFmOTMzMDkyMzVhZTA4NWVkYSIsInJlZmVyZW5jZUxlbmd0aCI6MTh9",
+          "selectionEnd": 175,
+          "selectionStart": 0,
+          "status": "Three-field contract ready."
+        },
+        "digest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+        "exit": "closed · marked",
+        "film": {
+          "callout": "Exact reset after trap",
+          "detail": "Entrance · north · zero · empty trail",
+          "phase": "reset after trap"
+        },
+        "hint": {
+          "hidden": true,
+          "text": ""
+        },
+        "hintButton": {
+          "disabled": true,
+          "text": "Earn hint after 4 moves"
+        },
+        "reference": "18 moves",
+        "scroll": {
+          "height": 540,
+          "width": 960
+        },
+        "seed": "RAPP-42",
+        "status": "Seed RAPP-42 ready. Find the marked exit; reference length 18.",
+        "steps": "0 / 18",
+        "success": {
+          "hidden": true,
+          "text": ""
+        },
+        "trap": {
+          "hidden": true,
+          "text": ""
+        },
+        "viewport": {
+          "height": 540,
+          "width": 960
+        },
+        "visibleComponents": [
+          "#seed-value",
+          "#reference-value",
+          "#digest-value",
+          "#maze-board",
+          "#exit-beacon",
+          "#film-slate"
+        ]
+      },
+      "frame": 108,
+      "liveRgbSha256": "1611666d506b83a1f889e1a19d5b995e90969ae62dd2b7e7ff7111015f5fad3e",
+      "masterRgbSha256": "1611666d506b83a1f889e1a19d5b995e90969ae62dd2b7e7ff7111015f5fad3e",
+      "phase": "reset-after-trap",
+      "pixelExact": true,
+      "screenshotPngSha256": "3445346889852c99d26ab1b50ad2653e9bd5e49db1728e3658ba5a03d89d9f32",
+      "timestamp": 9
+    },
+    {
+      "dom": {
+        "activeId": "maze-board",
+        "assistance": "Earned · one bearing ready",
+        "bestFinish": "18",
+        "challenge": {
+          "ariaInvalid": "false",
+          "fragment": "#challenge=eyJzZWVkIjoiUkFQUC00MiIsInRvcG9sb2d5RGlnZXN0IjoiMTI2YmY3MDQ0MGQzZWY1NDJjOGRjOTcyNTE3MjY5OTRlMGYyMzQyMjY3NWU4MzFmOTMzMDkyMzVhZTA4NWVkYSIsInJlZmVyZW5jZUxlbmd0aCI6MTh9",
+          "selectionEnd": 175,
+          "selectionStart": 0,
+          "status": "Three-field contract ready."
+        },
+        "digest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+        "exit": "closed · marked",
+        "film": {
+          "callout": "Unassisted direct survey",
+          "detail": "18 individual Arrow-key moves",
+          "phase": "optimal 18"
+        },
+        "hint": {
+          "hidden": true,
+          "text": ""
+        },
+        "hintButton": {
+          "disabled": false,
+          "text": "Request earned one-step hint"
+        },
+        "reference": "18 moves",
+        "scroll": {
+          "height": 540,
+          "width": 960
+        },
+        "seed": "RAPP-42",
+        "status": "N accepted. 11 steps; best finish 18.",
+        "steps": "11 / 18",
+        "success": {
+          "hidden": true,
+          "text": ""
+        },
+        "trap": {
+          "hidden": true,
+          "text": ""
+        },
+        "viewport": {
+          "height": 540,
+          "width": 960
+        },
+        "visibleComponents": [
+          "#seed-value",
+          "#reference-value",
+          "#digest-value",
+          "#maze-board",
+          "#exit-beacon",
+          "#film-slate"
+        ]
+      },
+      "frame": 150,
+      "liveRgbSha256": "da4ba8a165fa76e1edb08f73fc16f830c44757c7389f3dd3c94ced9264fd2034",
+      "masterRgbSha256": "da4ba8a165fa76e1edb08f73fc16f830c44757c7389f3dd3c94ced9264fd2034",
+      "phase": "optimal-18",
+      "pixelExact": true,
+      "screenshotPngSha256": "17468011e69e28b3674bc6c5ee044c4330fc7445a639b973fe926da69f626bf7",
+      "timestamp": 12.5
+    },
+    {
+      "dom": {
+        "activeId": "maze-board",
+        "assistance": "UNASSISTED · completion locked",
+        "bestFinish": "18",
+        "challenge": {
+          "ariaInvalid": "false",
+          "fragment": "#challenge=eyJzZWVkIjoiUkFQUC00MiIsInRvcG9sb2d5RGlnZXN0IjoiMTI2YmY3MDQ0MGQzZWY1NDJjOGRjOTcyNTE3MjY5OTRlMGYyMzQyMjY3NWU4MzFmOTMzMDkyMzVhZTA4NWVkYSIsInJlZmVyZW5jZUxlbmd0aCI6MTh9",
+          "selectionEnd": 175,
+          "selectionStart": 0,
+          "status": "Three-field contract ready."
+        },
+        "digest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+        "exit": "open · marked",
+        "film": {
+          "callout": "Exit open · 18 = reference",
+          "detail": "Unassisted optimal",
+          "phase": "optimal complete"
+        },
+        "hint": {
+          "hidden": true,
+          "text": ""
+        },
+        "hintButton": {
+          "disabled": true,
+          "text": "Run complete · hint unavailable"
+        },
+        "reference": "18 moves",
+        "scroll": {
+          "height": 540,
+          "width": 960
+        },
+        "seed": "RAPP-42",
+        "status": "Exit open in 18. Direct survey matched the reference without assistance.",
+        "steps": "18 / 18",
+        "success": {
+          "hidden": false,
+          "text": "EXIT OPEN · 18 = reference · unassisted"
+        },
+        "trap": {
+          "hidden": true,
+          "text": ""
+        },
+        "viewport": {
+          "height": 540,
+          "width": 960
+        },
+        "visibleComponents": [
+          "#seed-value",
+          "#reference-value",
+          "#digest-value",
+          "#maze-board",
+          "#exit-beacon",
+          "#film-slate",
+          "#success-panel"
+        ]
+      },
+      "frame": 192,
+      "liveRgbSha256": "217c51b574c2f718a0f1890a3c9dc6715107fbac88f0f7f60478550b39946c8d",
+      "masterRgbSha256": "217c51b574c2f718a0f1890a3c9dc6715107fbac88f0f7f60478550b39946c8d",
+      "phase": "optimal-complete",
+      "pixelExact": true,
+      "screenshotPngSha256": "f8aa980930a13e561ad18db88cfacb998923aa7a4d57699eb3ebc0d38ef527bb",
+      "timestamp": 16
+    },
+    {
+      "dom": {
+        "activeId": "maze-board",
+        "assistance": "Survey charge locked · earn at 4",
+        "bestFinish": "18",
+        "challenge": {
+          "ariaInvalid": "false",
+          "fragment": "#challenge=eyJzZWVkIjoiUkFQUC00MiIsInRvcG9sb2d5RGlnZXN0IjoiMTI2YmY3MDQ0MGQzZWY1NDJjOGRjOTcyNTE3MjY5OTRlMGYyMzQyMjY3NWU4MzFmOTMzMDkyMzVhZTA4NWVkYSIsInJlZmVyZW5jZUxlbmd0aCI6MTh9",
+          "selectionEnd": 175,
+          "selectionStart": 0,
+          "status": "Three-field contract ready."
+        },
+        "digest": "126bf70440d3ef542c8dc97251726994e0f23422675e831f93309235ae085eda",
+        "exit": "closed · marked",
+        "film": {
+          "callout": "Exact reset repeats",
+          "detail": "Closed exit · zero · empty trail",
+          "phase": "reset after optimal"
+        },
+        "hint": {
+          "hidden": true,
+          "text": ""
+        },
+        "hintButton": {
+          "disabled": true,
+          "text": "Earn hint after 4 moves"
+        },
+        "reference": "18 moves",
+        "scroll": {
+          "height": 540,
+          "width": 960
+        },
+        "seed": "RAPP-42",
+        "status": "Seed RAPP-42 ready. Find the marked exit; reference length 18.",
+        "steps": "0 / 18",
+        "success": {
+          "hidden": true,
+          "text": ""
+        },
+        "trap": {
+          "hidden": true,
+          "text": ""
+        },
+        "viewport": {
+          "height": 540,
+          "width": 960
+        },
+        "visibleComponents": [
+          "#seed-value",
+          "#reference-value",
+          "#digest-value",
+          "#maze-board",
+          "#exit-beacon",
+          "#film-slate"
+        ]
+      },
+      "frame": 216,
+      "liveRgbSha256": "41b706254634311149ea17e74f00a9c2043344c5c429c136d1c6af061c9ff479",
+      "masterRgbSha256": "41b706254634311149ea17e74f00a9c2043344c5c429c136d1c6af061c9ff479",
+      "phase": "reset-after-optimal",
+      "pixelExact": true,
+      "screenshotPngSha256": "2d8ba5995a0547e038303883dd3417c32aa2fb9ff6dcacc891c64caf8da993a0",
+      "timestamp": 18
+    },
+    {
+      "dom": {
+        "activeId": "maze-board",
+        "assistance": "Survey charge locked · earn at 4",
+        "bestFinish": "10",
+        "challenge": {
+          "ariaInvalid": "false",
+          "fragment": "#challenge=eyJzZWVkIjoiRk9HLTciLCJ0b3BvbG9neURpZ2VzdCI6ImRkZGI2MTgzNWVhZjRhOTZmZTRlMzIyYzBkMzYzOTgxODU2ZTc1MmI3MjJlZmM4YWY2Y2Q2YWI5NDA0NWM4NTYiLCJyZWZlcmVuY2VMZW5ndGgiOjEwfQ",
+          "selectionEnd": 173,
+          "selectionStart": 173,
+          "status": "Challenge loaded from fragment · zero steps · empty trail."
+        },
+        "digest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
+        "exit": "closed · marked",
+        "film": {
+          "callout": "Untouched FOG-7 challenge",
+          "detail": "Zero steps · no assistance",
+          "phase": "alternate fresh"
+        },
+        "hint": {
+          "hidden": true,
+          "text": ""
+        },
+        "hintButton": {
+          "disabled": true,
+          "text": "Earn hint after 4 moves"
+        },
+        "reference": "10 moves",
+        "scroll": {
+          "height": 540,
+          "width": 960
+        },
+        "seed": "FOG-7",
+        "status": "Seed FOG-7 ready. Find the marked exit; reference length 10.",
+        "steps": "0 / 10",
+        "success": {
+          "hidden": true,
+          "text": ""
+        },
+        "trap": {
+          "hidden": true,
+          "text": ""
+        },
+        "viewport": {
+          "height": 540,
+          "width": 960
+        },
+        "visibleComponents": [
+          "#seed-value",
+          "#reference-value",
+          "#digest-value",
+          "#maze-board",
+          "#exit-beacon",
+          "#film-slate",
+          "#takeover-prompt"
+        ]
+      },
+      "frame": 240,
+      "liveRgbSha256": "4cb920adcdbbf37384d1cb92e8929eee886b9813ff59fe529bb9616bffdc7aa0",
+      "masterRgbSha256": "4cb920adcdbbf37384d1cb92e8929eee886b9813ff59fe529bb9616bffdc7aa0",
+      "phase": "alternate-fresh",
+      "pixelExact": true,
+      "screenshotPngSha256": "da4210a72a61194c41e7f15145bba6d36bfc50cf6eff97fc09f781f452c35a85",
+      "timestamp": 20
+    },
+    {
+      "dom": {
+        "activeId": "maze-board",
+        "assistance": "Survey charge locked · earn at 4",
+        "bestFinish": "10",
+        "challenge": {
+          "ariaInvalid": "false",
+          "fragment": "#challenge=eyJzZWVkIjoiRk9HLTciLCJ0b3BvbG9neURpZ2VzdCI6ImRkZGI2MTgzNWVhZjRhOTZmZTRlMzIyYzBkMzYzOTgxODU2ZTc1MmI3MjJlZmM4YWY2Y2Q2YWI5NDA0NWM4NTYiLCJyZWZlcmVuY2VMZW5ndGgiOjEwfQ",
+          "selectionEnd": 173,
+          "selectionStart": 173,
+          "status": "Challenge loaded from fragment · zero steps · empty trail."
+        },
+        "digest": "dddb61835eaf4a96fe4e322c0d363981856e752b722efc8af6cd6ab94045c856",
+        "exit": "closed · marked",
+        "film": {
+          "callout": "Your turn · movement focused",
+          "detail": "FOG-7 · Arrow or WASD now",
+          "phase": "takeover"
+        },
+        "hint": {
+          "hidden": true,
+          "text": ""
+        },
+        "hintButton": {
+          "disabled": true,
+          "text": "Earn hint after 4 moves"
+        },
+        "reference": "10 moves",
+        "scroll": {
+          "height": 540,
+          "width": 960
+        },
+        "seed": "FOG-7",
+        "status": "Seed FOG-7 ready. Find the marked exit; reference length 10.",
+        "steps": "0 / 10",
+        "success": {
+          "hidden": true,
+          "text": ""
+        },
+        "trap": {
+          "hidden": true,
+          "text": ""
+        },
+        "viewport": {
+          "height": 540,
+          "width": 960
+        },
+        "visibleComponents": [
+          "#seed-value",
+          "#reference-value",
+          "#digest-value",
+          "#maze-board",
+          "#exit-beacon",
+          "#film-slate",
+          "#takeover-prompt"
+        ]
+      },
+      "frame": 270,
+      "liveRgbSha256": "a44269205d6eb2a9af4b1a50b38bda036a3b4d4f2b87ae53ce8d1d0cde300682",
+      "masterRgbSha256": "a44269205d6eb2a9af4b1a50b38bda036a3b4d4f2b87ae53ce8d1d0cde300682",
+      "phase": "takeover",
+      "pixelExact": true,
+      "screenshotPngSha256": "f191b7711fc472779b8955fc1e6c935c3da57c44a60846ddf7e12576bdee984d",
+      "timestamp": 22.5
+    }
+  ],
+  "pixelBinding": {
+    "algorithm": "sha256-rgb24",
+    "exactAtEveryDeclaredPhase": true,
+    "height": 540,
+    "sampleCount": 9,
+    "width": 960
+  },
+  "renderer": {
+    "app": "apps/maze-fogline.html?film=1",
+    "fps": 12,
+    "frames": 288,
+    "height": 540,
+    "kind": "live-app-chromium-capture",
+    "width": 960
+  },
+  "schema": "fogline-survey-film-live-continuity/1.0",
+  "sharedStyle": {
+    "bodyFontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace",
+    "buttonFontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace",
+    "components": [
+      {
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "classes": [
+          "proof-strip"
+        ],
+        "color": "rgb(232, 241, 228)",
+        "fontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace",
+        "fontSize": 14,
+        "role": null,
+        "selector": ".proof-strip",
+        "tag": "section"
+      },
+      {
+        "backgroundColor": "rgb(11, 31, 31)",
+        "borderRadius": "0px",
+        "classes": [
+          "map-card"
+        ],
+        "color": "rgb(232, 241, 228)",
+        "fontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace",
+        "fontSize": 14,
+        "role": null,
+        "selector": ".map-card",
+        "tag": "section"
+      },
+      {
+        "backgroundColor": "rgb(7, 16, 18)",
+        "borderRadius": "0px",
+        "classes": [],
+        "color": "rgb(232, 241, 228)",
+        "fontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace",
+        "fontSize": 14,
+        "role": "application",
+        "selector": "#maze-board",
+        "tag": "div"
+      },
+      {
+        "backgroundColor": "rgb(11, 31, 31)",
+        "borderRadius": "0px",
+        "classes": [
+          "panel"
+        ],
+        "color": "rgb(232, 241, 228)",
+        "fontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace",
+        "fontSize": 14,
+        "role": null,
+        "selector": ".panel",
+        "tag": "section"
+      },
+      {
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "classes": [
+          "challenge-card"
+        ],
+        "color": "rgb(232, 241, 228)",
+        "fontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace",
+        "fontSize": 14,
+        "role": null,
+        "selector": ".challenge-card",
+        "tag": "section"
+      },
+      {
+        "backgroundColor": "rgb(11, 31, 31)",
+        "borderRadius": "0px",
+        "classes": [],
+        "color": "rgb(232, 241, 228)",
+        "fontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace",
+        "fontSize": 14,
+        "role": null,
+        "selector": "#film-slate",
+        "tag": "section"
+      }
+    ],
+    "criticalTypography": {
+      "#challenge-status": {
+        "fontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace",
+        "fontSize": 22,
+        "fontWeight": "900"
+      },
+      "#digest-value": {
+        "fontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace",
+        "fontSize": 22,
+        "fontWeight": "800"
+      },
+      "#film-callout": {
+        "fontFamily": "system-ui, sans-serif",
+        "fontSize": 22,
+        "fontWeight": "700"
+      },
+      "#film-detail": {
+        "fontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace",
+        "fontSize": 13,
+        "fontWeight": "400"
+      },
+      "#reference-value": {
+        "fontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace",
+        "fontSize": 22,
+        "fontWeight": "800"
+      },
+      "#seed-value": {
+        "fontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace",
+        "fontSize": 22,
+        "fontWeight": "800"
+      }
+    },
+    "fontsReady": "loaded",
+    "headingFontFamily": "system-ui, sans-serif",
+    "outputFontFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace"
+  },
+  "sourceAppSha256": "ee10db849dd0891f70b9a593de6b37e02b4e204112df5eca3607f564cd64348d"
+}

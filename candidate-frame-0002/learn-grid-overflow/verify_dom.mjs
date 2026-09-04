@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { readFile, rm } from "node:fs/promises";
+import { readFile, rm, stat } from "node:fs/promises";
 import { createServer } from "node:net";
 import { pathToFileURL } from "node:url";
 
@@ -25,6 +25,10 @@ const debugPort = await new Promise((resolvePort, rejectPort) => {
 });
 const browser = spawn(browserPath, [
   "--headless=new",
+  "--disable-background-networking",
+  "--disable-breakpad",
+  "--disable-crash-reporter",
+  "--disable-features=Crashpad",
   "--disable-gpu",
   "--disable-dev-shm-usage",
   "--no-sandbox",
@@ -41,6 +45,34 @@ browser.once("error", error => {
 });
 
 const delay = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+const browserRunning = () =>
+  browser.exitCode === null && browser.signalCode === null;
+
+function waitForBrowserExit(timeout) {
+  if (!browserRunning()) return Promise.resolve(true);
+  return new Promise(resolve => {
+    const onExit = () => {
+      clearTimeout(timer);
+      resolve(true);
+    };
+    const timer = setTimeout(() => {
+      browser.off("exit", onExit);
+      resolve(false);
+    }, timeout);
+    browser.once("exit", onExit);
+    if (!browserRunning()) onExit();
+  });
+}
+
+async function pathExists(path) {
+  try {
+    await stat(path);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") return false;
+    throw error;
+  }
+}
 
 async function waitForActivePort(timeout = 45000) {
   const deadline = Date.now() + timeout;
@@ -122,6 +154,8 @@ class Cdp {
 }
 
 let cdp;
+let report = null;
+let cleanup = null;
 const browserErrors = [];
 
 async function evaluate(expression) {
@@ -336,7 +370,7 @@ try {
   assert.equal(resetState.x, 0);
   assert.deepEqual(browserErrors, []);
 
-  console.log(JSON.stringify({
+  report = {
     browser: browserVersion.product,
     opening: `${opening.scrollWidth}>${opening.clientWidth}`,
     fixed320: `${claims.get("positive").expectedState.checks["320"].scrollWidth}=${claims.get("positive").expectedState.checks["320"].clientWidth}`,
@@ -346,17 +380,37 @@ try {
     restoredX: claims.get("failure").expectedState.x,
     resetX: resetState.x,
     browserErrors: browserErrors.length,
-  }));
+  };
 } finally {
-  if (cdp) cdp.close();
-  browser.kill();
-  await delay(750);
-  try {
-    await rm(profilePath, {
-      recursive: true,
-      force: true,
-      maxRetries: 12,
-      retryDelay: 150,
-    });
-  } catch {}
+  let browserCloseError = null;
+  if (cdp) {
+    try {
+      await cdp.command("Browser.close");
+    } catch (error) {
+      browserCloseError = error.message;
+    }
+    cdp.close();
+  }
+  let browserExited = await waitForBrowserExit(5_000);
+  if (!browserExited && browserRunning()) {
+    browser.kill();
+    browserExited = await waitForBrowserExit(5_000);
+  }
+  if (!browserExited && browserRunning()) {
+    browser.kill("SIGKILL");
+    browserExited = await waitForBrowserExit(5_000);
+  }
+  assert.equal(browserExited, true, "browser process did not terminate");
+  await rm(profilePath, {
+    recursive: true,
+    force: true,
+    maxRetries: 12,
+    retryDelay: 150,
+  });
+  const profileRemoved = !(await pathExists(profilePath));
+  assert.equal(profileRemoved, true, "browser profile cleanup failed");
+  cleanup = { browserExited, profileRemoved, browserCloseError };
 }
+
+assert.ok(report, "grid overflow browser report was not produced");
+console.log(JSON.stringify({ ...report, cleanup }));

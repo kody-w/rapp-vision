@@ -61,9 +61,9 @@
       "sha256": "265c77f2306324e89b0439e2715b7daa77eb575fa34aa18996b324b8e0961c4c"
     },
     "verify_dom.mjs": {
-      "bytes": 12091,
+      "bytes": 13694,
       "path": "verify_dom.mjs",
-      "sha256": "896680390490d136c3476b9f87d65b88416b878d69b3147a6ad512c63bc3ae76"
+      "sha256": "665834cf7627b96a4343bdee47826f89e29bf49cbec1cc50a48edcbae7107a86"
     }
   },
   "channel": "candidate-frame-0002-04",
