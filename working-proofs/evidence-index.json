@@ -95,11 +95,11 @@
       "commission_id": "play-seeded-maze-return",
       "delivery": {
         "path": "../candidate-frame-0004/maze-fogline/delivery.json",
-        "sha256": "914bd6d6c5352f74ebea41af46f03e758250e09376470dbe6521f44efdb7344f"
+        "sha256": "30cdd6fd3b367825da50e164cd12c1bc7346a7fa11f18e5d7294241bd0d27347"
       },
       "evidence": {
         "path": "../candidate-frame-0004/maze-fogline/evidence.json",
-        "sha256": "7c53937d7ec505795c9cd5726e509c9cd4b6939913eea64358314dd8b32dd9c7"
+        "sha256": "09b0bef17f52b210fb71beb75720e0cb508d941d7e5c6cc7bb05baf5ed504bb9"
       },
       "publication_id": "maze-fogline",
       "source_candidate": "../candidate-frame-0004/maze-fogline",

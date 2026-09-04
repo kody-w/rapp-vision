@@ -19,7 +19,7 @@
       "evidenceIndex": {
         "path": "working-proofs/evidence-index.json",
         "bytes": 5088,
-        "sha256": "3e3cf6b0c6f18c92deb25bf0895ff3b4f9c371890aca18ed306c07f1de3e3285"
+        "sha256": "0acd4eba10483e60826487b8cc5013dd25e6f7067c56d9c4dd7704c60bba19ff"
       }
     },
     "publications": [
@@ -140,7 +140,7 @@
         "evidence": {
           "path": "candidate-frame-0004/maze-fogline/evidence.json",
           "bytes": 51738,
-          "sha256": "7c53937d7ec505795c9cd5726e509c9cd4b6939913eea64358314dd8b32dd9c7"
+          "sha256": "09b0bef17f52b210fb71beb75720e0cb508d941d7e5c6cc7bb05baf5ed504bb9"
         }
       }
     ]
@@ -229,8 +229,8 @@
       },
       "screenshot": {
         "path": "learn-grid-overflow-desktop-positive.png",
-        "bytes": 72757,
-        "sha256": "4794dd764f08b104874dfbc1d3c0fb82d174e4a349ebfeb6c9671e3b7963e9da",
+        "bytes": 72606,
+        "sha256": "064e4ab8164816deb08baed0b579c44735a5c7549bc395964d42223c5b667394",
         "width": 962,
         "height": 601
       }
@@ -278,8 +278,8 @@
       },
       "screenshot": {
         "path": "learn-grid-overflow-desktop-failure.png",
-        "bytes": 74752,
-        "sha256": "9c237d2f6ab7f0b7baa267806a78d198bfb229295a60dbb7eb6271313dcaf6e9",
+        "bytes": 74627,
+        "sha256": "8413b0e9b291513ee88b95b6c790210de9f2d29b9ec79eddf1f6dd49d8d34fbd",
         "width": 962,
         "height": 601
       }
@@ -425,8 +425,8 @@
       },
       "screenshot": {
         "path": "use-keyboard-invoice-triage-desktop-rejected.png",
-        "bytes": 112479,
-        "sha256": "9c88353a6978c94c6004d295a4174293fca6d73237574cae01127d516da98b9a",
+        "bytes": 107931,
+        "sha256": "877524292edfdda81db297ad003429db85439cd9f5a4f5dbc79d2927265d3939",
         "width": 962,
         "height": 601
       }
@@ -523,8 +523,8 @@
       },
       "screenshot": {
         "path": "create-vector-icon-system-desktop-positive.png",
-        "bytes": 125597,
-        "sha256": "d9faea9848d2458f1ad8dacd7f7a595d3aa345658b698e5ac61f642ff4410c44",
+        "bytes": 124576,
+        "sha256": "d0a34f97f8015b1ce9b33cea6d265a597212d0daa797971a7365ff7f65fe1ced",
         "width": 962,
         "height": 601
       }
@@ -572,8 +572,8 @@
       },
       "screenshot": {
         "path": "create-vector-icon-system-desktop-rejected.png",
-        "bytes": 131001,
-        "sha256": "0c772504277d696edbf11a042794684b583fcf22edee191e4da41863ce9351fc",
+        "bytes": 130131,
+        "sha256": "29b85f9dd98e51cb44f653916dd197c528c43dbda4704c563df1639dc76e3155",
         "width": 962,
         "height": 601
       }
@@ -621,8 +621,8 @@
       },
       "screenshot": {
         "path": "create-vector-icon-system-desktop-reset.png",
-        "bytes": 95168,
-        "sha256": "d8d8f88d85c2abeab7c300ffbe9a1371ab1f5d54c3b7fb17f220068ca14fd36b",
+        "bytes": 93987,
+        "sha256": "12b98ab9c9c78b8fef93db098b5fc80f609ae1f23e9f50f94fc8d0d4178b4e0d",
         "width": 962,
         "height": 601
       }
@@ -670,8 +670,8 @@
       },
       "screenshot": {
         "path": "ecosystem-island-threshold-desktop-stable.png",
-        "bytes": 96445,
-        "sha256": "a8f697b1eba21419a0d4bde589ebfad1740a94a22a092cae42072cad99ac4366",
+        "bytes": 95023,
+        "sha256": "f9bc707757fdcd34ff55e0f57b6a3315b8ae6993fe81dfb438837ee213a65f1f",
         "width": 962,
         "height": 601
       }
@@ -768,8 +768,8 @@
       },
       "screenshot": {
         "path": "ecosystem-island-threshold-desktop-export.png",
-        "bytes": 104297,
-        "sha256": "98bd635127daf303779d4ef1de3982e2d6f4e04bd9317233f80f93aaec7de1d1",
+        "bytes": 102820,
+        "sha256": "310c0d896f19810daaf5e03fe6d6efd7c5f58a6292e02e21caef60b412be2757",
         "width": 962,
         "height": 601
       }
@@ -817,8 +817,8 @@
       },
       "screenshot": {
         "path": "ecosystem-island-threshold-desktop-reset.png",
-        "bytes": 93564,
-        "sha256": "98be17bd5af47658a03052bb72a3427d97a46221693790ebc2fecbfbca62f2bc",
+        "bytes": 92061,
+        "sha256": "e22caf3cd6876b9e70f717c4bdfa91b4c99ba2aaba17115e63910cacbdc352de",
         "width": 962,
         "height": 601
       }
@@ -866,8 +866,8 @@
       },
       "screenshot": {
         "path": "ecosystem-island-threshold-desktop-your-turn.png",
-        "bytes": 86804,
-        "sha256": "d60630c14e49bcacf939efd3be93994f8c9a3202796425192df81babb1907719",
+        "bytes": 85320,
+        "sha256": "031cf81b15bd407e56c9be910b0909db70d013de72244d027778e76e1ccf622f",
         "width": 962,
         "height": 601
       }
@@ -915,8 +915,8 @@
       },
       "screenshot": {
         "path": "explore-archive-map-contrast-desktop-positive.png",
-        "bytes": 96624,
-        "sha256": "38500c90efca35baecba03edbf1d697913efa3d8ec16e167cf1daf1711468a96",
+        "bytes": 96578,
+        "sha256": "941a92a676249c18b1b2abe085638e8ce481bbe0eafa4776ee4b76ef41f6d967",
         "width": 962,
         "height": 601
       }
@@ -964,8 +964,8 @@
       },
       "screenshot": {
         "path": "explore-archive-map-contrast-desktop-failure.png",
-        "bytes": 118221,
-        "sha256": "eebb7e6c1e46d9bd9e56c01d072eed2b562082d2960d803d639a9ef7cd1972d1",
+        "bytes": 118168,
+        "sha256": "56278ca3ef1b1ba46efb5b74a8e376d1f76f3f46052949dbf798b8bbf595fbab",
         "width": 962,
         "height": 601
       }
@@ -1013,8 +1013,8 @@
       },
       "screenshot": {
         "path": "explore-archive-map-contrast-desktop-reset.png",
-        "bytes": 100459,
-        "sha256": "4b7f51608d2d971115c6630f9a299d65a53e2e9c13ef121e1fba2ef8fa2804bc",
+        "bytes": 100425,
+        "sha256": "9d926ceacb16a835630dea37650aef425a0efbf9cf9f9301dd283a45fc85c1fa",
         "width": 962,
         "height": 601
       }
