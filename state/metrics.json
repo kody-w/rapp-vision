@@ -33,6 +33,25 @@
     "CONFUSED": "unclear"
   },
   "videos": {
+    "after-midnight-maps/after-midnight-maps": {
+      "channel": "after-midnight-maps",
+      "video": "after-midnight-maps",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/64",
+      "number": 64
+    },
     "arcade/arcade-cold-boot": {
       "channel": "arcade",
       "video": "arcade-cold-boot",
@@ -146,6 +165,25 @@
       },
       "url": "https://github.com/kody-w/rapp-vision/discussions/18",
       "number": 18
+    },
+    "creature-office-hours/creature-office-hours": {
+      "channel": "creature-office-hours",
+      "video": "creature-office-hours",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/65",
+      "number": 65
     },
     "dada-collective/exactly-eighteen-thousand": {
       "channel": "dada-collective",
@@ -375,6 +413,25 @@
       "url": "https://github.com/kody-w/rapp-vision/discussions/59",
       "number": 59
     },
+    "kitchen-table-physics/push-friction-motion": {
+      "channel": "kitchen-table-physics",
+      "video": "push-friction-motion",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/66",
+      "number": 66
+    },
     "learnwithkody/lwk-apex-live": {
       "channel": "learnwithkody",
       "video": "lwk-apex-live",
@@ -507,6 +564,63 @@
       },
       "url": "https://github.com/kody-w/rapp-vision/discussions/25",
       "number": 25
+    },
+    "new-way-of-work/s1e01-scout-builds-an-ai-worker-that-connects-to-the-outside-world": {
+      "channel": "new-way-of-work",
+      "video": "s1e01-scout-builds-an-ai-worker-that-connects-to-the-outside-world",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/83",
+      "number": 83
+    },
+    "null-arcade/null-arcade-integrity-run": {
+      "channel": "null-arcade",
+      "video": "null-arcade-integrity-run",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/67",
+      "number": 67
+    },
+    "one-minute-orchestra/one-minute-orchestra-proof-in-four-voices": {
+      "channel": "one-minute-orchestra",
+      "video": "one-minute-orchestra-proof-in-four-voices",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/68",
+      "number": 68
     },
     "openrappter-training/openrappter-m1-install-first-run": {
       "channel": "openrappter-training",
@@ -660,6 +774,25 @@
       "url": "https://github.com/kody-w/rapp-vision/discussions/9",
       "number": 9
     },
+    "patch-notes-tomorrow/civic-os-12": {
+      "channel": "patch-notes-tomorrow",
+      "video": "civic-os-12",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/69",
+      "number": 69
+    },
     "prompt-frontier/prompt-frontier-founding": {
       "channel": "prompt-frontier",
       "video": "prompt-frontier-founding",
@@ -679,9 +812,9 @@
       "url": "https://github.com/kody-w/rapp-vision/discussions/37",
       "number": 37
     },
-    "rappterbox/aivms-watch-their-own-film": {
-      "channel": "rappterbox",
-      "video": "aivms-watch-their-own-film",
+    "receipt-culture/receipt-culture-one-receipt": {
+      "channel": "receipt-culture",
+      "video": "receipt-culture-one-receipt",
       "upvotes": 0,
       "watched": 0,
       "score": 0,
@@ -695,12 +828,12 @@
         "too_long": 0,
         "confusing": 0
       },
-      "url": "https://github.com/kody-w/rapp-vision/discussions/39",
-      "number": 39
+      "url": "https://github.com/kody-w/rapp-vision/discussions/70",
+      "number": 70
     },
-    "rappterbox/genesis-251-founding-four-draft": {
-      "channel": "rappterbox",
-      "video": "genesis-251-founding-four-draft",
+    "repair-manual/machine-knows-the-fit": {
+      "channel": "repair-manual",
+      "video": "machine-knows-the-fit",
       "upvotes": 0,
       "watched": 0,
       "score": 0,
@@ -714,27 +847,8 @@
         "too_long": 0,
         "confusing": 0
       },
-      "url": "https://github.com/kody-w/rapp-vision/discussions/60",
-      "number": 60
-    },
-    "rappterbox/veridion-proof-trailer": {
-      "channel": "rappterbox",
-      "video": "veridion-proof-trailer",
-      "upvotes": 0,
-      "watched": 0,
-      "score": 0,
-      "comments": 0,
-      "signals": {
-        "watched_it_all": 0,
-        "learned_something": 0,
-        "want_more_like_this": 0,
-        "tried_it_myself": 0,
-        "saved_for_later": 0,
-        "too_long": 0,
-        "confusing": 0
-      },
-      "url": "https://github.com/kody-w/rapp-vision/discussions/40",
-      "number": 40
+      "url": "https://github.com/kody-w/rapp-vision/discussions/71",
+      "number": 71
     },
     "rock-tumbler/rock-tumbler-reel": {
       "channel": "rock-tumbler",
@@ -850,6 +964,101 @@
       "url": "https://github.com/kody-w/rapp-vision/discussions/28",
       "number": 28
     },
+    "signal-garden/signal-garden-pulse-lag": {
+      "channel": "signal-garden",
+      "video": "signal-garden-pulse-lag",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/72",
+      "number": 72
+    },
+    "tiny-bureau/tiny-bureau-five-fixture-gap": {
+      "channel": "tiny-bureau",
+      "video": "tiny-bureau-five-fixture-gap",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/73",
+      "number": 73
+    },
+    "tiny-systems/four-and-a-half-to-one": {
+      "channel": "tiny-systems",
+      "video": "four-and-a-half-to-one",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/84",
+      "number": 84
+    },
+    "tiny-systems/one-block-three-trains": {
+      "channel": "tiny-systems",
+      "video": "one-block-three-trains",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/85",
+      "number": 85
+    },
+    "tiny-systems/three-tokens-make-nine": {
+      "channel": "tiny-systems",
+      "video": "three-tokens-make-nine",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/86",
+      "number": 86
+    },
     "tumbler/tumble-2026-08-04": {
       "channel": "tumbler",
       "video": "tumble-2026-08-04",
@@ -925,9 +1134,141 @@
       },
       "url": "https://github.com/kody-w/rapp-vision/discussions/31",
       "number": 31
+    },
+    "working-proofs/create-vector-icon-system": {
+      "channel": "working-proofs",
+      "video": "create-vector-icon-system",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/87",
+      "number": 87
+    },
+    "working-proofs/ecosystem-island-threshold": {
+      "channel": "working-proofs",
+      "video": "ecosystem-island-threshold",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/92",
+      "number": 92
+    },
+    "working-proofs/explore-archive-map-contrast": {
+      "channel": "working-proofs",
+      "video": "explore-archive-map-contrast",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/93",
+      "number": 93
+    },
+    "working-proofs/learn-grid-overflow": {
+      "channel": "working-proofs",
+      "video": "learn-grid-overflow",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/88",
+      "number": 88
+    },
+    "working-proofs/maze-fogline": {
+      "channel": "working-proofs",
+      "video": "maze-fogline",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/94",
+      "number": 94
+    },
+    "working-proofs/use-keyboard-invoice-triage": {
+      "channel": "working-proofs",
+      "video": "use-keyboard-invoice-triage",
+      "upvotes": 0,
+      "watched": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "watched_it_all": 0,
+        "learned_something": 0,
+        "want_more_like_this": 0,
+        "tried_it_myself": 0,
+        "saved_for_later": 0,
+        "too_long": 0,
+        "confusing": 0
+      },
+      "url": "https://github.com/kody-w/rapp-vision/discussions/89",
+      "number": 89
     }
   },
   "editorial": {
+    "after-midnight-maps/after-midnight-maps": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "rough",
+      "checks_passed": 6,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [
+        "1 of 1 app scene(s) declare no ready{selector|text}; their action times run from scene start."
+      ],
+      "record_sha8": "da76d326",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
     "arcade/arcade-cold-boot": {
       "by": "rapp-vision-rubric/1.0",
       "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
@@ -938,7 +1279,7 @@
       "notes": [
         "1 of 6 app scene(s) declare no ready{selector|text}; their action times run from scene start."
       ],
-      "record_sha8": "c3c998dc",
+      "record_sha8": "2ddbfd1e",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -954,7 +1295,7 @@
       "checks_total": 7,
       "not_applicable": 1,
       "notes": [],
-      "record_sha8": "90c88551",
+      "record_sha8": "4e65ebe9",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -970,7 +1311,7 @@
       "checks_total": 6,
       "not_applicable": 2,
       "notes": [],
-      "record_sha8": "14ba2c48",
+      "record_sha8": "dd95646c",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -988,7 +1329,7 @@
       "notes": [
         "Width/height missing — the player cannot lay the card out."
       ],
-      "record_sha8": "913413ef",
+      "record_sha8": "2f4104b4",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1006,7 +1347,7 @@
       "notes": [
         "Width/height missing — the player cannot lay the card out."
       ],
-      "record_sha8": "05855f35",
+      "record_sha8": "6de68584",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1022,7 +1363,27 @@
       "checks_total": 7,
       "not_applicable": 1,
       "notes": [],
-      "record_sha8": "156363b4",
+      "record_sha8": "4c3ddb38",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "creature-office-hours/creature-office-hours": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "rough",
+      "checks_passed": 4,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [
+        "No thumb (or poster) — the card renders empty in every grid.",
+        "1 of 1 app scene(s) declare no ready{selector|text}; their action times run from scene start.",
+        "No tags — undiscoverable."
+      ],
+      "record_sha8": "80b51fce",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1040,7 +1401,7 @@
       "notes": [
         "1 of 1 app scene(s) declare no ready{selector|text}; their action times run from scene start."
       ],
-      "record_sha8": "7ba385e5",
+      "record_sha8": "6b5032e2",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1058,7 +1419,7 @@
       "notes": [
         "1 of 1 app scene(s) declare no ready{selector|text}; their action times run from scene start."
       ],
-      "record_sha8": "520b65b5",
+      "record_sha8": "ac97a533",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1077,7 +1438,7 @@
         "Description is 59 characters; under 60 it tells a viewer nothing.",
         "1 of 1 app scene(s) declare no ready{selector|text}; their action times run from scene start."
       ],
-      "record_sha8": "9aad7f66",
+      "record_sha8": "5a00dff0",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1095,7 +1456,7 @@
       "notes": [
         "1 of 1 app scene(s) declare no ready{selector|text}; their action times run from scene start."
       ],
-      "record_sha8": "e4352d2a",
+      "record_sha8": "55e1c844",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1111,7 +1472,7 @@
       "checks_total": 6,
       "not_applicable": 2,
       "notes": [],
-      "record_sha8": "f8b0dd6d",
+      "record_sha8": "f8b1996d",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1127,7 +1488,7 @@
       "checks_total": 6,
       "not_applicable": 2,
       "notes": [],
-      "record_sha8": "961bdf89",
+      "record_sha8": "a61fcffb",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1143,7 +1504,7 @@
       "checks_total": 5,
       "not_applicable": 3,
       "notes": [],
-      "record_sha8": "af72f500",
+      "record_sha8": "54c333b4",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1155,11 +1516,11 @@
       "by": "rapp-vision-rubric/1.0",
       "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
       "verdict": "ready",
-      "checks_passed": 6,
-      "checks_total": 6,
-      "not_applicable": 2,
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
       "notes": [],
-      "record_sha8": "9a432a8e",
+      "record_sha8": "a9a90808",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1171,11 +1532,11 @@
       "by": "rapp-vision-rubric/1.0",
       "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
       "verdict": "ready",
-      "checks_passed": 6,
-      "checks_total": 6,
-      "not_applicable": 2,
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
       "notes": [],
-      "record_sha8": "e5a993c8",
+      "record_sha8": "d94f4030",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1191,7 +1552,7 @@
       "checks_total": 7,
       "not_applicable": 1,
       "notes": [],
-      "record_sha8": "4b038a53",
+      "record_sha8": "98f529e5",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1203,11 +1564,11 @@
       "by": "rapp-vision-rubric/1.0",
       "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
       "verdict": "ready",
-      "checks_passed": 6,
-      "checks_total": 6,
-      "not_applicable": 2,
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
       "notes": [],
-      "record_sha8": "926b7ebf",
+      "record_sha8": "e84699c8",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1219,11 +1580,30 @@
       "by": "rapp-vision-rubric/1.0",
       "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
       "verdict": "ready",
-      "checks_passed": 6,
-      "checks_total": 6,
-      "not_applicable": 2,
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
       "notes": [],
-      "record_sha8": "59cadeba",
+      "record_sha8": "3b8832ac",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "kitchen-table-physics/push-friction-motion": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "rough",
+      "checks_passed": 5,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [
+        "No thumb (or poster) — the card renders empty in every grid.",
+        "No tags — undiscoverable."
+      ],
+      "record_sha8": "06f0bad6",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1239,7 +1619,7 @@
       "checks_total": 6,
       "not_applicable": 2,
       "notes": [],
-      "record_sha8": "08c9ee1d",
+      "record_sha8": "306f6c2f",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1257,7 +1637,7 @@
       "notes": [
         "Width/height missing — the player cannot lay the card out."
       ],
-      "record_sha8": "ba7eb2ab",
+      "record_sha8": "f34cd063",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1275,7 +1655,7 @@
       "notes": [
         "Width/height missing — the player cannot lay the card out."
       ],
-      "record_sha8": "5910748f",
+      "record_sha8": "ae535ac9",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1291,7 +1671,7 @@
       "checks_total": 6,
       "not_applicable": 2,
       "notes": [],
-      "record_sha8": "bd89a539",
+      "record_sha8": "c22e9ed9",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1309,7 +1689,7 @@
       "notes": [
         "3 of 4 app scene(s) declare no ready{selector|text}; their action times run from scene start."
       ],
-      "record_sha8": "dc0afc69",
+      "record_sha8": "35ac48ec",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1325,7 +1705,7 @@
       "checks_total": 6,
       "not_applicable": 2,
       "notes": [],
-      "record_sha8": "7af021b4",
+      "record_sha8": "bb872887",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1341,7 +1721,59 @@
       "checks_total": 6,
       "not_applicable": 2,
       "notes": [],
-      "record_sha8": "7a263a03",
+      "record_sha8": "f0a10e75",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "new-way-of-work/s1e01-scout-builds-an-ai-worker-that-connects-to-the-outside-world": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [],
+      "record_sha8": "e8597994",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "null-arcade/null-arcade-integrity-run": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [],
+      "record_sha8": "fff51008",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "one-minute-orchestra/one-minute-orchestra-proof-in-four-voices": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "rough",
+      "checks_passed": 4,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [
+        "Width/height missing — the player cannot lay the card out.",
+        "1 of 1 app scene(s) declare no ready{selector|text}; their action times run from scene start.",
+        "No tags — undiscoverable."
+      ],
+      "record_sha8": "6367b014",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1357,7 +1789,7 @@
       "checks_total": 5,
       "not_applicable": 3,
       "notes": [],
-      "record_sha8": "3ab4c226",
+      "record_sha8": "84fd1d1c",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1373,7 +1805,7 @@
       "checks_total": 5,
       "not_applicable": 3,
       "notes": [],
-      "record_sha8": "ec6d6a7e",
+      "record_sha8": "2cded247",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1389,7 +1821,7 @@
       "checks_total": 5,
       "not_applicable": 3,
       "notes": [],
-      "record_sha8": "b150ee76",
+      "record_sha8": "e13b3e36",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1405,7 +1837,7 @@
       "checks_total": 5,
       "not_applicable": 3,
       "notes": [],
-      "record_sha8": "038b6287",
+      "record_sha8": "93e6af2b",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1421,7 +1853,7 @@
       "checks_total": 5,
       "not_applicable": 3,
       "notes": [],
-      "record_sha8": "12edced0",
+      "record_sha8": "19765886",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1437,7 +1869,7 @@
       "checks_total": 5,
       "not_applicable": 3,
       "notes": [],
-      "record_sha8": "61044f91",
+      "record_sha8": "57784087",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1453,7 +1885,7 @@
       "checks_total": 5,
       "not_applicable": 3,
       "notes": [],
-      "record_sha8": "f182a30c",
+      "record_sha8": "af6068c1",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1469,7 +1901,23 @@
       "checks_total": 5,
       "not_applicable": 3,
       "notes": [],
-      "record_sha8": "a982fec0",
+      "record_sha8": "e0ce691b",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "patch-notes-tomorrow/civic-os-12": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [],
+      "record_sha8": "92d8a0bf",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1485,7 +1933,7 @@
       "checks_total": 5,
       "not_applicable": 3,
       "notes": [],
-      "record_sha8": "efe53b4f",
+      "record_sha8": "85ea1e50",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1493,15 +1941,15 @@
         "actor": "human"
       }
     },
-    "rappterbox/aivms-watch-their-own-film": {
+    "receipt-culture/receipt-culture-one-receipt": {
       "by": "rapp-vision-rubric/1.0",
       "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
       "verdict": "ready",
-      "checks_passed": 6,
-      "checks_total": 6,
-      "not_applicable": 2,
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
       "notes": [],
-      "record_sha8": "6e9fab83",
+      "record_sha8": "defa227f",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1509,31 +1957,15 @@
         "actor": "human"
       }
     },
-    "rappterbox/genesis-251-founding-four-draft": {
+    "repair-manual/machine-knows-the-fit": {
       "by": "rapp-vision-rubric/1.0",
       "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
       "verdict": "ready",
-      "checks_passed": 6,
-      "checks_total": 6,
-      "not_applicable": 2,
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
       "notes": [],
-      "record_sha8": "7c627ca6",
-      "reviewer_feedback": {
-        "agreed": 0,
-        "disputed": 0,
-        "unclear": 0,
-        "actor": "human"
-      }
-    },
-    "rappterbox/veridion-proof-trailer": {
-      "by": "rapp-vision-rubric/1.0",
-      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
-      "verdict": "ready",
-      "checks_passed": 6,
-      "checks_total": 6,
-      "not_applicable": 2,
-      "notes": [],
-      "record_sha8": "c1f8342f",
+      "record_sha8": "1ac0f610",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1549,7 +1981,7 @@
       "checks_total": 6,
       "not_applicable": 2,
       "notes": [],
-      "record_sha8": "089a1a0c",
+      "record_sha8": "fd7a92a0",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1565,7 +1997,7 @@
       "checks_total": 6,
       "not_applicable": 2,
       "notes": [],
-      "record_sha8": "d4194601",
+      "record_sha8": "3e430237",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1581,7 +2013,7 @@
       "checks_total": 7,
       "not_applicable": 1,
       "notes": [],
-      "record_sha8": "7854a1c0",
+      "record_sha8": "a2f2a55f",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1599,7 +2031,7 @@
       "notes": [
         "1 of 3 app scene(s) declare no ready{selector|text}; their action times run from scene start."
       ],
-      "record_sha8": "9c0229e3",
+      "record_sha8": "39a63984",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1615,7 +2047,7 @@
       "checks_total": 7,
       "not_applicable": 1,
       "notes": [],
-      "record_sha8": "fd1b901c",
+      "record_sha8": "b22ec9e4",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1631,7 +2063,97 @@
       "checks_total": 7,
       "not_applicable": 1,
       "notes": [],
-      "record_sha8": "0263ebc4",
+      "record_sha8": "81d1718e",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "signal-garden/signal-garden-pulse-lag": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "rough",
+      "checks_passed": 3,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [
+        "No thumb (or poster) — the card renders empty in every grid.",
+        "Description is 0 characters; under 60 it tells a viewer nothing.",
+        "Width/height missing — the player cannot lay the card out.",
+        "No tags — undiscoverable."
+      ],
+      "record_sha8": "a7c00a9e",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "tiny-bureau/tiny-bureau-five-fixture-gap": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "rough",
+      "checks_passed": 3,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [
+        "No thumb (or poster) — the card renders empty in every grid.",
+        "Description is 0 characters; under 60 it tells a viewer nothing.",
+        "1 of 1 app scene(s) declare no ready{selector|text}; their action times run from scene start.",
+        "No tags — undiscoverable."
+      ],
+      "record_sha8": "56f787c6",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "tiny-systems/four-and-a-half-to-one": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [],
+      "record_sha8": "a962f04c",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "tiny-systems/one-block-three-trains": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [],
+      "record_sha8": "e369b14e",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "tiny-systems/three-tokens-make-nine": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [],
+      "record_sha8": "edcaae54",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1647,7 +2169,7 @@
       "checks_total": 5,
       "not_applicable": 3,
       "notes": [],
-      "record_sha8": "ffcf3f03",
+      "record_sha8": "0c8b39af",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1663,7 +2185,7 @@
       "checks_total": 6,
       "not_applicable": 2,
       "notes": [],
-      "record_sha8": "c2dd0d43",
+      "record_sha8": "634f5cde",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1679,7 +2201,7 @@
       "checks_total": 7,
       "not_applicable": 1,
       "notes": [],
-      "record_sha8": "a23c3f35",
+      "record_sha8": "aa43e2e5",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
@@ -1697,7 +2219,103 @@
       "notes": [
         "2 of 3 app scene(s) declare no ready{selector|text}; their action times run from scene start."
       ],
-      "record_sha8": "c86fd69c",
+      "record_sha8": "1af5ff45",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "working-proofs/create-vector-icon-system": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [],
+      "record_sha8": "492d0571",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "working-proofs/ecosystem-island-threshold": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [],
+      "record_sha8": "fa3238c9",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "working-proofs/explore-archive-map-contrast": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [],
+      "record_sha8": "23acc17d",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "working-proofs/learn-grid-overflow": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [],
+      "record_sha8": "ec825015",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "working-proofs/maze-fogline": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [],
+      "record_sha8": "e9201a22",
+      "reviewer_feedback": {
+        "agreed": 0,
+        "disputed": 0,
+        "unclear": 0,
+        "actor": "human"
+      }
+    },
+    "working-proofs/use-keyboard-invoice-triage": {
+      "by": "rapp-vision-rubric/1.0",
+      "note": "Machine-written from the channel record by a deterministic rubric. Never counted in any human total, ranking, or leaderboard.",
+      "verdict": "ready",
+      "checks_passed": 7,
+      "checks_total": 7,
+      "not_applicable": 1,
+      "notes": [],
+      "record_sha8": "3c3f9574",
       "reviewer_feedback": {
         "agreed": 0,
         "disputed": 0,
