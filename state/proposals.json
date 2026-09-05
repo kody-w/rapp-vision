@@ -1,10 +1,33 @@
 {
-  "advisories": [],
+  "advisories": [
+    {
+      "detail": "No thumb or poster; the card renders an empty frame.",
+      "kind": "missing_thumb",
+      "subject": "creature-office-hours/creature-office-hours"
+    },
+    {
+      "detail": "No thumb or poster; the card renders an empty frame.",
+      "kind": "missing_thumb",
+      "subject": "kitchen-table-physics/push-friction-motion"
+    },
+    {
+      "detail": "No thumb or poster; the card renders an empty frame.",
+      "kind": "missing_thumb",
+      "subject": "signal-garden/signal-garden-pulse-lag"
+    },
+    {
+      "detail": "No thumb or poster; the card renders an empty frame.",
+      "kind": "missing_thumb",
+      "subject": "tiny-bureau/tiny-bureau-five-fixture-gap"
+    }
+  ],
   "coverage": {
-    "channels_in_registry": 15,
-    "channels_loaded": 15,
+    "channels_in_registry": 27,
+    "channels_loaded": 27,
     "channels_unreachable": [],
-    "queue_channels_not_loaded": [],
+    "queue_channels_not_loaded": [
+      "rappterbox"
+    ],
     "signals_available": true
   },
   "generated_by": {
@@ -14,6 +37,66 @@
   },
   "note": "A QUEUE, NOT A PUBLICATION. Nothing here is on the network. A human — or an explicit promotion step — turns a proposal into an episode by editing a channel.json. The content machine cannot write a channel.json: its only write path refuses any destination outside state/.",
   "proposals": [
+    {
+      "channel": "after-midnight-maps",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "The waypoint moves. The proof rules remain."
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "c93e427b7088",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Quiet coordinate essays for places that never existed.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: The waypoint moves. The proof rules remain..",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] After Midnight Maps has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "after-midnight-maps"
+    },
+    {
+      "channel": "creature-office-hours",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "The Mossbell Glider Family Tree"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "684960c68d3c",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "A channel needs a second and third entry before it reads as a channel.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: The Mossbell Glider Family Tree.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Creature Office Hours has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "creature-office-hours"
+    },
     {
       "channel": "field-notes",
       "evidence": {
@@ -106,6 +189,156 @@
       "subject": "fieldguide"
     },
     {
+      "channel": "kitchen-table-physics",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "Push, Friction, Motion"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "dd529ad3c082",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "A channel needs a second and third entry before it reads as a channel.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: Push, Friction, Motion.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Kitchen Table Physics has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "kitchen-table-physics"
+    },
+    {
+      "channel": "new-way-of-work",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "Scout Builds an AI Worker That Connects to the Outside World"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "62e3b81dc743",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Production drafts for building, testing, and launching practical AI workers.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: Scout Builds an AI Worker That Connects to the Outside World.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] The New Way of Work has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "new-way-of-work"
+    },
+    {
+      "channel": "null-arcade",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "Trust the Timer"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "feec06566305",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Beat time. Keep trust.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: Trust the Timer.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Null Arcade has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "null-arcade"
+    },
+    {
+      "channel": "one-minute-orchestra",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "Proof in Four Voices"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "83235b7fa977",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "A channel needs a second and third entry before it reads as a channel.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: Proof in Four Voices.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] One Minute Orchestra has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "one-minute-orchestra"
+    },
+    {
+      "channel": "patch-notes-tomorrow",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "Civic OS 12: The Queue Weather Patch"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "a56b3ae1e118",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Deadpan bulletins from futures that did not happen.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: Civic OS 12: The Queue Weather Patch.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Patch Notes from Tomorrow has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "patch-notes-tomorrow"
+    },
+    {
       "channel": "prompt-frontier",
       "evidence": {
         "entries": 1,
@@ -167,6 +400,126 @@
       "subject": "rappterbox"
     },
     {
+      "channel": "receipt-culture",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "One Receipt, End to End"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "f5f11cdc4ad6",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Design criticism for objects that can show their work.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: One Receipt, End to End.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Receipt Culture has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "receipt-culture"
+    },
+    {
+      "channel": "repair-manual",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "The Machine Knows the Fit"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "73f2cf359570",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Fictional machines that explain their own exact-fit diagnosis.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: The Machine Knows the Fit.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] The Repair Manual has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "repair-manual"
+    },
+    {
+      "channel": "signal-garden",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "When a Heartbeat Wilts"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "4ec192d1e794",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "A channel needs a second and third entry before it reads as a channel.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: When a Heartbeat Wilts.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Signal Garden has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "signal-garden"
+    },
+    {
+      "channel": "tiny-bureau",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "The Five-Fixture Gap"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "fce53c83bb82",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "A channel needs a second and third entry before it reads as a channel.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: The Five-Fixture Gap.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Tiny Bureau has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "tiny-bureau"
+    },
+    {
       "channel": "tumbler",
       "evidence": {
         "entries": 1,
@@ -205,8 +558,8 @@
     "thin_min": 3
   },
   "totals": {
-    "advisories": 0,
-    "open": 4,
-    "proposals": 6
+    "advisories": 4,
+    "open": 15,
+    "proposals": 17
   }
 }

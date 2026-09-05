@@ -1,0 +1,2369 @@
+{
+  "coverage": {
+    "channels_loaded": 27,
+    "channels_unreachable": []
+  },
+  "lane": "editorial",
+  "lane_binding": {
+    "binding": "rapp_metrics constants + write_json snapshot guard",
+    "lane": "editorial",
+    "machinery_exclusion_verified": true,
+    "marker": "<!-- rapp-vision:editorial -->",
+    "problems": []
+  },
+  "never_sum_into": [
+    "human_counters",
+    "viewer_signals",
+    "ratings"
+  ],
+  "note": "MACHINE-WRITTEN EDITORIAL SCORES. These are the engine's own opinion of its own channel. They are NOT viewer signal and must never be summed into, averaged with, or displayed as human counters — report them in their own block, labelled. A null score means the reviewer could not judge that criterion; render it as an em-dash, never as 0.",
+  "reviewer": {
+    "id": "dryrun-structural/1.0.0",
+    "judgment": false,
+    "kind": "structural"
+  },
+  "reviews": {
+    "after-midnight-maps/after-midnight-maps": {
+      "channel": "after-midnight-maps",
+      "composite": null,
+      "content_hash": "sha256:842fbbdfa5a0b9fea06edf0bb2d6714b",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "50 words with a concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.4,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 4,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "after-midnight-maps/after-midnight-maps",
+      "title": "The waypoint moves. The proof rules remain.",
+      "video": "after-midnight-maps"
+    },
+    "arcade/arcade-cold-boot": {
+      "channel": "arcade",
+      "composite": null,
+      "content_hash": "sha256:1e7bce9b981297c99b68813d3ec9c294",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [
+        "overclaim_risk"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "181 words and carries at least one concrete figure.",
+        "honest_confidence": "Unhedged absolutes with no grounding: perfectly.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 2.6,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 1,
+        "pacing": null
+      },
+      "subject": "arcade/arcade-cold-boot",
+      "title": "Six games, cold-booted and played live — and you can grab the controller mid-run",
+      "video": "arcade-cold-boot"
+    },
+    "arcade/arcade-emulator-shelf": {
+      "channel": "arcade",
+      "composite": null,
+      "content_hash": "sha256:d7e955e89d9df0d6564b281f7badb886",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "140 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.8,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "arcade/arcade-emulator-shelf",
+      "title": "An emulator shelf in a browser tab — cycle-accurate 6502, and a CHIP-8 with a rewind button",
+      "video": "arcade-emulator-shelf"
+    },
+    "arcade/arcade-take-over": {
+      "channel": "arcade",
+      "composite": null,
+      "content_hash": "sha256:9e4cb6efacfe2f04496694b579ee8baf",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "130 words but no concrete finding (no figures).",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 3,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "arcade/arcade-take-over",
+      "title": "This one stops on purpose. You finish it.",
+      "video": "arcade-take-over"
+    },
+    "catchup/catchup-2026-08-01": {
+      "channel": "catchup",
+      "composite": null,
+      "content_hash": "sha256:7370dd418c7a249ae089970295eede9c",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "113 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.8,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "catchup/catchup-2026-08-01",
+      "title": "Catch-up — August 1",
+      "video": "catchup-2026-08-01"
+    },
+    "catchup/catchup-2026-08-01-part-2": {
+      "channel": "catchup",
+      "composite": null,
+      "content_hash": "sha256:8ab9f62acc2649991591e16328a23da5",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "141 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes; one grounding marker: measured.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 4.4,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 4,
+        "pacing": null
+      },
+      "subject": "catchup/catchup-2026-08-01-part-2",
+      "title": "Catch-up — August 1, part two",
+      "video": "catchup-2026-08-01-part-2"
+    },
+    "catchup/catchup-2026-08-01-part-3": {
+      "channel": "catchup",
+      "composite": null,
+      "content_hash": "sha256:f34e222e1b8fbbea780d7e4165a9e2d3",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "235 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.8,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "catchup/catchup-2026-08-01-part-3",
+      "title": "Catch-up — August 1, part three: four things, and you own all of them",
+      "video": "catchup-2026-08-01-part-3"
+    },
+    "creature-office-hours/creature-office-hours": {
+      "channel": "creature-office-hours",
+      "composite": null,
+      "content_hash": "sha256:33c64a460fca7f186b01759b43a1a3eb",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [
+        "orphan_description"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "13 words; a caption, not a description.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 2.2,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 1,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "creature-office-hours/creature-office-hours",
+      "title": "The Mossbell Glider Family Tree",
+      "video": "creature-office-hours"
+    },
+    "dada-collective/exactly-eighteen-thousand": {
+      "channel": "dada-collective",
+      "composite": null,
+      "content_hash": "sha256:3959d61c6cf2de75cf510d7682cbe25a",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "37 words but no concrete finding (no figures).",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 3,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "dada-collective/exactly-eighteen-thousand",
+      "title": "Exactly Eighteen Thousand",
+      "video": "exactly-eighteen-thousand"
+    },
+    "dada-collective/rounded-to-the-minute": {
+      "channel": "dada-collective",
+      "composite": null,
+      "content_hash": "sha256:08e0e62c11735e46d6192445fa00796c",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [
+        "orphan_description"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "19 words and no concrete finding; states the subject only.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 2.6,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 2,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "dada-collective/rounded-to-the-minute",
+      "title": "Rounded to the Minute",
+      "video": "rounded-to-the-minute"
+    },
+    "dada-collective/six-titles-undone": {
+      "channel": "dada-collective",
+      "composite": null,
+      "content_hash": "sha256:ffbd8a1b742e91857147f86258af9fe4",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [
+        "orphan_description"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "10 words; a caption, not a description.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 2.2,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 1,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "dada-collective/six-titles-undone",
+      "title": "Six Titles Undone",
+      "video": "six-titles-undone"
+    },
+    "dada-collective/unreachable-from-a-clone": {
+      "channel": "dada-collective",
+      "composite": null,
+      "content_hash": "sha256:03472d621668b37192ee04d1e08a4f86",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [
+        "orphan_description"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "17 words and no concrete finding; states the subject only.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 2.6,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 2,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "dada-collective/unreachable-from-a-clone",
+      "title": "Unreachable From a Clone",
+      "video": "unreachable-from-a-clone"
+    },
+    "field-notes/above-not-beside": {
+      "channel": "field-notes",
+      "composite": null,
+      "content_hash": "sha256:fb08367b710c7b0d5c34e42e81b93372",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "320 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes; grounding markers present: 53 seconds, verified.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 5.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 5,
+        "pacing": null
+      },
+      "subject": "field-notes/above-not-beside",
+      "title": "I gave three agents the night's record and asked them nothing. All three proved my dashboard was lying.",
+      "video": "above-not-beside"
+    },
+    "field-notes/platform-relaunch-recap": {
+      "channel": "field-notes",
+      "composite": null,
+      "content_hash": "sha256:d9cb2d83735763f9cce42a856852a532",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "269 words and carries at least one concrete figure.",
+        "honest_confidence": "Absolutes present (100%) but grounding markers too (100%, 168ms, 404s, error, test).",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.8,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "field-notes/platform-relaunch-recap",
+      "title": "Two platforms were silently deadlocked for 19 days. Both looked perfectly healthy.",
+      "video": "platform-relaunch-recap"
+    },
+    "fieldguide/guide-2026-08-04": {
+      "channel": "fieldguide",
+      "composite": null,
+      "content_hash": "sha256:a4413e3e02d400b83bcbfd10a076e5fa",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "175 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes; one grounding marker: measured.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 4.4,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 4,
+        "pacing": null
+      },
+      "subject": "fieldguide/guide-2026-08-04",
+      "title": "Field Guide 2026-08-04 - The Alpine Summit · Above The Clouds",
+      "video": "guide-2026-08-04"
+    },
+    "frame-chains/ai-soul-passport": {
+      "channel": "frame-chains",
+      "composite": null,
+      "content_hash": "sha256:16c57d877935cb26a1c7b36f25c41844",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "33 words but no concrete finding (no figures).",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 3,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "frame-chains/ai-soul-passport",
+      "title": "AI Soul Passport — Identity Migration and Counterfeit Rejection",
+      "video": "ai-soul-passport"
+    },
+    "frame-chains/attack-the-timeline": {
+      "channel": "frame-chains",
+      "composite": null,
+      "content_hash": "sha256:090bdefaf57b6f5679657f3c007fed54",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "33 words but no concrete finding (no figures).",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 3,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "frame-chains/attack-the-timeline",
+      "title": "Attack the Timeline — Control, Attack All, Replay",
+      "video": "attack-the-timeline"
+    },
+    "frame-chains/frame-chains-ten-frame-loop": {
+      "channel": "frame-chains",
+      "composite": null,
+      "content_hash": "sha256:89423e25fe710b07458592b4ed97853b",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "45 words but no concrete finding (no figures).",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 3,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "frame-chains/frame-chains-ten-frame-loop",
+      "title": "Ten Impossible Worlds, One Verifiable History",
+      "video": "frame-chains-ten-frame-loop"
+    },
+    "frame-chains/many-worlds-mission-control": {
+      "channel": "frame-chains",
+      "composite": null,
+      "content_hash": "sha256:e16061429bde5af19190deeaaf633129",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "40 words with a concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.4,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 4,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "frame-chains/many-worlds-mission-control",
+      "title": "Many Worlds Mission Control — Parent-Hash Challenge",
+      "video": "many-worlds-mission-control"
+    },
+    "frame-chains/teleporting-roguelike": {
+      "channel": "frame-chains",
+      "composite": null,
+      "content_hash": "sha256:618e055666879aa0ba7669bae965a501",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "36 words but no concrete finding (no figures).",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 3,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "frame-chains/teleporting-roguelike",
+      "title": "Teleporting Roguelike — Inventory and Provenance Proof",
+      "video": "teleporting-roguelike"
+    },
+    "kitchen-table-physics/push-friction-motion": {
+      "channel": "kitchen-table-physics",
+      "composite": null,
+      "content_hash": "sha256:ec55579ec226e2b8ba31df3f87fb8fe1",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [
+        "orphan_description"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "9 words; a caption, not a description.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 2.2,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 1,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "kitchen-table-physics/push-friction-motion",
+      "title": "Push, Friction, Motion",
+      "video": "push-friction-motion"
+    },
+    "learnwithkody/lwk-apex-live": {
+      "channel": "learnwithkody",
+      "composite": null,
+      "content_hash": "sha256:ae5af3b83dec55fb10e5b3b053aca95f",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "70 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.8,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "learnwithkody/lwk-apex-live",
+      "title": "LIVE: drive the finished sim yourself - no video file",
+      "video": "lwk-apex-live"
+    },
+    "learnwithkody/lwk-buzzsaw-voxel": {
+      "channel": "learnwithkody",
+      "composite": null,
+      "content_hash": "sha256:c304849864f95fb2ca9a773c05f514a5",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "173 words and carries at least one concrete figure.",
+        "honest_confidence": "Absolutes present (the best) but grounding markers too (105%, 66%, measured, test).",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.8,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "learnwithkody/lwk-buzzsaw-voxel",
+      "title": "Six times the test was wrong: a buzzsaw pass over one 9,749-line file",
+      "video": "lwk-buzzsaw-voxel"
+    },
+    "learnwithkody/lwk-coastal-city": {
+      "channel": "learnwithkody",
+      "composite": null,
+      "content_hash": "sha256:e0fa3e1d826cb9fd9bafb7738a28877d",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "214 words and carries at least one concrete figure.",
+        "honest_confidence": "Absolutes present (the best) but grounding markers too (2.7ms, 51.5ms, 56ms, benchmark, measured, test).",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.8,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "learnwithkody/lwk-coastal-city",
+      "title": "An open-world city in one HTML file — and a gate that failed for the wrong reason",
+      "video": "lwk-coastal-city"
+    },
+    "learnwithkody/lwk-walkthrough-apex": {
+      "channel": "learnwithkody",
+      "composite": null,
+      "content_hash": "sha256:e0747b8f3da3ae849ddb98a453e44f89",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "114 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.8,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "learnwithkody/lwk-walkthrough-apex",
+      "title": "Follow along: build a Gran Turismo-grade racing sim in one HTML file",
+      "video": "lwk-walkthrough-apex"
+    },
+    "localfirsttools/lft-tumbler-live": {
+      "channel": "localfirsttools",
+      "composite": null,
+      "content_hash": "sha256:cd7d732ff622335fafd3e08fd35b91c4",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "111 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.8,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "localfirsttools/lft-tumbler-live",
+      "title": "LIVE REPLAY: ten apps, driven in real time — no video file",
+      "video": "lft-tumbler-live"
+    },
+    "localfirsttools/lft-tumbler-reel": {
+      "channel": "localfirsttools",
+      "composite": null,
+      "content_hash": "sha256:0e0b07f37306909612bc24398a1f9cb9",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [
+        "orphan_description"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "23 words and no concrete finding; states the subject only.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 2.6,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 2,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "localfirsttools/lft-tumbler-reel",
+      "title": "Ten browser apps, after tumbling — silent reel",
+      "video": "lft-tumbler-reel"
+    },
+    "localfirsttools/lft-tumbler-short": {
+      "channel": "localfirsttools",
+      "composite": null,
+      "content_hash": "sha256:061a264ea813d19eae4b88ed3f1bf5c5",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [
+        "orphan_description"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "26 words and no concrete finding; states the subject only.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 2.6,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 2,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "localfirsttools/lft-tumbler-short",
+      "title": "10 apps. 10 said they worked. 9 were broken. (60s)",
+      "video": "lft-tumbler-short"
+    },
+    "new-way-of-work/s1e01-scout-builds-an-ai-worker-that-connects-to-the-outside-world": {
+      "channel": "new-way-of-work",
+      "composite": null,
+      "content_hash": "sha256:1fab2b522efe2f6d240da5d513d355a1",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [
+        "orphan_description"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "16 words and no concrete finding; states the subject only.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 2.6,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 2,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "new-way-of-work/s1e01-scout-builds-an-ai-worker-that-connects-to-the-outside-world",
+      "title": "Scout Builds an AI Worker That Connects to the Outside World",
+      "video": "s1e01-scout-builds-an-ai-worker-that-connects-to-the-outside-world"
+    },
+    "null-arcade/null-arcade-integrity-run": {
+      "channel": "null-arcade",
+      "composite": null,
+      "content_hash": "sha256:ffecc19d73c4b6500b78a0ec709e25a6",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [
+        "orphan_description"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "19 words and no concrete finding; states the subject only.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 2.6,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 2,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "null-arcade/null-arcade-integrity-run",
+      "title": "Trust the Timer",
+      "video": "null-arcade-integrity-run"
+    },
+    "one-minute-orchestra/one-minute-orchestra-proof-in-four-voices": {
+      "channel": "one-minute-orchestra",
+      "composite": null,
+      "content_hash": "sha256:6f1714e914569b8ec30478c0ab5d229a",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [
+        "orphan_description"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "13 words; a caption, not a description.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 2.2,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 1,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "one-minute-orchestra/one-minute-orchestra-proof-in-four-voices",
+      "title": "Proof in Four Voices",
+      "video": "one-minute-orchestra-proof-in-four-voices"
+    },
+    "openrappter-training/openrappter-m1-install-first-run": {
+      "channel": "openrappter-training",
+      "composite": null,
+      "content_hash": "sha256:21e3a71837162d5e7977bddf80aa62b9",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "483 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes; grounding markers present: error, verified.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 5.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 5,
+        "pacing": null
+      },
+      "subject": "openrappter-training/openrappter-m1-install-first-run",
+      "title": "Module 1 — Install OpenRappter and prove it is running (no pip install required)",
+      "video": "openrappter-m1-install-first-run"
+    },
+    "openrappter-training/openrappter-m2-local-memory": {
+      "channel": "openrappter-training",
+      "composite": null,
+      "content_hash": "sha256:13672105352847486d6429bcaff7225e",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "397 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes; one grounding marker: verified.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 4.4,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 4,
+        "pacing": null
+      },
+      "subject": "openrappter-training/openrappter-m2-local-memory",
+      "title": "Module 2 — Give an AI a memory file you own (no API key, no cloud)",
+      "video": "openrappter-m2-local-memory"
+    },
+    "openrappter-training/openrappter-m3-deterministic-agents": {
+      "channel": "openrappter-training",
+      "composite": null,
+      "content_hash": "sha256:d642aadf4995abd7f3204a1c88d75df0",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "397 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes; grounding markers present: error, verified.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 5.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 5,
+        "pacing": null
+      },
+      "subject": "openrappter-training/openrappter-m3-deterministic-agents",
+      "title": "Module 3 — Real work with zero AI: Shell, CodeReview, Git (and the --exec trap)",
+      "video": "openrappter-m3-deterministic-agents"
+    },
+    "openrappter-training/openrappter-m4-brainstem-local-endpoint": {
+      "channel": "openrappter-training",
+      "composite": null,
+      "content_hash": "sha256:7e9198119148fc2f3d0e076e257c7a1e",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "503 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes; grounding markers present: 6.2s, error, unverified, verified.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 5.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 5,
+        "pacing": null
+      },
+      "subject": "openrappter-training/openrappter-m4-brainstem-local-endpoint",
+      "title": "Module 4 — Run the brainstem: one local HTTP endpoint, and hot-load an agent into it",
+      "video": "openrappter-m4-brainstem-local-endpoint"
+    },
+    "openrappter-training/openrappter-m5-author-single-file-agent": {
+      "channel": "openrappter-training",
+      "composite": null,
+      "content_hash": "sha256:eda571743beb05feaeb6a26959b6a2d2",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "466 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes; one grounding marker: verified.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 4.4,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 4,
+        "pacing": null
+      },
+      "subject": "openrappter-training/openrappter-m5-author-single-file-agent",
+      "title": "Module 5 — Write your own agent: one file, live in one request",
+      "video": "openrappter-m5-author-single-file-agent"
+    },
+    "openrappter-training/openrappter-m6-conformance-gate": {
+      "channel": "openrappter-training",
+      "composite": null,
+      "content_hash": "sha256:bd908c664f2895ed7b3421cb95712333",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "474 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes; grounding markers present: error, verified.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 5.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 5,
+        "pacing": null
+      },
+      "subject": "openrappter-training/openrappter-m6-conformance-gate",
+      "title": "Module 6 — Make your agent adoptable: run the RAPP conformance gate and read it red",
+      "video": "openrappter-m6-conformance-gate"
+    },
+    "openrappter-training/openrappter-m7-llm-free-chaining": {
+      "channel": "openrappter-training",
+      "composite": null,
+      "content_hash": "sha256:ad075c6dd827f10ed2c97b5e3ae9b329",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "396 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes; grounding markers present: test, verified.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 5.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 5,
+        "pacing": null
+      },
+      "subject": "openrappter-training/openrappter-m7-llm-free-chaining",
+      "title": "Module 7 — Chain agents with no LLM in the middle: data_slush, AgentChain, Pipeline",
+      "video": "openrappter-m7-llm-free-chaining"
+    },
+    "openrappter-training/openrappter-m8-know-what-is-real": {
+      "channel": "openrappter-training",
+      "composite": null,
+      "content_hash": "sha256:9903537cc799a3b303fb8c61553e7ebd",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "862 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes; grounding markers present: 18.57s, 60%, 8.07s, measured, test, verified.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 5.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 5,
+        "pacing": null
+      },
+      "subject": "openrappter-training/openrappter-m8-know-what-is-real",
+      "title": "Module 8 — Read the map before you bet: what is proven, what is partial, what is fiction",
+      "video": "openrappter-m8-know-what-is-real"
+    },
+    "patch-notes-tomorrow/civic-os-12": {
+      "channel": "patch-notes-tomorrow",
+      "composite": null,
+      "content_hash": "sha256:988c34412b6d0ad4b43e83d378ac058f",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "23 words with a concrete figure; short but carries a finding.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 3,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "patch-notes-tomorrow/civic-os-12",
+      "title": "Civic OS 12: The Queue Weather Patch",
+      "video": "civic-os-12"
+    },
+    "prompt-frontier/prompt-frontier-founding": {
+      "channel": "prompt-frontier",
+      "composite": null,
+      "content_hash": "sha256:b5023f24ee987f8754fc8de42e35e400",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "75 words but no concrete finding (no figures).",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 3,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "prompt-frontier/prompt-frontier-founding",
+      "title": "Prompt Frontier begins",
+      "video": "prompt-frontier-founding"
+    },
+    "receipt-culture/receipt-culture-one-receipt": {
+      "channel": "receipt-culture",
+      "composite": null,
+      "content_hash": "sha256:bd071e56f7c3f670a1098b79ed4f50bf",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [
+        "orphan_description"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "22 words and no concrete finding; states the subject only.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 2.6,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 2,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "receipt-culture/receipt-culture-one-receipt",
+      "title": "One Receipt, End to End",
+      "video": "receipt-culture-one-receipt"
+    },
+    "repair-manual/machine-knows-the-fit": {
+      "channel": "repair-manual",
+      "composite": null,
+      "content_hash": "sha256:b5ce373bd7111c5ae8f79d32afa3c0f3",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "43 words with a concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.4,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 4,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "repair-manual/machine-knows-the-fit",
+      "title": "The Machine Knows the Fit",
+      "video": "machine-knows-the-fit"
+    },
+    "rock-tumbler/rock-tumbler-reel": {
+      "channel": "rock-tumbler",
+      "composite": null,
+      "content_hash": "sha256:b88bb12f9be0c737109b6f0c01b8d70d",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "46 words but no concrete finding (no figures).",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 3,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "rock-tumbler/rock-tumbler-reel",
+      "title": "Ten browser apps, after tumbling — silent reel",
+      "video": "rock-tumbler-reel"
+    },
+    "rock-tumbler/rock-tumbler-short": {
+      "channel": "rock-tumbler",
+      "composite": null,
+      "content_hash": "sha256:016d76250395696208f5544796a55f3c",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [
+        "overclaim_risk"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "32 words with a concrete figure.",
+        "honest_confidence": "Unhedged absolutes with no grounding: perfect.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 2.2,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 4,
+        "honest_confidence": 1,
+        "pacing": null
+      },
+      "subject": "rock-tumbler/rock-tumbler-short",
+      "title": "10 apps. 10 said they worked. 9 were broken.",
+      "video": "rock-tumbler-short"
+    },
+    "rock-tumbler/rock-tumbler-showcase": {
+      "channel": "rock-tumbler",
+      "composite": null,
+      "content_hash": "sha256:59c496ffac8c64458cfda6f081d99bb2",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "163 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes; grounding markers present: 0.49%, 1%, error, test.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 5.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 5,
+        "pacing": null
+      },
+      "subject": "rock-tumbler/rock-tumbler-showcase",
+      "title": "I built 10 apps with AI sub-agents. All 10 said they worked. Nine were broken.",
+      "video": "rock-tumbler-showcase"
+    },
+    "rooms/rooms-rain": {
+      "channel": "rooms",
+      "composite": null,
+      "content_hash": "sha256:6c60719faeee1d85e1343b365e9d3dd2",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "101 words but no concrete finding (no figures).",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 3,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "rooms/rooms-rain",
+      "title": "Three kinds of rain, and none of them are a video",
+      "video": "rooms-rain"
+    },
+    "rooms/rooms-slow": {
+      "channel": "rooms",
+      "composite": null,
+      "content_hash": "sha256:a123da06b5c8f81a92dc5955e57d794e",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "110 words but no concrete finding (no figures).",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 3,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "rooms/rooms-slow",
+      "title": "Ten minutes on a still lake — one room, no cuts, no video",
+      "video": "rooms-slow"
+    },
+    "rooms/rooms-tour": {
+      "channel": "rooms",
+      "composite": null,
+      "content_hash": "sha256:5244f07bf1e13c5af0822f1536ff98ec",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "174 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.8,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "rooms/rooms-tour",
+      "title": "Nine rooms that don't exist — a seven-minute tour with no video file",
+      "video": "rooms-tour"
+    },
+    "signal-garden/signal-garden-pulse-lag": {
+      "channel": "signal-garden",
+      "composite": null,
+      "content_hash": "sha256:6481f045e4bd9abc3514fbabb64c4977",
+      "coverage": "1/5",
+      "criteria_scored": [
+        "description_stands_alone"
+      ],
+      "flags": [
+        "orphan_description"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "Empty description.",
+        "honest_confidence": "No description to check; the video's narration is not readable from here.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 1.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 1,
+        "honest_confidence": null,
+        "pacing": null
+      },
+      "subject": "signal-garden/signal-garden-pulse-lag",
+      "title": "When a Heartbeat Wilts",
+      "video": "signal-garden-pulse-lag"
+    },
+    "tiny-bureau/tiny-bureau-five-fixture-gap": {
+      "channel": "tiny-bureau",
+      "composite": null,
+      "content_hash": "sha256:6ae7aff30cc343abb7cfa2bf2753b7fe",
+      "coverage": "1/5",
+      "criteria_scored": [
+        "description_stands_alone"
+      ],
+      "flags": [
+        "orphan_description"
+      ],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "Empty description.",
+        "honest_confidence": "No description to check; the video's narration is not readable from here.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 1.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 1,
+        "honest_confidence": null,
+        "pacing": null
+      },
+      "subject": "tiny-bureau/tiny-bureau-five-fixture-gap",
+      "title": "The Five-Fixture Gap",
+      "video": "tiny-bureau-five-fixture-gap"
+    },
+    "tiny-systems/four-and-a-half-to-one": {
+      "channel": "tiny-systems",
+      "composite": null,
+      "content_hash": "sha256:dfb0c2b816611bcf9abd6f96d6e54da6",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "33 words with a concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.4,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 4,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "tiny-systems/four-and-a-half-to-one",
+      "title": "Four-and-a-Half to One",
+      "video": "four-and-a-half-to-one"
+    },
+    "tiny-systems/one-block-three-trains": {
+      "channel": "tiny-systems",
+      "composite": null,
+      "content_hash": "sha256:a91bc4b03bc680710605fae4e92dd16f",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "31 words with a concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.4,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 4,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "tiny-systems/one-block-three-trains",
+      "title": "One Block, Three Trains",
+      "video": "one-block-three-trains"
+    },
+    "tiny-systems/three-tokens-make-nine": {
+      "channel": "tiny-systems",
+      "composite": null,
+      "content_hash": "sha256:6114b7bb8b2dd0be42219d6f7dd43c71",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "36 words with a concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.4,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 4,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "tiny-systems/three-tokens-make-nine",
+      "title": "Three Tokens Make Nine",
+      "video": "three-tokens-make-nine"
+    },
+    "tumbler/tumble-2026-08-04": {
+      "channel": "tumbler",
+      "composite": null,
+      "content_hash": "sha256:771f6fe7c821198e29904ed2a8429d0f",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "272 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes; one grounding marker: measured.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 4.4,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 4,
+        "pacing": null
+      },
+      "subject": "tumbler/tumble-2026-08-04",
+      "title": "Tumble 2026-08-04 - Baseline: 30 apps hashed, 24 media files probed",
+      "video": "tumble-2026-08-04"
+    },
+    "workbench/workbench-808": {
+      "channel": "workbench",
+      "composite": null,
+      "content_hash": "sha256:91b82a0066f6f0290f00251404941660",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "102 words but no concrete finding (no figures).",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 3,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "workbench/workbench-808",
+      "title": "Programming an 808 pattern live — the sequencer is running while you watch it",
+      "video": "workbench-808"
+    },
+    "workbench/workbench-generative": {
+      "channel": "workbench",
+      "composite": null,
+      "content_hash": "sha256:b2249e94492bc4c4fd8db59acee26050",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "102 words but no concrete finding (no figures).",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.0,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 3,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "workbench/workbench-generative",
+      "title": "Three generative studios where the output is different every single run",
+      "video": "workbench-generative"
+    },
+    "workbench/workbench-three-tools": {
+      "channel": "workbench",
+      "composite": null,
+      "content_hash": "sha256:385e9d73a4e0863e839f4256eac02341",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "130 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.8,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "workbench/workbench-three-tools",
+      "title": "A DAW, a vector editor and a spreadsheet — three files, no install, and you can grab the mouse",
+      "video": "workbench-three-tools"
+    },
+    "working-proofs/create-vector-icon-system": {
+      "channel": "working-proofs",
+      "composite": null,
+      "content_hash": "sha256:c06ccb12d3cfa642e82c213b945cff78",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "61 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.8,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "working-proofs/create-vector-icon-system",
+      "title": "Six Shapes, One Grid",
+      "video": "create-vector-icon-system"
+    },
+    "working-proofs/ecosystem-island-threshold": {
+      "channel": "working-proofs",
+      "composite": null,
+      "content_hash": "sha256:efafbdbaef1e50293f6f812d9bcefc15",
+      "coverage": "2/5",
+      "criteria_scored": [
+        "description_stands_alone",
+        "honest_confidence"
+      ],
+      "flags": [],
+      "notes": {
+        "accuracy": "Not machine-checkable; no model reviewer ran.",
+        "clarity": "Not machine-checkable; no model reviewer ran.",
+        "description_stands_alone": "78 words and carries at least one concrete figure.",
+        "honest_confidence": "No unhedged absolutes, but nothing grounding a claim either.",
+        "pacing": "Not machine-checkable; no model reviewer ran."
+      },
+      "partial_composite": 3.8,
+      "reviewer": {
+        "id": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "rubric": {
+        "id": "rapp-vision-editorial",
+        "version": "1.0.0"
+      },
+      "scores": {
+        "accuracy": null,
+        "clarity": null,
+        "description_stands_alone": 5,
+        "honest_confidence": 3,
+        "pacing": null
+      },
+      "subject": "working-proofs/ecosystem-island-threshold",
+      "title": "Will the Island Herd Hold?",
+      "video": "ecosystem-island-threshold"
+    }
+  },
+  "rubric": {
+    "criteria": [
+      "clarity",
+      "accuracy",
+      "pacing",
+      "description_stands_alone",
+      "honest_confidence"
+    ],
+    "id": "rapp-vision-editorial",
+    "version": "1.0.0"
+  },
+  "schema": "rapp-vision-editorial-reviews/1.0",
+  "totals": {
+    "flagged": [
+      "arcade/arcade-cold-boot",
+      "creature-office-hours/creature-office-hours",
+      "dada-collective/rounded-to-the-minute",
+      "dada-collective/six-titles-undone",
+      "dada-collective/unreachable-from-a-clone",
+      "kitchen-table-physics/push-friction-motion",
+      "localfirsttools/lft-tumbler-reel",
+      "localfirsttools/lft-tumbler-short",
+      "new-way-of-work/s1e01-scout-builds-an-ai-worker-that-connects-to-the-outside-world",
+      "null-arcade/null-arcade-integrity-run",
+      "one-minute-orchestra/one-minute-orchestra-proof-in-four-voices",
+      "receipt-culture/receipt-culture-one-receipt",
+      "rock-tumbler/rock-tumbler-short",
+      "signal-garden/signal-garden-pulse-lag",
+      "tiny-bureau/tiny-bureau-five-fixture-gap"
+    ],
+    "judgment_reviews": 0,
+    "reviews": 60,
+    "structural_reviews": 60
+  }
+}
