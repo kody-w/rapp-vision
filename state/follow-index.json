@@ -1,9 +1,75 @@
 {
-  "generated_at": "2026-08-31T16:21:43Z",
+  "generated_at": "2026-09-05T12:01:19Z",
   "owners": {
     "kody-w": {
-      "at": "2026-08-31T16:21:43Z",
+      "at": "2026-09-05T12:01:19Z",
       "entries": [
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-new-way-of-work/main/channel.json",
+          "id": "gh:kody-w/rappvision-new-way-of-work",
+          "repo": "https://github.com/kody-w/rappvision-new-way-of-work",
+          "url": "https://kody-w.github.io/rappvision-new-way-of-work/channel.json"
+        },
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-null-arcade/main/channel.json",
+          "id": "gh:kody-w/rappvision-null-arcade",
+          "repo": "https://github.com/kody-w/rappvision-null-arcade",
+          "url": "https://kody-w.github.io/rappvision-null-arcade/channel.json"
+        },
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-kitchen-table-physics/main/channel.json",
+          "id": "gh:kody-w/rappvision-kitchen-table-physics",
+          "repo": "https://github.com/kody-w/rappvision-kitchen-table-physics",
+          "url": "https://kody-w.github.io/rappvision-kitchen-table-physics/channel.json"
+        },
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-signal-garden/main/channel.json",
+          "id": "gh:kody-w/rappvision-signal-garden",
+          "repo": "https://github.com/kody-w/rappvision-signal-garden",
+          "url": "https://kody-w.github.io/rappvision-signal-garden/channel.json"
+        },
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-patch-notes-tomorrow/main/channel.json",
+          "id": "gh:kody-w/rappvision-patch-notes-tomorrow",
+          "repo": "https://github.com/kody-w/rappvision-patch-notes-tomorrow",
+          "url": "https://kody-w.github.io/rappvision-patch-notes-tomorrow/channel.json"
+        },
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-one-minute-orchestra/main/channel.json",
+          "id": "gh:kody-w/rappvision-one-minute-orchestra",
+          "repo": "https://github.com/kody-w/rappvision-one-minute-orchestra",
+          "url": "https://kody-w.github.io/rappvision-one-minute-orchestra/channel.json"
+        },
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-after-midnight-maps/main/channel.json",
+          "id": "gh:kody-w/rappvision-after-midnight-maps",
+          "repo": "https://github.com/kody-w/rappvision-after-midnight-maps",
+          "url": "https://kody-w.github.io/rappvision-after-midnight-maps/channel.json"
+        },
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-tiny-bureau/main/channel.json",
+          "id": "gh:kody-w/rappvision-tiny-bureau",
+          "repo": "https://github.com/kody-w/rappvision-tiny-bureau",
+          "url": "https://kody-w.github.io/rappvision-tiny-bureau/channel.json"
+        },
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-repair-manual/main/channel.json",
+          "id": "gh:kody-w/rappvision-repair-manual",
+          "repo": "https://github.com/kody-w/rappvision-repair-manual",
+          "url": "https://kody-w.github.io/rappvision-repair-manual/channel.json"
+        },
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-receipt-culture/main/channel.json",
+          "id": "gh:kody-w/rappvision-receipt-culture",
+          "repo": "https://github.com/kody-w/rappvision-receipt-culture",
+          "url": "https://kody-w.github.io/rappvision-receipt-culture/channel.json"
+        },
+        {
+          "alt": "https://raw.githubusercontent.com/kody-w/rappvision-creature-office-hours/main/channel.json",
+          "id": "gh:kody-w/rappvision-creature-office-hours",
+          "repo": "https://github.com/kody-w/rappvision-creature-office-hours",
+          "url": "https://kody-w.github.io/rappvision-creature-office-hours/channel.json"
+        },
         {
           "alt": "https://raw.githubusercontent.com/kody-w/rappvision-rappterbox/main/channel.json",
           "id": "gh:kody-w/rappvision-rappterbox",
