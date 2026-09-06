@@ -1180,6 +1180,7 @@ function mountLive(v, host, progressKey) {
   let clock = 0, playing = false, raf = 0, cur = -1, frame = null, fired = new Set(), last = 0;
   let anchor = null, anchorPoll = 0;
   let takeover = false, resumeAfterTakeover = false, frameEscapeDocument = null;
+  let takeoverScroll = null;
   let frameEscapeAvailable = false;
   let destroyed = false;
   const retryTimers = new Set();
@@ -1240,6 +1241,7 @@ function mountLive(v, host, progressKey) {
 
   function enterTakeover() {
     if (destroyed || takeover || !frame || takebar.hidden) return;
+    takeoverScroll = { x: window.scrollX, y: window.scrollY, margin: stage.style.scrollMarginTop };
     resumeAfterTakeover = playing;
     takeover = true;
     pause();
@@ -1249,19 +1251,28 @@ function mountLive(v, host, progressKey) {
     takeoverStatus.textContent = frameEscapeAvailable
       ? "Take control mode. Scripted replay paused; use Show captions or Escape to return."
       : "Take control mode. Scripted replay paused; this app is cross-origin, so use the reserved Show captions button to return.";
-    stage.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "auto" });
+    // Keep the app's top-row controls below the sticky navigation during takeover.
+    const navigation = document.querySelector("body > header");
+    stage.style.scrollMarginTop = `${(navigation ? navigation.getBoundingClientRect().height : 0) + 12}px`;
+    stage.scrollIntoView({ block: "start", inline: "nearest", behavior: "auto" });
     focusLiveFrame();
     requestAnimationFrame(() => { if (takeover) focusLiveFrame(); });
   }
 
   function leaveTakeover({ resume = true, focusControl = true, announce = true } = {}) {
     const shouldResume = takeover && resume && resumeAfterTakeover;
+    const priorScroll = takeoverScroll;
+    takeoverScroll = null;
     takeover = false;
     resumeAfterTakeover = false;
     host.classList.remove("live-takeover");
     host.dataset.takeover = "false";
     host.dataset.takeoverEscape = "toolbar-only";
     updateTakeoverControl();
+    if (priorScroll) {
+      stage.style.scrollMarginTop = priorScroll.margin;
+      if (focusControl) window.scrollTo({ left: priorScroll.x, top: priorScroll.y, behavior: "auto" });
+    }
     if (announce) {
       takeoverStatus.textContent = shouldResume
         ? "Captions shown. Scripted replay resumed."

@@ -1,0 +1,86 @@
+{
+  "schema": "rapp-vision-channel/2.0",
+  "id": "inside-immunity",
+  "name": "Inside Immunity",
+  "handle": "@kody-w",
+  "avatar": "T",
+  "tagline": "Illustrated biology you can watch, question, and try.",
+  "links": [
+    {"label": "Scientific sources", "url": "https://kody-w.github.io/rapp-vision/inside-immunity/sources.html"},
+    {"label": "English subtitles", "url": "https://kody-w.github.io/rapp-vision/inside-immunity/captions/t-cells.en.srt"}
+  ],
+  "videos": [
+    {
+      "id": "t-cells",
+      "title": "T Cells: Recognize, Respond, Remember",
+      "description": "An original five-minute introduction to T-cell development, peptide-MHC recognition, activation, helper and killer roles, regulation, memory, and medical relevance. The live companion lets you test one simplified CD8 clone, observe a matching response, reject incompatible encounters, and restore the exact opening state.",
+      "published": "2026-09-06",
+      "duration": 300,
+      "width": 1920,
+      "height": 1080,
+      "orientation": "landscape",
+      "tags": ["science", "biology", "education", "immunology", "t-cells", "live-replay"],
+      "thumb": "thumbs/t-cells.jpg",
+      "sources": [
+        {"src": "media/t-cells.mp4", "type": "video/mp4"},
+        {"src": "media/t-cells.webm", "type": "video/webm"}
+      ],
+      "chapters": [
+        {"t": 0, "label": "The two-cell puzzle"},
+        {"t": 21.2, "label": "Part of a larger team"},
+        {"t": 45.1, "label": "Selected in the thymus"},
+        {"t": 67.233, "label": "Reading the display"},
+        {"t": 90.9, "label": "A meeting in a lymph node"},
+        {"t": 116.367, "label": "Expanding the responders"},
+        {"t": 144, "label": "Helpers coordinate"},
+        {"t": 172.533, "label": "Removing an infected cell"},
+        {"t": 198.5, "label": "Restraint is protection"},
+        {"t": 223.367, "label": "What remains"},
+        {"t": 247.733, "label": "T cells in medicine"},
+        {"t": 273.533, "label": "Solve the puzzle"}
+      ],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "duration": 60,
+        "chapters": [
+          {"t": 0, "label": "One clone, one recognition rule"},
+          {"t": 6, "label": "A matching activated encounter"},
+          {"t": 15, "label": "A different peptide is rejected"},
+          {"t": 24, "label": "An incompatible MHC class"},
+          {"t": 33, "label": "Activation matters"},
+          {"t": 42, "label": "T cells do not make antibodies"},
+          {"t": 51, "label": "Exact reset and viewer takeover"}
+        ],
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 6,
+            "card": {
+              "title": "Try the recognition rule",
+              "sub": "This is a live model, not another video.",
+              "note": "Follow one activated CD8 clone. Pause and take the wheel at any time."
+            }
+          },
+          {
+            "t": 6,
+            "dur": 54,
+            "app": "apps/t-cell-lab.html",
+            "ready": {"selector": "html[data-ready=\"true\"] #signal-btn"},
+            "actions": [
+              {"at": 0.8, "do": "click", "selector": "#signal-btn"},
+              {"at": 9, "do": "click", "selector": "#different-btn"},
+              {"at": 10, "do": "click", "selector": "#signal-btn"},
+              {"at": 18, "do": "click", "selector": "#class-two-btn"},
+              {"at": 19, "do": "click", "selector": "#signal-btn"},
+              {"at": 27, "do": "click", "selector": "#inactive-btn"},
+              {"at": 28, "do": "click", "selector": "#signal-btn"},
+              {"at": 36, "do": "click", "selector": "#matching-btn"},
+              {"at": 37, "do": "click", "selector": "#antibody-btn"},
+              {"at": 45, "do": "click", "selector": "#reset-btn"}
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

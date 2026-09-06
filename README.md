@@ -55,6 +55,7 @@ automation branches and open review-ready pull requests. See
 |---|---|---|
 | **Working Proofs** | ✓ | A recurring public channel for reviewed work. Its first six publications preserve the winning cycle-2 through cycle-4 films, live controls, evidence, visible failures, exact resets, and viewer takeover without duplicating their binaries. |
 | **Tiny Systems** | ▦ | Three deterministic micro-lessons about an interlock, an accessibility boundary, and an arithmetic gate. Each film teaches the rule; each live replay proves acceptance, visible rejection, preserved state, and exact reset. |
+| **Inside Immunity** | T | A five-minute illustrated T-cell lesson with narration and captions, paired with a live CD8 recognition lab that demonstrates a matching response, explicit rejection, preserved accepted results, and exact reset. |
 | **Oil Field season** | 🛢️ | Ten independent current-contract channels spanning botanical documentary, portrait gameplay, investigation, physics, cartography, future news, repair, music, synthetic nature, and criticism. Every film teaches first; every replay exposes a positive path, visible failure, and reset. |
 | **Frame Chains** | ⛓️ | The first current-contract channel: five paired publications combining newcomer-first encoded films with live executable proofs across ten synthetic worlds. |
 | **Rooms** | 🕯️ | Nine ambient places that do not exist — a canoe at dawn, a cabin under the aurora, a cave lit by larvae. Slow TV where the rain is simulated, so it never falls the same way twice. |

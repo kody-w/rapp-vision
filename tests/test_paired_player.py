@@ -726,6 +726,11 @@ class TestPairedPlayerTakeoverBrowser(unittest.TestCase):
             restored = run["restored"]
             self.assertEqual(takeover["lowerDisplay"], "none")
             self.assertGreaterEqual(takeover["frame"]["height"], 520, name)
+            self.assertGreaterEqual(
+                takeover["frame"]["top"],
+                takeover["navigationBottom"],
+                f"{name}: sticky navigation covers the live application's top controls",
+            )
             self.assertGreaterEqual(takeover["button"]["height"], 44, name)
             self.assertGreaterEqual(takeover["toolbar"]["height"], 52, name)
             self.assertGreaterEqual(

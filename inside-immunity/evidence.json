@@ -1,0 +1,76 @@
+{
+  "schema": "inside-immunity-evidence/1",
+  "channel": "inside-immunity",
+  "publication": "t-cells",
+  "scope": "Measured local publication checks, not a protected creator-ingress review or an assertion of clinical outcomes.",
+  "guided": {
+    "duration_seconds": 300,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "mp4": {
+      "path": "media/t-cells.mp4",
+      "video_codec": "h264",
+      "audio_codec": "aac",
+      "sha256": "221b90291dbd6f252bafdfdfda6cf8b117f29154b66d5e39c7479160c743a8fc",
+      "master_bytes_preserved": true
+    },
+    "webm": {
+      "path": "media/t-cells.webm",
+      "video_codec": "vp9",
+      "audio_codec": "opus",
+      "sha256": "1445064ab88c30f2bc8d683ff040f7ef1efbe89d55f31418ad1ba7e0d956c25a"
+    },
+    "both_formats_decoded_and_played_in_browser": true
+  },
+  "live": {
+    "duration_seconds": 60,
+    "app": "apps/t-cell-lab.html",
+    "model": "apps/t-cell-model.mjs",
+    "measurement": "Executed real DOM controls and the complete assembled RAPP Vision replay in Chromium.",
+    "positive": {
+      "actions": ["#signal-btn"],
+      "expected": {"acceptedCount": 1, "targetStatus": "apoptosis", "decision": "accepted"},
+      "observed_matches": true
+    },
+    "visible_rejections": [
+      {"scenario": "different", "action": "#signal-btn", "accepted_projection_preserved": true},
+      {"scenario": "class-two", "action": "#signal-btn", "accepted_projection_preserved": true},
+      {"scenario": "inactive", "action": "#signal-btn", "accepted_projection_preserved": true},
+      {"scenario": "matching", "action": "#antibody-btn", "accepted_projection_preserved": true}
+    ],
+    "accepted_projection": ["acceptedCount", "lastAccepted", "targetStatus"],
+    "reset": {
+      "action": "#reset-btn",
+      "expected": {
+        "scenario": "matching",
+        "targetStatus": "intact",
+        "acceptedCount": 0,
+        "rejectedCount": 0,
+        "lastAccepted": null,
+        "decision": "ready",
+        "message": "Try an encounter. This model follows one CD8 T-cell clone."
+      },
+      "observed_exact": true,
+      "visual_settle_ms": 500
+    },
+    "assembled_replay_reached_exact_reset": true,
+    "viewer_takeover_and_manual_controls": true,
+    "mobile_viewport": {"width": 390, "height": 844},
+    "desktop_viewport": {"width": 960, "height": 540},
+    "horizontal_overflow": false,
+    "new_publication_runtime_or_network_errors": []
+  },
+  "verification_commands": [
+    "python3 scripts/validate_publications.py --ffprobe-local inside-immunity/channel.json",
+    "python3 -m unittest discover -s tests -p test_inside_immunity.py -v",
+    "PYTHONPATH=tests python3 -m unittest test_paired_player.TestPairedPlayerTakeoverBrowser -v"
+  ],
+  "rights_and_privacy": {
+    "original_narration_and_illustrations": true,
+    "synthetic_narration": true,
+    "scientific_sources": ["sources.html", "sources.json"],
+    "private_chats_or_production_notes_included": false,
+    "workstation_paths_or_credentials_in_public_payload": false
+  }
+}
