@@ -250,7 +250,7 @@
       <span aria-hidden="true">🔍</span>
       <input id="q" type="search" placeholder="Search videos, tags, chapters…" aria-label="Search">
     </div>
-    <a class="navbtn" href="agent.json" title="Machine-readable creator contract">Create with an agent</a>
+    <a class="navbtn" href="creator-handbook.html" title="The shared quality and culture guide for human and autonomous creators">Creator handbook</a>
     <button class="navbtn" id="nav-ch">RAPP Hive</button>
     <button class="navbtn" id="nav-lib">Library</button>
     <button class="navbtn" id="nav-about">About</button>
@@ -967,10 +967,11 @@ function viewHome(q = "", tag = "") {
     ${q || tag ? "" : `<section class="hero">
       <h1>${esc(CHANNELS[0] ? (CHANNELS[0].tagline || CHANNELS[0].about || "Local-first video.") : "Local-first video.")}</h1>
       <p>Watch local-first video with no account or tracking. Your history, resume points and
-         playlists stay in this browser, and the creator contract gives an agent the portable
-         format and validation rules needed to publish.</p>
+         playlists stay in this browser. Creators start with one shared handbook for quality
+         and audience understanding, then use the creator contract for formats and publishing.</p>
       <div class="toolbar" style="margin-top:16px">
-        <a class="tbtn mode-switch" href="agent.json">Create with an agent</a>
+        <a class="tbtn mode-switch" href="creator-handbook.html">Read the creator handbook</a>
+        <a class="tbtn" href="agent.json">Create with an agent</a>
         <a class="tbtn" href="#/channels">Explore RAPP Hive</a>
       </div>
       <p style="margin-top:12px">Under the hood, this remains one static HTML player; its JSON

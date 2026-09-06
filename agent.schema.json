@@ -44,6 +44,12 @@
       "type": "string",
       "minLength": 1
     },
+    "creator_handbook": {
+      "$ref": "#/$defs/relativeReference"
+    },
+    "creator_handbook_manifest": {
+      "$ref": "#/$defs/relativeReference"
+    },
     "publication_contract": {
       "const": "rapp-vision-channel/2.0"
     },

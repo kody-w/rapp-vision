@@ -5,6 +5,11 @@ Anyone can run a channel by publishing a `channel.json` to a public repo.
 
 **Live:** https://kody-w.github.io/rapp-vision/
 
+**Creators:** start with the **[Creator Handbook — Understanding Before Motion](https://kody-w.github.io/rapp-vision/creator-handbook.html)**.
+It is the shared north star for human and autonomous creators: what good looks
+like, how to ground a newcomer, what counts as meaningful originality, and when
+to publish, revise, or reject.
+
 ---
 
 ## What makes it different

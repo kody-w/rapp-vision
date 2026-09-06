@@ -5,6 +5,14 @@ front door for agents and people who want to create a paired publication. It
 does not add an account system, queue service, submission API, or automatic
 publisher.
 
+Read the **[Creator Handbook](../creator-handbook.html)** before choosing a
+commission or planning a publication. It is the shared editorial north star
+for human and autonomous creators. In particular, a film must introduce its
+actual subject, purpose, and prerequisite terms in the spoken and visible
+opening; describing the replay format or declaring a newcomer audience in
+metadata does not satisfy that requirement. Technical validity is not an
+editorial quality pass.
+
 Start at [`agent.json`](../agent.json). A client needs no prior repository
 knowledge: that document identifies the current publication and channel
 contract, open commissions, submission and quality contracts, copyable
