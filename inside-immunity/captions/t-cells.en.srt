@@ -1,0 +1,403 @@
+1
+00:00:00,525 --> 00:00:03,685
+Two neighboring body cells look almost identical.
+
+2
+00:00:03,685 --> 00:00:04,905
+One is healthy.
+
+3
+00:00:04,905 --> 00:00:06,965
+The other is making viruses.
+
+4
+00:00:06,965 --> 00:00:08,525
+How can your immune system tell them
+
+5
+00:00:08,525 --> 00:00:10,745
+apart without destroying both?
+
+6
+00:00:10,745 --> 00:00:13,345
+T cells help solve that problem by reading
+
+7
+00:00:13,345 --> 00:00:15,085
+tiny molecular clues.
+
+8
+00:00:15,085 --> 00:00:17,915
+Their story is about recognition, teamwork, and
+
+9
+00:00:17,915 --> 00:00:19,203
+knowing when to stop.
+
+10
+00:00:21,715 --> 00:00:23,775
+T cells are white blood cells in the
+
+11
+00:00:23,775 --> 00:00:27,155
+adaptive immune system, alongside B cells.
+
+12
+00:00:27,155 --> 00:00:30,065
+This system builds highly targeted responses and
+
+13
+00:00:30,065 --> 00:00:32,475
+can retain a memory of encounters.
+
+14
+00:00:32,475 --> 00:00:34,155
+But it never works alone.
+
+15
+00:00:34,155 --> 00:00:36,905
+Barriers and innate immune cells provide early
+
+16
+00:00:36,905 --> 00:00:40,315
+defenses and signals that help guide the response.
+
+17
+00:00:40,315 --> 00:00:43,040
+Think coordinated team, not lone warrior.
+
+18
+00:00:45,615 --> 00:00:49,115
+T cells develop from stem cells in bone marrow.
+
+19
+00:00:49,115 --> 00:00:51,565
+Their precursors travel to the thymus, an
+
+20
+00:00:51,565 --> 00:00:53,515
+organ in the upper chest.
+
+21
+00:00:53,515 --> 00:00:56,195
+There, selection preserves cells able to read
+
+22
+00:00:56,195 --> 00:00:59,040
+the body's molecular displays and removes many
+
+23
+00:00:59,075 --> 00:01:01,495
+that react too strongly to self.
+
+24
+00:01:01,495 --> 00:01:05,240
+These checks reduce autoimmunity risk, but don't eliminate it.
+
+25
+00:01:07,748 --> 00:01:10,188
+Most T cells recognize an antigen as a
+
+26
+00:01:10,188 --> 00:01:13,228
+small protein fragment, called a peptide.
+
+27
+00:01:13,228 --> 00:01:17,013
+Another cell displays it on a protein called MHC.
+
+28
+00:01:17,068 --> 00:01:20,038
+A T cell receptor recognizes a particular peptide
+
+29
+00:01:20,038 --> 00:01:24,628
+and MHC combination, not a whole virus floating freely.
+
+30
+00:01:24,628 --> 00:01:26,828
+Think of a sample on a display stand.
+
+31
+00:01:26,828 --> 00:01:28,833
+Both pieces matter for recognition.
+
+32
+00:01:31,445 --> 00:01:34,085
+Dendritic cells collect material in tissues and
+
+33
+00:01:34,085 --> 00:01:36,165
+carry it to nearby lymph nodes, where
+
+34
+00:01:36,165 --> 00:01:38,005
+T cells circulate.
+
+35
+00:01:38,005 --> 00:01:41,405
+For an inexperienced T cell, recognizing its matching
+
+36
+00:01:41,405 --> 00:01:44,485
+peptide display usually isn't enough.
+
+37
+00:01:44,485 --> 00:01:48,025
+An activated dendritic cell also provides co-stimulation,
+
+38
+00:01:48,025 --> 00:01:51,300
+an additional signal that helps start the response.
+
+39
+00:01:51,475 --> 00:01:54,340
+Other chemical signals help shape what happens next.
+
+40
+00:01:56,882 --> 00:02:00,422
+Once activated, the responding T cell divides.
+
+41
+00:02:00,422 --> 00:02:03,462
+Its descendants share the same receptor specificity,
+
+42
+00:02:03,462 --> 00:02:05,742
+building a larger group able to recognize
+
+43
+00:02:05,742 --> 00:02:07,442
+that molecular target.
+
+44
+00:02:07,442 --> 00:02:09,622
+This is clonal expansion.
+
+45
+00:02:09,622 --> 00:02:12,212
+Some descendants become working cells that help
+
+46
+00:02:12,212 --> 00:02:15,742
+coordinate defenses or attack infected cells.
+
+47
+00:02:15,742 --> 00:02:18,837
+The immune system expands selected responders.
+
+48
+00:02:18,862 --> 00:02:21,977
+It doesn't turn every T cell into a universal fighter.
+
+49
+00:02:24,625 --> 00:02:28,035
+CD4 helper T cells generally recognize peptides on
+
+50
+00:02:28,035 --> 00:02:32,480
+MHC class II displayed by antigen-presenting cells.
+
+51
+00:02:32,505 --> 00:02:35,265
+They coordinate other cells through direct contact
+
+52
+00:02:35,265 --> 00:02:38,160
+and chemical messengers, called cytokines.
+
+53
+00:02:38,185 --> 00:02:41,720
+Some help B cells develop into antibody-producing cells.
+
+54
+00:02:41,745 --> 00:02:45,170
+Others help microbe-eating cells destroy what they've swallowed.
+
+55
+00:02:45,225 --> 00:02:46,615
+The distinction matters.
+
+56
+00:02:46,615 --> 00:02:48,800
+B cells make antibodies.
+
+57
+00:02:48,825 --> 00:02:50,460
+Helper T cells provide support.
+
+58
+00:02:53,158 --> 00:02:57,658
+CD8 cytotoxic or killer, T cells recognize peptides
+
+59
+00:02:57,658 --> 00:03:00,263
+on MHC class 1, found on most
+
+60
+00:03:00,308 --> 00:03:02,193
+cells with a nucleus.
+
+61
+00:03:02,238 --> 00:03:04,338
+When an activated killer meets an infected
+
+62
+00:03:04,338 --> 00:03:06,773
+cell displaying a matching peptide, it can
+
+63
+00:03:06,798 --> 00:03:11,053
+trigger apoptosis: the cell's controlled self-destruction.
+
+64
+00:03:11,078 --> 00:03:13,128
+It does not swallow the virus.
+
+65
+00:03:13,128 --> 00:03:15,023
+It removes a cellular home where the
+
+66
+00:03:15,078 --> 00:03:16,493
+virus is reproducing.
+
+67
+00:03:19,025 --> 00:03:22,805
+A defense powerful enough to kill cells needs restraint.
+
+68
+00:03:22,805 --> 00:03:26,585
+Regulatory T cells help suppress excessive responses and
+
+69
+00:03:26,585 --> 00:03:29,205
+limit attacks on the body's own tissues.
+
+70
+00:03:29,205 --> 00:03:30,755
+They're part of a wider set of
+
+71
+00:03:30,755 --> 00:03:34,125
+immune checks, not an infallible safety switch.
+
+72
+00:03:34,125 --> 00:03:37,325
+Protection means striking a balance, enough action
+
+73
+00:03:37,325 --> 00:03:40,215
+to control a threat without unnecessary damage
+
+74
+00:03:40,215 --> 00:03:41,393
+to healthy tissue.
+
+75
+00:03:43,892 --> 00:03:46,352
+When an infection subsides, most of the
+
+76
+00:03:46,352 --> 00:03:48,172
+expanded T cells die.
+
+77
+00:03:48,172 --> 00:03:50,982
+Memory cells remain, ready to respond faster
+
+78
+00:03:50,982 --> 00:03:52,572
+to a matching target.
+
+79
+00:03:52,572 --> 00:03:55,972
+Vaccines often engage both T cells and B cells
+
+80
+00:03:55,972 --> 00:03:59,407
+to build this kind of protection. Responses vary.
+
+81
+00:03:59,452 --> 00:04:02,512
+Memory can reduce severe disease without preventing
+
+82
+00:04:02,512 --> 00:04:05,791
+every infection, and protection isn't always lifelong.
+
+83
+00:04:08,248 --> 00:04:10,808
+HIV shows why T cells matter.
+
+84
+00:04:10,808 --> 00:04:14,968
+It damages CD4 T cells and weakens immune defenses.
+
+85
+00:04:14,968 --> 00:04:18,723
+Cancer medicine sometimes harnesses T cells instead.
+
+86
+00:04:18,728 --> 00:04:20,868
+Some treatments release immune brakes.
+
+87
+00:04:20,868 --> 00:04:24,088
+Others engineer T cells to recognize cancer.
+
+88
+00:04:24,088 --> 00:04:26,728
+These approaches can help selected patients, but
+
+89
+00:04:26,728 --> 00:04:28,638
+don't work for everyone and can cause
+
+90
+00:04:28,638 --> 00:04:30,288
+serious side effects.
+
+91
+00:04:30,288 --> 00:04:31,586
+They're not cure-alls.
+
+92
+00:04:34,058 --> 00:04:35,588
+Back to our two cells.
+
+93
+00:04:35,588 --> 00:04:38,498
+An activated killer T cell recognizes a matching
+
+94
+00:04:38,498 --> 00:04:40,358
+viral peptide display.
+
+95
+00:04:40,358 --> 00:04:41,348
+What can it do?
+
+96
+00:04:41,348 --> 00:04:44,328
+Make antibodies, swallow viruses, or signal the
+
+97
+00:04:44,328 --> 00:04:45,873
+infected cell to die.
+
+98
+00:04:47,798 --> 00:04:50,178
+Signal the infected cell to die.
+
+99
+00:04:50,178 --> 00:04:53,458
+Across their different roles, T cells recognize, help,
+
+100
+00:04:53,458 --> 00:04:55,818
+kill, regulate, and remember.
+
+101
+00:04:55,818 --> 00:04:58,042
+Effective defense depends on teamwork.

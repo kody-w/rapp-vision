@@ -1,0 +1,67 @@
+{
+  "R1": {
+    "title": "NIAID - Immune System Overview",
+    "url": "https://www.niaid.nih.gov/research/immune-system-overview",
+    "receipt": "Bone marrow origins; maturation in the upper-chest thymus; lymphatic meeting sites."
+  },
+  "R2": {
+    "title": "NIAID - Immune Cells",
+    "url": "https://www.niaid.nih.gov/research/immune-cells",
+    "receipt": "T/B roles, CD4/CD8 recognition, MHC presentation, cytokines, apoptosis, and regulation."
+  },
+  "R3": {
+    "title": "Immunobiology - Selection of lymphocytes",
+    "url": "https://www.ncbi.nlm.nih.gov/books/NBK27089/",
+    "receipt": "Peptide-MHC recognition and positive/negative thymic selection; foundational 2001 reference."
+  },
+  "R4": {
+    "title": "NIAID - Immune Tolerance",
+    "url": "https://www.niaid.nih.gov/research/immune-tolerance",
+    "receipt": "Autoreactive cells can remain despite developmental selection; additional tolerance mechanisms."
+  },
+  "R5": {
+    "title": "Immunobiology - The course of the adaptive response",
+    "url": "https://www.ncbi.nlm.nih.gov/books/NBK27125/",
+    "receipt": "Dendritic-cell migration, innate context, co-stimulation, and selective expansion."
+  },
+  "R6": {
+    "title": "Immunobiology - Immunological memory",
+    "url": "https://www.ncbi.nlm.nih.gov/books/NBK27158/",
+    "receipt": "Response contraction, persistent memory, faster recall, and B-derived plasma cells."
+  },
+  "R7": {
+    "title": "NIH - Immune response improves after vaccination",
+    "url": "https://www.nih.gov/news-events/nih-research-matters/covid-19-immune-response-improves-months-after-vaccination",
+    "receipt": "A specific vaccination example engaging T and B cells; not a universal duration estimate."
+  },
+  "R8": {
+    "title": "NIH - Vaccine immune responses to Omicron",
+    "url": "https://www.nih.gov/news-events/nih-research-matters/covid-19-vaccines-induce-immune-response-omicron",
+    "receipt": "Cellular responses can remain relevant despite breakthrough infection; no infection-proof claim."
+  },
+  "R9": {
+    "title": "NIH HIVinfo - HIV and AIDS: The Basics",
+    "url": "https://hivinfo.nih.gov/understanding-hiv/fact-sheets/hiv-and-aids-basics",
+    "receipt": "HIV attacks CD4 cells and compromises immune defenses."
+  },
+  "R10": {
+    "title": "NCI - Immune Checkpoint Inhibitors",
+    "url": "https://www.cancer.gov/about-cancer/treatment/types/immunotherapy/checkpoint-inhibitors",
+    "receipt": "Checkpoint restraint, therapeutic blockade, and possible inflammatory side effects."
+  },
+  "R11": {
+    "title": "NCI - T-cell Transfer Therapy",
+    "url": "https://www.cancer.gov/about-cancer/treatment/types/immunotherapy/t-cell-transfer-therapy",
+    "receipt": "Engineered receptors can bind selected surface proteins; restricted applications and serious risks."
+  },
+  "R12": {
+    "title": "NCI - Immunotherapy to Treat Cancer",
+    "url": "https://www.cancer.gov/about-cancer/treatment/types/immunotherapy",
+    "receipt": "Patient responses vary, resistance exists, and healthy tissues can be affected."
+  },
+  "R13": {
+    "title": "Immunobiology - Vaccination",
+    "url": "https://www.ncbi.nlm.nih.gov/books/NBK27131/",
+    "receipt": "Protective requirements and T-cell involvement vary among pathogens and vaccines."
+  }
+}

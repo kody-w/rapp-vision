@@ -444,8 +444,8 @@ async function dispatchKey(name) {
   const common = {
     key: definition.key,
     code: definition.code,
+    // Native key codes are platform-specific; Windows key codes plus `code` are portable.
     windowsVirtualKeyCode: definition.virtualKeyCode,
-    nativeVirtualKeyCode: definition.virtualKeyCode,
   };
   await client.send(
     "Input.dispatchKeyEvent",
@@ -496,6 +496,7 @@ const captureExpression = `(() => {
     page: {
       innerWidth,
       innerHeight,
+      navigationBottom: round(document.querySelector("body > header")?.getBoundingClientRect().bottom || 0),
       clientWidth: document.documentElement.clientWidth,
       scrollWidth: document.documentElement.scrollWidth,
       bodyScrollWidth: document.body.scrollWidth
@@ -1334,6 +1335,7 @@ try {
       takeover: {
         stage: takeover.stage,
         frame: takeover.frame,
+        navigationBottom: takeover.page.navigationBottom,
         toolbar: takeover.takebar.rect,
         button: takeover.button.rect,
         lowerDisplay: takeover.lower.display,

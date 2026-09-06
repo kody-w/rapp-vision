@@ -5,8 +5,8 @@
   "name": "RAPP Hive",
   "visibility": "public",
   "revision": {
-    "sequence": 6,
-    "updated": "2026-09-03T00:43:54Z"
+    "sequence": 7,
+    "updated": "2026-09-06T14:36:08Z"
   },
   "peers": [],
   "_note": "RAPP Hive is the most universal contribution layer: a parking lot of federated channel.json URLs. Channels stay in their own repos; anyone can run a registry or add a channel locally without asking permission. Open a PR only if you want default listing.",
@@ -225,6 +225,14 @@
       "repo": "https://github.com/kody-w/rapp-vision",
       "contract": "rapp-vision-channel/2.0",
       "_why": "A recurring public channel for reviewed work whose measurable result, visible failure, controls, and exact reset remain executable."
+    },
+    {
+      "id": "inside-immunity",
+      "name": "Inside Immunity",
+      "url": "inside-immunity/channel.json",
+      "repo": "https://github.com/kody-w/rapp-vision",
+      "contract": "rapp-vision-channel/2.0",
+      "_why": "An original five-minute T-cell lesson paired with a live recognition lab: test a matching encounter, reject incompatible actions, preserve the accepted result, and reset."
     }
   ]
 }

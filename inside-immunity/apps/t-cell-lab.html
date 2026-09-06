@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T-cell recognition lab - Inside Immunity</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; background: #f6f4ec; color: #1d3430; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; font-weight: 650; padding: 9px 14px; border: 1px solid #a4b6ab; border-radius: 8px; background: #faf9f3; color: #1d3430; cursor: pointer; min-height: 40px; }
+    button:hover { background: #dcece3; }
+    button:focus-visible, a:focus-visible { outline: 3px solid #76609e; outline-offset: 3px; }
+    button[aria-pressed="true"] { border-color: #167a6a; background: #dcece3; box-shadow: inset 0 0 0 1px #167a6a; }
+    #signal-btn { background: #167a6a; color: #fffdf5; border-color: #167a6a; }
+    #reset-btn { white-space: nowrap; }
+    main { min-height: 100svh; width: min(100%, 1140px); margin: auto; padding: 14px 20px; display: flex; flex-direction: column; gap: 10px; }
+    header { display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+    .eyebrow { margin: 0 0 2px; font-size: 11px; letter-spacing: .14em; font-weight: 750; text-transform: uppercase; color: #536960; }
+    h1 { margin: 0; font-size: clamp(22px, 3vw, 34px); letter-spacing: -.04em; }
+    .controls, .actions { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+    .controls button { font-size: 14px; padding: 7px 11px; min-height: 36px; }
+    .actions button { font-size: 14px; }
+    .encounter { flex: 1; min-height: 160px; margin: 0; border-radius: 12px; background: #e7eee5; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+    svg { display: block; width: 100%; max-height: 260px; min-height: 115px; }
+    svg text { font-family: system-ui, sans-serif; fill: #1d3430; }
+    figcaption { padding: 0 14px 10px; font-size: 14px; text-align: center; font-weight: 650; }
+    #t-cell { transition: transform .45s ease; }
+    #target-body, #mhc { transition: opacity .4s ease; }
+    #fragments { opacity: 0; transition: opacity .4s ease; }
+    .committed #t-cell { transform: translateX(168px); }
+    .committed #target-body, .committed #mhc { opacity: 0; }
+    .committed #fragments { opacity: 1; }
+    .inactive #t-cell-body { fill: #719b91; }
+    .different #peptide { fill: #356a8a; }
+    .results { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(180px, 1fr); gap: 12px; }
+    .result, .receipt { border: 1px solid #bfcdc2; border-radius: 10px; padding: 10px 12px; background: #fcfbf6; }
+    .result[data-decision="rejected"] { border-color: #b8483d; background: #f8e8df; }
+    .result[data-decision="accepted"] { border-color: #167a6a; background: #dcece3; }
+    #decision-label { font-size: 12px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    #message { margin: 4px 0 0; font-size: 14px; line-height: 1.35; }
+    .receipt h2 { margin: 0 0 5px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+    #receipt { margin: 0; font-size: 13px; line-height: 1.35; }
+    #counts { margin-top: 5px; font-size: 12px; color: #536960; }
+    footer { font-size: 12px; line-height: 1.4; color: #536960; }
+    footer a { color: #126451; font-weight: 650; }
+    @media (max-width: 560px) {
+      main { padding: 12px; }
+      .results { grid-template-columns: 1fr; gap: 7px; }
+      .controls { display: grid; grid-template-columns: 1fr 1fr; }
+      .actions button { flex: 1; }
+      .encounter { min-height: 150px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #t-cell, #target-body, #mhc, #fragments { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div><p class="eyebrow">Inside Immunity / take the wheel</p><h1>T-cell recognition lab</h1></div>
+      <button id="reset-btn" type="button">Reset lab</button>
+    </header>
+    <nav class="controls" aria-label="Choose a new encounter">
+      <button id="matching-btn" type="button" data-scenario="matching" aria-pressed="true">Matching peptide</button>
+      <button id="different-btn" type="button" data-scenario="different" aria-pressed="false">Different peptide</button>
+      <button id="class-two-btn" type="button" data-scenario="class-two" aria-pressed="false">Wrong MHC class</button>
+      <button id="inactive-btn" type="button" data-scenario="inactive" aria-pressed="false">Not activated</button>
+    </nav>
+    <div class="actions" aria-label="Try an action">
+      <button id="signal-btn" type="button">Signal controlled cell death</button>
+      <button id="antibody-btn" type="button">Can this T cell make antibodies?</button>
+    </div>
+    <figure class="encounter" id="encounter">
+      <svg viewBox="0 0 960 260" role="img" aria-labelledby="diagram-title diagram-description">
+        <title id="diagram-title">One CD8 T-cell clone and a proposed target</title>
+        <desc id="diagram-description">A matching, activated encounter can trigger controlled target-cell death. A mismatched encounter does not.</desc>
+        <g id="t-cell">
+          <path id="t-cell-body" d="M174 104C180 68 213 47 251 53C285 45 320 76 330 108C344 144 326 183 298 203C268 224 227 220 200 204C166 185 156 139 174 104Z" fill="#167a6a" stroke="#1d3430" stroke-width="4"/>
+          <path d="M194 112C205 81 238 78 256 98C280 108 284 143 263 165C243 188 207 180 193 157C184 140 183 125 194 112Z" fill="#1d3430"/>
+          <path d="M286 83Q310 96 313 117M289 180Q309 168 314 146M198 91Q216 65 242 67" fill="none" stroke="#dcece3" stroke-width="4" stroke-linecap="round"/>
+          <path d="M330 135H360M360 135L390 115M360 135L390 155" fill="none" stroke="#167a6a" stroke-width="7" stroke-linecap="round"/>
+          <path d="M244 53V35M244 35L233 25M244 35L255 25M187 188L174 200M174 200L161 197M174 200L177 213" fill="none" stroke="#167a6a" stroke-width="4"/>
+          <text id="effector-label" x="250" y="247" text-anchor="middle" font-size="18" font-weight="650">Activated CD8 T cell</text>
+        </g>
+        <g id="target-body">
+          <path d="M627 98C640 65 674 48 707 55C744 46 779 74 788 110C801 143 783 180 756 202C724 224 682 216 654 202C622 183 610 137 627 98Z" fill="#f3dbd3" stroke="#b8483d" stroke-width="4"/>
+          <path d="M667 115C676 88 706 88 725 106C746 120 742 151 723 167C701 185 673 170 665 149C656 135 658 124 667 115Z" fill="#b8483d"/>
+          <path d="M747 83Q770 103 771 118M646 156Q650 181 672 190M744 179L761 166" fill="none" stroke="#b8483d" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <g id="mhc">
+          <path d="M620 135H592M570 115H580Q606 135 580 155H570" fill="none" stroke="#76609e" stroke-width="7" stroke-linecap="round"/>
+          <path id="peptide" d="M550 126L560 121L569 129L566 142L555 148L548 137Z" fill="#b8483d" stroke="#1d3430" stroke-width="2"/>
+        </g>
+        <g id="fragments" fill="#f3dbd3" stroke="#b8483d" stroke-width="3">
+          <circle cx="670" cy="106" r="30"/><circle cx="741" cy="102" r="28"/>
+          <circle cx="667" cy="172" r="29"/><circle cx="741" cy="172" r="31"/>
+          <circle cx="705" cy="138" r="20"/>
+          <path d="M659 99L672 94L681 105L674 115L660 112ZM730 97L742 90L750 104L738 112ZM653 170L665 159L677 170L669 181ZM729 163L742 156L752 171L740 183ZM699 132L708 127L714 140L701 147Z" fill="#b8483d" stroke="none"/>
+        </g>
+        <text id="target-label" x="706" y="247" text-anchor="middle" font-size="18" font-weight="650">Proposed target: intact</text>
+        <text id="mhc-label" x="573" y="83" text-anchor="middle" font-size="16">MHC I</text>
+      </svg>
+      <figcaption id="display-label">MHC I + the clone's matching peptide</figcaption>
+    </figure>
+    <section class="results" aria-label="Observed model outcome">
+      <div class="result" id="result" data-decision="ready" role="status" aria-live="polite" aria-atomic="true">
+        <span id="decision-label">Ready</span>
+        <p id="message">Try an encounter. This model follows one CD8 T-cell clone.</p>
+      </div>
+      <div class="receipt">
+        <h2>Last accepted model result</h2>
+        <p id="receipt">None yet.</p>
+        <div id="counts">Accepted trials: 0 / rejected attempts: 0</div>
+      </div>
+    </section>
+    <footer>
+      Simplified schematic, not to scale. This fixed-clone model does not simulate every immune signal, thymic tolerance, or clinical outcomes.
+      Trial counts are software state, not biological measurements.
+      <a href="../sources.html" target="_blank" rel="noopener noreferrer">Scientific sources</a>
+    </footer>
+  </main>
+  <script type="module">
+    import { scenarios, initialState, selectScenario, applyAction } from "./t-cell-model.mjs";
+    let state = initialState();
+    const $ = id => document.getElementById(id);
+    function render() {
+      const encounter = scenarios[state.scenario];
+      $("encounter").className = `encounter ${state.targetStatus === "apoptosis" ? "committed" : ""} ${state.scenario}`;
+      $("effector-label").textContent = encounter.activated ? "Activated CD8 T cell" : "CD8 T cell: not activated";
+      $("target-label").textContent = state.targetStatus === "apoptosis" ? "Controlled cell death" : "Proposed target: intact";
+      $("mhc-label").textContent = `MHC ${encounter.mhc}`;
+      $("display-label").textContent = encounter.display;
+      $("result").dataset.decision = state.decision;
+      $("decision-label").textContent = state.decision;
+      $("message").textContent = state.message;
+      $("receipt").textContent = state.lastAccepted
+        ? `Trial ${state.lastAccepted.trial}: matching peptide-MHC I; apoptosis signaled.`
+        : "None yet.";
+      $("counts").textContent = `Accepted trials: ${state.acceptedCount} / rejected attempts: ${state.rejectedCount}`;
+      document.querySelectorAll("[data-scenario]").forEach(button => {
+        button.setAttribute("aria-pressed", String(button.dataset.scenario === state.scenario));
+      });
+    }
+    document.querySelectorAll("[data-scenario]").forEach(button => {
+      button.addEventListener("click", () => { state = selectScenario(state, button.dataset.scenario); render(); });
+    });
+    $("signal-btn").addEventListener("click", () => { state = applyAction(state, "signal"); render(); });
+    $("antibody-btn").addEventListener("click", () => { state = applyAction(state, "antibody"); render(); });
+    $("reset-btn").addEventListener("click", () => { state = initialState(); render(); window.scrollTo(0, 0); });
+    window.tCellLab = Object.freeze({ snapshot: () => JSON.parse(JSON.stringify(state)) });
+    render();
+    document.documentElement.dataset.ready = "true";
+  </script>
+</body>
+</html>

@@ -11,7 +11,7 @@
       "url": "https://github.com/your-github-handle"
     }
   ],
-  "_howto": "Every new publication is one paired entry. MP4 and WebM provide the default guided video; live is the take-the-wheel replay available from the same permalink. Entry duration/chapters describe the film; live duration/chapters describe the replay and may differ. Every src, thumb, and app resolves relative to this file.",
+  "_howto": "Begin with the shared creator handbook at https://kody-w.github.io/rapp-vision/creator-handbook.html. Every new publication is one paired entry. MP4 and WebM provide the default guided video; live is the take-the-wheel replay available from the same permalink. Entry duration/chapters describe the film; live duration/chapters describe the replay and may differ. Every src, thumb, and app resolves relative to this file.",
   "videos": [
     {
       "id": "my-first-publication",

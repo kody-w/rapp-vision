@@ -4,6 +4,8 @@
   "id": "rapp-vision",
   "name": "RAPP Vision",
   "description": "Static, agent-first discovery for creating paired RAPP Vision publications.",
+  "creator_handbook": "creator-handbook.html",
+  "creator_handbook_manifest": "creator-handbook.manifest.json",
   "publication_contract": "rapp-vision-channel/2.0",
   "publication_schema": "channel.schema.json#/$defs/publication",
   "channel_contract": "rapp-vision-channel/2.0",

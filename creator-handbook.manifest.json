@@ -1,0 +1,19 @@
+{
+  "bytes": 27671,
+  "canonicalization": {
+    "active_content": "forbidden",
+    "attributes": "lowercase-lexicographic-double-quoted",
+    "comments": "forbidden",
+    "doctype": "html5",
+    "encoding": "utf-8",
+    "entities": "decoded-then-minimally-escaped",
+    "line_endings": "LF",
+    "tags": "lowercase-explicit-end-tags",
+    "unicode": "NFC"
+  },
+  "file": "creator-handbook.html",
+  "media_type": "text/html;charset=utf-8",
+  "particle_hash": "715fb5ee0ca68c264f0f0c963bae22cfa11b451466fd50028eb9376b9e23f219",
+  "schema": "rapp/1-html",
+  "sha256": "b3df784af717efd9a77b0564304acdafa9dd02c9bce278f1720f25091093fac5"
+}

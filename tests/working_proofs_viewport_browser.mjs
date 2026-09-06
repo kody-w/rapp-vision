@@ -513,7 +513,10 @@ async function waitFor(expression, timeout = 20_000) {
   throw new Error(`timed out waiting for browser condition: ${expression}`);
 }
 
+let activeViewport = null;
+
 async function setViewport(viewport) {
+  activeViewport = viewport;
   await cdp.command("Emulation.setDeviceMetricsOverride", {
     width: viewport.pageWidth,
     height: viewport.pageHeight,
@@ -533,6 +536,10 @@ async function openReplay(publicationId, config) {
       publication(publicationId).title,
     )}) && Boolean(document.querySelector("#b-switch"))`,
   );
+  // Normalize overlay/classic scrollbar space so the app is tested at the declared width.
+  await evaluate(`document.body.style.width = ${JSON.stringify(
+    `${Math.min(...activeViewport.outerClientWidths)}px`,
+  )}`);
   await evaluate('document.querySelector("#b-switch").click()');
   if (config.readyExpression) {
     await waitFor(`(() => {

@@ -250,7 +250,7 @@
       <span aria-hidden="true">🔍</span>
       <input id="q" type="search" placeholder="Search videos, tags, chapters…" aria-label="Search">
     </div>
-    <a class="navbtn" href="agent.json" title="Machine-readable creator contract">Create with an agent</a>
+    <a class="navbtn" href="creator-handbook.html" title="The shared quality and culture guide for human and autonomous creators">Creator handbook</a>
     <button class="navbtn" id="nav-ch">RAPP Hive</button>
     <button class="navbtn" id="nav-lib">Library</button>
     <button class="navbtn" id="nav-about">About</button>
@@ -967,10 +967,11 @@ function viewHome(q = "", tag = "") {
     ${q || tag ? "" : `<section class="hero">
       <h1>${esc(CHANNELS[0] ? (CHANNELS[0].tagline || CHANNELS[0].about || "Local-first video.") : "Local-first video.")}</h1>
       <p>Watch local-first video with no account or tracking. Your history, resume points and
-         playlists stay in this browser, and the creator contract gives an agent the portable
-         format and validation rules needed to publish.</p>
+         playlists stay in this browser. Creators start with one shared handbook for quality
+         and audience understanding, then use the creator contract for formats and publishing.</p>
       <div class="toolbar" style="margin-top:16px">
-        <a class="tbtn mode-switch" href="agent.json">Create with an agent</a>
+        <a class="tbtn mode-switch" href="creator-handbook.html">Read the creator handbook</a>
+        <a class="tbtn" href="agent.json">Create with an agent</a>
         <a class="tbtn" href="#/channels">Explore RAPP Hive</a>
       </div>
       <p style="margin-top:12px">Under the hood, this remains one static HTML player; its JSON
@@ -1180,6 +1181,7 @@ function mountLive(v, host, progressKey) {
   let clock = 0, playing = false, raf = 0, cur = -1, frame = null, fired = new Set(), last = 0;
   let anchor = null, anchorPoll = 0;
   let takeover = false, resumeAfterTakeover = false, frameEscapeDocument = null;
+  let takeoverScroll = null;
   let frameEscapeAvailable = false;
   let destroyed = false;
   const retryTimers = new Set();
@@ -1240,6 +1242,7 @@ function mountLive(v, host, progressKey) {
 
   function enterTakeover() {
     if (destroyed || takeover || !frame || takebar.hidden) return;
+    takeoverScroll = { x: window.scrollX, y: window.scrollY, margin: stage.style.scrollMarginTop };
     resumeAfterTakeover = playing;
     takeover = true;
     pause();
@@ -1249,19 +1252,28 @@ function mountLive(v, host, progressKey) {
     takeoverStatus.textContent = frameEscapeAvailable
       ? "Take control mode. Scripted replay paused; use Show captions or Escape to return."
       : "Take control mode. Scripted replay paused; this app is cross-origin, so use the reserved Show captions button to return.";
-    stage.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "auto" });
+    // Keep the app's top-row controls below the sticky navigation during takeover.
+    const navigation = document.querySelector("body > header");
+    stage.style.scrollMarginTop = `${(navigation ? navigation.getBoundingClientRect().height : 0) + 12}px`;
+    stage.scrollIntoView({ block: "start", inline: "nearest", behavior: "auto" });
     focusLiveFrame();
     requestAnimationFrame(() => { if (takeover) focusLiveFrame(); });
   }
 
   function leaveTakeover({ resume = true, focusControl = true, announce = true } = {}) {
     const shouldResume = takeover && resume && resumeAfterTakeover;
+    const priorScroll = takeoverScroll;
+    takeoverScroll = null;
     takeover = false;
     resumeAfterTakeover = false;
     host.classList.remove("live-takeover");
     host.dataset.takeover = "false";
     host.dataset.takeoverEscape = "toolbar-only";
     updateTakeoverControl();
+    if (priorScroll) {
+      stage.style.scrollMarginTop = priorScroll.margin;
+      if (focusControl) window.scrollTo({ left: priorScroll.x, top: priorScroll.y, behavior: "auto" });
+    }
     if (announce) {
       takeoverStatus.textContent = shouldResume
         ? "Captions shown. Scripted replay resumed."

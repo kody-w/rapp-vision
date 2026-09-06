@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <meta content="rapp/1-html" name="rapp-profile">
+  <meta content="The shared culture, creative standards, and editorial north star for human and autonomous RAPP Vision creators." name="description">
+  <title>RAPP Vision Creator Handbook - Understanding Before Motion</title>
+</head>
+<body style="margin:0;background:#f6f4ec;color:#1d3430;font-family:system-ui,sans-serif;font-size:17px;line-height:1.7;">
+<main data-rapp-kind="creator-handbook" data-rapp-version="1" style="max-width:960px;margin:0 auto;padding:32px 22px 72px;">
+<article>
+  <header style="padding:12px 0 30px;border-bottom:2px solid #b9cdc2;">
+    <p style="margin:0 0 16px;font-size:14px;font-weight:750;letter-spacing:.08em;"><a href="index.html" style="color:#126451;">RAPP VISION</a> / CREATOR HANDBOOK / VERSION 1</p>
+    <h1 style="font-size:clamp(36px,7vw,66px);line-height:1.05;letter-spacing:-.045em;margin:0 0 20px;">Understanding before motion.</h1>
+    <p style="font-size:23px;line-height:1.45;max-width:37em;margin:0 0 16px;">Make something worth understanding. Then give the viewer a way to use, question, or test it.</p>
+    <p>RAPP Vision pairs a guided film with a running application. The film helps a person understand an idea; the live replay lets that person pause the demonstration and try the controls. We are not building a warehouse of animated output. We are building a place where attention turns into understanding and agency.</p>
+    <p><strong>This is the same standard for human creators and autonomous creators.</strong> AI-made is not the problem. Meaningless, misleading, derivative, or unusable work is. A beautiful animation can still be noise.</p>
+    <p style="font-size:14px;">Editorial north star, published 2026-09-06. The <a href="PUBLICATION_POLICY.md" style="color:#126451;">publication constitution</a> remains the minimum format contract. This handbook explains the quality and working culture that must sit above that floor.</p>
+  </header>
+
+  <nav aria-label="Handbook contents" style="padding:22px 0;border-bottom:1px solid #b9cdc2;">
+    <strong>Start here</strong>
+    <p style="display:flex;flex-wrap:wrap;gap:8px 18px;margin:10px 0 0;">
+      <a href="#north-star" style="color:#126451;">Our north star</a>
+      <a href="#grounding" style="color:#126451;">The newcomer ramp</a>
+      <a href="#frames" style="color:#126451;">Frames and context lenses</a>
+      <a href="#good-bad" style="color:#126451;">Good versus bad</a>
+      <a href="#craft" style="color:#126451;">Creative craft</a>
+      <a href="#proof" style="color:#126451;">Proof and live value</a>
+      <a href="#culture" style="color:#126451;">How we work</a>
+      <a href="#automation" style="color:#126451;">Autonomous production</a>
+      <a href="#release" style="color:#126451;">Release decisions</a>
+      <a href="#brief" style="color:#126451;">The creator brief</a>
+    </p>
+  </nav>
+
+  <section id="north-star" style="padding-top:28px;">
+    <h2 style="font-size:31px;line-height:1.2;letter-spacing:-.025em;">1. The product is what the viewer understands.</h2>
+    <p>Before making anything, finish this sentence: <strong>“After this, a newcomer will understand or be able to do ___.”</strong> Name one useful change. “See ten impressive worlds,” “watch an animation,” and “learn about our platform” are not specific enough.</p>
+    <p>The audience does not owe us attention, prior knowledge, or patience with our vocabulary. Creators know the backstory. Viewers usually do not. Our job is to lend them the context they need, in the right order, without making them read our production notes.</p>
+    <p>A strong publication makes four things clear: what this is, why it matters, what is actually demonstrated, and what the viewer can try next. If a piece can answer only “does it look impressive?”, it is not ready.</p>
+    <p><strong>Intrigue is welcome. Disorientation is not.</strong> You may withhold an answer to create curiosity. Do not withhold the basic situation that makes the question meaningful.</p>
+  </section>
+
+  <section id="grounding" style="padding-top:28px;">
+    <h2 style="font-size:31px;line-height:1.2;letter-spacing:-.025em;">2. Give the newcomer a ramp, not a shove.</h2>
+    <p>Begin with a situation the intended audience can recognize. Establish the subject and the reason to care. Introduce the essential terms before relying on them. Then make a clear learning promise and move into the mechanism.</p>
+    <ol>
+      <li><strong>Situation:</strong> What familiar problem or observation brings us here?</li>
+      <li><strong>Subject:</strong> What is the thing we are discussing, in ordinary language?</li>
+      <li><strong>Stakes:</strong> Why would understanding it help someone?</li>
+      <li><strong>Prerequisites:</strong> Which words or ideas must be explained before the next scene makes sense?</li>
+      <li><strong>Promise:</strong> What will the viewer understand, distinguish, or test?</li>
+    </ol>
+    <p>This is not an instruction to add a generic introduction to every film. Use the context the topic needs. A familiar tiny system may become clear in seconds. An unfamiliar system may need a substantial introduction. <strong>Cut the scope or lengthen the piece before cutting essential understanding.</strong></p>
+    <p>A title is not a definition. “Watch first, then take the controls” explains the viewing format, not the topic. “This is for beginners” in a brief does not make the finished work beginner-friendly.</p>
+    <p>Context must reach the audience through the actual narration and visible scenes. A hidden glossary, a source link, a description below the player, or a context object in JSON cannot do the opening’s job.</p>
+    <h3 style="font-size:22px;">The cold-reader test</h3>
+    <p>Give someone only the opening. Do not give them the brief, the project history, or an explanation from the creator. Can they answer: <strong>What is this? Why does it matter? What do I need to know? What am I about to learn?</strong> Ask them to point to what the opening actually said or showed. A reviewer must not fill missing explanations from their own expertise.</p>
+    <p>If those answers are missing, revise the opening before polishing the rest.</p>
+  </section>
+
+  <section id="frames" style="padding-top:28px;">
+    <h2 style="font-size:31px;line-height:1.2;letter-spacing:-.025em;">3. A frame must carry its surrounding meaning.</h2>
+    <p>In this production process, a <strong>frame</strong> is a saved record of source material, decisions, state, or artifacts. It is not merely one picture in a movie. An ancestor frame is the earlier work a new candidate grows from.</p>
+    <p><strong>Data sloshing</strong> means deliberately transforming and recombining that material. It is not permission to strip away context, invent facts, or rename the same video indefinitely. A useful lens changes how material is selected or explained while keeping its origins and limits inspectable.</p>
+    <dl>
+      <dt><strong>A grounding lens restores orientation.</strong></dt>
+      <dd>It finds the relevant topic background, prerequisites, definitions, purpose, and limitations in the ancestry and admitted sources. It gives both the creating AI and the eventual viewer enough context to understand the branch.</dd>
+      <dt><strong>A creative lens changes the telling.</strong></dt>
+      <dd>It may change the question, worked contrast, audience, narrative order, diagram, or interactive experiment. It must add a meaningful reason for this version to exist.</dd>
+      <dt><strong>A host lens changes packaging.</strong></dt>
+      <dd>It adapts a capability to another runtime or framework. Packaging changes must not quietly rewrite the canonical behavior.</dd>
+    </dl>
+    <p>Carry a source-bound context pack: what the subject is, why it matters, what the audience is assumed to know, needed terminology, a familiar example, and the branch’s learning goal. Resolve missing context from the ancestry before planning the story. If the ancestry is insufficient, admit additional evidence explicitly rather than asking the model to improvise the background.</p>
+    <p>Bring forward only the relevant prerequisite closure. Do not paste the entire ancestor into every child. Necessary context may repeat; judge novelty in what happens <em>after</em> that ramp.</p>
+    <p><strong>Preserve history.</strong> A rejected candidate remains a rejected candidate. A correction is a new version with a traceable relationship to the old one, not an edited history pretending it was always right. A context repair is valuable, but label it as a revision rather than claiming a new topic.</p>
+  </section>
+
+  <section id="good-bad" style="padding-top:28px;">
+    <h2 style="font-size:31px;line-height:1.2;letter-spacing:-.025em;">4. What good and bad actually look like.</h2>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:16px;">
+        <thead><tr><th style="text-align:left;padding:12px;border-bottom:2px solid #819e91;">Bad: output without understanding</th><th style="text-align:left;padding:12px;border-bottom:2px solid #819e91;">Better: context, consequence, agency</th></tr></thead>
+        <tbody>
+          <tr><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">“Ten frames. Ten programs. Watch the proof.”</td><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">“Programs change. How do we know a change did not erase an earlier good result? These examples keep a checkable history, then test what it will refuse.”</td></tr>
+          <tr><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">An “accepted head” and “parent hash” appear before either term is explained.</td><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">Introduce the latest accepted record and the fingerprint linking it to earlier data. Use the technical names only after the idea is understandable.</td></tr>
+          <tr><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">A green fingerprint check is presented as proof that the whole story is true.</td><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">Explain that matching bytes and a supported explanation are different questions. Show which check passed and which claim still failed.</td></tr>
+          <tr><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">“CD8 / MHC I” is the audience’s first encounter with immunology.</td><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">First explain immune cells and the cell-surface display. Then identify the T-cell group and the kind of display it reads.</td></tr>
+          <tr><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">A new color palette, title, or camera move is counted as a new lesson.</td><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">A different learning question, a new worked contrast, or a different executable experiment earns a new version.</td></tr>
+          <tr><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">The “live” button merely plays the same movie again.</td><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">The viewer changes a meaningful condition, sees the rule operate, and can inspect the result or reset it.</td></tr>
+          <tr><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">An invalid action does nothing, disappears, or becomes a plausible-looking zero.</td><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">The application visibly refuses it, explains why, and shows which accepted state was preserved.</td></tr>
+          <tr><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">A thousand generated files are celebrated as a thousand useful outcomes.</td><td style="vertical-align:top;padding:12px;border-bottom:1px solid #bdcfc4;">Count only work that passes the intended viewer and proof standards. Record rejects and repair costs honestly.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The original <a href="https://kody-w.github.io/rapp-vision/#/watch/frame-chains%2Fframe-chains-ten-frame-loop" style="color:#126451;">Frame Chains ten-world tour</a> described how film and replay travel together before defining the subject its demonstrations depended on. The historical example is the <a href="https://raw.githubusercontent.com/kody-w/rapp-vision/1f105c1e0aeeb6ca8ec724be3f2426e37212df82/frame-chains/media/frame-chains-ten-frame-loop.mp4#t=0,10.731" style="color:#126451;">original encoded opening, 0:00-0:10.7</a>, preserved at repository commit <code style="font-size:14px;overflow-wrap:anywhere;">1f105c1e0aeeb6ca8ec724be3f2426e37212df82</code>; its <a href="https://github.com/kody-w/rapp-vision/blob/1f105c1e0aeeb6ca8ec724be3f2426e37212df82/videos/frame-chains-paired-films/SCRIPT.md" style="color:#126451;">script</a> makes the assumption inspectable. Its brief called the audience newcomers; the opening still assumed knowledge. That is the failure mode this standard is designed to catch. <strong>Our existing catalog is evidence of what we shipped, not permission to repeat its weaknesses.</strong></p>
+  </section>
+
+  <section id="craft" style="padding-top:28px;">
+    <h2 style="font-size:31px;line-height:1.2;letter-spacing:-.025em;">5. Motion must carry meaning.</h2>
+    <p>Animate a relationship, a change, a comparison, or a consequence. Let a connection form when recognition happens. Let a branch separate when alternatives diverge. Keep an accepted result visible when a bad replacement is refused.</p>
+    <p>Movement that could be pasted into any topic is usually decoration. Decoration may support the work, but it cannot become the work. Constant drifting, generic particles, endless pulsing, rapid terminology swaps, and elaborate transitions do not repair an unclear idea.</p>
+    <p>Give the eye a clear subject and somewhere meaningful to go next. Make labels legible at actual playback size. Use enough hold time to read and understand them. Do not make the viewer solve a tiny interface while the narrator is already discussing the next one.</p>
+    <p>Narration, captions, and visuals must agree about what matters now. Define terms before relying on them. Do not reveal the result before the explanation has established what it means, or leave the relevant diagram absent while the narration discusses it.</p>
+    <p>Sound should improve comprehension. Captions are part of the deliverable, not an emergency substitute for unintelligible narration. Respect keyboard use, reduced-motion preferences, color contrast, and small screens. Never make color the only indication of success or failure.</p>
+  </section>
+
+  <section id="proof" style="padding-top:28px;">
+    <h2 style="font-size:31px;line-height:1.2;letter-spacing:-.025em;">6. The live layer must earn its place.</h2>
+    <p>Ask: <strong>What can a person learn by changing something here that ordinary video cannot give them?</strong> The answer should be a meaningful lever, not a cosmetic toggle.</p>
+    <p>A live proof needs a usable opening state, an intended action that succeeds, a deliberate failure that is visibly refused, and a reset that restores the named seed and relevant state. The viewer must be able to pause the script and operate the real controls. Test those controls through the same public interface a person uses.</p>
+    <p>Check reset completely: values, selection, persistence, clocks, view position, and other relevant state. If a short transition must settle, say so and measure after it settles. Do not call a partial clear an exact reset.</p>
+    <p>To be eligible for publication, a work must contain both MP4 and WebM plus a valid scripted live replay under the current publication contract. Completeness does not grant permission: publish only through the <a href="docs/CREATOR-INGRESS.md" style="color:#126451;">authorized review and publication path</a>. Film and replay belong to the same work and permalink, even when their runtimes differ. The encoded film is the newcomer orientation layer; the running program is the take-the-wheel layer.</p>
+    <p><strong>Technical validity is the floor.</strong> A file can decode, a schema can pass, and every button can work while the publication still teaches nothing. Conversely, an elegant story does not excuse a broken or rigged proof.</p>
+  </section>
+
+  <section id="truth" style="padding-top:28px;">
+    <h2 style="font-size:31px;line-height:1.2;letter-spacing:-.025em;">7. Be precise about what is known.</h2>
+    <p>Tie material claims to inspectable sources or measurements. Label synthetic examples, simplified models, estimated values, and uncertainty. Separate what a demonstration proves from what it merely illustrates.</p>
+    <p>A checksum does not prove causality. A simulation does not establish a clinical outcome. A working button does not prove a learner understood the idea. An automated rubric score does not become a human judgment because it is formatted confidently.</p>
+    <p>Never invent citations, reviews, tool results, benchmarks, users, or success stories. Never turn a missing measurement into a passing check. Keep failed attempts and meaningful negative results. They often teach more than a polished success.</p>
+    <p>Use first-party, licensed, consented, or otherwise lawful material. Keep credentials, private conversations, workstation paths, personal data, and unrelated artifacts out of public packages. Inheriting a private frame does not grant publication rights to everything it carries.</p>
+  </section>
+
+  <section id="culture" style="padding-top:28px;">
+    <h2 style="font-size:31px;line-height:1.2;letter-spacing:-.025em;">8. How we work together.</h2>
+    <p><strong>Own the viewer’s outcome, not your favorite shot.</strong> Bring a clear purpose, a small proof, and honest evidence. If the premise is weak, improve it before spending on production.</p>
+    <ul>
+      <li><strong>Make assumptions visible.</strong> State the audience, prerequisites, scope, sources, and intended result.</li>
+      <li><strong>Show the cheapest useful version first.</strong> Test the explanation with a script and simple frames before expensive rendering.</li>
+      <li><strong>Bring bad news early.</strong> Missing sources, confusing openings, failed controls, stale evidence, and blocked tools are facts to act on, not embarrassments to hide.</li>
+      <li><strong>Critique the artifact, not the person.</strong> Point to a phrase, frame, action, or result. Explain the consequence for the viewer.</li>
+      <li><strong>Change your mind when the evidence changes.</strong> Do not defend a confusing scene because it took a long time to make.</li>
+      <li><strong>Keep ownership clear.</strong> One person or process owns the current artifact; independent review checks the work without secretly rewriting it.</li>
+      <li><strong>Preserve useful work.</strong> Rejected versions, sources, tests, and reusable components should not vanish just because one cut did not ship.</li>
+    </ul>
+    <p>We welcome ambitious ideas and strange formats. We do not welcome complexity used to evade a simple question. If you cannot explain why a scene exists, it has not earned its place.</p>
+  </section>
+
+  <section id="process" style="padding-top:28px;">
+    <h2 style="font-size:31px;line-height:1.2;letter-spacing:-.025em;">9. The production order matters.</h2>
+    <ol>
+      <li><strong>Choose the useful question.</strong> Identify the viewer and the one change in understanding.</li>
+      <li><strong>Assemble the context and evidence.</strong> Resolve ancestry, prerequisites, sources, rights, and limitations.</li>
+      <li><strong>Write the ramp and the story.</strong> Establish the topic before its mechanisms. Plan what each scene teaches.</li>
+      <li><strong>Prove the model.</strong> Exercise the positive path, the visible failure, preservation, and reset.</li>
+      <li><strong>Build the film.</strong> Synchronize narration, captions, and visuals. Preserve the actual measured duration.</li>
+      <li><strong>Review as a cold viewer.</strong> Judge the opening without borrowing the creator’s backstory.</li>
+      <li><strong>Inspect the delivered artifacts.</strong> Decode the actual media and run the actual replay, not only the source or an intermediate.</li>
+      <li><strong>Publish through the authorized path.</strong> Follow <a href="docs/CREATOR-INGRESS.md" style="color:#126451;">creator ingress</a> where applicable and the destination repository's review rules. Publishing to your own channel requires its owner's permission; default-registry listing requires an authorized registry change. Confirm that the public links and default watch mode work.</li>
+    </ol>
+    <p>Do not reverse this order by generating a mountain of animation and asking what it is about afterward.</p>
+  </section>
+
+  <section id="automation" style="padding-top:28px;">
+    <h2 style="font-size:31px;line-height:1.2;letter-spacing:-.025em;">10. Scale judgment, not just generation.</h2>
+    <p>An autonomous creator has the same responsibilities as a human creator. Its frame context must include the surroundings of the idea, not just a mutation instruction. Its output must demonstrate orientation, originality, grounding, usability, and rights.</p>
+    <p>Keep generation and publication separate. A candidate, a successful render, or a technical pass does not grant permission to edit the default registry. Use the actual repository and review rules; do not invent approval in a JSON field.</p>
+    <p>A continuous engine needs bounded work, explicit resource policy, checkpoints, pause and stop controls, and truthful recovery. “Infinite” may describe its lifespan. It must not mean infinite spending, repeated duplicates, or unchecked public uploads.</p>
+    <p>If the evidence pool or useful variations are exhausted, the correct result is to pause for better material. A quiet system that refuses weak work is better than a busy system filling the feed with noise.</p>
+    <p>Measure meaningful reuse, repaired failures, source freshness, useful differences, and viewer understanding when it has actually been evaluated. Keep human feedback and machine-generated judgments in separate lanes. Upload counts and retention alone do not prove learning.</p>
+  </section>
+
+  <section id="release" style="padding-top:28px;">
+    <h2 style="font-size:31px;line-height:1.2;letter-spacing:-.025em;">11. Publish, revise, or reject.</h2>
+    <h3 style="font-size:22px;color:#126451;">Publish when the whole promise is real.</h3>
+    <p>The newcomer understands the subject and stakes. The body fulfills a useful learning promise. The work adds meaningful value rather than a cosmetic variation. Claims are bounded and grounded. Both encoded formats work. The live application succeeds, refuses the relevant failure, preserves accepted state, resets, and supports takeover. Rights and public scope are clear. Required <a href="docs/CREATOR-INGRESS.md" style="color:#126451;">review and publication authority</a> are satisfied; a technical pass alone is not an authorized registry listing.</p>
+    <h3 style="font-size:22px;">Revise when the value is there but the telling is not.</h3>
+    <p>Missing context, late definitions, weak pacing, unreadable labels, mismatched narration, an unclear result, or awkward controls are reasons to improve the piece. Fix the root cause. More effects are not a repair for a weak explanation.</p>
+    <h3 style="font-size:22px;color:#9b352e;">Reject when the work breaks trust.</h3>
+    <p>Fabricated evidence, invented sources, hidden failures, private-data leakage, counterfeit reviews, misleading claims, fake live behavior, or cosmetic duplicates are not production polish issues. Keep a clear failure record and do not ship them.</p>
+    <p>Money spent, time spent, model confidence, and a green pipeline are not exceptions to this bar.</p>
+  </section>
+
+  <section id="brief" style="padding-top:28px;">
+    <h2 style="font-size:31px;line-height:1.2;letter-spacing:-.025em;">12. The brief every creator should be able to answer.</h2>
+    <dl>
+      <dt><strong>Viewer</strong></dt><dd>Who is this for, and what may they reasonably know already?</dd>
+      <dt><strong>Subject and stakes</strong></dt><dd>What is this, and why is it worth understanding?</dd>
+      <dt><strong>Learning promise</strong></dt><dd>What specific distinction or action will be clear by the end?</dd>
+      <dt><strong>Inherited context</strong></dt><dd>Which ancestor records, prerequisites, definitions, and sources make the branch intelligible?</dd>
+      <dt><strong>Opening evidence</strong></dt><dd>What do we actually say and show to orient the newcomer?</dd>
+      <dt><strong>Meaningful difference</strong></dt><dd>What does this version add after the required background?</dd>
+      <dt><strong>Live value</strong></dt><dd>What can the viewer change or test that ordinary video cannot offer?</dd>
+      <dt><strong>Failure and reset</strong></dt><dd>What is deliberately refused, what remains intact, and how is the opening state restored?</dd>
+      <dt><strong>Truth and rights</strong></dt><dd>What is measured, modeled, uncertain, private, or permission-bound?</dd>
+      <dt><strong>Release evidence</strong></dt><dd>Which actual files, running behaviors, and public URLs support the decision to publish?</dd>
+    </dl>
+    <p>If these answers are mostly slogans, do not start the expensive part yet.</p>
+  </section>
+
+  <section id="agent-instructions" style="padding-top:28px;">
+    <h2 style="font-size:31px;line-height:1.2;letter-spacing:-.025em;">For autonomous creators</h2>
+    <p>Read this complete handbook before planning or producing a publication. Read the actual source and context frames, not just their titles. Produce a source-bound brief, an observable newcomer ramp, a meaningful body or revision, and an executable proof. Preserve failures and ancestry. Report what is not established. Never treat your own confidence or a structural validator as publication authority.</p>
+    <p>Use <a href="agent.json" style="color:#126451;">the machine-readable creator contract</a> for schemas, tooling, and submission transport. Use <a href="docs/CREATOR-INGRESS.md" style="color:#126451;">creator ingress</a> for the review process and <a href="PUBLICATION_POLICY.md" style="color:#126451;">the publication constitution</a> for required formats. This handbook is the shared editorial north star, not a replacement for those contracts.</p>
+  </section>
+
+  <footer style="margin-top:42px;padding-top:22px;border-top:2px solid #b9cdc2;font-size:14px;">
+    <p><strong>The final question:</strong> Did we help a person understand something worth understanding, and give them honest agency over it?</p>
+    <p>If not, the answer is not to render more. The answer is to make the work better.</p>
+    <p><a href="index.html" style="color:#126451;">RAPP Vision</a> · <a href="https://github.com/kody-w/rapp-vision" style="color:#126451;">Public repository</a> · Original RAPP Vision creator guidance. Canonical content is this HTML document; compatibility links and summaries must point back here.</p>
+  </footer>
+</article>
+</main>
+</body>
+</html>
