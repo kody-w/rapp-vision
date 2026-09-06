@@ -157,14 +157,16 @@ class TestConsumerDiscovery(unittest.TestCase):
         home = source_block("function viewHome(", "/* ---------------------------------------------------------------- *")
         self.assertRegex(
             header,
-            r'<a class="navbtn" href="agent\.json"[^>]*>Create with an agent</a>',
+            r'<a class="navbtn" href="creator-handbook\.html"[^>]*>Creator handbook</a>',
         )
         self.assertIn('${q || tag ? "" : `<section class="hero">', home)
         self.assertRegex(
             home,
-            r'<a class="tbtn mode-switch" href="agent\.json">'
-            r"Create with an agent</a>",
+            r'<a class="tbtn mode-switch" href="creator-handbook\.html">'
+            r"Read the creator handbook</a>",
         )
+        self.assertRegex(home, r'<a class="tbtn" href="agent\.json">Create with an agent</a>')
+        self.assertLess(home.index('href="creator-handbook.html"'), home.index('href="agent.json"'))
         self.assertLess(home.index('href="agent.json"'), home.index("Under the hood"))
         self.assertIn('id="nav-ch">RAPP Hive</button>', header)
         self.assertIn(
