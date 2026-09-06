@@ -7,7 +7,7 @@ Human and autonomous creators use that same source for culture, audience
 grounding, creative quality, good/bad examples, and release decisions.
 
 RAPP/1 HTML particle:
-`decfa638d60cdd5454d411052adca2726db653742010e2f2c5405459938b3557`
+`715fb5ee0ca68c264f0f0c963bae22cfa11b451466fd50028eb9376b9e23f219`
 
 The byte and canonicalization record is
 [`creator-handbook.manifest.json`](creator-handbook.manifest.json).
