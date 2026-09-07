@@ -70,20 +70,21 @@
       "segments": [
         {
           "start": 0,
-          "end": 105.34400000000001
+          "end": 201.003
         }
       ],
-      "duration_s": 105.4,
+      "duration_s": 201.003,
       "mp4": {
-        "path": "media/frame-chains-ten-frame-loop.mp4",
-        "bytes": 40705459,
-        "sha256": "7ba54725407c038cde2d59823c411439148446b21e793c9316277f7dbd188b40"
+        "path": "media/frame-chains-ten-frame-loop-context-v2.mp4",
+        "bytes": 32580461,
+        "sha256": "97e4be295b5ded68ec1f1bd77dee25fb5e6dded7f5342494799e13e003df9dcc"
       },
       "webm": {
-        "path": "media/frame-chains-ten-frame-loop.webm",
-        "bytes": 14308521,
-        "sha256": "d480c9da4d413d836c2f76f6e5e011b08d12da132ec1972a8f43c29b069753c3"
-      }
+        "path": "media/frame-chains-ten-frame-loop-context-v2.webm",
+        "bytes": 20838081,
+        "sha256": "83f8bf55c89c257f582eb48af935adc044bc6dd7b632047f2f54bf0aaaca86d8"
+      },
+      "context_revision": "../context/ten-worlds-v2.json"
     },
     {
       "id": "many-worlds-mission-control",

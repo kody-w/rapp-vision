@@ -13,15 +13,19 @@
     {
       "label": "Live showcase",
       "url": "https://kody-w.github.io/frame-chains/showcase/"
+    },
+    {
+      "label": "Flagship English captions",
+      "url": "https://kody-w.github.io/rapp-vision/frame-chains/captions/frame-chains-ten-frame-loop-context-v2.vtt"
     }
   ],
   "videos": [
     {
       "id": "frame-chains-ten-frame-loop",
       "title": "Ten Impossible Worlds, One Verifiable History",
-      "description": "Start with the narrated film: it explains what each proof means and which visible outcome matters. Then switch to Try live replay to operate all ten current public programs yourself. Both modes use synthetic public state; no desktop capture or private source material is included.",
+      "description": "Context revision: begin with a document-history analogy, learn what state, frames, chains, fingerprints and verifiers mean, then watch the preserved original film. The ten fictional worlds demonstrate allowed changes, explicit refusals and preserved accepted state. The live replay introduces each model before demonstrating its controls.",
       "published": "2026-08-31",
-      "duration": 105.4,
+      "duration": 201.003,
       "width": 1920,
       "height": 1080,
       "orientation": "landscape",
@@ -31,75 +35,146 @@
         "encoded-video",
         "live-replay",
         "public-showcase",
-        "synthetic"
+        "synthetic",
+        "newcomer-orientation",
+        "context-revision"
       ],
       "thumb": "thumbs/frame-chains-ten-frame-loop.svg",
       "sources": [
         {
-          "src": "media/frame-chains-ten-frame-loop.mp4",
+          "src": "media/frame-chains-ten-frame-loop-context-v2.mp4",
           "type": "video/mp4"
         },
         {
-          "src": "media/frame-chains-ten-frame-loop.webm",
+          "src": "media/frame-chains-ten-frame-loop-context-v2.webm",
           "type": "video/webm"
         }
       ],
       "live": {
         "kind": "rapp-vision-live/1.0",
-        "duration": 576,
+        "duration": 752,
         "chapters": [
           {
             "t": 0,
-            "label": "Live replay, not captured footage"
+            "label": "What changed - and can we trust it?"
           },
           {
-            "t": 8,
+            "t": 28,
+            "label": "A frame is a data record"
+          },
+          {
+            "t": 55,
+            "label": "Watch the rule, not just the world"
+          },
+          {
+            "t": 86,
+            "label": "Ten frames. Ten live programs."
+          },
+          {
+            "t": 94,
             "label": "01 · Many Worlds Mission Control"
           },
           {
-            "t": 64,
+            "t": 159,
             "label": "02 · AI Soul Passport"
           },
           {
-            "t": 120,
+            "t": 224,
             "label": "03 · Mars Colony"
           },
           {
-            "t": 176,
+            "t": 289,
             "label": "04 · Five Realities"
           },
           {
-            "t": 232,
+            "t": 354,
             "label": "05 · Causal Detective"
           },
           {
-            "t": 288,
+            "t": 419,
             "label": "06 · Space Station"
           },
           {
-            "t": 344,
+            "t": 484,
             "label": "07 · Constitution"
           },
           {
-            "t": 400,
+            "t": 549,
             "label": "08 · Teleporting Roguelike"
           },
           {
-            "t": 456,
+            "t": 614,
             "label": "09 · Attack the Timeline"
           },
           {
-            "t": 512,
+            "t": 679,
             "label": "10 · Futures Museum"
           },
           {
-            "t": 568,
-            "label": "Take the wheel"
+            "t": 744,
+            "label": "The pixels were never recorded."
           }
         ],
         "scenes": [
           {
-            "t": 0,
+            "dur": 28,
+            "app": "apps/topic-intro.html?chapter=0",
+            "ready": {
+              "selector": "html[data-ready=\"true\"]"
+            },
+            "lower": {
+              "title": "What changed - and can we trust it?",
+              "fix": "Hear the explanation or read the cards."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#hear"
+              }
+            ],
+            "t": 0
+          },
+          {
+            "dur": 27,
+            "app": "apps/topic-intro.html?chapter=1",
+            "ready": {
+              "selector": "html[data-ready=\"true\"]"
+            },
+            "lower": {
+              "title": "A frame is a data record",
+              "fix": "Hear the explanation or read the cards."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#hear"
+              }
+            ],
+            "t": 28
+          },
+          {
+            "dur": 31,
+            "app": "apps/topic-intro.html?chapter=2",
+            "ready": {
+              "selector": "html[data-ready=\"true\"]"
+            },
+            "lower": {
+              "title": "Watch the rule, not just the world",
+              "fix": "Hear the explanation or read the cards."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#hear"
+              }
+            ],
+            "t": 55
+          },
+          {
+            "t": 86,
             "dur": 8,
             "card": {
               "title": "Ten frames. Ten live programs.",
@@ -108,7 +183,16 @@
             }
           },
           {
-            "t": 8,
+            "dur": 9,
+            "card": {
+              "title": "Alternative histories",
+              "sub": "Mission control models separate possible branches.",
+              "note": "Watch a valid branch, then a wrong parent reference being refused."
+            },
+            "t": 94
+          },
+          {
+            "t": 103,
             "dur": 56,
             "app": "../../frame-chains/showcase/01-many-worlds/index.html",
             "ready": {
@@ -132,7 +216,16 @@
             ]
           },
           {
-            "t": 64,
+            "dur": 9,
+            "card": {
+              "title": "Software identity",
+              "sub": "The passport models recorded continuity across devices, not a human passport or consciousness.",
+              "note": "Watch a counterfeit fail without replacing the accepted record."
+            },
+            "t": 159
+          },
+          {
+            "t": 168,
             "dur": 56,
             "app": "../../frame-chains/showcase/02-soul-passport/index.html",
             "ready": {
@@ -161,7 +254,16 @@
             ]
           },
           {
-            "t": 120,
+            "dur": 9,
+            "card": {
+              "title": "Allowed repairs",
+              "sub": "The fictional colony has rules about which systems may be changed.",
+              "note": "A correct fingerprint cannot make an unauthorized repair acceptable."
+            },
+            "t": 224
+          },
+          {
+            "t": 233,
             "dur": 56,
             "app": "../../frame-chains/showcase/03-mars-colony/index.html",
             "ready": {
@@ -215,7 +317,16 @@
             ]
           },
           {
-            "t": 176,
+            "dur": 9,
+            "card": {
+              "title": "Different views, one history",
+              "sub": "Five interfaces read the same source.",
+              "note": "Find the inconsistent view without changing the underlying history."
+            },
+            "t": 289
+          },
+          {
+            "t": 298,
             "dur": 56,
             "app": "../../frame-chains/showcase/04-five-realities/index.html",
             "ready": {
@@ -239,7 +350,16 @@
             ]
           },
           {
-            "t": 232,
+            "dur": 9,
+            "card": {
+              "title": "Evidence and causes",
+              "sub": "A believable clue is not enough to support every theory.",
+              "note": "Watch the model distinguish matching data from supported causal claims."
+            },
+            "t": 354
+          },
+          {
+            "t": 363,
             "dur": 56,
             "app": "../../frame-chains/showcase/05-causal-detective/index.html",
             "ready": {
@@ -293,7 +413,16 @@
             ]
           },
           {
-            "t": 288,
+            "dur": 9,
+            "card": {
+              "title": "Preserved disagreement",
+              "sub": "Different agents can report conflicting state.",
+              "note": "Look for both versions being retained rather than silently overwritten."
+            },
+            "t": 419
+          },
+          {
+            "t": 428,
             "dur": 56,
             "app": "../../frame-chains/showcase/06-space-station/index.html",
             "ready": {
@@ -312,7 +441,16 @@
             ]
           },
           {
-            "t": 344,
+            "dur": 9,
+            "card": {
+              "title": "Rules have history",
+              "sub": "A rule can be replaced by a later rule.",
+              "note": "Watch a decision based on a superseded rule being refused."
+            },
+            "t": 484
+          },
+          {
+            "t": 493,
             "dur": 56,
             "app": "../../frame-chains/showcase/07-constitution/index.html",
             "ready": {
@@ -336,7 +474,16 @@
             ]
           },
           {
-            "t": 400,
+            "dur": 9,
+            "card": {
+              "title": "Move the state, not a recording",
+              "sub": "The game demonstrates moving verifiable data between devices.",
+              "note": "Check inventory and provenance, not just whether the screen looks right."
+            },
+            "t": 549
+          },
+          {
+            "t": 558,
             "dur": 56,
             "app": "../../frame-chains/showcase/08-teleporting-roguelike/index.html",
             "ready": {
@@ -365,7 +512,16 @@
             ]
           },
           {
-            "t": 456,
+            "dur": 9,
+            "card": {
+              "title": "Test the boundaries",
+              "sub": "This is a laboratory for deliberately bad changes.",
+              "note": "Expect specific refusal reasons and a replayable record."
+            },
+            "t": 614
+          },
+          {
+            "t": 623,
             "dur": 56,
             "app": "../../frame-chains/showcase/09-attack-timeline/index.html",
             "ready": {
@@ -394,7 +550,16 @@
             ]
           },
           {
-            "t": 512,
+            "dur": 9,
+            "card": {
+              "title": "Illustrated possible futures",
+              "sub": "The museum gives different branches a visual form.",
+              "note": "Watch a corrupted branch being isolated instead of erasing valid history."
+            },
+            "t": 679
+          },
+          {
+            "t": 688,
             "dur": 56,
             "app": "../../frame-chains/showcase/10-futures-museum/index.html",
             "ready": {
@@ -418,7 +583,7 @@
             ]
           },
           {
-            "t": 568,
+            "t": 744,
             "dur": 8,
             "card": {
               "title": "The pixels were never recorded.",
@@ -430,44 +595,24 @@
       },
       "chapters": [
         {
-          "t": 0,
-          "label": "Why film and replay travel together"
+          "t": 0.0,
+          "label": "What changed - and can we trust it?"
         },
         {
-          "t": 10.731,
-          "label": "Identity carries its history"
+          "t": 25.438,
+          "label": "A frame is a data record"
         },
         {
-          "t": 21.974,
-          "label": "Correct hash, wrong repair"
+          "t": 50.216,
+          "label": "Watch the rule, not just the world"
         },
         {
-          "t": 32.619,
-          "label": "Five realities, one source"
+          "t": 78.43,
+          "label": "The original ten-world tour"
         },
         {
-          "t": 42.219,
-          "label": "Cryptography is not causality"
-        },
-        {
-          "t": 52.971,
-          "label": "Preserve the disagreement"
-        },
-        {
-          "t": 63.083,
-          "label": "Law that executes"
-        },
-        {
-          "t": 72.576,
-          "label": "State, not pixels"
-        },
-        {
-          "t": 83.797,
-          "label": "Attack every boundary"
-        },
-        {
-          "t": 94.976,
-          "label": "Film plus proof"
+          "t": 183.83,
+          "label": "An inspectable history"
         }
       ]
     },

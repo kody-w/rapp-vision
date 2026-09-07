@@ -1,0 +1,55 @@
+{
+  "schema": "rapp-vision-topic-intro/1",
+  "chapters": [
+    {
+      "id": "why-history",
+      "title": "What changed - and can we trust it?",
+      "copy": [
+        "Familiar anchor: a shared notebook with numbered history",
+        "State: the information a program currently holds",
+        "Frame Chains: linked, checkable records of changing software state",
+        "Why it matters: a convincing screen alone cannot establish an allowed change"
+      ],
+      "narration": "When a shared notebook changes, numbered history helps you see what happened without erasing earlier pages. Software needs something similar. State is the information a program currently holds. Frame Chains organizes that changing state as records that can be checked, linked, and replayed. A convincing screen is not enough: we need to know which change was allowed and which accepted state can still be trusted.",
+      "audio": {
+        "src": "audio/intro-01.wav",
+        "duration_ms": 24405,
+        "sha256": "1ca59f13c05150914c2d7750b88e87e2faaac9979ac0c428e9dd1215073f1d53"
+      }
+    },
+    {
+      "id": "record-not-picture",
+      "title": "A frame is a data record",
+      "copy": [
+        "Frame: one data record, not a movie picture",
+        "Chain: an ordered history linked to earlier records",
+        "Hash: a data fingerprint, not proof that a story is true",
+        "Verifier: checks data and rules",
+        "Accepted head: latest record that passed"
+      ],
+      "narration": "A frame is one recorded event or state description, not a picture in a movie. A chain links those records into a checkable history. A hash is a fingerprint computed from data: it can reveal changed bytes, but cannot by itself prove a story or a cause. A verifier checks the recorded data and rules. The accepted head is the latest record that passed those checks.",
+      "audio": {
+        "src": "audio/intro-02.wav",
+        "duration_ms": 23744,
+        "sha256": "2c03bb6d70e01d99dfd4600e7ad92ab15e03416c671ce5f23315698ca25b8460"
+      }
+    },
+    {
+      "id": "watch-the-boundary",
+      "title": "Watch the rule, not just the world",
+      "copy": [
+        "Proof models: fictional programs testing specific rules",
+        "Branch: a separate continuation of history",
+        "Projection: another view of the same history",
+        "Live replay: a running app you can pause and operate",
+        "Watch for: accept, refuse, preserve"
+      ],
+      "narration": "These ten worlds are proof models: deliberately simplified programs that test specific rules, not real colonies or conscious digital people. A branch is a separate continuation of history. A projection or lens is a different interface onto the same history. A live replay is a running application you can pause and operate. Watch a valid change succeed, a bad change get refused, and the accepted state remain intact.",
+      "audio": {
+        "src": "audio/intro-03.wav",
+        "duration_ms": 27179,
+        "sha256": "2a058e963536e03536cfdbef64f3f2762ad0b756563ee7ae3071318b8b640069"
+      }
+    }
+  ]
+}
