@@ -1,0 +1,703 @@
+{
+  "schema": "rapp-vision.context-revision/1",
+  "id": "frame-chains-ten-worlds-context-v2",
+  "kind": "context-repair",
+  "publication": "frame-chains-ten-frame-loop",
+  "source_revision": "1f105c1e0aeeb6ca8ec724be3f2426e37212df82",
+  "reason": "Introduce the topic and prerequisites before the preserved technical tour.",
+  "is_new_episode": false,
+  "ancestor": {
+    "publication": {
+      "id": "frame-chains-ten-frame-loop",
+      "title": "Ten Impossible Worlds, One Verifiable History",
+      "description": "Start with the narrated film: it explains what each proof means and which visible outcome matters. Then switch to Try live replay to operate all ten current public programs yourself. Both modes use synthetic public state; no desktop capture or private source material is included.",
+      "published": "2026-08-31",
+      "duration": 105.4,
+      "width": 1920,
+      "height": 1080,
+      "orientation": "landscape",
+      "tags": [
+        "frame-chains",
+        "paired-publication",
+        "encoded-video",
+        "live-replay",
+        "public-showcase",
+        "synthetic"
+      ],
+      "thumb": "thumbs/frame-chains-ten-frame-loop.svg",
+      "sources": [
+        {
+          "src": "media/frame-chains-ten-frame-loop.mp4",
+          "type": "video/mp4"
+        },
+        {
+          "src": "media/frame-chains-ten-frame-loop.webm",
+          "type": "video/webm"
+        }
+      ],
+      "live": {
+        "kind": "rapp-vision-live/1.0",
+        "duration": 576,
+        "chapters": [
+          {
+            "t": 0,
+            "label": "Live replay, not captured footage"
+          },
+          {
+            "t": 8,
+            "label": "01 · Many Worlds Mission Control"
+          },
+          {
+            "t": 64,
+            "label": "02 · AI Soul Passport"
+          },
+          {
+            "t": 120,
+            "label": "03 · Mars Colony"
+          },
+          {
+            "t": 176,
+            "label": "04 · Five Realities"
+          },
+          {
+            "t": 232,
+            "label": "05 · Causal Detective"
+          },
+          {
+            "t": 288,
+            "label": "06 · Space Station"
+          },
+          {
+            "t": 344,
+            "label": "07 · Constitution"
+          },
+          {
+            "t": 400,
+            "label": "08 · Teleporting Roguelike"
+          },
+          {
+            "t": 456,
+            "label": "09 · Attack the Timeline"
+          },
+          {
+            "t": 512,
+            "label": "10 · Futures Museum"
+          },
+          {
+            "t": 568,
+            "label": "Take the wheel"
+          }
+        ],
+        "scenes": [
+          {
+            "t": 0,
+            "dur": 8,
+            "card": {
+              "title": "Ten frames. Ten live programs.",
+              "sub": "A replay script, not captured footage",
+              "note": "Each scene opens a public GitHub Pages app and addresses controls by selector."
+            }
+          },
+          {
+            "t": 8,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/01-many-worlds/index.html",
+            "ready": {
+              "selector": "#guided-btn"
+            },
+            "lower": {
+              "title": "01 · Many Worlds Mission Control",
+              "fix": "Run the guided branch, then challenge its parent hash."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#guided-btn"
+              },
+              {
+                "at": 32,
+                "do": "click",
+                "selector": "#mutate-btn"
+              }
+            ]
+          },
+          {
+            "t": 64,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/02-soul-passport/index.html",
+            "ready": {
+              "selector": "#guided-button"
+            },
+            "lower": {
+              "title": "02 · AI Soul Passport",
+              "fix": "Migrate a synthetic identity, then reject a counterfeit."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#guided-button"
+              },
+              {
+                "at": 32,
+                "do": "click",
+                "selector": "#forge-button"
+              },
+              {
+                "at": 38,
+                "do": "click",
+                "selector": "#verify-button"
+              }
+            ]
+          },
+          {
+            "t": 120,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/03-mars-colony/index.html",
+            "ready": {
+              "selector": "#nextButton"
+            },
+            "lower": {
+              "title": "03 · Mars Colony",
+              "fix": "Advance the public synthetic colony tour one verified step at a time."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#nextButton"
+              },
+              {
+                "at": 6.5,
+                "do": "click",
+                "selector": "#nextButton"
+              },
+              {
+                "at": 12.5,
+                "do": "click",
+                "selector": "#nextButton"
+              },
+              {
+                "at": 18.5,
+                "do": "click",
+                "selector": "#nextButton"
+              },
+              {
+                "at": 24.5,
+                "do": "click",
+                "selector": "#nextButton"
+              },
+              {
+                "at": 30.5,
+                "do": "click",
+                "selector": "#nextButton"
+              },
+              {
+                "at": 36.5,
+                "do": "click",
+                "selector": "#nextButton"
+              },
+              {
+                "at": 42.5,
+                "do": "click",
+                "selector": "#nextButton"
+              }
+            ]
+          },
+          {
+            "t": 176,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/04-five-realities/index.html",
+            "ready": {
+              "selector": "#guideBtn"
+            },
+            "lower": {
+              "title": "04 · Five Realities",
+              "fix": "Follow the guide, then expose a conflicting mutation."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#guideBtn"
+              },
+              {
+                "at": 32,
+                "do": "click",
+                "selector": "#mutationBtn"
+              }
+            ]
+          },
+          {
+            "t": 232,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/05-causal-detective/index.html",
+            "ready": {
+              "selector": "#guidedBtn"
+            },
+            "lower": {
+              "title": "05 · Causal Detective",
+              "fix": "Trace the chain, then test whether altered evidence survives."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#guidedBtn"
+              },
+              {
+                "at": 5,
+                "do": "click",
+                "selector": ".cite-btn[data-id=\"E02\"]"
+              },
+              {
+                "at": 10,
+                "do": "click",
+                "selector": ".cite-btn[data-id=\"E03\"]"
+              },
+              {
+                "at": 15,
+                "do": "click",
+                "selector": ".cite-btn[data-id=\"E04\"]"
+              },
+              {
+                "at": 20,
+                "do": "click",
+                "selector": ".cite-btn[data-id=\"E06\"]"
+              },
+              {
+                "at": 25,
+                "do": "click",
+                "selector": ".cite-btn[data-id=\"E07\"]"
+              },
+              {
+                "at": 32,
+                "do": "click",
+                "selector": "#accuseBtn"
+              },
+              {
+                "at": 44,
+                "do": "click",
+                "selector": "#mutateBtn"
+              }
+            ]
+          },
+          {
+            "t": 288,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/06-space-station/index.html",
+            "ready": {
+              "selector": "#guided"
+            },
+            "lower": {
+              "title": "06 · Space Station",
+              "fix": "Run the visible guided station proof; no hidden controls are scripted."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#guided"
+              }
+            ]
+          },
+          {
+            "t": 344,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/07-constitution/index.html",
+            "ready": {
+              "selector": "#guidedBtn"
+            },
+            "lower": {
+              "title": "07 · Constitution",
+              "fix": "Replay the rules, then show the tyrant branch being challenged."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#guidedBtn"
+              },
+              {
+                "at": 32,
+                "do": "click",
+                "selector": "#tyrantBtn"
+              }
+            ]
+          },
+          {
+            "t": 400,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/08-teleporting-roguelike/index.html",
+            "ready": {
+              "selector": "#runDemo"
+            },
+            "lower": {
+              "title": "08 · Teleporting Roguelike",
+              "fix": "Complete the proof, then reject forged inventory and provenance."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#runDemo"
+              },
+              {
+                "at": 30,
+                "do": "click",
+                "selector": "#forgeItem"
+              },
+              {
+                "at": 40,
+                "do": "click",
+                "selector": "#forgeParent"
+              }
+            ]
+          },
+          {
+            "t": 456,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/09-attack-timeline/index.html",
+            "ready": {
+              "selector": "#controlBtn"
+            },
+            "lower": {
+              "title": "09 · Attack the Timeline",
+              "fix": "Establish control, attack every branch, then replay the evidence."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#controlBtn"
+              },
+              {
+                "at": 20,
+                "do": "click",
+                "selector": "#attackAllBtn"
+              },
+              {
+                "at": 40,
+                "do": "click",
+                "selector": "#replayBtn"
+              }
+            ]
+          },
+          {
+            "t": 512,
+            "dur": 56,
+            "app": "../../frame-chains/showcase/10-futures-museum/index.html",
+            "ready": {
+              "selector": "#playBtn"
+            },
+            "lower": {
+              "title": "10 · Futures Museum",
+              "fix": "Play the exhibit, then compare its mutated future."
+            },
+            "actions": [
+              {
+                "at": 0.5,
+                "do": "click",
+                "selector": "#playBtn"
+              },
+              {
+                "at": 32,
+                "do": "click",
+                "selector": "#mutateBtn"
+              }
+            ]
+          },
+          {
+            "t": 568,
+            "dur": 8,
+            "card": {
+              "title": "The pixels were never recorded.",
+              "sub": "The public programs just ran",
+              "note": "Pause any app scene to inspect the live synthetic state yourself."
+            }
+          }
+        ]
+      },
+      "chapters": [
+        {
+          "t": 0,
+          "label": "Why film and replay travel together"
+        },
+        {
+          "t": 10.731,
+          "label": "Identity carries its history"
+        },
+        {
+          "t": 21.974,
+          "label": "Correct hash, wrong repair"
+        },
+        {
+          "t": 32.619,
+          "label": "Five realities, one source"
+        },
+        {
+          "t": 42.219,
+          "label": "Cryptography is not causality"
+        },
+        {
+          "t": 52.971,
+          "label": "Preserve the disagreement"
+        },
+        {
+          "t": 63.083,
+          "label": "Law that executes"
+        },
+        {
+          "t": 72.576,
+          "label": "State, not pixels"
+        },
+        {
+          "t": 83.797,
+          "label": "Attack every boundary"
+        },
+        {
+          "t": 94.976,
+          "label": "Film plus proof"
+        }
+      ]
+    },
+    "delivery": {
+      "id": "frame-chains-ten-frame-loop",
+      "title": "Ten Impossible Worlds, One Verifiable History",
+      "segments": [
+        {
+          "start": 0,
+          "end": 105.34400000000001
+        }
+      ],
+      "duration_s": 105.4,
+      "mp4": {
+        "path": "media/frame-chains-ten-frame-loop.mp4",
+        "bytes": 40705459,
+        "sha256": "7ba54725407c038cde2d59823c411439148446b21e793c9316277f7dbd188b40"
+      },
+      "webm": {
+        "path": "media/frame-chains-ten-frame-loop.webm",
+        "bytes": 14308521,
+        "sha256": "d480c9da4d413d836c2f76f6e5e011b08d12da132ec1972a8f43c29b069753c3"
+      }
+    },
+    "original_files_preserved": true
+  },
+  "opening": [
+    {
+      "id": "why-history",
+      "kind": "orientation",
+      "headline": "What changed - and can we trust it?",
+      "narration": "When a shared notebook changes, numbered history helps you see what happened without erasing earlier pages. Software needs something similar. State is the information a program currently holds. Frame Chains organizes that changing state as records that can be checked, linked, and replayed. A convincing screen is not enough: we need to know which change was allowed and which accepted state can still be trusted.",
+      "on_screen_text": [
+        "Familiar anchor: a shared notebook with numbered history",
+        "State: the information a program currently holds",
+        "Frame Chains: linked, checkable records of changing software state",
+        "Why it matters: a convincing screen alone cannot establish an allowed change"
+      ],
+      "claim_ids": [
+        "fc-state",
+        "fc-acceptance"
+      ],
+      "visual": "familiar-version-history"
+    },
+    {
+      "id": "record-not-picture",
+      "kind": "orientation",
+      "headline": "A frame is a data record",
+      "narration": "A frame is one recorded event or state description, not a picture in a movie. A chain links those records into a checkable history. A hash is a fingerprint computed from data: it can reveal changed bytes, but cannot by itself prove a story or a cause. A verifier checks the recorded data and rules. The accepted head is the latest record that passed those checks.",
+      "on_screen_text": [
+        "Frame: one data record, not a movie picture",
+        "Chain: an ordered history linked to earlier records",
+        "Hash: a data fingerprint, not proof that a story is true",
+        "Verifier: checks data and rules",
+        "Accepted head: latest record that passed"
+      ],
+      "claim_ids": [
+        "fc-state",
+        "fc-frame",
+        "fc-chain",
+        "fc-fingerprint",
+        "fc-acceptance"
+      ],
+      "visual": "record-chain-and-fingerprint"
+    },
+    {
+      "id": "watch-the-boundary",
+      "kind": "orientation",
+      "headline": "Watch the rule, not just the world",
+      "narration": "These ten worlds are proof models: deliberately simplified programs that test specific rules, not real colonies or conscious digital people. A branch is a separate continuation of history. A projection or lens is a different interface onto the same history. A live replay is a running application you can pause and operate. Watch a valid change succeed, a bad change get refused, and the accepted state remain intact.",
+      "on_screen_text": [
+        "Proof models: fictional programs testing specific rules",
+        "Branch: a separate continuation of history",
+        "Projection: another view of the same history",
+        "Live replay: a running app you can pause and operate",
+        "Watch for: accept, refuse, preserve"
+      ],
+      "claim_ids": [
+        "fc-state",
+        "fc-models",
+        "fc-acceptance",
+        "fc-branches",
+        "fc-projections",
+        "fc-live"
+      ],
+      "visual": "accept-refuse-preserve"
+    }
+  ],
+  "closing": {
+    "id": "bring-it-back",
+    "kind": "recap",
+    "headline": "An inspectable history",
+    "narration": "The common idea is not Mars or a passport. It is an inspectable history of software state. Check what the model accepted, why it refused a bad change, and what remained unchanged. Now try one live example and test that rule yourself.",
+    "on_screen_text": [
+      "What changed?",
+      "Why was a bad change refused?",
+      "What accepted state stayed intact?"
+    ],
+    "claim_ids": [
+      "fc-state",
+      "fc-acceptance",
+      "fc-live"
+    ],
+    "visual": "three-questions"
+  },
+  "live_context": {
+    "opening_cards": [
+      {
+        "duration_ms": 15000,
+        "title": "What is Frame Chains?",
+        "sub": "Like a document's version history, linked records make software changes inspectable.",
+        "note": "State is stored information. A frame records it. A chain links records - not movie pictures."
+      },
+      {
+        "duration_ms": 15000,
+        "title": "A fingerprint is not the whole truth",
+        "sub": "A hash helps detect changed data. A verifier also checks the rules a candidate must satisfy.",
+        "note": "The accepted head means the latest record that passed the checks."
+      },
+      {
+        "duration_ms": 12000,
+        "title": "These worlds are teaching models",
+        "sub": "Watch a valid action, an explicit refusal, and the accepted state remaining intact.",
+        "note": "Pause any app to try its controls. The fictional setting is not the claim."
+      }
+    ],
+    "before_apps": [
+      {
+        "title": "Alternative histories",
+        "sub": "Mission control models separate possible branches.",
+        "note": "Watch a valid branch, then a wrong parent reference being refused."
+      },
+      {
+        "title": "Software identity",
+        "sub": "The passport models recorded continuity across devices, not a human passport or consciousness.",
+        "note": "Watch a counterfeit fail without replacing the accepted record."
+      },
+      {
+        "title": "Allowed repairs",
+        "sub": "The fictional colony has rules about which systems may be changed.",
+        "note": "A correct fingerprint cannot make an unauthorized repair acceptable."
+      },
+      {
+        "title": "Different views, one history",
+        "sub": "Five interfaces read the same source.",
+        "note": "Find the inconsistent view without changing the underlying history."
+      },
+      {
+        "title": "Evidence and causes",
+        "sub": "A believable clue is not enough to support every theory.",
+        "note": "Watch the model distinguish matching data from supported causal claims."
+      },
+      {
+        "title": "Preserved disagreement",
+        "sub": "Different agents can report conflicting state.",
+        "note": "Look for both versions being retained rather than silently overwritten."
+      },
+      {
+        "title": "Rules have history",
+        "sub": "A rule can be replaced by a later rule.",
+        "note": "Watch a decision based on a superseded rule being refused."
+      },
+      {
+        "title": "Move the state, not a recording",
+        "sub": "The game demonstrates moving verifiable data between devices.",
+        "note": "Check inventory and provenance, not just whether the screen looks right."
+      },
+      {
+        "title": "Test the boundaries",
+        "sub": "This is a laboratory for deliberately bad changes.",
+        "note": "Expect specific refusal reasons and a replayable record."
+      },
+      {
+        "title": "Illustrated possible futures",
+        "sub": "The museum gives different branches a visual form.",
+        "note": "Watch a corrupted branch being isolated instead of erasing valid history."
+      }
+    ],
+    "per_app_context_ms": 9000
+  },
+  "intro_data": "intro-v2.json",
+  "intro_audio": [
+    {
+      "path": "context/audio/intro-01.wav",
+      "sha256": "1ca59f13c05150914c2d7750b88e87e2faaac9979ac0c428e9dd1215073f1d53",
+      "duration_ms": 24405
+    },
+    {
+      "path": "context/audio/intro-02.wav",
+      "sha256": "2c03bb6d70e01d99dfd4600e7ad92ab15e03416c671ce5f23315698ca25b8460",
+      "duration_ms": 23744
+    },
+    {
+      "path": "context/audio/intro-03.wav",
+      "sha256": "2a058e963536e03536cfdbef64f3f2762ad0b756563ee7ae3071318b8b640069",
+      "duration_ms": 27179
+    }
+  ],
+  "captions": {
+    "path": "captions/frame-chains-ten-frame-loop-context-v2.vtt",
+    "sha256": "ca412e6669e22a9051280759c18120f0502f78bf8e9a4ebb297dc842f5810d26"
+  },
+  "delivery_audio": {
+    "delivery_audio_prepared_without_replacing_source_files": true,
+    "maximum_true_peak_dbtp": -1,
+    "mp4": {
+      "integrated_lufs": -16.56,
+      "range_lu": 3.3,
+      "true_peak_dbtp": -1.76
+    },
+    "new_narration_prepared_for_stereo_playback": true,
+    "original_source_containers_retained": true,
+    "schema": "vision-loaf-delivery-audio/1",
+    "shared_prepared_assets_for_preview_and_render": true,
+    "target_lufs": -16,
+    "unsupported_browser_limiter_used": false,
+    "webm": {
+      "integrated_lufs": -16.52,
+      "range_lu": 3.3,
+      "true_peak_dbtp": -2.0
+    }
+  },
+  "source_bindings": [
+    "https://raw.githubusercontent.com/kody-w/frame-chains/c2600c440fd870eb1c053de22706ee5dd28ce743/README.md",
+    "https://raw.githubusercontent.com/kody-w/rapp-1/eb50008011447f5e69372ac22a1755f0978d15ed/SPEC.md",
+    "https://raw.githubusercontent.com/kody-w/rapp-vision/1f105c1e0aeeb6ca8ec724be3f2426e37212df82/videos/frame-chains-paired-films/SCRIPT.md"
+  ],
+  "media": {
+    "mp4": {
+      "path": "media/frame-chains-ten-frame-loop-context-v2.mp4",
+      "sha256": "97e4be295b5ded68ec1f1bd77dee25fb5e6dded7f5342494799e13e003df9dcc",
+      "bytes": 32580461,
+      "duration_ms": 201003
+    },
+    "webm": {
+      "path": "media/frame-chains-ten-frame-loop-context-v2.webm",
+      "sha256": "83f8bf55c89c257f582eb48af935adc044bc6dd7b632047f2f54bf0aaaca86d8",
+      "bytes": 20838081,
+      "duration_ms": 201010
+    }
+  }
+}

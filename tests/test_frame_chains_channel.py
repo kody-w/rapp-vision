@@ -68,7 +68,10 @@ def load_json(path):
 
 
 def app_scenes(video):
-    return [scene for scene in video["live"]["scenes"] if "app" in scene]
+    return [
+        scene for scene in video["live"]["scenes"]
+        if scene.get("app", "").startswith("../../frame-chains/showcase/")
+    ]
 
 
 class ElementIndex(HTMLParser):
@@ -247,7 +250,7 @@ class TestFrameChainsChannel(unittest.TestCase):
                         (1920, 1080),
                     )
 
-    def test_all_app_paths_resolve_to_public_showcase_pages(self):
+    def test_all_showcase_paths_resolve_to_public_showcase_pages(self):
         for video in self.videos.values():
             for scene in app_scenes(video):
                 relative = scene["app"]
@@ -270,7 +273,11 @@ class TestFrameChainsChannel(unittest.TestCase):
         loop = self.videos["frame-chains-ten-frame-loop"]
         slugs = [PurePosixPath(scene["app"]).parts[-2] for scene in app_scenes(loop)]
         self.assertEqual(slugs, list(APP_SELECTORS))
-        self.assertIn("card", loop["live"]["scenes"][0])
+        self.assertEqual(
+            [scene.get("app") for scene in loop["live"]["scenes"][:3]],
+            [f"apps/topic-intro.html?chapter={index}" for index in range(3)],
+        )
+        self.assertIn("card", loop["live"]["scenes"][3])
         self.assertIn("card", loop["live"]["scenes"][-1])
         mars_actions = app_scenes(loop)[2]["actions"]
         self.assertEqual(
