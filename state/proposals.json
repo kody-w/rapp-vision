@@ -1,10 +1,33 @@
 {
-  "advisories": [],
+  "advisories": [
+    {
+      "detail": "No thumb or poster; the card renders an empty frame.",
+      "kind": "missing_thumb",
+      "subject": "creature-office-hours/creature-office-hours"
+    },
+    {
+      "detail": "No thumb or poster; the card renders an empty frame.",
+      "kind": "missing_thumb",
+      "subject": "kitchen-table-physics/push-friction-motion"
+    },
+    {
+      "detail": "No thumb or poster; the card renders an empty frame.",
+      "kind": "missing_thumb",
+      "subject": "signal-garden/signal-garden-pulse-lag"
+    },
+    {
+      "detail": "No thumb or poster; the card renders an empty frame.",
+      "kind": "missing_thumb",
+      "subject": "tiny-bureau/tiny-bureau-five-fixture-gap"
+    }
+  ],
   "coverage": {
-    "channels_in_registry": 15,
-    "channels_loaded": 15,
+    "channels_in_registry": 28,
+    "channels_loaded": 28,
     "channels_unreachable": [],
-    "queue_channels_not_loaded": [],
+    "queue_channels_not_loaded": [
+      "rappterbox"
+    ],
     "signals_available": true
   },
   "generated_by": {
@@ -14,6 +37,153 @@
   },
   "note": "A QUEUE, NOT A PUBLICATION. Nothing here is on the network. A human — or an explicit promotion step — turns a proposal into an episode by editing a channel.json. The content machine cannot write a channel.json: its only write path refuses any destination outside state/.",
   "proposals": [
+    {
+      "channel": "after-midnight-maps",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "The waypoint moves. The proof rules remain."
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "c93e427b7088",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Quiet coordinate essays for places that never existed.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: The waypoint moves. The proof rules remain..",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] After Midnight Maps has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "after-midnight-maps"
+    },
+    {
+      "channel": "arcade",
+      "evidence": {
+        "entries": 3,
+        "newest_published": "2026-08-01",
+        "stale_after_days": 45
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "5ef22e9feae1",
+      "kind": "channel_stale",
+      "proposal": {
+        "angle": "Games and emulators, booted and played live. Hit pause and you are holding the controller. The channel's own most recent entry is the obvious starting point.",
+        "format": "unset",
+        "outline": [
+          "Open on the thing that changed since the last entry.",
+          "Show it running, not described.",
+          "Close on the measurement that proves it."
+        ],
+        "title": "[gap] Arcade has published nothing since 2026-08-01",
+        "why_now": "Nothing published for more than 45 days."
+      },
+      "status": "proposed",
+      "subject": "arcade"
+    },
+    {
+      "channel": "catchup",
+      "evidence": {
+        "entries": 3,
+        "newest_published": "2026-08-01",
+        "stale_after_days": 45
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "a62ace352a1e",
+      "kind": "channel_stale",
+      "proposal": {
+        "angle": "Pick up the thread this channel was already pulling on. The channel's own most recent entry is the obvious starting point.",
+        "format": "unset",
+        "outline": [
+          "Open on the thing that changed since the last entry.",
+          "Show it running, not described.",
+          "Close on the measurement that proves it."
+        ],
+        "title": "[gap] Catch-up has published nothing since 2026-08-01",
+        "why_now": "Nothing published for more than 45 days."
+      },
+      "status": "proposed",
+      "subject": "catchup"
+    },
+    {
+      "channel": "creature-office-hours",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "The Mossbell Glider Family Tree"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "684960c68d3c",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "A channel needs a second and third entry before it reads as a channel.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: The Mossbell Glider Family Tree.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Creature Office Hours has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "creature-office-hours"
+    },
+    {
+      "channel": "field-notes",
+      "evidence": {
+        "entries": 2,
+        "newest_published": "2026-08-04",
+        "stale_after_days": 45
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "6c9082a356e9",
+      "kind": "channel_stale",
+      "proposal": {
+        "angle": "Post-mortems from autonomous systems that looked perfectly healthy while being completely frozen. The channel's own most recent entry is the obvious starting point.",
+        "format": "unset",
+        "outline": [
+          "Open on the thing that changed since the last entry.",
+          "Show it running, not described.",
+          "Close on the measurement that proves it."
+        ],
+        "title": "[gap] Field Notes has published nothing since 2026-08-04",
+        "why_now": "Nothing published for more than 45 days."
+      },
+      "status": "proposed",
+      "subject": "field-notes"
+    },
     {
       "channel": "field-notes",
       "evidence": {
@@ -79,6 +249,35 @@
       "channel": "fieldguide",
       "evidence": {
         "entries": 1,
+        "newest_published": "2026-08-04",
+        "stale_after_days": 45
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "2378c212d433",
+      "kind": "channel_stale",
+      "proposal": {
+        "angle": "One app nobody has covered yet, walked through for someone who arrived five minutes ago. The channel's own most recent entry is the obvious starting point.",
+        "format": "unset",
+        "outline": [
+          "Open on the thing that changed since the last entry.",
+          "Show it running, not described.",
+          "Close on the measurement that proves it."
+        ],
+        "title": "[gap] Field Guide has published nothing since 2026-08-04",
+        "why_now": "Nothing published for more than 45 days."
+      },
+      "status": "proposed",
+      "subject": "fieldguide"
+    },
+    {
+      "channel": "fieldguide",
+      "evidence": {
+        "entries": 1,
         "thin_below": 3,
         "titles": [
           "Field Guide 2026-08-04 - The Alpine Summit · Above The Clouds"
@@ -104,6 +303,273 @@
       },
       "status": "proposed",
       "subject": "fieldguide"
+    },
+    {
+      "channel": "inside-immunity",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "T Cells: Recognize, Respond, Remember"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "817faf52b3a4",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Illustrated biology you can watch, question, and try.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: T Cells: Recognize, Respond, Remember.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Inside Immunity has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "inside-immunity"
+    },
+    {
+      "channel": "kitchen-table-physics",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "Push, Friction, Motion"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "dd529ad3c082",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "A channel needs a second and third entry before it reads as a channel.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: Push, Friction, Motion.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Kitchen Table Physics has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "kitchen-table-physics"
+    },
+    {
+      "channel": "learnwithkody",
+      "evidence": {
+        "entries": 4,
+        "newest_published": "2026-08-03",
+        "stale_after_days": 45
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "a51b7cafd30c",
+      "kind": "channel_stale",
+      "proposal": {
+        "angle": "Pick up the thread this channel was already pulling on. The channel's own most recent entry is the obvious starting point.",
+        "format": "unset",
+        "outline": [
+          "Open on the thing that changed since the last entry.",
+          "Show it running, not described.",
+          "Close on the measurement that proves it."
+        ],
+        "title": "[gap] Learn with Kody has published nothing since 2026-08-03",
+        "why_now": "Nothing published for more than 45 days."
+      },
+      "status": "proposed",
+      "subject": "learnwithkody"
+    },
+    {
+      "channel": "localfirsttools",
+      "evidence": {
+        "entries": 3,
+        "newest_published": "2026-08-01",
+        "stale_after_days": 45
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "15c33456e19b",
+      "kind": "channel_stale",
+      "proposal": {
+        "angle": "2885+ single-file, offline-first web tools. Build logs, demos, and things that run entirely in your browser. The channel's own most recent entry is the obvious starting point.",
+        "format": "unset",
+        "outline": [
+          "Open on the thing that changed since the last entry.",
+          "Show it running, not described.",
+          "Close on the measurement that proves it."
+        ],
+        "title": "[gap] Local First Tools has published nothing since 2026-08-01",
+        "why_now": "Nothing published for more than 45 days."
+      },
+      "status": "proposed",
+      "subject": "localfirsttools"
+    },
+    {
+      "channel": "new-way-of-work",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "Scout Builds an AI Worker That Connects to the Outside World"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "62e3b81dc743",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Production drafts for building, testing, and launching practical AI workers.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: Scout Builds an AI Worker That Connects to the Outside World.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] The New Way of Work has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "new-way-of-work"
+    },
+    {
+      "channel": "null-arcade",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "Trust the Timer"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "feec06566305",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Beat time. Keep trust.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: Trust the Timer.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Null Arcade has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "null-arcade"
+    },
+    {
+      "channel": "one-minute-orchestra",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "Proof in Four Voices"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "83235b7fa977",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "A channel needs a second and third entry before it reads as a channel.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: Proof in Four Voices.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] One Minute Orchestra has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "one-minute-orchestra"
+    },
+    {
+      "channel": "openrappter-training",
+      "evidence": {
+        "entries": 8,
+        "newest_published": "2026-08-02",
+        "stale_after_days": 45
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "057647b2a9f0",
+      "kind": "channel_stale",
+      "proposal": {
+        "angle": "Run the command. Read what it actually printed. Eight modules built only from things that were run. The channel's own most recent entry is the obvious starting point.",
+        "format": "unset",
+        "outline": [
+          "Open on the thing that changed since the last entry.",
+          "Show it running, not described.",
+          "Close on the measurement that proves it."
+        ],
+        "title": "[gap] OpenRappter Training has published nothing since 2026-08-02",
+        "why_now": "Nothing published for more than 45 days."
+      },
+      "status": "proposed",
+      "subject": "openrappter-training"
+    },
+    {
+      "channel": "patch-notes-tomorrow",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "Civic OS 12: The Queue Weather Patch"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "a56b3ae1e118",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Deadpan bulletins from futures that did not happen.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: Civic OS 12: The Queue Weather Patch.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Patch Notes from Tomorrow has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "patch-notes-tomorrow"
     },
     {
       "channel": "prompt-frontier",
@@ -167,6 +633,213 @@
       "subject": "rappterbox"
     },
     {
+      "channel": "receipt-culture",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "One Receipt, End to End"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "f5f11cdc4ad6",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Design criticism for objects that can show their work.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: One Receipt, End to End.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Receipt Culture has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "receipt-culture"
+    },
+    {
+      "channel": "repair-manual",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "The Machine Knows the Fit"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "73f2cf359570",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "Fictional machines that explain their own exact-fit diagnosis.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: The Machine Knows the Fit.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] The Repair Manual has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "repair-manual"
+    },
+    {
+      "channel": "rock-tumbler",
+      "evidence": {
+        "entries": 3,
+        "newest_published": "2026-08-01",
+        "stale_after_days": 45
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "c35bef336261",
+      "kind": "channel_stale",
+      "proposal": {
+        "angle": "An agent's report of success is not evidence of success. The channel's own most recent entry is the obvious starting point.",
+        "format": "unset",
+        "outline": [
+          "Open on the thing that changed since the last entry.",
+          "Show it running, not described.",
+          "Close on the measurement that proves it."
+        ],
+        "title": "[gap] Rock Tumbler has published nothing since 2026-08-01",
+        "why_now": "Nothing published for more than 45 days."
+      },
+      "status": "proposed",
+      "subject": "rock-tumbler"
+    },
+    {
+      "channel": "rooms",
+      "evidence": {
+        "entries": 3,
+        "newest_published": "2026-08-01",
+        "stale_after_days": 45
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "a523ea9e86e6",
+      "kind": "channel_stale",
+      "proposal": {
+        "angle": "Places that do not exist, running live. Every entry here ships zero video. The channel's own most recent entry is the obvious starting point.",
+        "format": "unset",
+        "outline": [
+          "Open on the thing that changed since the last entry.",
+          "Show it running, not described.",
+          "Close on the measurement that proves it."
+        ],
+        "title": "[gap] Rooms has published nothing since 2026-08-01",
+        "why_now": "Nothing published for more than 45 days."
+      },
+      "status": "proposed",
+      "subject": "rooms"
+    },
+    {
+      "channel": "signal-garden",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "When a Heartbeat Wilts"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "4ec192d1e794",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "A channel needs a second and third entry before it reads as a channel.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: When a Heartbeat Wilts.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Signal Garden has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "signal-garden"
+    },
+    {
+      "channel": "tiny-bureau",
+      "evidence": {
+        "entries": 1,
+        "thin_below": 3,
+        "titles": [
+          "The Five-Fixture Gap"
+        ]
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "fce53c83bb82",
+      "kind": "channel_thin",
+      "proposal": {
+        "angle": "A channel needs a second and third entry before it reads as a channel.",
+        "format": "unset",
+        "outline": [
+          "Choose a subject adjacent to: The Five-Fixture Gap.",
+          "Keep the same shape as the existing entries so the channel reads as one thing."
+        ],
+        "title": "[gap] Tiny Bureau has only 1 entry",
+        "why_now": "Below the 3-entry floor."
+      },
+      "status": "proposed",
+      "subject": "tiny-bureau"
+    },
+    {
+      "channel": "tumbler",
+      "evidence": {
+        "entries": 1,
+        "newest_published": "2026-08-04",
+        "stale_after_days": 45
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "9e9fc8233ea2",
+      "kind": "channel_stale",
+      "proposal": {
+        "angle": "A daily tumble report on the RAPP Vision network. Every claim is a number, or it is not published. The channel's own most recent entry is the obvious starting point.",
+        "format": "unset",
+        "outline": [
+          "Open on the thing that changed since the last entry.",
+          "Show it running, not described.",
+          "Close on the measurement that proves it."
+        ],
+        "title": "[gap] The Tumbler has published nothing since 2026-08-04",
+        "why_now": "Nothing published for more than 45 days."
+      },
+      "status": "proposed",
+      "subject": "tumbler"
+    },
+    {
       "channel": "tumbler",
       "evidence": {
         "entries": 1,
@@ -195,6 +868,35 @@
       },
       "status": "proposed",
       "subject": "tumbler"
+    },
+    {
+      "channel": "workbench",
+      "evidence": {
+        "entries": 3,
+        "newest_published": "2026-08-01",
+        "stale_after_days": 45
+      },
+      "gap_closed": false,
+      "generated_by": {
+        "adapter": "dryrun-structural/1.0.0",
+        "judgment": false,
+        "kind": "structural"
+      },
+      "id": "4d15f22e62a2",
+      "kind": "channel_stale",
+      "proposal": {
+        "angle": "Production tools as single HTML files — a DAW, a vector editor, a spreadsheet. Take over mid-demo. The channel's own most recent entry is the obvious starting point.",
+        "format": "unset",
+        "outline": [
+          "Open on the thing that changed since the last entry.",
+          "Show it running, not described.",
+          "Close on the measurement that proves it."
+        ],
+        "title": "[gap] The Workbench has published nothing since 2026-08-01",
+        "why_now": "Nothing published for more than 45 days."
+      },
+      "status": "proposed",
+      "subject": "workbench"
     }
   ],
   "schema": "rapp-vision-proposals/1.0",
@@ -205,8 +907,8 @@
     "thin_min": 3
   },
   "totals": {
-    "advisories": 0,
-    "open": 4,
-    "proposals": 6
+    "advisories": 4,
+    "open": 27,
+    "proposals": 29
   }
 }
