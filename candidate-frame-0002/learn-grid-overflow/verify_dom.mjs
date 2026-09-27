@@ -264,16 +264,19 @@ async function assertDisplayed(snapshot) {
 
 try {
   const { port } = await waitForActivePort();
-  let targets = await readJson(`http://127.0.0.1:${port}/json/list`);
-  let pageTarget = targets.find(target => target.type === "page");
-  if (!pageTarget?.webSocketDebuggerUrl) {
-    try {
-      await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, { method: "PUT" });
-      targets = await readJson(`http://127.0.0.1:${port}/json/list`);
-      pageTarget = targets.find(target => target.type === "page");
-    } catch (error) {
-      void error;
+  let pageTarget = null;
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const targets = await readJson(`http://127.0.0.1:${port}/json/list`);
+    pageTarget = targets.find(target => target.type === "page" && target.webSocketDebuggerUrl && target.webSocketDebuggerUrl);
+    if (pageTarget?.webSocketDebuggerUrl) break;
+    if (attempt === 0) {
+      try {
+        await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, { method: "PUT" });
+      } catch (error) {
+        void error;
+      }
     }
+    if (attempt < 4) await delay(75);
   }
   assert.ok(pageTarget?.webSocketDebuggerUrl, "browser exposed no page target");
   cdp = new Cdp(pageTarget.webSocketDebuggerUrl);

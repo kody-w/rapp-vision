@@ -2479,9 +2479,9 @@
       "sha256": "b4de0ff85e147d57239181374ba5f68dd8ef636004b324fbc37841754c95acb7"
     },
     {
-      "bytes": 24939,
+      "bytes": 25368,
       "path": "render_live.mjs",
-      "sha256": "c242da39daa11e1350a8dd697e0fe7c34ff6b9eb16c0bfe808a57d4cf92ad71a"
+      "sha256": "c1be7390e436ded951aab5996746b0f13a3f9ad4b194e9c69785fb8cec983336"
     },
     {
       "bytes": 23317,
@@ -2494,9 +2494,9 @@
       "sha256": "03a7dc5b3b7cec1c58c0f5802e97a3a8b10ae5399c531aa2ae63463f74dbc51e"
     },
     {
-      "bytes": 98544,
+      "bytes": 98595,
       "path": "verify_dom.mjs",
-      "sha256": "6edb95e5902601f5606ad04717bc9dec01dd6a1fdeed95acfc016db1c689f6ae"
+      "sha256": "4d71b1036f7046bd5c19dc36cd14d36417e1cf66e19bf768799e2a3ba987ddb6"
     }
   ]
 }
