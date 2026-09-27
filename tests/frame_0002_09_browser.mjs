@@ -104,7 +104,9 @@ async function waitForDevTools(child, port, timeout = 45_000) {
         const version = await response.json();
         if (version.webSocketDebuggerUrl) return version.webSocketDebuggerUrl;
       }
-    } catch {}
+    } catch (error) {
+      void error;
+    }
     await new Promise(resolveDelay => setTimeout(resolveDelay, 75));
   }
   throw new Error("timed out waiting for explicit browser DevTools port");

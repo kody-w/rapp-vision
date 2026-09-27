@@ -28,7 +28,7 @@
     "evidence.json": {
       "bytes": 239922,
       "path": "evidence.json",
-      "sha256": "099576ef0f5e8da21357c2690e36b2f0f99a38d80e8c01f3ef2021376f28b00e"
+      "sha256": "f21bdb60fe0765e1de2b8b45098ab203db5a0fbee5f9cc7f8e70999de7150d23"
     },
     "exports/fixture-series.json": {
       "bytes": 549903,
@@ -66,14 +66,14 @@
       "sha256": "ebfe8688e3793da7704683e9ec435a5eaf5de8ee68d3d56216cfb224002e4180"
     },
     "verify_dom.mjs": {
-      "bytes": 44988,
+      "bytes": 45299,
       "path": "verify_dom.mjs",
-      "sha256": "a4e3fd8de436e718dc02f1d0567bd634dbe99ae578b5f33405d522a4b16271b8"
+      "sha256": "d6135184bcbfd3ac30fb4ec277631cfe5f87d4c43ffcc1dd9806bd6df3831c40"
     }
   },
   "bindings": {
     "compiledChannelSha256": "5778dd5e11ae124943c69d87e563799a61ea14b44383abd090d1d4f447feeed1",
-    "evidenceSha256": "099576ef0f5e8da21357c2690e36b2f0f99a38d80e8c01f3ef2021376f28b00e",
+    "evidenceSha256": "f21bdb60fe0765e1de2b8b45098ab203db5a0fbee5f9cc7f8e70999de7150d23",
     "fixtureSeriesSha256": "74a9c039b9748edd010b2260795644eb7fcafc7f747f8671f84be14be15639c9",
     "productionSha256": "8a2aec96b832fc50c1493f564669c99f90582782654638d6d866910695f214a3"
   },

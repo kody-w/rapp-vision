@@ -404,7 +404,9 @@ async function activePort(timeout = 45_000) {
         `http://127.0.0.1:${debugPort}/json/version`,
       );
       if (response.ok) return String(debugPort);
-    } catch {}
+    } catch (error) {
+      void error;
+    }
     await delay(75);
   }
   throw new Error("browser did not publish DevToolsActivePort");
@@ -422,7 +424,9 @@ async function readJson(url, timeout = 15_000) {
     try {
       const response = await fetch(url);
       if (response.ok) return await response.json();
-    } catch {}
+    } catch (error) {
+      void error;
+    }
     await delay(75);
   }
   throw new Error(`timed out waiting for ${url}`);
@@ -507,7 +511,9 @@ async function waitFor(expression, timeout = 20_000) {
   while (Date.now() < deadline) {
     try {
       if (await evaluate(expression)) return;
-    } catch {}
+    } catch (error) {
+      void error;
+    }
     await delay(75);
   }
   throw new Error(`timed out waiting for browser condition: ${expression}`);
@@ -1404,8 +1410,17 @@ let report = null;
 let cleanup = null;
 try {
   const port = await activePort();
-  const targets = await readJson(`http://127.0.0.1:${port}/json/list`);
-  const page = targets.find((target) => target.type === "page");
+  let targets = await readJson(`http://127.0.0.1:${port}/json/list`);
+  let page = targets.find((target) => target.type === "page");
+  if (!page?.webSocketDebuggerUrl) {
+    try {
+      await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, { method: "PUT" });
+      targets = await readJson(`http://127.0.0.1:${port}/json/list`);
+      page = targets.find((target) => target.type === "page");
+    } catch (error) {
+      void error;
+    }
+  }
   assert.ok(page?.webSocketDebuggerUrl, "browser exposed no page target");
   cdp = new Cdp(page.webSocketDebuggerUrl);
   await cdp.connect();

@@ -5,7 +5,7 @@
       "commission_id": "learn-grid-overflow",
       "delivery": {
         "path": "../candidate-frame-0002/learn-grid-overflow/delivery.json",
-        "sha256": "9c2e4b157685f7cfd1804b16ede6dcf8009310a22b2a489f876d835022cbd411"
+        "sha256": "a3337f0e102d5a25acffe24086f57b17b4719549ca7bd2d8b568a03f09968a9c"
       },
       "evidence": {
         "path": "../candidate-frame-0002/learn-grid-overflow/evidence.json",
@@ -23,7 +23,7 @@
       "commission_id": "use-keyboard-invoice-triage",
       "delivery": {
         "path": "../candidate-frame-0002/use-keyboard-invoice-triage/delivery.json",
-        "sha256": "c7c16c69ed63024daaaf7bf24b846222f84d873aa51ac99109d0589967bbe015"
+        "sha256": "66c18047bf952342ebef5a09e2fe9a58ad991308b0620c0698e904ba1702d928"
       },
       "evidence": {
         "path": "../candidate-frame-0002/use-keyboard-invoice-triage/evidence.json",
@@ -59,11 +59,11 @@
       "commission_id": "explore-ecosystem-threshold",
       "delivery": {
         "path": "../candidate-frame-0003/ecosystem-island-threshold/delivery.json",
-        "sha256": "7c4db9133cfcf7e5e82f6afd87d0e632e4ffa49781fe162f9de820c63a11c214"
+        "sha256": "1fd5e3bdd78cabae44290ece3657c7d631b0e12e8f03753475dd4b615f515298"
       },
       "evidence": {
         "path": "../candidate-frame-0003/ecosystem-island-threshold/evidence.json",
-        "sha256": "099576ef0f5e8da21357c2690e36b2f0f99a38d80e8c01f3ef2021376f28b00e"
+        "sha256": "f21bdb60fe0765e1de2b8b45098ab203db5a0fbee5f9cc7f8e70999de7150d23"
       },
       "publication_id": "ecosystem-island-threshold",
       "source_candidate": "../candidate-frame-0003/ecosystem-island-threshold",
@@ -77,7 +77,7 @@
       "commission_id": "explore-archive-map-contrast",
       "delivery": {
         "path": "../candidate-frame-0003/archive-wetland-contrast/delivery.json",
-        "sha256": "518107878e762a9253e83ef327a730c6086ec1636cd969f0478eee6f2b541f8b"
+        "sha256": "ce4e28daff93aa4d9c55ec430c860069bc4bd5e613b3b7bb6b4d7b65df4bd6ac"
       },
       "evidence": {
         "path": "../candidate-frame-0003/archive-wetland-contrast/evidence.json",
@@ -95,11 +95,11 @@
       "commission_id": "play-seeded-maze-return",
       "delivery": {
         "path": "../candidate-frame-0004/maze-fogline/delivery.json",
-        "sha256": "30cdd6fd3b367825da50e164cd12c1bc7346a7fa11f18e5d7294241bd0d27347"
+        "sha256": "bde7d10b85bac729f0436367ac821d886adea2c8c16fcdcc146f8a6eba02a197"
       },
       "evidence": {
         "path": "../candidate-frame-0004/maze-fogline/evidence.json",
-        "sha256": "09b0bef17f52b210fb71beb75720e0cb508d941d7e5c6cc7bb05baf5ed504bb9"
+        "sha256": "1384a926f768ecda1232752cdf3d08766a066aacc2fdd6aae4e7a57be6cebb05"
       },
       "publication_id": "maze-fogline",
       "source_candidate": "../candidate-frame-0004/maze-fogline",
