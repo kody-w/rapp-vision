@@ -342,7 +342,9 @@ async function browserEndpoint(timeout = 45_000) {
         const version = await response.json();
         if (version.webSocketDebuggerUrl) return version.webSocketDebuggerUrl;
       }
-    } catch {}
+    } catch (error) {
+      void error;
+    }
     await delay(75);
   }
   throw new Error("timed out waiting for browser DevTools");
@@ -424,7 +426,9 @@ async function waitFor(expression, timeout = 20_000) {
   while (Date.now() < deadline) {
     try {
       if (await evaluate(expression)) return;
-    } catch {}
+    } catch (error) {
+      void error;
+    }
     await delay(60);
   }
   throw new Error(`timed out waiting for: ${expression}`);
@@ -1376,7 +1380,9 @@ try {
 } finally {
   try {
     if (client) await client.send("Browser.close");
-  } catch {}
+  } catch (error) {
+      void error;
+    }
   client?.close();
   const deadline = Date.now() + 10_000;
   while (browser.exitCode === null && Date.now() < deadline) await delay(50);

@@ -174,9 +174,9 @@
       "sha256": "55755d1df8f25d92e95b7e8b36e448aa469ceddb57517547242240469d523f65"
     },
     {
-      "bytes": 47356,
+      "bytes": 47667,
       "path": "verify_dom.mjs",
-      "sha256": "e3d40be113410d1dbbfc6acb7d6c5a36fd03a5450b7d01d453e2165210389d0e"
+      "sha256": "335e29816eff3de8fb257453bc62f72b1a98335ef75f6fbef39ef47252694ad6"
     }
   ]
 }
