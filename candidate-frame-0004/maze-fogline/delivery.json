@@ -268,7 +268,7 @@
     {
       "bytes": 51738,
       "path": "evidence.json",
-      "sha256": "09b0bef17f52b210fb71beb75720e0cb508d941d7e5c6cc7bb05baf5ed504bb9"
+      "sha256": "1384a926f768ecda1232752cdf3d08766a066aacc2fdd6aae4e7a57be6cebb05"
     },
     {
       "bytes": 99451,
@@ -296,9 +296,9 @@
       "sha256": "03a7dc5b3b7cec1c58c0f5802e97a3a8b10ae5399c531aa2ae63463f74dbc51e"
     },
     {
-      "bytes": 98168,
+      "bytes": 98544,
       "path": "verify_dom.mjs",
-      "sha256": "85fb790715538f150ce4f962847be74904ba4f15ce1113b3e14bb907ed52b49a"
+      "sha256": "6edb95e5902601f5606ad04717bc9dec01dd6a1fdeed95acfc016db1c689f6ae"
     }
   ]
 }
