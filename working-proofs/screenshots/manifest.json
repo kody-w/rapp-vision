@@ -2259,144 +2259,144 @@
   "channel": "working-proofs",
   "schema": "working-proofs-viewport-evidence/1.1",
   "sourceBindings": {
-    "aggregate": {
-      "channel": {
-        "bytes": 50663,
-        "path": "working-proofs/channel.json",
-        "sha256": "b484a8d2cea15ea5134d2a1c4a1f9d93a145f344a41300d97f2d14e977243f76"
-      },
-      "evidenceIndex": {
-        "bytes": 5088,
-        "path": "working-proofs/evidence-index.json",
-        "sha256": "668359ca3bbe88a4580e9d9696a392f2874498c24f8ba9d227e19a638432e7a4"
-      }
-    },
     "algorithm": "sha256",
     "pathBase": "repository-root",
     "player": {
-      "bytes": 123884,
       "path": "index.html",
+      "bytes": 123884,
       "sha256": "f497d6a46b431220c61fe848bdafa2d7f6c9740e4ec8817e13fc82a09ec16aca"
+    },
+    "aggregate": {
+      "channel": {
+        "path": "working-proofs/channel.json",
+        "bytes": 50663,
+        "sha256": "b484a8d2cea15ea5134d2a1c4a1f9d93a145f344a41300d97f2d14e977243f76"
+      },
+      "evidenceIndex": {
+        "path": "working-proofs/evidence-index.json",
+        "bytes": 5088,
+        "sha256": "2ae0615940168d6ac58c6eec313dba579f4095732d3a62888588f93005bd0c57"
+      }
     },
     "publications": [
       {
+        "publication": "learn-grid-overflow",
         "apps": [
           {
-            "bytes": 32189,
             "path": "candidate-frame-0002/learn-grid-overflow/apps/learn-grid-overflow.html",
+            "bytes": 32189,
             "sha256": "858e223fdc0adba54f7e54b890fb2e9ad346b4851d6cf6e0f189474c9137a82f"
           }
         ],
-        "evidence": {
-          "bytes": 12138,
-          "path": "candidate-frame-0002/learn-grid-overflow/evidence.json",
-          "sha256": "500b6674104c2b359ba77e85197d83657e602893d9628ffedf4498dbf0c7dae4"
-        },
-        "publication": "learn-grid-overflow",
         "sourceChannel": {
-          "bytes": 6886,
           "path": "candidate-frame-0002/learn-grid-overflow/channel.json",
+          "bytes": 6886,
           "sha256": "410582bd2d6088ffa70aabceb4f8a2fcdd02f2015333725cdd43d30ab116b8c9"
+        },
+        "evidence": {
+          "path": "candidate-frame-0002/learn-grid-overflow/evidence.json",
+          "bytes": 12138,
+          "sha256": "500b6674104c2b359ba77e85197d83657e602893d9628ffedf4498dbf0c7dae4"
         }
       },
       {
+        "publication": "use-keyboard-invoice-triage",
         "apps": [
           {
-            "bytes": 47082,
             "path": "candidate-frame-0002/use-keyboard-invoice-triage/apps/use-keyboard-invoice-triage.html",
+            "bytes": 47082,
             "sha256": "28209ac77188e48a22545252a7db8403d2070ce1750c3b06d138c066831d6bf2"
           }
         ],
-        "evidence": {
-          "bytes": 9123,
-          "path": "candidate-frame-0002/use-keyboard-invoice-triage/evidence.json",
-          "sha256": "e97712e3cbb0d9a4da22de7eaee27a18dd5d4f3fbe3f33a8da3af62a22e7145f"
-        },
-        "publication": "use-keyboard-invoice-triage",
         "sourceChannel": {
-          "bytes": 8079,
           "path": "candidate-frame-0002/use-keyboard-invoice-triage/channel.json",
+          "bytes": 8079,
           "sha256": "9b2d6aa9b42279874614d486615fb3ecd097909c8836b734f072db0eda95481b"
+        },
+        "evidence": {
+          "path": "candidate-frame-0002/use-keyboard-invoice-triage/evidence.json",
+          "bytes": 9123,
+          "sha256": "e97712e3cbb0d9a4da22de7eaee27a18dd5d4f3fbe3f33a8da3af62a22e7145f"
         }
       },
       {
+        "publication": "create-vector-icon-system",
         "apps": [
           {
-            "bytes": 45128,
             "path": "candidate-frame-0002/create-vector-icon-system/apps/create-vector-icon-system.html",
+            "bytes": 45128,
             "sha256": "fbe8b11a4294ef8fa557e1b87192f846cacf95b65358bcc8acb23f78c5dd9569"
           }
         ],
-        "evidence": {
-          "bytes": 23254,
-          "path": "candidate-frame-0002/create-vector-icon-system/evidence.json",
-          "sha256": "6becaa4f9c5595b4081d8d479e6b610ac0c88e78091452e2b9289950ff7c0da2"
-        },
-        "publication": "create-vector-icon-system",
         "sourceChannel": {
-          "bytes": 6297,
           "path": "candidate-frame-0002/create-vector-icon-system/channel.json",
+          "bytes": 6297,
           "sha256": "966c85f43ce482e98e2abd1bce64a3d3c80d59f646b4d1413bcea8b3d4329f5e"
+        },
+        "evidence": {
+          "path": "candidate-frame-0002/create-vector-icon-system/evidence.json",
+          "bytes": 23254,
+          "sha256": "6becaa4f9c5595b4081d8d479e6b610ac0c88e78091452e2b9289950ff7c0da2"
         }
       },
       {
+        "publication": "ecosystem-island-threshold",
         "apps": [
           {
-            "bytes": 49307,
             "path": "candidate-frame-0003/ecosystem-island-threshold/apps/ecosystem-island-threshold.html",
+            "bytes": 49307,
             "sha256": "5f17f11e50df5792f54b4d53768c476b7e5f971ed46daac1546479a500a07cd0"
           }
         ],
-        "evidence": {
-          "bytes": 239922,
-          "path": "candidate-frame-0003/ecosystem-island-threshold/evidence.json",
-          "sha256": "f21bdb60fe0765e1de2b8b45098ab203db5a0fbee5f9cc7f8e70999de7150d23"
-        },
-        "publication": "ecosystem-island-threshold",
         "sourceChannel": {
-          "bytes": 7788,
           "path": "candidate-frame-0003/ecosystem-island-threshold/channel.json",
+          "bytes": 7788,
           "sha256": "5778dd5e11ae124943c69d87e563799a61ea14b44383abd090d1d4f447feeed1"
+        },
+        "evidence": {
+          "path": "candidate-frame-0003/ecosystem-island-threshold/evidence.json",
+          "bytes": 239922,
+          "sha256": "8face9f333d6140a4ba950a439041aec72fc75992b01a4f0c1ba6435c949937c"
         }
       },
       {
+        "publication": "explore-archive-map-contrast",
         "apps": [
           {
-            "bytes": 56461,
             "path": "candidate-frame-0003/archive-wetland-contrast/apps/explore-archive-map-contrast.html",
+            "bytes": 56461,
             "sha256": "5a8e5215b7ae47c4d52a70a266e422aa33886c75f7e85c12c09d58c2dbf33426"
           }
         ],
-        "evidence": {
-          "bytes": 16909,
-          "path": "candidate-frame-0003/archive-wetland-contrast/evidence.json",
-          "sha256": "cb44b128b019522985d9dfc854ab90185fbc95e0b4da38f09f9ca47c113a10da"
-        },
-        "publication": "explore-archive-map-contrast",
         "sourceChannel": {
-          "bytes": 7916,
           "path": "candidate-frame-0003/archive-wetland-contrast/channel.json",
+          "bytes": 7916,
           "sha256": "d9549fbf05dc18f2211cc8623e5ffb9ba079ca720702ce3b98713989ceca0d8b"
+        },
+        "evidence": {
+          "path": "candidate-frame-0003/archive-wetland-contrast/evidence.json",
+          "bytes": 16909,
+          "sha256": "cb44b128b019522985d9dfc854ab90185fbc95e0b4da38f09f9ca47c113a10da"
         }
       },
       {
+        "publication": "maze-fogline",
         "apps": [
           {
-            "bytes": 65498,
             "path": "candidate-frame-0004/maze-fogline/apps/maze-fogline.html",
+            "bytes": 65498,
             "sha256": "ee10db849dd0891f70b9a593de6b37e02b4e204112df5eca3607f564cd64348d"
           }
         ],
-        "evidence": {
-          "bytes": 51738,
-          "path": "candidate-frame-0004/maze-fogline/evidence.json",
-          "sha256": "1384a926f768ecda1232752cdf3d08766a066aacc2fdd6aae4e7a57be6cebb05"
-        },
-        "publication": "maze-fogline",
         "sourceChannel": {
-          "bytes": 14647,
           "path": "candidate-frame-0004/maze-fogline/channel.json",
+          "bytes": 14647,
           "sha256": "bcfa513f9b1773a42e686c01c3d9ff322b5c4dd4ead19441acb231b7bc0bf5aa"
+        },
+        "evidence": {
+          "path": "candidate-frame-0004/maze-fogline/evidence.json",
+          "bytes": 51738,
+          "sha256": "cbd83b4c2385987c35084afb70ff0648eb0effa812327b1a00653fc44b42a161"
         }
       }
     ]
